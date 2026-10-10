@@ -22,7 +22,7 @@ export default function RequestPage() {
         </p>
         <ul className="m-0 grid grid-cols-1 gap-2 pl-5">
           <li>Зазвичай студії відповідають за 1–3 робочі дні.</li>
-          <li>Терміни виготовлення партії — переважно {site.prices.batchLeadTime}.</li>
+          <li>Терміни виготовлення партії — переважно {site.lead.batch}.</li>
           <li>{site.model}</li>
           <li id="dlya-studiy">Студія чи майстер? Профіль у каталозі безкоштовний: напишіть через цю ж форму (поле «Що потрібно» — «Інше»), додайте Instagram чи сайт.</li>
         </ul>

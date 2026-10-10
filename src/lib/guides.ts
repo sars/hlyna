@@ -36,8 +36,8 @@ export async function guideCtx(): Promise<GuideCtx> {
     mk: mk.length,
     mkCities: groupByCity(mk).length,
     price,
-    batch: site.prices.batchLeadTime,
-    logo: site.prices.logoLeadTime,
+    batch: site.lead.batch,
+    logo: site.lead.logoDetail,
   }
 }
 

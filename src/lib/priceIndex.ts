@@ -1,6 +1,8 @@
 // Price index 2026 (/tsiny-2026): typical prices per category from the studios' own price lines.
 // One value per studio and category (the median of its matching lines), so a studio with twenty
 // price lines counts once. Ranges are the 10th–90th percentile across studios, rounded.
+import { cache } from 'react'
+
 import { getAllStudios, type StudioCard } from './catalog'
 import { publicPrices, roundNice } from './present'
 import { PRODUCT_RE } from './products'
@@ -110,7 +112,7 @@ export function localPrices(studios: StudioCard[]) {
   })
 }
 
-export async function priceIndex() {
+export const priceIndex = cache(async function priceIndex() {
   const studios = (await getAllStudios()).filter((s) => s.type !== 'supplier')
   const { values, sources, years: found } = studioValues(studios)
   const years = found.sort()
@@ -141,4 +143,4 @@ export async function priceIndex() {
     .map((c) => ({ name: c.name, slug: c.slug, n: c.vals.length, median: roundNice(median(c.vals)), min: roundNice(Math.min(...c.vals)), max: roundNice(Math.max(...c.vals)) }))
     .sort((a, b) => b.n - a.n)
   return { stats, cities, studios: sources.size, years: years.length ? { from: years[0], to: years[years.length - 1] } : null }
-}
+})

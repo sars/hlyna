@@ -6,6 +6,7 @@ import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/compon
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { mainNav } from '@/content/navigation'
+import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { verses } from '@/content/verses'
 import { fmt, getAllStudios, groupByCity, hasFormat, pluralUk, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from '@/lib/catalog'
@@ -21,11 +22,11 @@ export const metadata: Metadata = {
   openGraph: { images: ogImage({ title: 'Кераміка ручної роботи для бізнесу', kicker: 'Для бізнесу', sub: 'Посуд для закладів, чашки з логотипом, подарунки, корпоративи', img: 'restaurant-table' }) },
 }
 
-const faq = [
+const faqFor = (corporate: string) => [
   { q: 'Яка мінімальна партія посуду чи чашок?', a: 'Залежить від студії та виробу: одні беруть і кілька штук, інші працюють з більшими партіями. Умови кожної студії — у її профілі або у відповіді на запит.' },
-  { q: 'Скільки часу займає виготовлення партії?', a: `Зазвичай ${site.prices.batchLeadTime}: формування, сушіння і два випали. Для чашок з логотипом — ${site.prices.logoLeadTime}.` },
+  { q: 'Скільки часу займає виготовлення партії?', a: `Зазвичай ${site.lead.batch}: формування, сушіння і два випали. Для чашок з логотипом — ${site.lead.logoDetail}.` },
   { q: 'Чи можна мити такий посуд у посудомийці?', a: 'Залежить від глини, поливи й температури випалу. Перед партією попросіть у студії зразок і спитайте про харчову поливу без свинцю та посудомийку.' },
-  { q: 'Скільки коштує корпоратив з ліплення з глини?', a: `Зазвичай ${site.prices.corporate}; ціна залежить від кількості людей, формату і місця.` },
+  { q: 'Скільки коштує корпоратив з ліплення з глини?', a: `У прайсах студій — ${corporate}; ціна залежить від кількості людей, формату і місця.` },
   { q: 'Скільки коштує ваш сервіс?', a: site.model },
 ]
 
@@ -39,6 +40,7 @@ const what = (s: StudioCard) =>
     .join(' · ')
 
 export default async function BusinessIndex() {
+  const faq = faqFor((await facts()).range('corporate'))
   const biz = mainNav.find((s) => s.id === 'biz')!
   const all = (await getAllStudios()).filter((s) => worksWithVenues(s) || worksWithCompanies(s))
   const top = [...all].filter((s) => s.type !== 'school').sort((a, b) => bizScore(b) - bizScore(a) || a.name.localeCompare(b.name, 'uk')).slice(0, 8)
@@ -65,7 +67,7 @@ export default async function BusinessIndex() {
           <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Для бізнесу' }]} />
           <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Кераміка ручної роботи для бізнесу</h1>
           <p className="m-0 max-w-[70ch] text-lg">
-            У каталозі — {fmt(all.length)} {pluralUk(all.length, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])} у {fmt(cities)} {pluralUk(cities, ['місті', 'містах', 'містах'])}, які роблять посуд для ресторанів, кав’ярень і готелів, чашки з логотипом і подарунки для команд або проводять корпоративи з ліплення з глини. Партію зазвичай виготовляють {site.prices.batchLeadTime}; корпоратив коштує {site.prices.corporate}. {site.model}
+            У каталозі — {fmt(all.length)} {pluralUk(all.length, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])} у {fmt(cities)} {pluralUk(cities, ['місті', 'містах', 'містах'])}, які роблять посуд для ресторанів, кав’ярень і готелів, чашки з логотипом і подарунки для команд або проводять корпоративи з ліплення з глини. Партію зазвичай виготовляють {site.lead.batch}; корпоратив коштує {(await facts()).range('corporate')}. {site.model}
           </p>
           <Updated />
           <Epigraph lines={verses.business} />

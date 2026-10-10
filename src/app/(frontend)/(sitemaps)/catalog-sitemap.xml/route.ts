@@ -3,7 +3,7 @@ import { getServerSideSitemap } from 'next-sitemap'
 import { guides } from '@/content/guides'
 import { site } from '@/content/site'
 import { topicList } from '@/content/topics'
-import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses } from '@/lib/catalog'
+import { getAllStudios, getCatalog, groupByCity, MIN_LIST, offersMasterClasses } from '@/lib/catalog'
 import { makerCities } from '@/lib/makers'
 import { certificateCities } from '@/lib/topics'
 
@@ -23,6 +23,6 @@ export async function GET() {
     ...(await certificateCities()).map((c) => ({ loc: `${site.url}/sertyfikaty/${c.slug}`, lastmod: now })),
     ...cities.map((g) => ({ loc: `${site.url}/maister-klasy/${g.city.slug}`, lastmod: now })),
     ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: now })),
-    ...studios.map((s) => ({ loc: `${site.url}/vyrobnyky/${s.slug}`, lastmod: s.updatedAt || now })),
+    ...(await getCatalog()).map((s) => ({ loc: `${site.url}/vyrobnyky/${s.slug}`, lastmod: s.updatedAt || now })),
   ])
 }

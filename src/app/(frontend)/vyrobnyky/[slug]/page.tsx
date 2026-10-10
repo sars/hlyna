@@ -11,7 +11,7 @@ import { StudioCard } from '@/components/site/StudioCard'
 import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
-import { getAllStudios, getStudioBySlug, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
+import { getAllStudios, getCatalog, getStudioBySlug, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
 import { cleanName, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
 
 export const revalidate = 86400
@@ -19,7 +19,7 @@ export const dynamicParams = true
 
 export async function generateStaticParams() {
   try {
-    return (await getAllStudios()).map((s) => ({ slug: s.slug as string }))
+    return (await getCatalog()).map((s) => ({ slug: s.slug as string }))
   } catch {
     return []
   }
@@ -123,9 +123,11 @@ export default async function StudioPage({ params }: Args) {
   const city = s.cityDoc
   const typeLabel = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   const exhibiting = isExhibitingOnly(s)
-  const mk = !exhibiting && offersMasterClasses(s)
-  const venues = !exhibiting && worksWithVenues(s)
-  const companies = !exhibiting && worksWithCompanies(s)
+  // Closed, or no confirmed activity after 2022: the profile stays (history, search), but nothing invites a visit.
+  const dormant = Boolean(s.unverified) || s.status === 'closed'
+  const mk = !exhibiting && !dormant && offersMasterClasses(s)
+  const venues = !exhibiting && !dormant && worksWithVenues(s)
+  const companies = !exhibiting && !dormant && worksWithCompanies(s)
   const everyone = await getAllStudios()
   const related = city ? everyone.filter((x) => x.cityDoc?.slug === city.slug && x.slug !== s.slug).slice(0, 6) : []
   // Link the city only when it has its own master-class page (MIN_LIST places).
@@ -160,7 +162,7 @@ export default async function StudioPage({ params }: Args) {
       <JsonLd
         data={{
           '@context': 'https://schema.org',
-          '@type': s.type === 'maker' ? 'Person' : 'LocalBusiness',
+          '@type': s.type === 'maker' ? 'Person' : dormant ? 'Organization' : 'LocalBusiness',
           name,
           description: stripPersonal(s.summary || description),
           url: `${site.url}/vyrobnyky/${s.slug}`,
@@ -252,7 +254,7 @@ export default async function StudioPage({ params }: Args) {
             </section>
           )}
 
-          {(venues || companies || hasB2bData) && (
+          {!dormant && (venues || companies || hasB2bData) && (
             <section aria-labelledby="b2b">
               <SectionHead kicker="Для бізнесу" title="Умови для закладів і компаній" id="b2b" />
               {hasB2bData ? (
@@ -285,7 +287,18 @@ export default async function StudioPage({ params }: Args) {
         </div>
 
         <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
-          {exhibiting ? (
+          {dormant ? (
+            <div className="grid grid-cols-1 gap-2 rounded-[20px] border border-l-[6px] border-line border-l-ochre bg-card p-[18px]">
+              <p className="font-display m-0 text-sm tracking-wide uppercase">{s.status === 'closed' ? 'Не працює' : 'Актуальність не підтверджена'}</p>
+              <p className="m-0 text-[15px]">
+                {s.status === 'closed'
+                  ? 'За нашими даними, студія чи майстерня більше не працює. Профіль лишаємо як довідку.'
+                  : 'Актуальність не підтверджена — уточніть перед візитом. Ми не знайшли свіжих оголошень чи постів після 2022 року.'}{' '}
+                Шукаєте подібне? Надішліть запит — ми підберемо студії, які працюють зараз.
+              </p>
+              <Link href="/zapyt" className="font-bold">Надіслати запит →</Link>
+            </div>
+          ) : exhibiting ? (
             <div className="grid grid-cols-1 gap-2 rounded-[20px] border border-line bg-card p-[18px]">
               <p className="font-display m-0 text-sm tracking-wide uppercase">Де побачити роботи</p>
               <p className="m-0 text-[15px]">

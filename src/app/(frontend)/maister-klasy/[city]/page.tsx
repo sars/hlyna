@@ -6,6 +6,7 @@ import React from 'react'
 import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
+import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
@@ -92,16 +93,17 @@ export default async function CityMasterClassesPage({ params }: Args) {
     .filter(([f]) => count(f))
     .map(([f, label]) => `${label} — ${count(f)}`)
 
+  const f = await facts()
   const faq = [
     {
       q: `Скільки коштує майстер-клас з кераміки ${where}?`,
       a: r
         ? `За прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])} міста разовий майстер-клас найчастіше коштує ${priceText(r)}. Групове заняття дешевше за індивідуальне; випал і полива іноді оплачуються окремо. Курси й абонементи рахуються окремо.`
-        : `Студії міста здебільшого не публікують ціни. По Україні груповий майстер-клас коштує приблизно ${site.prices.groupClass}, індивідуальний — ${site.prices.privateClass}.`,
+        : `Студії міста здебільшого не публікують ціни. По Україні разовий майстер-клас коштує ${f.range('group')}, індивідуальний — ${f.range('private')}.`,
     },
-    { q: 'Коли можна забрати свій виріб?', a: 'Зазвичай через 2–4 тижні: виріб має висохнути і пройти два випали (до і після поливи). Деякі студії надсилають готові вироби Новою поштою.' },
+    { q: 'Коли можна забрати свій виріб?', a: `Зазвичай через ${site.lead.pickup}: виріб має висохнути і пройти два випали (до і після поливи). Деякі студії надсилають готові вироби Новою поштою.` },
     { q: 'Чи можна подарувати майстер-клас?', a: 'Так, більшість студій продають подарункові сертифікати; термін дії найчастіше 3–6 місяців. Умови — у профілі студії.' },
-    { q: 'А для команди?', a: `Корпоратив з ліплення з глини проводять у студії або у вашому офісі; по Україні це ${site.prices.corporate}. Надішліть запит — ми передамо його кільком студіям.` },
+    { q: 'А для команди?', a: `Корпоратив з ліплення з глини проводять у студії або у вашому офісі; по Україні — ${f.range('corporate')}. Надішліть запит — ми передамо його кільком студіям.` },
   ]
 
   return (
@@ -234,7 +236,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           <RequestForm sourcePage={`/maister-klasy/${city.slug}`} defaultWhat="master-class" defaultCity={city.name} />
           <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny" className="rounded-[20px] bg-cobalt p-4 text-clay no-underline hover:text-clay">
             <b className="font-display text-sm uppercase">Для команди</b>
-            <span className="mt-1 block text-sm">Корпоратив з ліплення з глини: у студії або в офісі, {site.prices.corporate}. →</span>
+            <span className="mt-1 block text-sm">Корпоратив з ліплення з глини: у студії або в офісі, {f.range('corporate')}. →</span>
           </Link>
         </aside>
       </div>

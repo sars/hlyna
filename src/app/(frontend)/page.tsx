@@ -6,6 +6,7 @@ import React from 'react'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF, STUDIO_JOIN_HREF } from '@/content/navigation'
+import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { verses } from '@/content/verses'
@@ -28,7 +29,7 @@ const paths = [
   { img: '/images/stock/restaurant-table.jpg', alt: 'Керамічні тарілки і піала на столі ресторану', title: 'Посуд для ресторанів і кав’ярень', text: 'Тарілки, миски, чашки під стиль закладу. Посудомийка, зразки, дозамовлення.', cta: 'Студії та ціни', href: '/dlya-biznesu/posud-dlya-restoraniv' },
   { img: '/images/stock/teal-mug.jpg', alt: 'Керамічна чашка ручної роботи з бірюзовою поливою', title: 'Чашки та посуд з логотипом', text: 'Штамп, деколь або полива у фірмових кольорах. Ціни залежно від кількості.', cta: 'Як це роблять', href: '/dlya-biznesu/chashky-z-lohotypom' },
   { img: '/images/doc/festive-ware.jpg', alt: 'Святковий розписний посуд бубнівської кераміки', title: 'Новорічні подарунки 2026', text: 'Для команди і клієнтів: що встигнуть зробити до свят і коли замовляти.', cta: 'Ідеї та терміни', href: '/dlya-biznesu/novorichni-podarunky-2026' },
-  { img: '/images/doc/workshop-table.jpg', alt: 'Стіл майстерні з розписаними виробами і людьми за роботою', title: 'Корпоратив з ліплення з глини', text: 'У студії чи у вашому офісі, від 10 до 40+ людей. 550–1 550 грн з особи.', cta: 'Формати', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
+  { img: '/images/doc/workshop-table.jpg', alt: 'Стіл майстерні з розписаними виробами і людьми за роботою', title: 'Корпоратив з ліплення з глини', text: 'У студії чи у вашому офісі, для невеликої команди чи великого відділу. Ціни з особи — у таблиці нижче.', cta: 'Формати', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
 ]
 
 const cities = [
@@ -37,12 +38,14 @@ const cities = [
   ['Івано-Франківськ', 11, 'ivano-frankivsk'], ['Вінниця', 10, 'vinnytsia'], ['Суми', 10, 'sumy'],
 ] as const
 
-const faq = [
+type Facts = Awaited<ReturnType<typeof facts>>
+
+const faqFor = (f: Facts) => [
   { q: 'Чи можна замовити посуд ручної роботи невеликою партією?', a: 'Так. Українські студії беруть і невеликі, і великі замовлення. Мінімальна партія залежить від студії та виробу; умови, терміни й ціни кожної студії вказані в її профілі.' },
-  { q: 'Скільки часу займає виготовлення партії кераміки?', a: 'Зазвичай від 3 до 8 тижнів: формування, сушіння, перший випал, полива (глазур) і другий випал. Перед Новим роком і відкриттям закладу замовляйте заздалегідь.' },
+  { q: 'Скільки часу займає виготовлення партії кераміки?', a: `Зазвичай ${site.lead.batch}: формування, сушіння, перший випал, полива (глазур) і другий випал. Перед Новим роком і відкриттям закладу замовляйте заздалегідь.` },
   { q: 'Чи безпечний такий посуд і чи можна мити його в посудомийці?', a: 'Це залежить від глини й поливи. У профілях ми позначаємо, які студії використовують харчові глазурі та чи підходить посуд для посудомийки. Перед великою партією просіть зразок.' },
   { q: 'Як нанести логотип на кераміку?', a: 'Найчастіше штампом на сирій глині, деколлю (перекладною картинкою, яку випалюють) або поливою у фірмових кольорах. Спосіб впливає на ціну і термін.' },
-  { q: 'Скільки коштує майстер-клас з гончарства?', a: `За нашими даними 2026 року груповий майстер-клас коштує приблизно ${site.prices.groupClass}, індивідуальний — ${site.prices.privateClass}. Корпоративні формати — ${site.prices.corporate}.` },
+  { q: 'Скільки коштує майстер-клас з гончарства?', a: `За прайсами студій 2026 року разовий майстер-клас коштує ${f.range('group')}, індивідуальний — ${f.range('private')}, корпоратив — ${f.range('corporate')}. Докладно — на сторінці «Ціни 2026».` },
   { q: 'Скільки коштує сервіс для замовника?', a: site.model },
 ]
 
@@ -67,6 +70,8 @@ async function stats() {
 }
 
 export default async function HomePage() {
+  const f = await facts()
+  const faq = faqFor(f)
   const s = await stats()
   return (
     <main>
@@ -130,7 +135,7 @@ export default async function HomePage() {
           ))}
         </div>
         <p className="mt-3 mb-0 text-[11.5px] text-umber">
-          Фото: Віталій Попков, Качуровська (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener nofollow" className="text-umber">CC BY-SA 4.0</a>), Андрій Стебелєв (CC0) — Wikimedia Commons; інші — Unsplash (CC0).
+          Фото: Віталій Попков, Качуровська (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener nofollow" className="text-umber">CC BY-SA 4.0</a>), Андрій Стебелєв (CC0) — Wikimedia Commons; pepe nero, Alejandra Parejo, Jessica Ruscello, Jared Sluyter — Unsplash (CC0).
         </p>
       </section>
 
@@ -161,8 +166,8 @@ export default async function HomePage() {
         <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Коротко про ринок · оновлено {site.dataUpdated}</span><h2 id="market" className={h2}>Скільки коштує і скільки часу займає</h2></div>
         <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
           <div className="grid grid-cols-1 gap-2.5 rounded-2xl border border-l-[6px] border-line border-l-ochre bg-cream p-[22px]">
-            <p className="m-0 text-[16.5px]"><b>Посуд ручної роботи</b> від українських студій можна замовити і невеликою, і великою партією: мінімальна кількість залежить від студії та виробу. Виготовлення зазвичай займає {site.prices.batchLeadTime}, бо кожна партія проходить сушіння і два випали.</p>
-            <p className="m-0 text-[16.5px]"><b>Майстер-клас з гончарства</b> у групі коштує приблизно {site.prices.groupClass}, індивідуальний — {site.prices.privateClass}. Корпоративні формати — {site.prices.corporate}.</p>
+            <p className="m-0 text-[16.5px]"><b>Посуд ручної роботи</b> від українських студій можна замовити і невеликою, і великою партією: мінімальна кількість залежить від студії та виробу. Виготовлення зазвичай займає {site.lead.batch}, бо кожна партія проходить сушіння і два випали.</p>
+            <p className="m-0 text-[16.5px]"><b>Разовий майстер-клас</b> коштує {f.range('group')}, індивідуальний — {f.range('private')}. Корпоратив — {f.range('corporate')}.</p>
             <p className="m-0 text-[13px] text-umber">Джерело: прайси, сайти і сторіс українських студій, зібрані «Глиною» у 2026 році. Ціни для кожної студії — у її профілі.</p>
           </div>
           <dl className="m-0 grid grid-cols-2 gap-3">
@@ -177,11 +182,11 @@ export default async function HomePage() {
             <thead><tr className="text-left text-[12.5px] tracking-wide text-umber uppercase"><th className="border-b border-line px-3.5 py-3">Що</th><th className="border-b border-line px-3.5 py-3">Типова ціна</th><th className="border-b border-line px-3.5 py-3">Термін</th><th className="border-b border-line px-3.5 py-3">Детальніше</th></tr></thead>
             <tbody>
               {[
-                ['Партія посуду для закладу', 'за запитом, залежить від кількості', site.prices.batchLeadTime, 'Посуд для ресторанів', '/dlya-biznesu/posud-dlya-restoraniv'],
-                ['Чашки з логотипом', 'за запитом', site.prices.logoLeadTimeShort, 'Чашки з логотипом', '/dlya-biznesu/chashky-z-lohotypom'],
-                ['Корпоратив з ліплення з глини', site.prices.corporate, 'бронювання за 1–3 тижні', 'Корпоративи', '/dlya-biznesu/korporatyv-lipennya-z-hlyny'],
-                ['Груповий майстер-клас', site.prices.groupClass, 'запис на тиждень уперед', 'За містами', '/maister-klasy'],
-                ['Індивідуальний майстер-клас', site.prices.privateClass, 'за домовленістю', 'За містами', '/maister-klasy'],
+                ['Партія посуду для закладу', 'за запитом, залежить від кількості', site.lead.batch, 'Посуд для ресторанів', '/dlya-biznesu/posud-dlya-restoraniv'],
+                ['Чашки з логотипом', 'за запитом', site.lead.logo, 'Чашки з логотипом', '/dlya-biznesu/chashky-z-lohotypom'],
+                ['Корпоратив з ліплення з глини', f.range('corporate'), 'бронювання за 1–3 тижні', 'Корпоративи', '/dlya-biznesu/korporatyv-lipennya-z-hlyny'],
+                ['Разовий майстер-клас', f.range('group'), 'запис на тиждень уперед', 'За містами', '/maister-klasy'],
+                ['Індивідуальний майстер-клас', f.range('private'), 'за домовленістю', 'За містами', '/maister-klasy'],
               ].map((r) => (
                 <tr key={r[0]}><td className="border-b border-line px-3.5 py-3">{r[0]}</td><td className="border-b border-line px-3.5 py-3">{r[1]}</td><td className="border-b border-line px-3.5 py-3">{r[2]}</td><td className="border-b border-line px-3.5 py-3"><Link href={r[4]}>{r[3]}</Link></td></tr>
               ))}

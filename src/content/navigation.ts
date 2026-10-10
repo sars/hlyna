@@ -150,7 +150,7 @@ const mainNavPlan: NavSection[] = [
     ],
     promo: {
       title: 'Для команди?',
-      text: 'Корпоративи з ліплення з глини: у студії або в офісі, 550–1 550 грн з особи.',
+      text: 'Корпоративи з ліплення з глини: у студії або в офісі. Ціни з особи — на сторінці.',
       cta: { label: 'Корпоративи', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
     },
   },

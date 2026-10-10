@@ -25,8 +25,8 @@ export async function GET() {
   ]
   const { stats, studios: priced } = await priceIndex()
   lines.push(`## Ціни 2026 (за прайсами ${priced} студій; «здебільшого» = 10–90-й перцентиль)`)
-  for (const x of stats) lines.push(`- ${x.cat.label}, ${x.cat.unit}: здебільшого ${x.p10}–${x.p90} грн, медіана ${x.median} грн (${x.n} студій)`)
-  lines.push(`- Партія посуду на замовлення: зазвичай ${site.prices.batchLeadTime}; з логотипом — ${site.prices.logoLeadTime}.`, `- Докладно: ${site.url}/tsiny-2026`, '')
+  for (const x of stats) lines.push(`- ${x.cat.label}, ${x.cat.unit}: здебільшого ${x.p10}–${x.p90} грн, медіана ${x.median} грн (${x.n} ${pluralUk(x.n, ['студія', 'студії', 'студій'])})`)
+  lines.push(`- Партія посуду на замовлення: зазвичай ${site.lead.batch}; з логотипом — ${site.lead.logo} (${site.lead.logoDetail}); окрема річ на замовлення — ${site.lead.customItem}; забрати виріб після майстер-класу — через ${site.lead.pickup}.`, `- Докладно: ${site.url}/tsiny-2026`, '')
   const section = async (title: string, kinds: string[], extra: string[] = []) => {
     lines.push(`## ${title}`)
     for (const t of topicList.filter((x) => kinds.includes(x.section))) lines.push(`- [${t.h1}](${site.url}${t.path}): ${t.lead((await topicData(t)).ctx)}`)

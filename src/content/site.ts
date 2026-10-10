@@ -13,13 +13,13 @@ export const site = {
     'Для замовника безкоштовно. Ціни встановлюють студії. Якщо замовлення відбулося, студія платить нам 5% від його суми; за розміщення чи запити ми грошей не беремо.',
   // Snapshot of the public catalogue (10 Oct 2026); pages use live counts from the database where available.
   stats: { makers: 507, cities: 110, masterClassPlaces: 196, withPrices: 137 },
-  prices: {
-    groupClass: '550–1 200 грн з особи',
-    privateClass: '1 200–2 400 грн',
-    corporate: '550–1 550 грн з особи',
-    batchLeadTime: '3–8 тижнів',
-    // Logo batches: the same 3–8 weeks plus making the stamp or decal. Used on the home table and the logo page.
-    logoLeadTime: '3–8 тижнів плюс 1–2 тижні на штамп чи деколь',
-    logoLeadTimeShort: '4–10 тижнів',
+  // Lead times as studios state them (not derived from price lines). Prices are never hard-coded:
+  // pages take them from the live price index through src/lib/facts.ts.
+  lead: {
+    batch: '3–8 тижнів', // a batch of tableware made to order: forming, drying, two firings
+    logo: '4–10 тижнів', // a batch with a logo: the batch plus 1–2 weeks for a new stamp or decal
+    logoDetail: '3–8 тижнів на партію плюс 1–2 тижні на новий штамп чи деколь',
+    customItem: '3–6 тижнів', // one piece made to order, e.g. a cup with an inscription
+    pickup: '2–4 тижні', // collecting a piece after a class: drying and two firings
   },
 }

@@ -2,11 +2,10 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, DocPhoto, SectionHead, Updated } from '@/components/site/Bits'
+import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { Faq } from '@/components/site/SelectionFaq'
 import { StudioCard } from '@/components/site/StudioCard'
-import { docPhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import { pluralUk } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
@@ -19,7 +18,7 @@ export const metadata: Metadata = {
   title: 'Косів і Опішне сьогодні: сучасні майстри, студії й де купити кераміку',
   description: 'Хто працює з глиною в Косові й Опішному зараз: майстри, родинні майстерні, бренди, студії з майстер-класами, крамниці, музеї й школи. З посиланнями на профілі.',
   alternates: { canonical: '/dobirky/kosiv-i-opishne' },
-  openGraph: { images: ogImage({ title: 'Косів і Опішне сьогодні', kicker: 'Добірка', img: 'doc-festive-ware', credit: 'Фото: Андрій Стебелєв, CC0' }) },
+  openGraph: { images: ogImage({ title: 'Косів і Опішне сьогодні', kicker: 'Добірка', pattern: 'kosiv-i-opishne' }) },
 }
 
 const many = (n: number) => `${n} ${pluralUk(n, ['майстер, бренд чи студія', 'майстри, бренди й студії', 'майстрів, брендів і студій'])}`
@@ -37,7 +36,7 @@ export default async function KosivOpishne() {
   return (
     <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 pb-16`}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Косів і Опішне: майстри й студії', numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/${s.slug}`, name: cleanName(s.name) })) }} />
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]">
+      <div className="grid grid-cols-1 items-start gap-8">
         <div className="grid grid-cols-1 gap-4">
           <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Добірки', href: '/dobirky' }, { label: 'Косів і Опішне' }]} />
           <span className="kicker">Добірка · традиція сьогодні</span>
@@ -47,7 +46,6 @@ export default async function KosivOpishne() {
           </p>
           <Updated />
         </div>
-        <DocPhoto photo={docPhotos.festiveWare} priority />
       </div>
       <div className="grid grid-cols-1 gap-10">
         <p className="m-0 max-w-[70ch]">

@@ -33,6 +33,34 @@ export function dedupeTexts(items: string[]): string[] {
   return kept.map((k) => k.text).sort((a, b) => (order.get(a) ?? 0) - (order.get(b) ?? 0))
 }
 
+// ---------- research notes ----------
+
+// Research annotations that must not reach visitors: «(уточнюється)», «дані зі сніпета пошуку»,
+// «сторінка зараз 404», «717 використань», «~2024». Inside a parenthesis only the note part is removed,
+// so a source hint like «(tvoeshop, 2026; сертифікат наразі «недоступний»)» keeps «tvoeshop, 2026».
+const NOTE_WORDS = /уточн|можливо|ймовірно|не підтвердж|сніпет|снипет|(?<!\d)404(?!\d)|станом на|не вказано|орієнтир|стара картка|недоступн|перевірит|на сайті —/iu
+const NOTE_SENTENCE = /[^.!?\n]*(?:актуальн\p{L}* [^.!?\n]{0,60}не підтвердж|сторінк\p{L}* зараз 404|дані зі сніпет)[^.!?\n]*[.!?]?/giu
+
+export function cleanPublic(text?: string | null): string {
+  if (!text) return ''
+  return text
+    .replace(NOTE_SENTENCE, '')
+    .replace(/\(([^()]*)\)/g, (_m, inner: string) => {
+      const kept = inner.split(/\s*;\s*/).filter((seg) => seg.trim() && !NOTE_WORDS.test(seg))
+      return kept.length ? `(${kept.join('; ')})` : ''
+    })
+    .replace(/[;,]?\s*\d[\d\s]*використан\p{L}*/giu, '')
+    .replace(/\s*[—–-]\s*уточнити\.?\s*$/iu, '')
+    .replace(/~\s?((?:19|20)\d\d)(?!\d)/g, '$1')
+    .replace(/~\s?(?=\d)/g, '≈')
+    .replace(/,\s*(?=,)/g, '')
+    .replace(/\s+([,.;)])/g, '$1')
+    .replace(/\(\s+/g, '(')
+    .replace(/[ \t]{2,}/g, ' ')
+    .replace(/\n{3,}/g, '\n\n')
+    .trim()
+}
+
 // ---------- prices ----------
 
 // "… — 1750 грн (сайт, 2026)" → body + source hint. Old (≤2022) and internal lines are dropped.

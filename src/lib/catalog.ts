@@ -4,6 +4,7 @@ import { unstable_cache } from 'next/cache'
 import { cache } from 'react'
 
 import type { City, Studio } from '@/payload-types'
+import { cleanPublic } from './present'
 
 // Read-only data layer for public pages. One cached query per request; pages are statically
 // generated and revalidated, so the database is hit rarely.
@@ -19,7 +20,9 @@ export const TYPE_LABEL: Record<string, string> = {
   other: 'Інше',
 }
 
-export type StudioCard = Studio & { cityDoc: City | null }
+// unverified: the research found no sign of activity after 2022 and says so (or work is suspended), with no
+// fresher Instagram evidence. Such a studio keeps its profile but is left out of every list, count and map.
+export type StudioCard = Studio & { cityDoc: City | null; unverified?: boolean }
 
 // depth 0 + a separate city lookup keeps the cached payload small (Next's data cache limit is 2 MB per entry).
 const loadStudios = unstable_cache(
@@ -40,15 +43,41 @@ const loadStudios = unstable_cache(
       payload.find({ collection: 'cities', depth: 0, limit: 2000, pagination: false, overrideAccess: false }),
     ])
     const byId = new Map(cities.docs.map((c) => [c.id, c]))
-    return studios.docs.map((s) => ({ ...(s as Studio), cityDoc: (typeof s.city === 'object' ? s.city : byId.get(s.city as number)) ?? null }))
+    return studios.docs.map((s) => ({ ...publicText(s as Studio), unverified: isUnverified(s as Studio), cityDoc: (typeof s.city === 'object' ? s.city : byId.get(s.city as number)) ?? null }))
   },
-  ['studios-all-v4'],
+  ['studios-all-v6'],
   { revalidate: 3600, tags: ['studios'] },
 )
 
-export const getAllStudios = cache(loadStudios)
+// Research annotations stay in the database (admin sees them) but never reach public pages.
+const cleanList = <T extends { text: string }>(xs?: T[] | null) => (xs ?? []).map((x) => ({ ...x, text: cleanPublic(x.text) })).filter((x) => x.text)
+const publicText = (s: Studio): Studio => ({
+  ...s,
+  summary: cleanPublic(s.summary),
+  publicDescription: cleanPublic(s.publicDescription),
+  description: cleanPublic(s.description),
+  recentNote: cleanPublic(s.recentNote),
+  address: cleanPublic(s.address),
+  services: cleanList(s.services),
+  products: cleanList(s.products),
+  prices: cleanList(s.prices),
+})
 
-export const getStudioBySlug = cache(async (slug: string) => (await getAllStudios()).find((s) => s.slug === slug) ?? null)
+const DOUBT = /актуальн\p{L}*[^.!?]{0,60}не підтвердж|не підтвердж\p{L}*[^.!?]{0,30}актуальн|роботу призупинено|тимчасово (?:закрит|не працює)|більше не працює|статус[^.!?]{0,40}не підтвердж|актуальн\p{L}* активн\p{L}*[^.!?]{0,30}не підтвердж/iu
+const FRESH_SINCE = '2025-01-01'
+function isUnverified(s: Studio): boolean {
+  if (s.status === 'closed') return false // handled separately
+  const fresh = (s.activity?.lastPostDate ?? '') >= FRESH_SINCE
+  return !fresh && DOUBT.test([s.publicDescription, s.description, s.summary].filter(Boolean).join(' '))
+}
+
+/** Every published record, including closed and unverified ones (profiles and the sitemap). */
+export const getCatalog = cache(loadStudios)
+
+/** What lists, counts, the map and the price index use: no closed or unverified studios. */
+export const getAllStudios = cache(async () => (await getCatalog()).filter((s) => s.status !== 'closed' && !s.unverified))
+
+export const getStudioBySlug = cache(async (slug: string) => (await getCatalog()).find((s) => s.slug === slug) ?? null)
 
 export const texts = (s: Studio) =>
   [s.description, ...(s.services ?? []).map((x) => x.text), ...(s.products ?? []).map((x) => x.text), ...(s.prices ?? []).map((x) => x.text)]

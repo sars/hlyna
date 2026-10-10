@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { topics, type Topic, type TopicCtx } from '@/content/topics'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt, getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
+import { facts } from './facts'
 import { amountsIn, publicPrices, splitSource, typicalRange } from './present'
 
 export type TopicListData = { title: string; note?: string; byCity?: boolean; studios: StudioCard[] }
@@ -41,12 +42,16 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     const best = [...lines].sort((a, b) => Number(!!topic.price.unit?.test(b.text)) - Number(!!topic.price.unit?.test(a.text)) || (b.year ?? 0) - (a.year ?? 0))[0]
     if (best) examples.push({ studio: s, text: best.text, source: best.source })
   }
-  const r = typicalRange(amounts)
+  const f = await facts()
+  // Whole-Ukraine pages quote the price index for their category, so the number matches /tsiny-2026 and
+  // every other page; city pages keep the range of their own studios.
+  const idx = topic.price.index && !citySlug ? f.get(topic.price.index) : null
+  const r = idx ? { min: idx.min, max: idx.max } : typicalRange(amounts)
   return {
     lists,
     all,
     examples: examples.slice(0, 8),
-    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, place: citySlug ? all[0]?.cityDoc?.name : undefined },
+    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
   }
 }
 

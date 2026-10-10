@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
-import { site } from '@/content/site'
+import { facts } from '@/lib/facts'
 import { topicList } from '@/content/topics'
 import { fmt, getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { singleClassAmounts, typicalRange } from '@/lib/present'
@@ -17,6 +17,7 @@ export const metadata: Metadata = {
 }
 
 export default async function MasterClassesIndex() {
+  const f = await facts()
   const groups = groupByCity((await getAllStudios()).filter(offersMasterClasses))
   const big = groups.filter((g) => g.studios.length >= MIN_LIST)
   const small = groups.filter((g) => g.studios.length < MIN_LIST)
@@ -28,7 +29,7 @@ export default async function MasterClassesIndex() {
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи' }]} />
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки в Україні</h1>
         <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі — {fmt(total)} {pluralUk(total, ['місце', 'місця', 'місць'])} у {groups.length} містах і селах, де проводять заняття з гончарства чи ліплення з глини. Груповий майстер-клас коштує приблизно {site.prices.groupClass}, індивідуальний — {site.prices.privateClass}. Оберіть місто, щоб побачити студії, ціни й сертифікати.
+          У каталозі — {fmt(total)} {pluralUk(total, ['місце', 'місця', 'місць'])} у {groups.length} містах і селах, де проводять заняття з гончарства чи ліплення з глини. Разовий майстер-клас коштує {f.range('group')}, індивідуальний — {f.range('private')}. Оберіть місто, щоб побачити студії, ціни й сертифікати.
         </p>
         <Updated />
       </div>
