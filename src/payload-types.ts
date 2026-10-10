@@ -166,6 +166,15 @@ export interface UserAuthOperations {
 export interface Studio {
   id: number;
   name: string;
+  /**
+   * Лише відомі варіанти: латиницею/кирилицею, Instagram, колишні назви. Заповнює scripts/alt-names.ts; не вигадувати.
+   */
+  alternateNames?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
   type?: ('studio' | 'brand' | 'maker' | 'school' | 'shop' | 'supplier' | 'heritage' | 'other') | null;
   city?: (number | null) | City;
   oblast?: string | null;
@@ -1255,6 +1264,12 @@ export interface PayloadMigration {
  */
 export interface StudiosSelect<T extends boolean = true> {
   name?: T;
+  alternateNames?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
   type?: T;
   city?: T;
   oblast?: T;

@@ -42,7 +42,7 @@ const loadStudios = unstable_cache(
     const byId = new Map(cities.docs.map((c) => [c.id, c]))
     return studios.docs.map((s) => ({ ...(s as Studio), cityDoc: (typeof s.city === 'object' ? s.city : byId.get(s.city as number)) ?? null }))
   },
-  ['studios-all-v2'],
+  ['studios-all-v3'],
   { revalidate: 3600, tags: ['studios'] },
 )
 

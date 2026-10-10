@@ -78,6 +78,14 @@ export const Studios: CollectionConfig = {
           fields: [
             { name: 'name', label: 'Назва', type: 'text', required: true },
             {
+              name: 'alternateNames',
+              label: 'Інші назви',
+              type: 'array',
+              labels: { singular: 'Назва', plural: 'Назви' },
+              admin: { description: 'Лише відомі варіанти: латиницею/кирилицею, Instagram, колишні назви. Заповнює scripts/alt-names.ts; не вигадувати.' },
+              fields: [{ name: 'text', label: 'Назва', type: 'text', required: true }],
+            },
+            {
               type: 'row',
               fields: [
                 {

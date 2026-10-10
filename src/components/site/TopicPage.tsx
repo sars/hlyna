@@ -222,7 +222,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
 }
 
 // On phones the form sits after all the content: a slim bar keeps the request one tap away.
-function MobileRequestBar() {
+export function MobileRequestBar() {
   return (
     <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-clay/95 px-4 py-2.5 pb-[max(10px,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
       <a href="#zapyt-forma" className="flex w-full justify-center rounded-full bg-terra px-5 py-3 font-bold text-cream no-underline hover:text-cream">

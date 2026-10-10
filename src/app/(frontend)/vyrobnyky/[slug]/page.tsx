@@ -117,6 +117,9 @@ export default async function StudioPage({ params }: Args) {
   if (!s) notFound()
 
   const name = cleanName(s.name)
+  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name)
+  // On the page, skip variants already visible in the heading («Ґроно (Grono)» → only grono.shop is new).
+  const shownAlt = altNames.filter((t) => !name.toLowerCase().includes(t.toLowerCase()))
   const city = s.cityDoc
   const typeLabel = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   const exhibiting = isExhibitingOnly(s)
@@ -166,6 +169,7 @@ export default async function StudioPage({ params }: Args) {
               ? { homeLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA' } } }
               : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(street ? { streetAddress: street } : {}) } }
             : {}),
+          ...(altNames.length ? { alternateName: altNames } : {}),
           sameAs: profileUrls(s),
         }}
       />
@@ -173,6 +177,7 @@ export default async function StudioPage({ params }: Args) {
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityPage ? [{ label: city.name, href: `/maister-klasy/${city.slug}` }] : []), { label: name }]} />
         <span className="kicker">{typeLabel}{city ? ` · ${city.name}` : ''}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06] break-words">{name}</h1>
+        {shownAlt.length > 0 && <p className="m-0 -mt-2 text-sm break-words text-umber">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}
         <div className="grid grid-cols-1 max-w-[70ch] gap-3 text-lg">
           {description.split(/\n{2,}/).map((para, i) => (
             <p key={i} className="m-0">{para}</p>

@@ -17,12 +17,12 @@ const label = 'grid gap-1 text-[13px] font-semibold text-umber'
 
 // Posts to Payload's REST API (collection `requests`, public create). `website2` is a honeypot.
 // defaultWhat / defaultCity come from the page (a master-class city page asks about a master class in that city).
-// /zapyt?vid=studiya opens the form for studios that want to add or update their profile.
-export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tableware', defaultCity = '' }: { sourcePage: string; compact?: boolean; defaultWhat?: string; defaultCity?: string }) {
+// /zapyt?vid=studiya (or forStudio, on /dlya-studiy) opens the form for studios that want to add or update their profile.
+export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tableware', defaultCity = '', forStudio = false }: { sourcePage: string; compact?: boolean; defaultWhat?: string; defaultCity?: string; forStudio?: boolean }) {
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
-  const [what, setWhat] = useState(defaultWhat)
-  const [studio, setStudio] = useState(false)
+  const [what, setWhat] = useState(forStudio ? 'other' : defaultWhat)
+  const [studio, setStudio] = useState(forStudio)
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('vid') === 'studiya') {
