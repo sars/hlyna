@@ -71,7 +71,8 @@ export default buildConfig({
     // Dev: schema is pushed automatically (push defaults to true outside production).
     // Production: pending migrations from src/migrations run on server start.
     // After changing collections: `pnpm payload migrate:create <name>` and commit the files.
-    prodMigrations: migrations,
+    // Migrations run when the production server starts, not during `next build` (the build only reads data).
+    prodMigrations: process.env.NEXT_PHASE === 'phase-production-build' ? undefined : migrations,
   }),
   collections: [Studios, Cities, Requests, Pages, Posts, Media, Categories, Users],
   i18n: {
