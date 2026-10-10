@@ -6,6 +6,7 @@ import React from 'react'
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
+import { InstagramPosts } from '@/components/site/InstagramPosts.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
@@ -134,11 +135,17 @@ export default async function StudioPage({ params }: Args) {
   const prices = publicPrices(s)
   const priceGroups = groupPrices(prices)
   const description = stripPersonal(s.publicDescription || s.description || '')
+  const recentNote = stripPersonal(s.recentNote || '')
+  const monthYear = (d?: string | null) => (d ? new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(d)).filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ') : '')
+  const lastPost = monthYear(s.activity?.lastPostDate)
+  const followers = s.activity?.followers ? new Intl.NumberFormat('uk-UA').format(s.activity.followers) : ''
+  const igPosts = (s.activity?.instagramPosts ?? []).map((x) => x.url)
   const facts: [string, React.ReactNode][] = [
     ['Тип', typeLabel],
     ...(city ? [['Місто', cityPage ? <Link key="c" href={`/maister-klasy/${city.slug}`}>{city.name}</Link> : city.name] as [string, React.ReactNode]] : []),
     ...(s.address ? [['Адреса', s.address] as [string, React.ReactNode]] : []),
     ...(s.instagram ? [['Instagram', link(s.instagram, '@' + igHandle(s.instagram))] as [string, React.ReactNode]] : []),
+    ...(lastPost ? [['Останній пост', `${lastPost}${followers ? ` · ${followers} підписників` : ''}`] as [string, React.ReactNode]] : []),
     ...(s.website ? [['Сайт', link(s.website, s.website.replace(/^https?:\/\//, '').replace(/\/$/, ''))] as [string, React.ReactNode]] : []),
     ...(s.facebook ? [['Facebook', link(s.facebook, 'сторінка')] as [string, React.ReactNode]] : []),
     ...(channels.length && !exhibiting ? [['Де продає', channels.join(' · ')] as [string, React.ReactNode]] : []),
@@ -170,6 +177,12 @@ export default async function StudioPage({ params }: Args) {
           {description.split(/\n{2,}/).map((para, i) => (
             <p key={i} className="m-0">{para}</p>
           ))}
+          {recentNote && (
+            <p className="m-0">
+              <span className="kicker mr-2">Що нового</span>
+              {recentNote}
+            </p>
+          )}
         </div>
         {(mk || venues || companies) && (
           <div className="flex flex-wrap gap-2 text-[13px] font-bold">
@@ -246,6 +259,15 @@ export default async function StudioPage({ params }: Args) {
               ) : (
                 <p className="m-0 rounded-2xl bg-card p-4">Мінімальну партію, терміни й ціни для бізнесу студія ще не вказала. Надішліть запит — ми передамо його студії разом з іншими, що роблять подібні вироби.</p>
               )}
+            </section>
+          )}
+
+          {igPosts.length > 0 && (
+            <section aria-labelledby="ig">
+              <SectionHead title="Останнє в Instagram" id="ig">
+                {s.instagram && <p className="m-0 text-sm text-umber">Пости з профілю <a href={s.instagram} target="_blank" rel="noopener nofollow">@{igHandle(s.instagram)}</a>; завантажуються з Instagram, коли ви до них гортаєте.</p>}
+              </SectionHead>
+              <InstagramPosts urls={igPosts} handle={igHandle(s.instagram)} />
             </section>
           )}
 
