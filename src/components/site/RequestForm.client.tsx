@@ -16,7 +16,7 @@ const field =
 const label = 'grid gap-1 text-[13px] font-semibold text-umber'
 
 // Posts to Payload's REST API (collection `requests`, public create). `website2` is a honeypot.
-export function RequestForm({ sourcePage, compact = false }: { sourcePage: string; compact?: boolean }) {
+export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tableware' }: { sourcePage: string; compact?: boolean; defaultWhat?: string }) {
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
 
@@ -56,7 +56,7 @@ export function RequestForm({ sourcePage, compact = false }: { sourcePage: strin
       <div className="grid gap-2.5 sm:grid-cols-2">
         <label className={label}>
           Що потрібно
-          <select name="what" className={field} defaultValue="tableware">
+          <select name="what" className={field} defaultValue={defaultWhat}>
             {WHAT.map((w) => (
               <option key={w.value} value={w.value}>
                 {w.label}

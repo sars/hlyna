@@ -27,8 +27,8 @@ const nf = (n: number) => n.toLocaleString('uk-UA')
 const paths = [
   { img: '/images/stock/terracotta.jpg', alt: 'Глиняний посуд ручної роботи', title: 'Посуд для ресторанів і кав’ярень', text: 'Тарілки, миски, чашки під стиль закладу. Посудомийка, зразки, дозамовлення.', cta: 'Студії та ціни', href: '/dlya-biznesu/posud-dlya-restoraniv' },
   { img: '/images/stock/stacked-cups.jpg', alt: 'Стос керамічних чашок', title: 'Чашки та посуд з логотипом', text: 'Штамп, деколь або полива у фірмових кольорах. Ціни залежно від кількості.', cta: 'Як це роблять', href: '/dlya-biznesu/chashky-z-lohotypom' },
-  { img: '/images/stock/glazed-bottles.jpg', alt: 'Глазуровані керамічні пляшки', title: 'Корпоративні подарунки', text: 'Для команди і клієнтів: кераміка з історією про українського майстра.', cta: 'Ідеї та студії', href: '/dlya-biznesu/korporatyvni-podarunky' },
-  { img: '/images/stock/hands-clay.jpg', alt: 'Руки ліплять з глини', title: 'Корпоратив з ліплення з глини', text: 'У студії чи у вашому офісі, від 10 до 40+ людей. 550–1 550 грн з особи.', cta: 'Формати', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
+  { img: '/images/doc/festive-ware.jpg', alt: 'Святковий розписний посуд бубнівської кераміки', title: 'Новорічні подарунки 2026', text: 'Для команди і клієнтів: що встигнуть зробити до свят і коли замовляти.', cta: 'Ідеї та терміни', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+  { img: '/images/doc/workshop-table.jpg', alt: 'Стіл майстерні з розписаними виробами і людьми за роботою', title: 'Корпоратив з ліплення з глини', text: 'У студії чи у вашому офісі, від 10 до 40+ людей. 550–1 550 грн з особи.', cta: 'Формати', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
 ]
 
 const cities = [
@@ -120,7 +120,7 @@ export default async function HomePage() {
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {[
-            { img: '/images/stock/wheel-top.jpg', alt: 'Гончарне коло, вигляд згори', title: 'Майстер-клас для себе', text: 'Гончарство, ліплення, побачення, заняття для дітей — по всій Україні.', href: '/maister-klasy' },
+            { img: '/images/doc/wheel-hands.jpg', alt: 'Руки гончаря на гончарному колі', title: 'Майстер-клас для себе', text: 'Гончарство, ліплення, побачення, заняття для дітей — по всій Україні.', href: '/maister-klasy' },
             { img: '/images/stock/teal-mug.jpg', alt: 'Керамічна чашка ручної роботи', title: 'Подарунковий сертифікат', text: 'Сертифікати на гончарство: ціни, термін дії й формати за містами.', href: '/sertyfikaty' },
           ].map((c) => (
             <Link key={c.href} href={c.href} className="grid grid-cols-[110px_minmax(0,1fr)] items-center gap-3.5 rounded-[20px] border border-line bg-cream p-2.5 text-ink no-underline hover:text-ink">
@@ -129,6 +129,9 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
+        <p className="mt-3 mb-0 text-[11.5px] text-umber">
+          Фото: Віталій Попков, Качуровська (<a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener nofollow" className="text-umber">CC BY-SA 4.0</a>), Андрій Стебелєв (CC0) — Wikimedia Commons; інші — Unsplash (CC0).
+        </p>
       </section>
 
       {/* How it works */}

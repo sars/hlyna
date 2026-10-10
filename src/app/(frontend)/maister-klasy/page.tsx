@@ -4,6 +4,7 @@ import React from 'react'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { site } from '@/content/site'
+import { topicList } from '@/content/topics'
 import { fmt, getAllStudios, groupByCity, hryvniaAmounts, MIN_LIST, offersMasterClasses, pluralUk, range } from '@/lib/catalog'
 
 export const revalidate = 86400
@@ -30,6 +31,20 @@ export default async function MasterClassesIndex() {
         </p>
         <Updated />
       </div>
+      <section aria-labelledby="formats">
+        <SectionHead title="Формати" id="formats" />
+        <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+          {topicList
+            .filter((t) => t.section !== 'biz')
+            .map((t) => (
+              <li key={t.path}>
+                <Link href={t.path} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
+                  {t.crumb}
+                </Link>
+              </li>
+            ))}
+        </ul>
+      </section>
       <section aria-labelledby="cities">
         <SectionHead title="Міста" id="cities" />
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2.5 p-0">

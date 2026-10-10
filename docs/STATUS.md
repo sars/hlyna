@@ -25,3 +25,10 @@ Updated 2026-10-10.
 - **Instagram pass** (needs a `claude --chrome` session): collect 1–3 pinned/latest post URLs per public studio for lazy-loaded embeds; read captions and images to add a unique, paraphrased paragraph to each profile.
 - **Telegram:** add TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID to the server `.env` after deploy.
 - **Photos for hub pages:** pick less "stocky", documentary photos (e.g. Wikimedia Commons workshops in Opishne/Kosiv, with credit) until studios send their own.
+
+## Topic pages (2026-10-10)
+- Config: `src/content/topics.ts`; layout: `src/components/site/TopicPage.tsx`; data: `src/lib/topics.ts`.
+- Lists come from `studios.formats` tags (`pnpm payload run scripts/tag-studios.ts`, re-run after each import; DRY=1 SHOW=<tag> prints evidence).
+- Photos: `public/images/doc/` (Wikimedia Commons, credits in CREDITS.md, visible caption via `<DocPhoto>` and on OG cards).
+- IndexNow: `deploy/indexnow.sh` runs at the end of `deploy/push.sh`; key file `public/12e1186b0c0ec23ee49b7f8359e536ca.txt`.
+- Production needs, after deploy: the `add_formats` migration (runs on start) and `scripts/tag-studios.ts` against the production DB, otherwise the topic lists are empty.

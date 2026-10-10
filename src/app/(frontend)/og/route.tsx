@@ -20,8 +20,11 @@ export async function GET(req: Request) {
   const kicker = (u.searchParams.get('kicker') || '').slice(0, 60)
   const sub = (u.searchParams.get('sub') || '').slice(0, 140)
   const img = (u.searchParams.get('img') || '').replace(/[^a-z0-9-]/g, '')
-  const photo = img ? `data:image/jpeg;base64,${(await readFile(path.join(process.cwd(), 'public/images/stock', `${img}.jpg`)).catch(() => Buffer.from(''))).toString('base64')}` : ''
+  // img=<name> → public/images/stock/<name>.jpg; img=doc-<name> → public/images/doc/<name>.jpg (Commons photos)
+  const imgPath = img.startsWith('doc-') ? path.join(process.cwd(), 'public/images/doc', `${img.slice(4)}.jpg`) : path.join(process.cwd(), 'public/images/stock', `${img}.jpg`)
+  const photo = img ? `data:image/jpeg;base64,${(await readFile(imgPath).catch(() => Buffer.from(''))).toString('base64')}` : ''
   const seed = (u.searchParams.get('pattern') || '').slice(0, 40)
+  const credit = (u.searchParams.get('credit') || '').slice(0, 80) // photo author + license (CC BY-SA needs it)
   // City coat of arms (public/images/coa/<slug>.png, from Wikimedia Commons); falls back to the mosaic.
   const coaSlug = (u.searchParams.get('coa') || '').replace(/[^a-z0-9-]/g, '')
   const coaBuf = coaSlug ? await readFile(path.join(process.cwd(), 'public/images/coa', `${coaSlug}.png`)).catch(() => null) : null
@@ -64,8 +67,11 @@ export async function GET(req: Request) {
           </div>
         )}
         {photo && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} width={420} height={548} alt="" style={{ width: 420, height: 548, objectFit: 'cover', borderRadius: 36, margin: '32px 32px 32px 0' }} />
+          <div style={{ display: 'flex', position: 'relative', width: 420, height: 548, margin: '32px 32px 32px 0' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={photo} width={420} height={548} alt="" style={{ width: 420, height: 548, objectFit: 'cover', borderRadius: 36 }} />
+            {credit && <div style={{ position: 'absolute', left: 18, bottom: 16, display: 'flex', padding: '4px 10px', borderRadius: 10, background: 'rgba(42,32,24,.62)', color: '#fbf3ea', fontSize: 15 }}>{credit}</div>}
+          </div>
         )}
         </div>
       </div>
@@ -83,10 +89,15 @@ export async function GET(req: Request) {
 }
 
 // Fallback "coat of arms": a heater shield filled with the city's own ceramic-tile mosaic.
-function ShieldMosaic({ seed }: { seed: string }) {
+// Deterministic pseudo-random sequence per city, so a city's card never changes between renders.
+function seeded(seed: string) {
   let h = 0
   for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0
-  const rnd = () => ((h = (h * 1103515245 + 12345) >>> 0) % 1000) / 1000
+  return () => ((h = (h * 1103515245 + 12345) >>> 0) % 1000) / 1000
+}
+
+function ShieldMosaic({ seed }: { seed: string }) {
+  const rnd = seeded(seed)
   const colors = [C.terra, C.cobalt, C.ochre, '#5f7e6a']
   const shield = 'M12 12 H318 V228 C318 318 250 382 165 412 C80 382 12 318 12 228 Z'
   const tiles: React.ReactNode[] = []

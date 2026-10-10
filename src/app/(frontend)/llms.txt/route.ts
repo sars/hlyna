@@ -1,10 +1,13 @@
-import { footerColumns, mainNav } from '@/content/navigation'
 import { site } from '@/content/site'
+import { topicList } from '@/content/topics'
+import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { certificateCities, topicData } from '@/lib/topics'
 
 // llms.txt: a plain-text map of the site for AI assistants (https://llmstxt.org).
-export const dynamic = 'force-static'
+// Only existing pages, each with its factual lead (live counts), so assistants can cite them.
+export const revalidate = 3600
 
-export function GET() {
+export async function GET() {
   const lines: string[] = [
     `# ${site.name}`,
     '',
@@ -23,13 +26,16 @@ export function GET() {
     `- Корпоратив з ліплення з глини: ${site.prices.corporate}.`,
     '',
   ]
-  for (const s of mainNav) {
-    lines.push(`## ${s.label}`)
-    for (const c of s.columns) for (const l of c.links) lines.push(`- [${l.label}](${site.url}${l.href})${l.note ? `: ${l.note}` : ''}`)
-    lines.push('')
+  const section = async (title: string, kinds: string[], extra: string[] = []) => {
+    lines.push(`## ${title}`)
+    for (const t of topicList.filter((x) => kinds.includes(x.section))) lines.push(`- [${t.h1}](${site.url}${t.path}): ${t.lead((await topicData(t)).ctx)}`)
+    lines.push(...extra, '')
   }
-  lines.push('## Інше')
-  for (const l of footerColumns.find((c) => c.title === 'Про нас')?.links ?? []) lines.push(`- [${l.label}](${site.url}${l.href})`)
+  await section('Для бізнесу', ['biz'], [`- [Посуд ручної роботи для ресторанів і кав’ярень](${site.url}/dlya-biznesu/posud-dlya-restoraniv)`])
+  const mkCities = groupByCity((await getAllStudios()).filter(offersMasterClasses)).filter((g) => g.studios.length >= MIN_LIST)
+  await section('Майстер-класи', ['mk'], mkCities.map((g) => `- [Майстер-класи з кераміки: ${g.city.name}](${site.url}/maister-klasy/${g.city.slug}): ${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}`))
+  await section('Подарункові сертифікати', ['cert'], (await certificateCities()).map((c) => `- [Сертифікати на гончарство: ${c.name}](${site.url}/sertyfikaty/${c.slug})`))
+  lines.push('## Каталог', `- [Усі студії, бренди й майстри](${site.url}/vyrobnyky): профілі з містом, послугами, цінами й посиланнями`, `- Карта сайту: ${site.url}/catalog-sitemap.xml`)
   lines.push('', `Надіслати запит: ${site.url}/zapyt`)
   return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 }

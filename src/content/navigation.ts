@@ -186,17 +186,16 @@ export const utilityNav: NavLink[] = [
   { label: 'Як це працює', href: '/yak-tse-pratsyuye' },
 ]
 
+// Footer: only pages that exist (it is on every page); the full plan lives in mainNav.
 export const footerColumns: NavColumn[] = [
   {
     title: 'Для бізнесу',
     links: [
       { label: 'Посуд для ресторанів', href: '/dlya-biznesu/posud-dlya-restoraniv' },
-      { label: 'Посуд для кав’ярень', href: '/dlya-biznesu/posud-dlya-kavyaren' },
-      { label: 'Посуд для готелів', href: '/dlya-biznesu/posud-dlya-hoteliv' },
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
-      { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
-      { label: 'Ціни на партії', href: '/tsiny-2026/partiyi' },
+      { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Надіслати запит', href: REQUEST_HREF },
     ],
   },
   {
@@ -208,29 +207,28 @@ export const footerColumns: NavColumn[] = [
       { label: 'Харків', href: '/maister-klasy/kharkiv' },
       { label: 'Дніпро', href: '/maister-klasy/dnipro' },
       { label: 'Луцьк', href: '/maister-klasy/lutsk' },
+      { label: 'Усі міста', href: '/maister-klasy' },
+    ],
+  },
+  {
+    title: 'Формати',
+    links: [
+      { label: 'Гончарне коло', href: '/maister-klasy/honcharne-kolo' },
+      { label: 'Ліплення з глини', href: '/maister-klasy/lipennya' },
+      { label: 'Розпис кераміки', href: '/maister-klasy/rozpys' },
+      { label: 'Для двох', href: '/maister-klasy/dlya-dvokh' },
+      { label: 'Для дітей', href: '/maister-klasy/dlya-ditey' },
+      { label: 'Курси й абонементи', href: '/maister-klasy/kursy' },
       { label: 'Сертифікати', href: '/sertyfikaty' },
     ],
   },
   {
-    title: 'Виробники',
+    title: 'Каталог',
     links: [
-      { label: 'Каталог', href: '/vyrobnyky' },
-      { label: 'Сучасні керамісти', href: '/dobirky/suchasni-keramisty' },
-      { label: 'Косів і Опішне', href: '/dobirky/kosiv-i-opishne' },
-      { label: 'За містом', href: '/vyrobnyky/misto' },
-      { label: 'Мапа', href: '/mapa' },
-    ],
-  },
-  {
-    title: 'Про нас',
-    links: [
-      { label: 'Як це працює', href: '/yak-tse-pratsyuye' },
-      { label: 'Методологія цін', href: '/pro-nas/metodolohiya' },
-      { label: 'Для студій', href: '/dlya-studiy' },
-      { label: 'Гайди', href: '/hayidy' },
-      { label: 'Кейси', href: '/keisy' },
-      { label: 'Контакти', href: '/kontakty' },
-      { label: 'Приватність', href: '/pryvatnist' },
+      { label: 'Усі студії й майстри', href: '/vyrobnyky' },
+      { label: 'Для бізнесу', href: '/dlya-biznesu' },
+      { label: 'Майстер-класи', href: '/maister-klasy' },
+      { label: 'Для LLM: llms.txt', href: '/llms.txt' },
     ],
   },
 ]

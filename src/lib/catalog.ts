@@ -50,23 +50,38 @@ export const getAllStudios = cache(loadStudios)
 
 export const getStudioBySlug = cache(async (slug: string) => (await getAllStudios()).find((s) => s.slug === slug) ?? null)
 
-const texts = (s: Studio) =>
+export const texts = (s: Studio) =>
   [s.description, ...(s.services ?? []).map((x) => x.text), ...(s.products ?? []).map((x) => x.text), ...(s.prices ?? []).map((x) => x.text)]
     .filter(Boolean)
     .join(' ')
     .toLowerCase()
 
+export type Format = NonNullable<Studio['formats']>[number]
+
+// Format tags come from scripts/tag-studios.ts (and admin edits); the regexes below are a fallback for untagged studios.
+export const hasFormat = (s: Studio, f: Format) => Boolean(s.formats?.includes(f))
+
+// JS \w and \b don't match Cyrillic, so the fallbacks use \p{L} with the u flag.
 export const offersMasterClasses = (s: Studio) =>
-  s.type === 'studio' || s.type === 'school' || /майстер-клас|\bмк\b|гончарн\w* кол|ліплен|заняття з кераміки/.test(texts(s))
+  s.type === 'studio' ||
+  s.type === 'school' ||
+  (['wheel', 'handbuilding', 'painting', 'couples', 'kids', 'courses'] as Format[]).some((f) => hasFormat(s, f)) ||
+  /майстер-клас|(?<!\p{L})мк(?!\p{L})|гончарн\p{L}* кол|ліплен|заняття з кераміки/u.test(texts(s))
 
 const MAKER_TYPES = new Set(['studio', 'brand', 'maker', 'school'])
 
 export const worksWithVenues = (s: Studio) =>
   MAKER_TYPES.has(s.type ?? '') &&
-  (Boolean(s.b2b?.worksWithHoreca) || /ресторан|кав.ярн|horeca|хорека|для заклад|готел|кафе\b|посуд на замовлення/.test(texts(s)))
+  (hasFormat(s, 'horeca') ||
+    Boolean(s.b2b?.worksWithHoreca) ||
+    /ресторан|кав.ярн|horeca|хорека|для заклад|готел|кафе(?!\p{L})|посуд на замовлення/u.test(texts(s)))
 
 export const worksWithCompanies = (s: Studio) =>
-  Boolean(s.b2b?.worksWithCorporate) || /корпоратив|логотип|мерч|подарунк\w* для (клієнт|партнер|співроб|команд)/.test(texts(s))
+  hasFormat(s, 'corporate-gifts') ||
+  hasFormat(s, 'corporate-workshop') ||
+  hasFormat(s, 'logo') ||
+  Boolean(s.b2b?.worksWithCorporate) ||
+  /корпоратив|логотип|мерч|подарунк\p{L}* для (?:клієнт|партнер|співроб|команд)/u.test(texts(s))
 
 // Hryvnia amounts mentioned in a studio's price lines (used for honest "from–to" ranges).
 export function hryvniaAmounts(s: Studio): number[] {

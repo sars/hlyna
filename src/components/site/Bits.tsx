@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
@@ -67,5 +68,17 @@ export function SectionHead({ kicker, title, id, children }: { kicker?: string; 
       </h2>
       {children}
     </div>
+  )
+}
+
+// A documentary photo with its visible credit (CC BY-SA requires author + license on the page).
+export function DocPhoto({ photo, priority = false, className = '' }: { photo: import('@/content/photos').DocPhoto; priority?: boolean; className?: string }) {
+  return (
+    <figure className={`m-0 grid gap-1.5 ${className}`}>
+      <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} priority={priority} sizes="(min-width:1024px) 520px, 100vw" className="aspect-[16/11] w-full rounded-[26px] object-cover" />
+      <figcaption className="text-[11.5px] text-umber">
+        Фото: {photo.author}, <a href={photo.href} target="_blank" rel="noopener nofollow" className="text-umber">{photo.license}</a>, Wikimedia Commons
+      </figcaption>
+    </figure>
   )
 }
