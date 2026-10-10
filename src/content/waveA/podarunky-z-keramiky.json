@@ -1,0 +1,108 @@
+{
+ "id": "podarunky-z-keramiky",
+ "title": "Подарунки з кераміки: {items} позицій за бюджетом",
+ "metaDescription": "Подарунки з кераміки ручної роботи: {items} цінових рядків від {count} студій. Браслет за 150 грн, чашка Восьмої Комори 700 грн, масельничка GUNIA 4900 грн.",
+ "lead": "На сторінці {items} цінових рядків від {count} студій і майстрів; типова ціна подарунка {priceRange}, медіана {median}. До 500 грн щось мають {to500Count} студій, у 500–1000 грн {to1000Count}, у 1000–2000 грн {to2000Count}, понад 2000 грн {over2000Count}.",
+ "epigraph": [],
+ "sections": [
+  {
+   "heading": "Як читати ціни нижче",
+   "paragraphs": [
+    "Кожен рядок узято з сайту студії, її Instagram, Всі.Свої, Prom або з добірок медіа, і біля нього стоїть джерело з роком. Рядки 2023 року з bzh.life чи «Наш Київ» (чашка Druzi Ceramic за 350 грн, кавова пара SaGa Pottery за 1050 грн) варто перевірити в студії: ціни могли змінитися."
+   ]
+  },
+  {
+   "heading": "Одна річ, чотири ціни",
+   "paragraphs": [
+    "Найкраще різницю між бюджетами видно на однаковій речі. Підставка під яйце в [Ряби Вош](riaba-vosh) з волинського Кульчина коштує 250 грн (Instagram, 2025), в ужгородської [Lebet Project](lebet-project) 390–750 грн, у [clay kyiv](clay-kyiv) 1200–1600 грн, а «Промені» від [GUNIA Project](gunia-project) 1900 грн, і це найдешевша позиція бренду в нашому прайсі (сайти, 2026). З чашкою так само: біла чашка [Покутської кераміки](pokutska-keramika-pokutska-ceramics) з Городенки на Всі.Свої коштує 210–570 грн, чашка 350 мл [Восьмої Комори](vosma-komora-8-komora) 700 грн, горня [AQYAR ceramics](aqyar-ceramics) 1100 грн, «Serenity» від [Nadiia](nadiia-nadiia-world-nadiia-shapoval) 2400 грн."
+   ]
+  },
+  {
+   "heading": "З чого складається кожен бюджет",
+   "paragraphs": [
+    "До 500 грн переважають прикраси, магніти й дрібний декор: браслет криворізької майстерні [«Коти і Ангели»](maisternia-khudozhnoi-keramiky-koty-i-anhely) за 150 грн і магніти по 140–270 грн (Prom, 2026), кулон «Жар-птиця» від [Kosiv Ceramics](kosiv-ceramics-rodynna-maisternia-ihoria-ta-khrystyny-trots) за 450 грн. Ужитковий посуд у цій сумі є в [GLYNKA](glynka-hlynka) зі Слов’янська: тарілки й миски 75–385 грн.",
+    "У 500–1000 грн вкладається одна авторська чашка або свічка: чашки «Злива» й «Мак» сумського [«Осоння»](studiia-keramiky-osonnia-sumy) по 950 грн, свічки «Хмаринки» й «Тюльпани рожеві» від вінницької майстерні кераміки й свічок [UBOdecor](ubodecor-ubo-keramika-ta-svichky-ruchnoi-roboty) 500–650 грн. У 1000–2000 грн починаються прикраси з іменем: сережки [BIGME](bigme-ua-bihme-keramichni-prykrasy-ceramic-jewerly) 850–1150 грн, сережки [[наїв]](n-a-yi-v-keramichni-prykrasy-ceramic-necklaces) 950–1500 грн. Понад 2000 грн — сети й свічники-скульптури: кавовий набір [KERRA](kerra) 3800 грн, свічник «Коза» від [Хатки](khatka-hatka-ceramics) 4000 грн, «Зоряний» від львівського [Ґроно](grono-grono) 3300 грн; верхню межу тримає дзеркало BREBENESKUL від [Pink Gentle Clouds](pink-gentle-clouds) за 10 240 грн зі знижкою з 12 800."
+   ]
+  },
+  {
+   "heading": "Коли річ обирати не хочеться",
+   "paragraphs": [
+    "Майстер-клас коштує приблизно як одна авторська чашка: «Знайомство з глиною» в київському [Glynar](glynar-honcharna-na-liuteranskii-maisternia-hlynar) коштує 800 грн за 90 хвилин і 2 вироби (сайт, 2026), груповий урок у [«Ліхтарику»](art-studiia-likhtaryk) 600 грн (2025), розпис посуду в [КатАртСис](katartsys) 1500 грн за 2–2,5 години. Без прив’язки до студії можна взяти електронну подарункову карту [наїв] від 1000 грн, а на сайті [Цвіте Терен](tsvite-teren-tsvite-teren) є готова добірка «Спонтанні втіхи до 2000 грн»."
+   ]
+  }
+ ],
+ "picks": [
+  {
+   "need": "До 500 грн, а не дрібничка",
+   "slugs": [
+    "riaba-vosh",
+    "pokutska-keramika-pokutska-ceramics"
+   ],
+   "why": "горщики-звірята 300–500 грн і свічники-будиночки від 500; чашки 210–570 грн на Всі.Свої"
+  },
+  {
+   "need": "Одна чашка на подарунок",
+   "slugs": [
+    "vosma-komora-8-komora",
+    "lebet-project",
+    "aqyar-ceramics"
+   ],
+   "why": "700 грн, 450–950 грн і 1100 грн; усі три продають на власних сайтах"
+  },
+  {
+   "need": "Прикраса з кераміки",
+   "slugs": [
+    "bigme-ua-bihme-keramichni-prykrasy-ceramic-jewerly",
+    "n-a-yi-v-keramichni-prykrasy-ceramic-necklaces"
+   ],
+   "why": "сережки 850–1500 грн; у [наїв] є електронна карта від 1000 грн"
+  },
+  {
+   "need": "Річ у центр святкового столу",
+   "slugs": [
+    "gunia-project",
+    "kerra",
+    "khatka-hatka-ceramics"
+   ],
+   "why": "глечик «Благість» 5200 грн, кавовий набір 3800 грн, свічник «Коза» 4000 грн"
+  }
+ ],
+ "faq": [
+  {
+   "q": "Що з кераміки можна подарувати до 500 грн?",
+   "a": "Магніти «Коти і Ангели» (140–270 грн), міні-горщики й дзвіночки Ряби Вош (200–250 грн), білу тарілку Покутської кераміки за 180 грн, кулон «Жар-птиця» Kosiv Ceramics за 450 грн. Усього позиції в цьому бюджеті мають {to500Count} студій."
+  },
+  {
+   "q": "Скільки коштує чашка ручної роботи?",
+   "a": "Від 210 грн (чашки Покутської кераміки на Всі.Свої, 2026) до 2400 грн (чашка «Serenity» Nadiia, 2026). Між ними: Lebet Project 450–950 грн залежно від розміру, Восьма Комора 700 грн, «Осоння» 950 грн, AQYAR 1100 грн, чашка Vintage від clay kyiv 1350 грн, KERRA 1200–2200 грн."
+  },
+  {
+   "q": "Який подарунок GUNIA Project найдешевший?",
+   "a": "Підставка під яйце «Промені» за 1900 грн, далі свічник «Світло» за 2500 грн і кружка «Голубка» за 2800 грн; тарілки коштують 3100–4400 грн, чайник «Щебіт» 5200 грн (сайт бренду й BADO, 2026)."
+  },
+  {
+   "q": "Що подарувати вчителю чи колегам?",
+   "a": "У прайсах для таких приводів найчастіше трапляється чашка за 400–950 грн: Druzi Ceramic 400 грн (2024), Покутська кераміка 210–570 грн, Lebet Project 450–950 грн, «Осоння» 950 грн. На цілий клас чи відділ дешевше вийдуть магніти «Коти і Ангели» по 140–270 грн."
+  }
+ ],
+ "sources": [
+  "https://guniaproject.com",
+  "https://nadiia.world/uk",
+  "https://claykyiv.com/",
+  "https://aqyarceramics.com",
+  "https://8komora.com/",
+  "http://kerra.shop/",
+  "https://hatkaceramics.com/",
+  "https://grono.shop",
+  "https://lebetproject.com/product-category/candles",
+  "https://www.osonnya.shop/",
+  "https://tsviteteren.com/",
+  "https://www.bigme.com.ua/",
+  "https://naiveua.com",
+  "https://pokutska-ceramics.com",
+  "https://pinkgentleclouds.com",
+  "https://www.katartsys.studio/",
+  "https://www.glynar.com/",
+  "https://lihtaryk.com.ua"
+ ]
+}
