@@ -7,6 +7,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
+import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses } from '@/lib/catalog'
 
 export const revalidate = 86400
 
@@ -44,8 +45,25 @@ const faq = [
 const container = 'mx-auto max-w-[1200px] px-4 sm:px-5'
 const h2 = 'h-display text-[clamp(20px,2.6vw,30px)] leading-[1.12] m-0'
 
-export default function HomePage() {
-  const s = site.stats
+// Live, honest counts from the public catalogue (falls back to the October 2026 snapshot without a database).
+async function stats() {
+  try {
+    const all = await getAllStudios()
+    const mk = all.filter(offersMasterClasses)
+    return {
+      makers: all.length,
+      cities: groupByCity(all).length,
+      masterClassPlaces: mk.length,
+      withPrices: all.filter((x) => hryvniaAmounts(x).length).length,
+      cityCounts: new Map(groupByCity(mk).map((g) => [g.city.slug as string, g.studios.length])),
+    }
+  } catch {
+    return { ...site.stats, cityCounts: new Map<string, number>() }
+  }
+}
+
+export default async function HomePage() {
+  const s = await stats()
   return (
     <main>
       <JsonLd
@@ -69,7 +87,7 @@ export default function HomePage() {
             <Link href="/maister-klasy" className="rounded-full border-2 border-ink px-[22px] py-[11px] font-bold text-ink no-underline hover:bg-ink hover:text-cream">Знайти майстер-клас</Link>
           </div>
           <dl className="m-0 flex flex-wrap gap-x-6 gap-y-2 text-sm text-umber">
-            <div><dt className="font-display text-xl text-cobalt">{nf(s.makers)}+</dt><dd className="m-0">студій, майстрів і брендів</dd></div>
+            <div><dt className="font-display text-xl text-cobalt">{nf(s.makers)}</dt><dd className="m-0">студій, майстрів і брендів</dd></div>
             <div><dt className="font-display text-xl text-cobalt">{s.cities}</dt><dd className="m-0">міст і сіл</dd></div>
             <div><dt className="font-display text-xl text-cobalt">{s.masterClassPlaces}</dt><dd className="m-0">місця з майстер-класами</dd></div>
           </dl>
@@ -140,7 +158,7 @@ export default function HomePage() {
             <p className="m-0 text-[13px] text-umber">Джерело: прайси, сайти і сторіс українських студій, зібрані глина.юа у 2026 році. Ціни для кожної студії — у її профілі.</p>
           </div>
           <dl className="m-0 grid grid-cols-2 gap-3">
-            {[[`${nf(s.makers)}+`, 'студій, майстрів і брендів у каталозі'], [String(s.masterClassPlaces), 'місця з майстер-класами'], [String(s.cities), 'міст і сіл'], [`${s.withPrices}+`, 'профілів з цінами']].map(([n, l]) => (
+            {[[nf(s.makers), 'студій, майстрів і брендів у каталозі'], [String(s.masterClassPlaces), 'місця з майстер-класами'], [String(s.cities), 'міст і сіл'], [String(s.withPrices), 'профілів з цінами з прайсу']].map(([n, l]) => (
               <div key={l} className="grid gap-0.5 rounded-2xl bg-card p-4"><dt className="font-display text-[clamp(22px,3vw,30px)] leading-tight text-cobalt">{n}</dt><dd className="m-0 text-sm text-umber">{l}</dd></div>
             ))}
           </dl>
@@ -168,8 +186,8 @@ export default function HomePage() {
       <section className={`${container} pb-14`} aria-labelledby="mk">
         <div className="mb-6 grid max-w-[760px] gap-2.5"><span className="kicker">Для себе і в подарунок</span><h2 id="mk" className={h2}>Майстер-класи з кераміки за містами</h2><p className="m-0 text-umber">Усі студії міста на одній сторінці: формати, ціни, сертифікати й контакти.</p></div>
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-2.5 p-0">
-          {cities.map(([n, c, slug]) => (
-            <li key={slug}><Link href={`/maister-klasy/${slug}`} className="flex justify-between gap-2 rounded-[14px] bg-card px-3.5 py-3 font-semibold text-ink no-underline hover:bg-sand hover:text-ink">{n}<span className="text-terra">{c}</span></Link></li>
+          {cities.filter(([, , slug]) => (s.cityCounts.get(slug) ?? 0) >= 3 || !s.cityCounts.size).map(([n, c, slug]) => (
+            <li key={slug}><Link href={`/maister-klasy/${slug}`} className="flex justify-between gap-2 rounded-[14px] bg-card px-3.5 py-3 font-semibold text-ink no-underline hover:bg-sand hover:text-ink">{n}<span className="text-terra">{s.cityCounts.get(slug) ?? c}</span></Link></li>
           ))}
           <li><Link href="/maister-klasy" className="flex justify-between gap-2 rounded-[14px] bg-card px-3.5 py-3 font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Усі міста<span className="text-terra">→</span></Link></li>
         </ul>

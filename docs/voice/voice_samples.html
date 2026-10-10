@@ -2,53 +2,46 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;700&family=Raleway:ital,wght@0,400;0,500;0,700;1,400;1,500&display=swap">
 <style>
-/* Layout: intro explaining the signature device, a picker for the wink phrase, then five real page openings: plain factual lead + the styled «ліричний відступ». Palette 1A, single light look. */
+/* Layout: one column. Each card = factual lead, a short verse set like an epigraph (the signature device), then warm plain prose. Palette 1A, single light look. */
 :root{ --clay:#f3e7da; --card:#fbf3ea; --white:#fffaf4; --ink:#2a2018; --muted:#6c5243; --line:#e1c7ae; --terra:#b4683f; --cobalt:#2a4fa8; --ochre:#d9a441;
  --fd:"Unbounded","Arial Black",sans-serif; --fb:"Raleway","Helvetica Neue",Arial,sans-serif; color-scheme:light }
 body{ background:var(--clay); color:var(--ink); font-family:var(--fb); font-size:16px; line-height:1.65; font-variant-numeric:lining-nums; padding-inline:16px; padding-block:0 60px }
 .band{ height:12px; margin-inline:-16px; background:repeating-linear-gradient(90deg,var(--terra) 0 16px,var(--clay) 16px 20px,var(--cobalt) 20px 36px,var(--clay) 36px 40px,var(--ochre) 40px 56px,var(--clay) 56px 60px) }
-.wrap{ max-width:860px; margin:0 auto; display:grid; gap:24px; padding-top:30px }
+.wrap{ max-width:820px; margin:0 auto; display:grid; gap:24px; padding-top:30px }
 h1{ font-family:var(--fd); text-transform:uppercase; font-size:clamp(24px,4vw,38px); line-height:1.08; margin:0; text-wrap:balance }
 h2{ font-family:var(--fd); font-size:clamp(16px,2.2vw,20px); text-transform:uppercase; margin:0; line-height:1.2 }
-.intro{ display:grid; gap:12px } .intro p, .intro li{ color:var(--muted) } .intro ul{ margin:0; padding-left:20px; display:grid; gap:4px }
-.picker{ display:flex; flex-wrap:wrap; gap:8px; align-items:center }
-.picker button{ font:inherit; font-weight:700; font-size:14px; padding:8px 14px; border-radius:999px; border:1.5px solid var(--line); background:var(--white); color:var(--ink); cursor:pointer }
-.picker button[aria-pressed="true"]{ border-color:var(--cobalt); background:var(--card) }
-.picker button:focus-visible{ outline:2px solid var(--cobalt); outline-offset:2px }
-.card{ background:var(--card); border-radius:22px; padding:22px; display:grid; gap:14px }
+.intro{ display:grid; gap:10px } .intro p, .intro li{ color:var(--muted) } .intro ul{ margin:0; padding-left:20px; display:grid; gap:4px }
+.card{ background:var(--card); border-radius:22px; padding:24px; display:grid; gap:16px }
 @media (max-width:520px){ .card{ padding:16px } }
 .lead-p{ margin:0; font-size:17px }
 .tag{ display:block; font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:4px }
-.lyric{ position:relative; background:var(--white); border-radius:16px; padding:14px 16px 14px 22px; border:1px solid var(--line) }
-.lyric::before{ content:""; position:absolute; left:0; top:12px; bottom:12px; width:6px; border-radius:6px; background:repeating-linear-gradient(180deg,var(--terra) 0 10px,var(--cobalt) 10px 20px,var(--ochre) 20px 30px) }
-.ll{ font-family:var(--fd); font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--terra) }
-.lyric p{ margin:6px 0 0; font-size:16.5px }
-.lyric i{ color:#4a3628 }
-.pr{ color:var(--cobalt) }
+.poem{ margin:4px 0; padding:6px 0 6px 22px; border-left:3px solid var(--ochre) }
+.poem p{ margin:0; font-style:italic; font-size:19px; line-height:1.55; color:#5a3f2c }
+.poem::after{ content:""; display:block; width:56px; height:8px; margin-top:12px; background:repeating-linear-gradient(90deg,var(--terra) 0 12px,transparent 12px 16px,var(--cobalt) 16px 28px,transparent 28px 32px,var(--ochre) 32px 44px) }
+.warm{ margin:0; font-size:17px }
 .note{ font-size:13.5px; color:var(--muted); margin:0 }
 </style>
 <div class="band" aria-hidden="true"></div>
 <div class="wrap">
- <header class="intro"><h1>Голос: Коцюбинський з посмішкою</h1>
- <p>Фішка — короткий «ліричний відступ»: одне речення в дусі Коцюбинського, а одразу за ним підморгування і проста суть. Видно, що це гра, і завжди зрозуміло, про що мова.</p>
- <ul><li>Перші 2–3 речення сторінки — прості факти з цифрами (їх цитують ЛЛМ і пошук).</li><li>Відступ — максимум один-два на сторінку, ніколи в таблицях, цінах і FAQ.</li><li>Одне образне речення, не більше, і обов’язково проза після нього.</li></ul>
- <div class="picker" role="group" aria-label="Слово-підморгування"><span class="note">Як підморгуємо:</span><button type="button" aria-pressed="true" data-v="Прозою:">Прозою:</button><button type="button" aria-pressed="false" data-v="А якщо без поезії:">А якщо без поезії:</button><button type="button" aria-pressed="false" data-v="Простіше кажучи:">Простіше кажучи:</button></div>
+ <header class="intro"><h1>Голос: вірш-епіграф і тепла проза</h1>
+ <p>Фішка — короткий вірш у дусі Коцюбинського, оформлений як епіграф: три-чотири рядки, без пояснень. Далі — звичайна гарна українська: тепла, гончарна, дружня і зрозуміла.</p>
+ <ul><li>Порядок: факти з цифрами → вірш → тепла проза → таблиці, ціни, FAQ.</li><li>Один вірш на сторінку, не більше. У профілях студій — не на кожному, лише там, де є про що.</li><li>Вірш не повторює факти й не пояснюється; проза не переказує вірш.</li></ul>
  </header>
  <article class="card"><h2>Головна</h2>
 <p class="lead-p"><span class="tag">Факти (бачать ЛЛМ і пошук)</span>глина.юа — каталог українських керамічних студій і майстрів. Тут можна замовити посуд і подарунки ручної роботи для закладу чи компанії або знайти майстер-клас у своєму місті.</p>
-<aside class="lyric" aria-label="Ліричний відступ"><span class="ll">ліричний відступ</span><p><i>Глина приходить з берегів Ворскли й Рибниці, сохне на полицях, а тоді народжується вдруге — у вогні, дзвінка, мов камінь.</i> <b class="pr" data-m>Прозою:</b> тут ви знайдете студії, які зроблять посуд для вашого закладу або подарунки для команди.</p></aside></article><article class="card"><h2>Посуд для ресторанів і кав’ярень</h2>
-<p class="lead-p"><span class="tag">Факти (бачать ЛЛМ і пошук)</span>Посуд ручної роботи для ресторанів, кав’ярень і готелів роблять десятки українських студій. Мінімальна партія залежить від студії, виготовлення зазвичай займає 3–8 тижнів. Нижче — студії, умови і ціни.</p>
-<aside class="lyric" aria-label="Ліричний відступ"><span class="ll">ліричний відступ</span><p><i>У поливі, як у глибокій воді, ховається світло вашої лампи, а теплий край тарілки ще пам’ятає руки майстра.</i> <b class="pr" data-m>Прозою:</b> такий посуд витримує посудомийку і вечірній наплив, а студії нижче вже працюють із закладами.</p></aside></article><article class="card"><h2>Корпоратив з ліплення з глини</h2>
+<figure class="poem"><p>Глина пам’ятає руки,<br>вогонь — терпіння,<br>а чашка — ранок,<br>коли її вперше взяли до рук.</p></figure>
+<p class="warm">Ми зібрали майстерні з усієї України — від Опішні над Ворсклою до Косова над Рибницею, від маленьких студій у містах до гончарень у селах. Тут легко знайти тих, хто зробить посуд для вашої кав’ярні, подарунки для команди або просто посадить вас за гончарне коло на суботу.</p></article><article class="card"><h2>Посуд для ресторанів і кав’ярень</h2>
+<p class="lead-p"><span class="tag">Факти (бачать ЛЛМ і пошук)</span>Посуд ручної роботи для ресторанів, кав’ярень і готелів роблять десятки українських студій. Мінімальна партія залежить від студії, виготовлення зазвичай займає 3–8 тижнів.</p>
+<figure class="poem"><p>Полива тримає світло,<br>як вечірня вода.<br>Край тарілки ще теплий —<br>від рук, не від печі.</p></figure>
+<p class="warm">Посуд ручної роботи — це спосіб сказати гостю, що тут думали про дрібниці. Кожна тарілка трохи інша, але разом вони складаються у ваш стиль. Студії нижче вже працюють із закладами і знають, що посуд має пережити посудомийку, вечірній наплив і дозамовлення через пів року.</p></article><article class="card"><h2>Корпоратив з ліплення з глини</h2>
 <p class="lead-p"><span class="tag">Факти (бачать ЛЛМ і пошук)</span>Корпоратив з ліплення з глини коштує приблизно 550–1 550 грн з особи. Його проводять у студії або у вашому офісі, для 10–40+ людей; бронювати варто за 1–3 тижні.</p>
-<aside class="lyric" aria-label="Ліричний відступ"><span class="ll">ліричний відступ</span><p><i>Двадцять людей, двадцять грудок глини, тиха вода в мисках — і жодного слайду на екрані.</i> <b class="pr" data-m>Прозою:</b> 2–3 години, усі матеріали включено, готові вироби після випалу привезуть в офіс.</p></aside></article><article class="card"><h2>Майстер-класи з кераміки у Львові</h2>
+<figure class="poem"><p>Двадцять пар рук,<br>двадцять грудок глини<br>і тиша, якої<br>не буває на нарадах.</p></figure>
+<p class="warm">Це дві-три години, коли команда робить щось руками й нікуди не поспішає. Кожен робить свою чашку чи миску, а після випалу готові вироби можна забрати або отримати доставкою. Можна в студії, а можна у вашому офісі — глина легко переїжджає.</p></article><article class="card"><h2>Майстер-класи з кераміки у Львові</h2>
 <p class="lead-p"><span class="tag">Факти (бачать ЛЛМ і пошук)</span>У Львові понад 30 місць, де можна спробувати гончарство чи ліплення з глини. Груповий майстер-клас коштує приблизно 550–1 200 грн з особи, індивідуальний — від 1 200 грн (жовтень 2026).</p>
-<aside class="lyric" aria-label="Ліричний відступ"><span class="ll">ліричний відступ</span><p><i>Коло крутиться, і грудка глини то тікає з-під долонь, то слухняно тягнеться вгору, тепла, як хліб.</i> <b class="pr" data-m>Прозою:</b> за дві години у вас буде перша миска, а через 2–4 тижні, після двох випалів, ви заберете її додому.</p></aside></article><article class="card"><h2>Профіль студії (Glinland, Одеса)</h2>
+<figure class="poem"><p>Коло крутиться повільно,<br>глина вперто тікає,<br>а потім раптом слухається —<br>і в долонях росте миска.</p></figure>
+<p class="warm">У Львові є де навчитися: студії з гончарним колом і ліпленням, заняття для двох, для дітей і для цілої команди. За дві години ви зробите свою першу річ, а після двох випалів заберете її додому — зазвичай за 2–4 тижні.</p></article><article class="card"><h2>Профіль студії (Glinland, Одеса)</h2>
 <p class="lead-p"><span class="tag">Факти (бачать ЛЛМ і пошук)</span>Glinland — гончарна студія в Одесі. Урок на гончарному колі (60 хв) коштує 900 грн плюс випал від 100 грн, майстер-клас «Доторкнись» — 1 200 грн для однієї людини (2026).</p>
-<aside class="lyric" aria-label="Ліричний відступ"><span class="ll">ліричний відступ</span><p><i>Море десь зовсім поруч, а в студії пахне мокрою глиною і теплом печі.</i> <b class="pr" data-m>Прозою:</b> у студії тільки ви і майстер, тож можна не поспішати.</p></aside></article>
- <p class="note">Факти в прикладах — з наших даних 2026 року (для Glinland — з прайсу студії). Формулювання корпоративу — ілюстрація формату.</p>
+<figure class="poem"><p>Море шумить за стіною,<br>у майстерні пахне мокрою глиною,<br>і нікуди не треба поспішати.</p></figure>
+<p class="warm">На занятті в Glinland тільки ви і майстер, тож можна спокійно розібратися, як глина поводиться під руками, і зробити річ, яку не соромно поставити на полицю — або подарувати.</p></article>
+ <p class="note">Факти — з наших даних 2026 року. Вірші написані для сайту в дусі Коцюбинського, без цитат.</p>
 </div>
-<script>
-(function(){ var b=document.querySelectorAll('.picker button'), m=document.querySelectorAll('[data-m]');
- function set(v){ m.forEach(function(x){ x.textContent=v; }); b.forEach(function(x){ x.setAttribute('aria-pressed', x.dataset.v===v?'true':'false'); }); }
- b.forEach(function(x){ x.addEventListener('click', function(){ set(x.dataset.v); }); }); })();
-</script>
