@@ -11,6 +11,7 @@ import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
 import { fmt, getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress, inCity, oblastLabel, singleClassAmounts, typicalRange } from '@/lib/present'
+import { cityContent } from '@/lib/places'
 import { certificateCities } from '@/lib/topics'
 
 export const revalidate = 86400
@@ -133,6 +134,12 @@ export default async function CityMasterClassesPage({ params }: Args) {
           {breakdown.length ? `: ${breakdown.join(', ')}` : ''}.
           {r ? ` Разовий майстер-клас найчастіше коштує ${priceText(r)} (за прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])}, ${site.dataUpdated}).` : ''} Нижче — кожна студія з форматами й цінами; один запит можна надіслати одразу кільком.
         </p>
+        {cityContent(city.slug as string)?.lead && (
+          <p className="m-0 max-w-[70ch] text-[15.5px] text-umber">
+            {cityContent(city.slug as string)!.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}{' '}
+            <Link href={`/vyrobnyky/misto/${city.slug}`}>Більше про кераміку {where} →</Link>
+          </p>
+        )}
         <Updated />
       </div>
 

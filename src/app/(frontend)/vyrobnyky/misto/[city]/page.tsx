@@ -6,11 +6,14 @@ import React from 'react'
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { MakerRow } from '@/components/site/MakerRow'
+import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
 import { fmt, getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { cityStats, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
+import { cityContent, fixPriceRef, mergeFaq } from '@/lib/places'
+import { localPrices } from '@/lib/priceIndex'
 import { certificateCities } from '@/lib/topics'
 import { ogImage } from '@/utilities/ogImage'
 
@@ -37,7 +40,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!g) return {}
   return {
     title: `Кераміка ручної роботи ${inCity(g.city.name)}: ${who(g.studios.length)}`,
-    description: `Керамічні студії, бренди й майстри ${inCity(g.city.name)}: ${who(g.studios.length)} — посуд, декор, майстер-класи, замовлення для закладів і компаній. Адреси, Instagram, що роблять.`,
+    description: (cityContent(g.city.slug as string)?.lead || `Керамічні студії, бренди й майстри ${inCity(g.city.name)}: ${who(g.studios.length)} — посуд, декор, майстер-класи, замовлення для закладів і компаній.`).replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').slice(0, 300),
     alternates: { canonical: `/vyrobnyky/misto/${g.city.slug}` },
     openGraph: { images: ogImage({ title: `Кераміка ручної роботи: ${g.city.name}`, kicker: 'Виробники', sub: who(g.studios.length), pattern: g.city.slug as string, coa: g.city.slug as string }) },
   }
@@ -54,12 +57,17 @@ export default async function CityMakersPage({ params }: Args) {
   const certPage = (await certificateCities()).some((c) => c.slug === city.slug)
   const groups = TYPE_GROUPS.map((t) => ({ ...t, studios: studios.filter((s) => t.types.includes(s.type ?? '')).sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name, 'uk')) })).filter((t) => t.studios.length)
   const counts = groups.map((t) => `${t.title.toLowerCase()} — ${t.studios.length}`).join(', ')
+  const content = cityContent(city.slug as string)
+  const known = new Map((await getAllStudios()).map((s) => [s.slug as string, s]))
+  const prices = localPrices(studios)
+  const priceWhere = prices.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
 
-  const faq = [
+  const baseFaq = [
     { q: `Де купити кераміку ручної роботи ${where}?`, a: `У каталозі — ${who(studios.length)} ${where}. Більшість продають напряму: через Instagram, власний сайт, Etsy чи у своїй майстерні; посилання — у профілях. Частина брендів має шоуруми або продається в концепт-сторах.` },
     ...(st.classes ? [{ q: `Де пройти майстер-клас з кераміки ${where}?`, a: `Майстер-класи проводять ${st.classes} ${pluralUk(st.classes, ['місце', 'місця', 'місць'])} з цього списку${mkPage ? ' — окремий перелік з цінами на сторінці майстер-класів міста' : ''}.` }] : []),
     { q: 'Чи можна замовити посуд для закладу чи подарунки для компанії?', a: `${st.venues ? `${st.venues} ${pluralUk(st.venues, ['студія тут згадує', 'студії тут згадують', 'студій тут згадують'])} роботу із закладами. ` : ''}Надішліть один запит — ми передамо його студіям, які роблять подібні вироби, у цьому місті й поруч. ${site.model}` },
   ]
+  const faq = mergeFaq(baseFaq, (content?.faq ?? []).map((f) => ({ q: f.q, a: fixPriceRef(f.a, priceWhere) })))
 
   return (
     <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
@@ -86,7 +94,8 @@ export default async function CityMakersPage({ params }: Args) {
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, { label: city.name }]} />
         <span className="kicker">Виробники{region ? ` · ${region}` : ''}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Кераміка ручної роботи: {city.name}</h1>
-        <p className="m-0 max-w-[70ch] text-lg">
+        {content?.lead && <p className="m-0 max-w-[70ch] text-lg">{content.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
+        <p className={`m-0 max-w-[70ch] ${content?.lead ? '' : 'text-lg'}`}>
           У каталозі «Глина» — {who(studios.length)} {where}: {counts}.
           {st.classes ? ` ${st.classes} ${pluralUk(st.classes, ['проводить', 'проводять', 'проводять'])} майстер-класи` : ''}
           {st.classes && st.venues ? ', ' : st.venues ? ' ' : ''}
@@ -104,6 +113,37 @@ export default async function CityMakersPage({ params }: Args) {
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
         <div className="grid grid-cols-1 gap-10">
+          {content && <PlaceStory c={content} known={known} title={`Кераміка ${where}: що тут роблять`} />}
+          {content && <PlacePicks c={content} known={known} />}
+          {prices.length > 0 && (
+            <section aria-labelledby="prices">
+              <SectionHead kicker="Ціни" title={`Ціни ${where}`} id="prices">
+                <p className="m-0 text-sm text-umber">З прайсів студій цього міста: одна ціна на студію, від найнижчої до найвищої. Порівняння з усією Україною — на сторінці <Link href="/tsiny-2026">«Ціни 2026»</Link>.</p>
+              </SectionHead>
+              <div className="overflow-x-auto rounded-2xl bg-card">
+                <table className="w-full border-collapse text-[14.5px]">
+                  <thead>
+                    <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
+                      <th className="border-b border-line px-3.5 py-3">Що</th>
+                      <th className="border-b border-line px-3.5 py-3 whitespace-nowrap">Від–до, грн</th>
+                      <th className="border-b border-line px-3.5 py-3">Медіана</th>
+                      <th className="hidden border-b border-line px-3.5 py-3 sm:table-cell">Студій</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {prices.map((p) => (
+                      <tr key={p.cat.key}>
+                        <td className="border-b border-line px-3.5 py-2.5">{p.cat.label} <span className="text-[12.5px] text-umber">{p.cat.unit}<span className="sm:hidden"> · {p.n} {pluralUk(p.n, ['студія', 'студії', 'студій'])}</span></span></td>
+                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.min === p.max ? fmt(p.min) : `${fmt(p.min)}–${fmt(p.max)}`}</td>
+                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.median ? fmt(p.median) : '—'}</td>
+                        <td className="hidden border-b border-line px-3.5 py-2.5 sm:table-cell">{p.n}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          )}
           {groups.map((t, k) => (
             <section key={t.title} aria-labelledby={`g${k}`}>
               <SectionHead title={`${t.title} ${t.studios.length > 1 ? `· ${t.studios.length}` : ''}`} id={`g${k}`} />
@@ -120,6 +160,8 @@ export default async function CityMakersPage({ params }: Args) {
             </section>
           ))}
 
+          {content && <PlaceSeeAlso c={content} known={known} />}
+
           <section aria-labelledby="faq">
             <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
             <div className="grid grid-cols-1 gap-2.5">
@@ -135,6 +177,7 @@ export default async function CityMakersPage({ params }: Args) {
               ))}
             </div>
           </section>
+          {content && <PlaceSources c={content} />}
         </div>
         <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
           <RequestForm sourcePage={`/vyrobnyky/misto/${city.slug}`} defaultWhat="tableware" defaultCity={city.name} />

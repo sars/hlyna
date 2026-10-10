@@ -3,7 +3,8 @@ import React from 'react'
 
 import { TopicPage } from '@/components/site/TopicPage'
 import { productTopics } from '@/content/topics'
-import { MIN_LIST } from '@/lib/catalog'
+import { getAllStudios, MIN_LIST } from '@/lib/catalog'
+import { productContent } from '@/lib/places'
 import { topicData, topicMetadata } from '@/lib/topics'
 
 export const revalidate = 86400
@@ -27,5 +28,7 @@ export default async function Page({ params }: Args) {
   const data = await topicData(topic)
   // No thin pages: fewer than MIN_LIST makers → 404 until the catalogue grows.
   if (data.ctx.n < MIN_LIST && process.env.BUILD_WITHOUT_DB !== '1') notFound()
-  return <TopicPage topic={topic} data={data} />
+  const slug = topic.path.split('/').pop() as string
+  const known = new Map((await getAllStudios()).map((s) => [s.slug as string, s]))
+  return <TopicPage topic={topic} data={data} content={productContent(slug)} known={known} />
 }

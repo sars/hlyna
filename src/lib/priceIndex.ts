@@ -74,10 +74,10 @@ const median = (a: number[]) => {
 }
 const q = (sorted: number[], p: number) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))]
 
-export async function priceIndex() {
-  const studios = (await getAllStudios()).filter((s) => s.type !== 'supplier')
+// One value per studio and category: the median of that studio's matching price lines.
+export function studioValues(studios: StudioCard[]) {
   const values = new Map<string, { studio: StudioCard; value: number; lines: Example[] }[]>()
-  let years: number[] = []
+  const years: number[] = []
   const sources = new Set<number>()
   for (const s of studios) {
     const lines = publicPrices(s)
@@ -97,7 +97,23 @@ export async function priceIndex() {
       values.set(cat.key, arr)
     }
   }
-  years = years.sort()
+  return { values, years, sources }
+}
+
+// Prices among one group of studios (a city page): from–to across studios, median once there are 3.
+export function localPrices(studios: StudioCard[]) {
+  const { values } = studioValues(studios)
+  return CATEGORIES.flatMap((cat) => {
+    const vals = (values.get(cat.key) ?? []).map((x) => x.value).sort((a, b) => a - b)
+    if (vals.length < 2) return []
+    return [{ cat, n: vals.length, min: roundNice(vals[0]), max: roundNice(vals[vals.length - 1]), median: vals.length >= 3 ? roundNice(median(vals)) : null }]
+  })
+}
+
+export async function priceIndex() {
+  const studios = (await getAllStudios()).filter((s) => s.type !== 'supplier')
+  const { values, sources, years: found } = studioValues(studios)
+  const years = found.sort()
   const stats: CategoryStats[] = []
   for (const cat of CATEGORIES) {
     const arr = values.get(cat.key) ?? []

@@ -2,6 +2,8 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, DocPhoto, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
+import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
+import { fixPriceRef, mergeFaq, type PlaceContent } from '@/lib/places'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF } from '@/content/navigation'
@@ -83,9 +85,11 @@ function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp
 }
 
 // Shared layout for topic pages (src/content/topics.ts). Business topics get the request form in the aside.
-export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic: Topic; data: TopicData; h1?: string; crumb?: string; extraParents?: { label: string; href: string }[] }) {
+export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, known }: { topic: Topic; data: TopicData; h1?: string; crumb?: string; extraParents?: { label: string; href: string }[]; content?: PlaceContent | null; known?: Map<string, StudioCard> }) {
   const { ctx, lists, all, examples } = data
-  const faq = topic.faq(ctx)
+  const place = content && known ? content : null
+  const priceWhere = examples.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
+  const faq = mergeFaq(topic.faq(ctx), (place?.faq ?? []).map((f) => ({ q: f.q, a: fixPriceRef(f.a, priceWhere) })))
   const title = h1 ?? topic.h1
 
   return (
@@ -98,7 +102,8 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
           <Breadcrumbs items={[...topic.parents, ...extraParents, { label: crumb ?? topic.crumb }]} />
           <span className="kicker">{topic.kicker}</span>
           <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{title}</h1>
-          <p className="m-0 max-w-[70ch] text-lg">{topic.lead(ctx)}</p>
+          {place?.lead && <p className="m-0 max-w-[70ch] text-lg">{place.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
+          <p className={`m-0 max-w-[70ch] ${place?.lead ? '' : 'text-lg'}`}>{topic.lead(ctx)}</p>
           <Updated />
         </div>
         {topic.photo && <DocPhoto photo={topic.photo} priority />}
@@ -107,6 +112,8 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
         <div className="grid grid-cols-1 gap-10">
           {topic.verse.length > 0 && <Epigraph lines={topic.verse} />}
+          {place && known && <PlaceStory c={place} known={known} title="Хто що робить зараз" />}
+          {place && known && <PlacePicks c={place} known={known} title="Що обрати для чого" />}
 
           {topic.sections.map((sec, k) => (
             <section key={sec.title} aria-labelledby={`sec${k}`}>
@@ -160,6 +167,8 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
             ) : null,
           )}
 
+          {place && known && <PlaceSeeAlso c={place} known={known} title="Де подивитися й купити" />}
+
           <section aria-labelledby="faq">
             <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
             <div className="grid grid-cols-1 gap-2.5">
@@ -188,6 +197,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
               ))}
             </ul>
           </nav>
+          {place && <PlaceSources c={place} />}
         </div>
 
         <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24">
