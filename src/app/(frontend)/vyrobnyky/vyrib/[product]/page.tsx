@@ -7,7 +7,6 @@ import { MIN_LIST } from '@/lib/catalog'
 import { topicData, topicMetadata } from '@/lib/topics'
 
 export const revalidate = 86400
-export const dynamicParams = false
 
 const bySlug = (slug: string) => Object.values(productTopics).find((t) => t.path.endsWith(`/${slug}`))
 
