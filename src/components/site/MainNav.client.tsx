@@ -41,8 +41,6 @@ export function MainNav() {
     document.body.style.overflow = drawer ? 'hidden' : ''
   }, [drawer])
 
-  const active = mainNav.find((s) => s.id === open)
-
   return (
     <div ref={rootRef} className="flex min-w-0 flex-1 items-center gap-4">
       <ul className="hidden min-w-0 flex-1 items-center gap-0.5 lg:flex">
@@ -86,10 +84,16 @@ export function MainNav() {
         Меню
       </button>
 
-      {active && (
-        <div id={`mega-${active.id}`} className="absolute inset-x-0 top-full hidden border-b border-line bg-card shadow-[0_18px_30px_rgba(42,32,24,.12)] lg:block">
+      {/* All panels are rendered on the server (links stay crawlable); only the open one is visible. */}
+      {mainNav.map((section) => (
+        <div
+          key={section.id}
+          id={`mega-${section.id}`}
+          hidden={open !== section.id}
+          className="absolute inset-x-0 top-full hidden border-b border-line bg-card shadow-[0_18px_30px_rgba(42,32,24,.12)] lg:block"
+        >
           <div className="mx-auto grid max-w-[1200px] grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.1fr)] gap-7 px-5 py-7">
-            {active.columns.map((c) => (
+            {section.columns.map((c) => (
               <div key={c.title}>
                 <p className="kicker mb-2.5">{c.title}</p>
                 <ul className="grid gap-2">
@@ -104,18 +108,18 @@ export function MainNav() {
                 </ul>
               </div>
             ))}
-            {active.promo && (
+            {section.promo && (
               <div className="grid content-start gap-2.5 rounded-2xl bg-cobalt p-4 text-clay">
-                <b className="font-display text-[15px] leading-tight uppercase">{active.promo.title}</b>
-                <p className="m-0 text-sm">{active.promo.text}</p>
-                <Link href={active.promo.cta.href} className="justify-self-start rounded-full bg-ochre px-4 py-2.5 text-sm font-bold text-ink no-underline hover:text-ink">
-                  {active.promo.cta.label}
+                <b className="font-display text-[15px] leading-tight uppercase">{section.promo.title}</b>
+                <p className="m-0 text-sm">{section.promo.text}</p>
+                <Link href={section.promo.cta.href} className="justify-self-start rounded-full bg-ochre px-4 py-2.5 text-sm font-bold text-ink no-underline hover:text-ink">
+                  {section.promo.cta.label}
                 </Link>
               </div>
             )}
           </div>
         </div>
-      )}
+      ))}
 
       {drawer && (
         <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" className="fixed inset-0 z-50 overflow-y-auto bg-clay px-4 pt-[calc(env(safe-area-inset-top,0px)+14px)] pb-10">
