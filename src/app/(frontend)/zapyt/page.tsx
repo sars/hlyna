@@ -13,14 +13,14 @@ export const metadata: Metadata = {
 
 export default function RequestPage() {
   return (
-    <main className="mx-auto grid max-w-[1200px] gap-8 px-4 pt-11 pb-16 sm:px-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-      <div className="grid content-start gap-4">
+    <main className="mx-auto grid grid-cols-1 max-w-[1200px] gap-8 px-4 pt-11 pb-16 sm:px-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 content-start gap-4">
         <span className="kicker">Один запит — кілька пропозицій</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Отримати пропозиції від студій</h1>
         <p className="m-0 text-lg text-umber">
           Опишіть, що потрібно: посуд для закладу, чашки з логотипом, подарунки для команди чи корпоратив з ліплення з глини. Ми передамо запит 3–5 студіям, які роблять такі вироби, і вони відповідатимуть вам напряму.
         </p>
-        <ul className="m-0 grid gap-2 pl-5">
+        <ul className="m-0 grid grid-cols-1 gap-2 pl-5">
           <li>Зазвичай студії відповідають за 1–3 робочі дні.</li>
           <li>Терміни виготовлення партії — переважно {site.prices.batchLeadTime}.</li>
           <li>{site.model}</li>

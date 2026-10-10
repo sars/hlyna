@@ -66,7 +66,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
   ]
 
   return (
-    <main className={`${container} grid gap-10 pt-8 pb-16`}>
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{
@@ -76,7 +76,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           itemListElement: sorted.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/${s.slug}`, name: s.name })),
         }}
       />
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи', href: '/maister-klasy' }, { label: city.name }]} />
         <span className="kicker">Майстер-класи · {city.oblast || 'Україна'}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки: {city.name}</h1>
@@ -87,8 +87,8 @@ export default async function CityMasterClassesPage({ params }: Args) {
         <Updated />
       </div>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid gap-10">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
+        <div className="grid grid-cols-1 gap-10">
           <Epigraph lines={pickVerse(city.slug as string)} />
 
           <section aria-labelledby="list">
@@ -122,12 +122,12 @@ export default async function CityMasterClassesPage({ params }: Args) {
 
           <section aria-labelledby="cards">
             <SectionHead title="Профілі" id="cards" />
-            <div className="grid gap-3 sm:grid-cols-2">{sorted.map((s) => <StudioCard key={s.id} s={s} showCity={false} />)}</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{sorted.map((s) => <StudioCard key={s.id} s={s} showCity={false} />)}</div>
           </section>
 
           <section aria-labelledby="faq">
             <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-            <div className="grid gap-2.5">
+            <div className="grid grid-cols-1 gap-2.5">
               {faq.map((f, i) => (
                 <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
                   <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">{f.q}<span aria-hidden className="font-display text-terra group-open:hidden">+</span><span aria-hidden className="font-display hidden text-terra group-open:inline">–</span></summary>
@@ -138,7 +138,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           </section>
         </div>
 
-        <aside className="grid gap-4 lg:sticky lg:top-24">
+        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
           <RequestForm sourcePage={`/maister-klasy/${city.slug}`} />
           <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny" className="rounded-[20px] bg-cobalt p-4 text-clay no-underline hover:text-clay">
             <b className="font-display text-sm uppercase">Для команди</b>

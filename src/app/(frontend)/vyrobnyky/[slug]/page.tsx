@@ -67,7 +67,7 @@ export default async function StudioPage({ params }: Args) {
   ]
 
   return (
-    <main className={`${container} grid gap-10 pt-8 pb-16`}>
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -79,11 +79,11 @@ export default async function StudioPage({ params }: Args) {
           sameAs: [s.instagram, s.website, s.facebook, ...(s.otherLinks ?? []).map((l) => l.url)].filter(Boolean),
         }}
       />
-      <div className="grid gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city ? [{ label: city.name, href: `/maister-klasy/${city.slug}` }] : []), { label: s.name }]} />
         <span className="kicker">{typeLabel}{city ? ` · ${city.name}` : ''}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{s.name}</h1>
-        <div className="grid max-w-[70ch] gap-3 text-lg">
+        <div className="grid grid-cols-1 max-w-[70ch] gap-3 text-lg">
           {(s.publicDescription || s.description || '').split(/\n{2,}/).map((para, i) => (
             <p key={i} className="m-0">{para}</p>
           ))}
@@ -97,11 +97,11 @@ export default async function StudioPage({ params }: Args) {
         <Updated />
       </div>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid gap-10">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
+        <div className="grid grid-cols-1 gap-10">
           <section aria-labelledby="facts">
             <SectionHead title="Коротко" id="facts" />
-            <dl className="m-0 grid gap-0 rounded-2xl bg-card">
+            <dl className="m-0 grid grid-cols-1 gap-0 rounded-2xl bg-card">
               {facts.map(([k, v]) => (
                 <div key={k} className="grid grid-cols-[130px_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3 last:border-b-0">
                   <dt className="text-sm font-semibold text-umber">{k}</dt>
@@ -114,12 +114,12 @@ export default async function StudioPage({ params }: Args) {
           {(!!s.services?.length || !!s.products?.length) && (
             <section aria-labelledby="offer">
               <SectionHead title="Що робить і пропонує" id="offer" />
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {!!s.products?.length && (
-                  <div className="rounded-2xl bg-card p-4"><p className="kicker mb-2">Вироби</p><ul className="m-0 grid gap-1 pl-5">{s.products.map((p) => <li key={p.id ?? p.text}>{p.text}</li>)}</ul></div>
+                  <div className="rounded-2xl bg-card p-4"><p className="kicker mb-2">Вироби</p><ul className="m-0 grid grid-cols-1 gap-1 pl-5">{s.products.map((p) => <li key={p.id ?? p.text}>{p.text}</li>)}</ul></div>
                 )}
                 {!!s.services?.length && (
-                  <div className="rounded-2xl bg-card p-4"><p className="kicker mb-2">Послуги</p><ul className="m-0 grid gap-1 pl-5">{s.services.map((p) => <li key={p.id ?? p.text}>{p.text}</li>)}</ul></div>
+                  <div className="rounded-2xl bg-card p-4"><p className="kicker mb-2">Послуги</p><ul className="m-0 grid grid-cols-1 gap-1 pl-5">{s.services.map((p) => <li key={p.id ?? p.text}>{p.text}</li>)}</ul></div>
                 )}
               </div>
             </section>
@@ -130,7 +130,7 @@ export default async function StudioPage({ params }: Args) {
               <SectionHead title="Ціни" id="prices">
                 <p className="m-0 text-sm text-umber">З прайсу, сайту або сторіс студії. Актуальні ціни уточнюйте у студії або через запит.</p>
               </SectionHead>
-              <ul className="m-0 grid list-none gap-2 p-0">
+              <ul className="m-0 grid grid-cols-1 list-none gap-2 p-0">
                 {s.prices.map((p) => (
                   <li key={p.id ?? p.text} className="rounded-xl bg-card px-4 py-3 [font-variant-numeric:lining-nums]">{p.text}</li>
                 ))}
@@ -141,7 +141,7 @@ export default async function StudioPage({ params }: Args) {
           <section aria-labelledby="b2b">
             <SectionHead kicker="Для бізнесу" title="Умови для закладів і компаній" id="b2b" />
             {b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length ? (
-              <dl className="m-0 grid rounded-2xl bg-card">
+              <dl className="m-0 grid grid-cols-1 rounded-2xl bg-card">
                 {b2b.minOrder && <div className="grid grid-cols-[180px_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3"><dt className="text-sm font-semibold text-umber">Мінімальне замовлення</dt><dd className="m-0">{b2b.minOrder}</dd></div>}
                 {b2b.leadTime && <div className="grid grid-cols-[180px_minmax(0,1fr)] gap-3 border-b border-line px-4 py-3"><dt className="text-sm font-semibold text-umber">Термін</dt><dd className="m-0">{b2b.leadTime}</dd></div>}
                 {!!b2b.logoMethods?.length && <div className="grid grid-cols-[180px_minmax(0,1fr)] gap-3 px-4 py-3"><dt className="text-sm font-semibold text-umber">Логотип</dt><dd className="m-0">{b2b.logoMethods.map((x) => x.text).join(', ')}</dd></div>}
@@ -154,12 +154,12 @@ export default async function StudioPage({ params }: Args) {
           {related.length > 0 && city && (
             <section aria-labelledby="near">
               <SectionHead title={`Інші студії та майстри: ${city.name}`} id="near" />
-              <div className="grid gap-3 sm:grid-cols-2">{related.map((r) => <StudioCard key={r.id} s={r} showCity={false} />)}</div>
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{related.map((r) => <StudioCard key={r.id} s={r} showCity={false} />)}</div>
             </section>
           )}
         </div>
 
-        <aside className="grid gap-4 lg:sticky lg:top-24">
+        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
           <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} />
           <div className="rounded-[20px] border border-line bg-cream p-4 text-sm">
             <b>Це ваша студія?</b> Додайте фото, умови для бізнесу й ціни — це безкоштовно. <Link href="/dlya-studiy">Оновити профіль →</Link>

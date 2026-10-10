@@ -44,12 +44,12 @@ export default async function HorecaTablewarePage() {
   const sorted = [...studios].sort((a, b) => (b.prices?.length ?? 0) - (a.prices?.length ?? 0))
 
   return (
-    <main className={`${container} grid gap-10 pt-8 pb-16`}>
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Посуд ручної роботи для ресторанів: українські студії', itemListElement: sorted.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/${s.slug}`, name: s.name })) }} />
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]">
-        <div className="grid gap-4">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]">
+        <div className="grid grid-cols-1 gap-4">
           <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Для бізнесу', href: '/dlya-biznesu' }, { label: 'Посуд для ресторанів' }]} />
           <span className="kicker">Для ресторанів, кав’ярень і готелів</span>
           <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Посуд ручної роботи для ресторанів і кав’ярень</h1>
@@ -61,15 +61,15 @@ export default async function HorecaTablewarePage() {
         <Image src="/images/stock/restaurant-table.jpg" alt="Керамічні тарілки на столі ресторану" width={1400} height={933} priority sizes="(min-width:1024px) 520px, 100vw" className="aspect-[16/10] w-full rounded-[26px] object-cover" />
       </div>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid gap-10">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
+        <div className="grid grid-cols-1 gap-10">
           <Epigraph lines={verses.horeca} />
 
           <section aria-labelledby="check">
             <SectionHead kicker="Перед замовленням" title="Що перевірити у студії" id="check" />
-            <ol className="m-0 grid list-none gap-2.5 p-0 sm:grid-cols-2">
+            <ol className="m-0 grid grid-cols-1 list-none gap-2.5 p-0 sm:grid-cols-2">
               {checklist.map(([t, d], i) => (
-                <li key={t} className="grid gap-1 rounded-2xl bg-card p-4">
+                <li key={t} className="grid grid-cols-1 gap-1 rounded-2xl bg-card p-4">
                   <span className="font-display text-sm text-terra">{i + 1}</span>
                   <b>{t}</b>
                   <span className="text-[15px] text-umber">{d}</span>
@@ -108,12 +108,12 @@ export default async function HorecaTablewarePage() {
 
           <section aria-labelledby="cards">
             <SectionHead title="Профілі" id="cards" />
-            <div className="grid gap-3 sm:grid-cols-2">{sorted.slice(0, 12).map((s) => <StudioCard key={s.id} s={s} />)}</div>
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{sorted.slice(0, 12).map((s) => <StudioCard key={s.id} s={s} />)}</div>
           </section>
 
           <section aria-labelledby="faq">
             <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-            <div className="grid gap-2.5">
+            <div className="grid grid-cols-1 gap-2.5">
               {faq.map((f, i) => (
                 <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
                   <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">{f.q}<span aria-hidden className="font-display text-terra group-open:hidden">+</span><span aria-hidden className="font-display hidden text-terra group-open:inline">–</span></summary>
@@ -124,7 +124,7 @@ export default async function HorecaTablewarePage() {
           </section>
         </div>
 
-        <aside className="grid gap-4 lg:sticky lg:top-24">
+        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
           <RequestForm sourcePage="/dlya-biznesu/posud-dlya-restoraniv" />
         </aside>
       </div>

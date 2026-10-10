@@ -14,7 +14,7 @@ function Row({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: boolean
   const line = evidenceLine(s, re)
   return (
     <li>
-      <Link href={`/vyrobnyky/${s.slug}`} className="grid h-full content-start gap-1.5 rounded-[18px] border border-transparent bg-card p-4 text-ink no-underline hover:border-line hover:text-ink">
+      <Link href={`/vyrobnyky/${s.slug}`} className="grid grid-cols-1 h-full content-start gap-1.5 rounded-[18px] border border-transparent bg-card p-4 text-ink no-underline hover:border-line hover:text-ink">
         <span className="flex flex-wrap gap-1.5 text-[11.5px] font-bold">
           <span className="rounded-full bg-sand px-2 py-0.5 text-umber">{TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'}</span>
           {showCity && s.cityDoc && <span className="rounded-full bg-sand px-2 py-0.5 text-umber">{s.cityDoc.name}</span>}
@@ -35,9 +35,9 @@ function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp
   const big = groups.filter((g) => g.studios.length >= MIN_LIST)
   const small = groups.filter((g) => g.studios.length < MIN_LIST)
   return (
-    <div className="grid gap-7">
+    <div className="grid grid-cols-1 gap-7">
       {big.map((g) => (
-        <section key={g.city.slug} className="grid gap-3">
+        <section key={g.city.slug} className="grid grid-cols-1 gap-3">
           <h3 className="h-display m-0 text-[17px]">
             {g.city.name} <span className="text-terra">{g.studios.length}</span>
           </h3>
@@ -45,7 +45,7 @@ function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp
         </section>
       ))}
       {small.length > 0 && (
-        <section className="grid gap-2">
+        <section className="grid grid-cols-1 gap-2">
           <h3 className="h-display m-0 text-[17px]">{big.length ? 'Ще міста і села' : 'Міста і села'}</h3>
           <p className="m-0 leading-8">
             {small.map((g, i) => (
@@ -74,12 +74,12 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
   const title = h1 ?? topic.h1
 
   return (
-    <main className={`${container} grid gap-10 pt-8 pb-16`}>
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: title, numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/${s.slug}`, name: s.name })) }} />
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]">
-        <div className="grid gap-4">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]">
+        <div className="grid grid-cols-1 gap-4">
           <Breadcrumbs items={[...topic.parents, ...extraParents, { label: crumb ?? topic.crumb }]} />
           <span className="kicker">{topic.kicker}</span>
           <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{title}</h1>
@@ -89,16 +89,16 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
         <DocPhoto photo={topic.photo} priority />
       </div>
 
-      <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid gap-10">
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
+        <div className="grid grid-cols-1 gap-10">
           <Epigraph lines={topic.verse} />
 
           {topic.sections.map((sec, k) => (
             <section key={sec.title} aria-labelledby={`sec${k}`}>
               <SectionHead kicker={sec.kicker} title={sec.title} id={`sec${k}`} />
-              <ol className="m-0 grid list-none gap-2.5 p-0 sm:grid-cols-2">
+              <ol className="m-0 grid grid-cols-1 list-none gap-2.5 p-0 sm:grid-cols-2">
                 {sec.items.map(([t, d], i) => (
-                  <li key={t} className="grid content-start gap-1 rounded-2xl bg-card p-4">
+                  <li key={t} className="grid grid-cols-1 content-start gap-1 rounded-2xl bg-card p-4">
                     <span className="font-display text-sm text-terra">{i + 1}</span>
                     <b>{t}</b>
                     <span className="text-[15px] text-umber">{d}</span>
@@ -113,13 +113,13 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
               <p className="m-0 text-sm text-umber">{topic.price.note}</p>
             </SectionHead>
             {examples.length ? (
-              <div className="grid gap-3">
+              <div className="grid grid-cols-1 gap-3">
                 {ctx.min && ctx.max && (
                   <p className="m-0 text-lg">
                     Найчастіше в прайсах — <b>від {ctx.min.toLocaleString('uk-UA')} до {ctx.max.toLocaleString('uk-UA')} грн</b>.
                   </p>
                 )}
-                <ul className="m-0 grid list-none gap-2 p-0">
+                <ul className="m-0 grid grid-cols-1 list-none gap-2 p-0">
                   {examples.map((e) => (
                     <li key={e.studio.id} className="rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
                       <Link href={`/vyrobnyky/${e.studio.slug}`}>{e.studio.name}</Link>
@@ -146,7 +146,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
 
           <section aria-labelledby="faq">
             <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-            <div className="grid gap-2.5">
+            <div className="grid grid-cols-1 gap-2.5">
               {faq.map((f, i) => (
                 <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
                   <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">
@@ -160,7 +160,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
             </div>
           </section>
 
-          <nav aria-label="Схожі сторінки" className="grid gap-3">
+          <nav aria-label="Схожі сторінки" className="grid grid-cols-1 gap-3">
             <p className="kicker m-0">Дивіться також</p>
             <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
               {topic.related.map((r) => (
@@ -174,11 +174,11 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
           </nav>
         </div>
 
-        <aside className="grid gap-4 lg:sticky lg:top-24">
+        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
           {topic.form ? (
             <RequestForm sourcePage={topic.path} defaultWhat={topic.form} />
           ) : (
-            <div className="grid gap-3 rounded-[20px] border border-line bg-card p-[18px]">
+            <div className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]">
               <p className="font-display m-0 text-sm tracking-wide uppercase">Подарувати або піти командою</p>
               <p className="m-0 text-[15px]">Сертифікат на майстер-клас — подарунок, який можна купити й в останній день. Для колективу є корпоративи з ліплення з глини.</p>
               <Link href="/sertyfikaty" className="font-bold">Сертифікати →</Link>

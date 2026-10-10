@@ -79,8 +79,8 @@ export default async function HomePage() {
       />
 
       {/* Hero: business first */}
-      <section className={`${container} grid items-start gap-8 pt-11 pb-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)]`}>
-        <div className="grid gap-[18px]">
+      <section className={`${container} grid grid-cols-1 items-start gap-8 pt-11 pb-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)]`}>
+        <div className="grid grid-cols-1 gap-[18px]">
           <span className="kicker">Українська кераміка ручної роботи</span>
           <h1 className="h-display m-0 text-[clamp(28px,4.6vw,52px)] leading-[1.04]">Посуд і подарунки ручної роботи від українських студій</h1>
           <p className="m-0 max-w-[58ch] text-lg text-umber">
@@ -97,7 +97,7 @@ export default async function HomePage() {
             <div><dt className="font-display text-xl text-cobalt">{s.masterClassPlaces}</dt><dd className="m-0">{pluralUk(s.masterClassPlaces, ['місце', 'місця', 'місць'])} з майстер-класами</dd></div>
           </dl>
         </div>
-        <div className="grid gap-3.5">
+        <div className="grid grid-cols-1 gap-3.5">
           <Image src="/images/stock/restaurant-table.jpg" alt="Керамічні тарілки і чашка на столі ресторану" width={1400} height={933} priority sizes="(min-width:1024px) 560px, 100vw" className="aspect-[16/10] w-full rounded-[26px] object-cover" />
           <RequestForm sourcePage="/" compact />
         </div>
@@ -105,12 +105,12 @@ export default async function HomePage() {
 
       {/* Paths */}
       <section className={`${container} pb-14`} aria-labelledby="paths">
-        <div className="mb-6 grid max-w-[760px] gap-2.5"><span className="kicker">Для бізнесу</span><h2 id="paths" className={h2}>Що ви шукаєте?</h2></div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Для бізнесу</span><h2 id="paths" className={h2}>Що ви шукаєте?</h2></div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {paths.map((p) => (
-            <Link key={p.href} href={p.href} className="grid content-start gap-2.5 rounded-[20px] border border-transparent bg-card p-2.5 pb-4 text-ink no-underline hover:border-line hover:text-ink">
+            <Link key={p.href} href={p.href} className="grid grid-cols-1 content-start gap-2.5 rounded-[20px] border border-transparent bg-card p-2.5 pb-4 text-ink no-underline hover:border-line hover:text-ink">
               <Image src={p.img} alt={p.alt} width={600} height={450} sizes="(min-width:1024px) 280px, (min-width:640px) 50vw, 100vw" className="aspect-[4/3] w-full rounded-[14px] object-cover" />
-              <span className="grid gap-1.5 px-1.5">
+              <span className="grid grid-cols-1 gap-1.5 px-1.5">
                 <span className="text-[17px] leading-tight font-semibold">{p.title}</span>
                 <span className="text-sm text-umber">{p.text}</span>
                 <span className="text-sm font-bold text-cobalt">{p.cta} →</span>
@@ -118,7 +118,7 @@ export default async function HomePage() {
             </Link>
           ))}
         </div>
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
             { img: '/images/doc/wheel-hands.jpg', alt: 'Руки гончаря на гончарному колі', title: 'Майстер-клас для себе', text: 'Гончарство, ліплення, побачення, заняття для дітей — по всій Україні.', href: '/maister-klasy' },
             { img: '/images/stock/teal-mug.jpg', alt: 'Керамічна чашка ручної роботи', title: 'Подарунковий сертифікат', text: 'Сертифікати на гончарство: ціни, термін дії й формати за містами.', href: '/sertyfikaty' },
@@ -136,15 +136,15 @@ export default async function HomePage() {
 
       {/* How it works */}
       <section className={`${container} pb-14`}>
-        <div className="grid gap-6 rounded-[28px] bg-cobalt p-6 text-clay sm:p-9">
-          <div className="grid gap-2.5"><span className="kicker !text-ochre">Як це працює</span><h2 className={`${h2} text-cream`}>Один запит замість десяти листувань</h2></div>
-          <ol className="m-0 grid list-none gap-4 p-0 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 rounded-[28px] bg-cobalt p-6 text-clay sm:p-9">
+          <div className="grid grid-cols-1 gap-2.5"><span className="kicker !text-ochre">Як це працює</span><h2 className={`${h2} text-cream`}>Один запит замість десяти листувань</h2></div>
+          <ol className="m-0 grid grid-cols-1 list-none gap-4 p-0 md:grid-cols-3">
             {[
               ['Опишіть замовлення', 'Що потрібно, скільки штук, до якої дати, місто й бюджет за одиницю.'],
               ['Ми підберемо студії', 'Передамо запит 3–5 студіям, які роблять такі вироби й працюють з такими обсягами.'],
               ['Порівняйте пропозиції', 'Студії відповідають напряму. Ви обираєте за ціною, терміном і стилем.'],
             ].map(([t, d], i) => (
-              <li key={t} className="grid gap-2 rounded-[18px] bg-cream/10 p-[18px]">
+              <li key={t} className="grid grid-cols-1 gap-2 rounded-[18px] bg-cream/10 p-[18px]">
                 <span className="font-display text-[28px] font-bold text-ochre">{i + 1}</span>
                 <span className="text-[17px] font-semibold text-cream">{t}</span>
                 <span>{d}</span>
@@ -158,16 +158,16 @@ export default async function HomePage() {
 
       {/* Short answer: the part LLMs quote */}
       <section className={`${container} pb-14`} aria-labelledby="market">
-        <div className="mb-6 grid max-w-[760px] gap-2.5"><span className="kicker">Коротко про ринок · оновлено {site.dataUpdated}</span><h2 id="market" className={h2}>Скільки коштує і скільки часу займає</h2></div>
-        <div className="grid items-start gap-7 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <div className="grid gap-2.5 rounded-2xl border border-l-[6px] border-line border-l-ochre bg-cream p-[22px]">
+        <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Коротко про ринок · оновлено {site.dataUpdated}</span><h2 id="market" className={h2}>Скільки коштує і скільки часу займає</h2></div>
+        <div className="grid grid-cols-1 items-start gap-7 lg:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-2.5 rounded-2xl border border-l-[6px] border-line border-l-ochre bg-cream p-[22px]">
             <p className="m-0 text-[16.5px]"><b>Посуд ручної роботи</b> від українських студій можна замовити і невеликою, і великою партією: мінімальна кількість залежить від студії та виробу. Виготовлення зазвичай займає {site.prices.batchLeadTime}, бо кожна партія проходить сушіння і два випали.</p>
             <p className="m-0 text-[16.5px]"><b>Майстер-клас з гончарства</b> у групі коштує приблизно {site.prices.groupClass}, індивідуальний — {site.prices.privateClass}. Корпоративні формати — {site.prices.corporate}.</p>
             <p className="m-0 text-[13px] text-umber">Джерело: прайси, сайти і сторіс українських студій, зібрані «Глиною» у 2026 році. Ціни для кожної студії — у її профілі.</p>
           </div>
           <dl className="m-0 grid grid-cols-2 gap-3">
             {[[nf(s.makers), `${pluralUk(s.makers, ['студія, майстер чи бренд', 'студії, майстри й бренди', 'студій, майстрів і брендів'])} у каталозі`], [String(s.masterClassPlaces), `${pluralUk(s.masterClassPlaces, ['місце', 'місця', 'місць'])} з майстер-класами`], [String(s.cities), pluralUk(s.cities, ['місто чи село', 'міста й села', 'міст і сіл'])], [String(s.withPrices), `${pluralUk(s.withPrices, ['профіль', 'профілі', 'профілів'])} з цінами з прайсу`]].map(([n, l]) => (
-              <div key={l} className="grid gap-0.5 rounded-2xl bg-card p-4"><dt className="font-display text-[clamp(22px,3vw,30px)] leading-tight text-cobalt">{n}</dt><dd className="m-0 text-sm text-umber">{l}</dd></div>
+              <div key={l} className="grid grid-cols-1 gap-0.5 rounded-2xl bg-card p-4"><dt className="font-display text-[clamp(22px,3vw,30px)] leading-tight text-cobalt">{n}</dt><dd className="m-0 text-sm text-umber">{l}</dd></div>
             ))}
           </dl>
         </div>
@@ -192,7 +192,7 @@ export default async function HomePage() {
 
       {/* Master classes by city */}
       <section className={`${container} pb-14`} aria-labelledby="mk">
-        <div className="mb-6 grid max-w-[760px] gap-2.5"><span className="kicker">Для себе і в подарунок</span><h2 id="mk" className={h2}>Майстер-класи з кераміки за містами</h2><p className="m-0 text-umber">Усі студії міста на одній сторінці: формати, ціни, сертифікати й контакти.</p></div>
+        <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Для себе і в подарунок</span><h2 id="mk" className={h2}>Майстер-класи з кераміки за містами</h2><p className="m-0 text-umber">Усі студії міста на одній сторінці: формати, ціни, сертифікати й контакти.</p></div>
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-2.5 p-0">
           {cities.filter(([, , slug]) => (s.cityCounts.get(slug) ?? 0) >= 3 || !s.cityCounts.size).map(([n, c, slug]) => (
             <li key={slug}><Link href={`/maister-klasy/${slug}`} className="flex justify-between gap-2 rounded-[14px] bg-card px-3.5 py-3 font-semibold text-ink no-underline hover:bg-sand hover:text-ink">{n}<span className="text-terra">{s.cityCounts.get(slug) ?? c}</span></Link></li>
@@ -209,22 +209,22 @@ export default async function HomePage() {
 
       {/* Guides */}
       <section className={`${container} pb-14`} aria-labelledby="guides">
-        <div className="mb-6 grid max-w-[760px] gap-2.5"><span className="kicker">Гайди</span><h2 id="guides" className={h2}>Як замовити кераміку без сюрпризів</h2></div>
-        <ul className="m-0 grid list-none gap-3.5 p-0 lg:grid-cols-3">
+        <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Гайди</span><h2 id="guides" className={h2}>Як замовити кераміку без сюрпризів</h2></div>
+        <ul className="m-0 grid grid-cols-1 list-none gap-3.5 p-0 lg:grid-cols-3">
           {[
             ['Для закладів', 'Як замовити посуд для ресторану', 'Зразки, харчова безпечність, посудомийка, дозамовлення через пів року.', '/hayidy/yak-zamovyty-posud-dlya-restoranu'],
             ['Для компаній', 'Новорічні подарунки з кераміки: коли замовляти', 'Чому партію до свят краще замовити до середини листопада.', '/hayidy/novorichni-podarunky-terminy'],
             ['Логотип', 'Штамп, деколь чи полива', 'Як виглядає логотип на кераміці і від чого залежить ціна.', '/hayidy/lohotyp-na-keramitsi'],
           ].map(([tag, t, d, href]) => (
-            <li key={href}><Link href={href} className="grid h-full gap-1.5 rounded-[20px] border border-line bg-cream p-[18px] text-ink no-underline hover:text-ink"><small className="text-xs font-bold tracking-wider text-terra uppercase">{tag}</small><span className="text-[17px] font-semibold">{t}</span><span className="text-sm text-umber">{d}</span></Link></li>
+            <li key={href}><Link href={href} className="grid grid-cols-1 h-full gap-1.5 rounded-[20px] border border-line bg-cream p-[18px] text-ink no-underline hover:text-ink"><small className="text-xs font-bold tracking-wider text-terra uppercase">{tag}</small><span className="text-[17px] font-semibold">{t}</span><span className="text-sm text-umber">{d}</span></Link></li>
           ))}
         </ul>
       </section>
 
       {/* FAQ */}
       <section className={`${container} pb-14`} aria-labelledby="faq">
-        <div className="mb-6 grid max-w-[760px] gap-2.5"><span className="kicker">Питання і відповіді</span><h2 id="faq" className={h2}>Часті питання</h2></div>
-        <div className="grid max-w-[860px] gap-2.5">
+        <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Питання і відповіді</span><h2 id="faq" className={h2}>Часті питання</h2></div>
+        <div className="grid grid-cols-1 max-w-[860px] gap-2.5">
           {faq.map((f, i) => (
             <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
               <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">{f.q}<span aria-hidden className="font-display text-terra group-open:hidden">+</span><span aria-hidden className="font-display hidden text-terra group-open:inline">–</span></summary>
@@ -236,11 +236,11 @@ export default async function HomePage() {
 
       {/* For studios */}
       <section className={`${container} pb-14`}>
-        <div className="grid items-center gap-6 rounded-[28px] bg-ink p-6 text-clay sm:p-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
-          <div className="grid gap-3">
+        <div className="grid grid-cols-1 items-center gap-6 rounded-[28px] bg-ink p-6 text-clay sm:p-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+          <div className="grid grid-cols-1 gap-3">
             <span className="kicker !text-ochre">Для студій і майстрів</span>
             <h2 className={`${h2} text-cream`}>Отримуйте замовлення від ресторанів і компаній</h2>
-            <ul className="m-0 grid gap-1.5 pl-[18px]">
+            <ul className="m-0 grid grid-cols-1 gap-1.5 pl-[18px]">
               <li>Безкоштовний профіль з вашими фото, цінами й умовами</li>
               <li>Запити від ресторанів, кав’ярень, готелів і компаній</li>
               <li>Ми беремо лише 5% і тільки з замовлень, які відбулися</li>

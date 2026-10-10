@@ -38,9 +38,3 @@ hlyna.com.ua {
 		lb_try_interval 250ms
 	}
 }
-
-# Temporary preview by IP until DNS points to this server (plain HTTP). Remove after launch.
-http://89.116.24.123 {
-	encode zstd gzip
-	reverse_proxy app:3000
-}

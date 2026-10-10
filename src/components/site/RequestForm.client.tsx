@@ -51,9 +51,9 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
     )
 
   return (
-    <form onSubmit={onSubmit} className="grid gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
+    <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
       <p className="font-display m-0 text-sm tracking-wide uppercase">Швидкий запит</p>
-      <div className="grid gap-2.5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <label className={label}>
           Що потрібно
           <select name="what" className={field} defaultValue={defaultWhat}>

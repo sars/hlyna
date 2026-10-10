@@ -17,8 +17,8 @@ export default async function MakersIndex() {
   const studios = await getAllStudios()
   const groups = groupByCity(studios)
   return (
-    <main className={`${container} grid gap-10 pt-8 pb-16`}>
-      <div className="grid gap-4">
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
+      <div className="grid grid-cols-1 gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники' }]} />
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Українські керамічні студії, майстри і бренди</h1>
         <p className="m-0 max-w-[70ch] text-lg">
@@ -29,7 +29,7 @@ export default async function MakersIndex() {
       {groups.map((g) => (
         <section key={g.city.slug} aria-labelledby={`c-${g.city.slug}`}>
           <SectionHead title={`${g.city.name} · ${g.studios.length}`} id={`c-${g.city.slug}`} />
-          <ul className="m-0 grid list-none gap-x-6 gap-y-1.5 p-0 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="m-0 grid grid-cols-1 list-none gap-x-6 gap-y-1.5 p-0 sm:grid-cols-2 lg:grid-cols-3">
             {g.studios.map((s) => (
               <li key={s.id}>
                 <Link href={`/vyrobnyky/${s.slug}`}>{s.name}</Link>

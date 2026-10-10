@@ -22,8 +22,8 @@ export default async function MasterClassesIndex() {
   const total = groups.reduce((n, g) => n + g.studios.length, 0)
 
   return (
-    <main className={`${container} grid gap-10 pt-8 pb-16`}>
-      <div className="grid gap-4">
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
+      <div className="grid grid-cols-1 gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи' }]} />
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки в Україні</h1>
         <p className="m-0 max-w-[70ch] text-lg">
@@ -52,7 +52,7 @@ export default async function MasterClassesIndex() {
             const r = range(g.studios.flatMap(hryvniaAmounts))
             return (
               <li key={g.city.slug}>
-                <Link href={`/maister-klasy/${g.city.slug}`} className="grid gap-0.5 rounded-[14px] bg-card px-3.5 py-3 text-ink no-underline hover:bg-sand hover:text-ink">
+                <Link href={`/maister-klasy/${g.city.slug}`} className="grid grid-cols-1 gap-0.5 rounded-[14px] bg-card px-3.5 py-3 text-ink no-underline hover:bg-sand hover:text-ink">
                   <span className="flex justify-between font-semibold">{g.city.name}<span className="text-terra">{g.studios.length}</span></span>
                   <span className="text-[13px] text-umber">{r ? `від ${fmt(r.min)} грн` : 'ціни уточнюються'}</span>
                 </Link>

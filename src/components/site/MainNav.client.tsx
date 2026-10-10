@@ -109,7 +109,7 @@ export function MainNav() {
             {section.columns.map((c) => (
               <div key={c.title}>
                 <p className="kicker mb-2.5">{c.title}</p>
-                <ul className="grid gap-2">
+                <ul className="grid grid-cols-1 gap-2">
                   {c.links.map((l) => (
                     <li key={l.href + l.label}>
                       <Link href={l.href} className="font-semibold text-ink no-underline hover:text-cobalt">
@@ -122,7 +122,7 @@ export function MainNav() {
               </div>
             ))}
             {section.promo && (
-              <div className="grid content-start gap-2.5 rounded-2xl bg-cobalt p-4 text-clay">
+              <div className="grid grid-cols-1 content-start gap-2.5 rounded-2xl bg-cobalt p-4 text-clay">
                 <b className="font-display text-[15px] leading-tight uppercase">{section.promo.title}</b>
                 <p className="m-0 text-sm">{section.promo.text}</p>
                 <Link href={section.promo.cta.href} className="justify-self-start rounded-full bg-ochre px-4 py-2.5 text-sm font-bold text-ink no-underline hover:text-ink">
@@ -150,7 +150,7 @@ export function MainNav() {
                 {s.label}
                 <span aria-hidden className="text-terra">+</span>
               </summary>
-              <ul className="mb-3.5 grid gap-2.5">
+              <ul className="mb-3.5 grid grid-cols-1 gap-2.5">
                 {s.columns.flatMap((c) => c.links).map((l) => (
                   <li key={l.href + l.label}>
                     <Link href={l.href} className="font-semibold text-ink no-underline">
@@ -165,7 +165,7 @@ export function MainNav() {
             <summary className="font-display flex cursor-pointer list-none justify-between py-4 text-base font-semibold uppercase">
               Ще <span aria-hidden className="text-terra">+</span>
             </summary>
-            <ul className="mb-3.5 grid gap-2.5">
+            <ul className="mb-3.5 grid grid-cols-1 gap-2.5">
               {[...simpleNav, { label: 'Для студій', href: '/dlya-studiy' }].map((l) => (
                 <li key={l.href}>
                   <Link href={l.href} className="font-semibold text-ink no-underline">

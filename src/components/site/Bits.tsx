@@ -61,7 +61,7 @@ export function Updated() {
 
 export function SectionHead({ kicker, title, id, children }: { kicker?: string; title: string; id?: string; children?: React.ReactNode }) {
   return (
-    <div className="mb-5 grid max-w-[760px] gap-2">
+    <div className="mb-5 grid grid-cols-1 max-w-[760px] gap-2">
       {kicker && <span className="kicker">{kicker}</span>}
       <h2 id={id} className="h-display m-0 text-[clamp(19px,2.4vw,26px)] leading-[1.15]">
         {title}
@@ -74,7 +74,7 @@ export function SectionHead({ kicker, title, id, children }: { kicker?: string; 
 // A documentary photo with its visible credit (CC BY-SA requires author + license on the page).
 export function DocPhoto({ photo, priority = false, className = '' }: { photo: import('@/content/photos').DocPhoto; priority?: boolean; className?: string }) {
   return (
-    <figure className={`m-0 grid gap-1.5 ${className}`}>
+    <figure className={`m-0 grid grid-cols-1 gap-1.5 ${className}`}>
       <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} priority={priority} sizes="(min-width:1024px) 520px, 100vw" className="aspect-[16/11] w-full rounded-[26px] object-cover" />
       <figcaption className="text-[11.5px] text-umber">
         Фото: {photo.author}, <a href={photo.href} target="_blank" rel="noopener nofollow" className="text-umber">{photo.license}</a>, Wikimedia Commons
