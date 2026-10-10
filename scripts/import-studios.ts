@@ -239,11 +239,22 @@ async function main() {
           continue
         }
         if (process.env.DEBUG_DIFF) payload.logger.info(`#${existing.docs[0].id} ${name}: ${changed}`)
-        // Keep manually edited slug, consent, b2b and activity data untouched.
+        // Records are curated after import (review, merges, hidden makers abroad, rewritten texts, split
+        // studios), so an existing record is only filled in: empty fields get data, nothing is overwritten,
+        // and the publish status stays as it is.
+        const cur = existing.docs[0] as unknown as Record<string, unknown>
+        const fill = Object.fromEntries(
+          Object.entries(data).filter(([k, v]) => k !== '_status' && k !== 'name' && empty(cur[k]) && !empty(v)),
+        )
+        if (!Object.keys(fill).length) {
+          counts.unchanged++
+          continue
+        }
         await payload.update({
           collection: 'studios',
           id: existing.docs[0].id,
-          data,
+          data: fill,
+          draft: existing.docs[0]._status !== 'published',
           context,
         })
         counts.updated++
