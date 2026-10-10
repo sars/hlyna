@@ -24,6 +24,8 @@ export type StudioCard = Studio & { cityDoc: City | null }
 // depth 0 + a separate city lookup keeps the cached payload small (Next's data cache limit is 2 MB per entry).
 const loadStudios = unstable_cache(
   async (): Promise<StudioCard[]> => {
+    // The Docker build has no database: render empty and let /revalidate refill after deploy.
+    if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
     const payload = await getPayload({ config: configPromise })
     const [studios, cities] = await Promise.all([
       payload.find({

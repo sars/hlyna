@@ -8,7 +8,7 @@ import { getPayload } from 'payload'
 import React from 'react'
 import PageClient from './page.client'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic' // template blog list; not used yet, must not need the DB at build time
 export const revalidate = 600
 
 export default async function Page() {

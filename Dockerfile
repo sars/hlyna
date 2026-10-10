@@ -24,7 +24,8 @@ ARG PAYLOAD_SECRET=build-time-placeholder
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL \
     DATABASE_URL=$DATABASE_URL \
     PAYLOAD_SECRET=$PAYLOAD_SECRET \
-    NEXT_TELEMETRY_DISABLED=1
+    NEXT_TELEMETRY_DISABLED=1 \
+    BUILD_WITHOUT_DB=1
 RUN pnpm run build
 
 FROM node:24-alpine AS runner
@@ -34,6 +35,8 @@ RUN addgroup --system --gid 1001 nodejs && adduser --system --uid 1001 nextjs
 COPY --from=builder /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+# Fonts for generated share cards (/og) are read from disk at runtime.
+COPY --from=builder /app/src/assets ./src/assets
 # Payload uploads land in public/media; compose mounts a volume there.
 RUN mkdir -p public/media && chown -R nextjs:nodejs public/media .next
 USER nextjs
