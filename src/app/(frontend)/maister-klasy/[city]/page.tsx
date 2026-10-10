@@ -8,7 +8,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
-import { fmt, getAllStudios, groupByCity, hryvniaAmounts, igHandle, MIN_LIST, offersMasterClasses, range, TYPE_LABEL } from '@/lib/catalog'
+import { fmt, getAllStudios, groupByCity, hryvniaAmounts, igHandle, MIN_LIST, offersMasterClasses, pluralUk, range, TYPE_LABEL } from '@/lib/catalog'
 
 export const revalidate = 86400
 
@@ -35,8 +35,8 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!g) return {}
   const r = range(g.studios.flatMap(hryvniaAmounts))
   return {
-    title: `Майстер-класи з кераміки: ${g.city.name} — ${g.studios.length} студій і ціни 2026`,
-    description: `${g.studios.length} місць у місті ${g.city.name}, де проводять майстер-класи з гончарства і ліплення з глини${r ? `; ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : ''}. Формати, сертифікати, контакти.`,
+    title: `Майстер-класи з кераміки: ${g.city.name} — ${g.studios.length} ${pluralUk(g.studios.length, ['студія', 'студії', 'студій'])} і ціни 2026`,
+    description: `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])} у місті ${g.city.name}, де проводять майстер-класи з гончарства і ліплення з глини${r ? `; ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : ''}. Формати, сертифікати, контакти.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
   }
 }
@@ -78,7 +78,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
         <span className="kicker">Майстер-класи · {city.oblast || 'Україна'}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки: {city.name}</h1>
         <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі глина.юа — {studios.length} місць у місті {city.name}, де проводять заняття з гончарства чи ліплення з глини.
+          У каталозі глина.юа — {studios.length} {pluralUk(studios.length, ['місце', 'місця', 'місць'])} у місті {city.name}, де проводять заняття з гончарства чи ліплення з глини.
           {r ? ` У прайсах студій трапляються ціни від ${fmt(r.min)} до ${fmt(r.max)} грн (дані ${site.dataUpdated}).` : ''} Нижче — студії, формати й контакти; один запит можна надіслати одразу кільком.
         </p>
         <Updated />

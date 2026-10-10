@@ -7,14 +7,14 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
-import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses } from '@/lib/catalog'
+import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses, pluralUk } from '@/lib/catalog'
 
 export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: { absolute: 'Українська кераміка ручної роботи для бізнесу і для себе — глина.юа' },
   description:
-    'Посуд і подарунки ручної роботи від українських студій для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови й ціни та надішліть один запит кільком студіям. Майстер-класи у 189 містах і селах.',
+    'Посуд і подарунки ручної роботи від українських студій для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови й ціни та надішліть один запит кільком студіям. Майстер-класи з кераміки по всій Україні.',
   alternates: { canonical: '/' },
 }
 
@@ -87,9 +87,9 @@ export default async function HomePage() {
             <Link href="/maister-klasy" className="rounded-full border-2 border-ink px-[22px] py-[11px] font-bold text-ink no-underline hover:bg-ink hover:text-cream">Знайти майстер-клас</Link>
           </div>
           <dl className="m-0 flex flex-wrap gap-x-6 gap-y-2 text-sm text-umber">
-            <div><dt className="font-display text-xl text-cobalt">{nf(s.makers)}</dt><dd className="m-0">студій, майстрів і брендів</dd></div>
-            <div><dt className="font-display text-xl text-cobalt">{s.cities}</dt><dd className="m-0">міст і сіл</dd></div>
-            <div><dt className="font-display text-xl text-cobalt">{s.masterClassPlaces}</dt><dd className="m-0">місця з майстер-класами</dd></div>
+            <div><dt className="font-display text-xl text-cobalt">{nf(s.makers)}</dt><dd className="m-0">{pluralUk(s.makers, ['студія, майстер чи бренд', 'студії, майстри й бренди', 'студій, майстрів і брендів'])}</dd></div>
+            <div><dt className="font-display text-xl text-cobalt">{s.cities}</dt><dd className="m-0">{pluralUk(s.cities, ['місто чи село', 'міста й села', 'міст і сіл'])}</dd></div>
+            <div><dt className="font-display text-xl text-cobalt">{s.masterClassPlaces}</dt><dd className="m-0">{pluralUk(s.masterClassPlaces, ['місце', 'місця', 'місць'])} з майстер-класами</dd></div>
           </dl>
         </div>
         <div className="grid gap-3.5">
@@ -115,7 +115,7 @@ export default async function HomePage() {
         </div>
         <div className="mt-4 grid gap-4 md:grid-cols-2">
           {[
-            { img: '/images/stock/wheel-top.jpg', alt: 'Гончарне коло, вигляд згори', title: 'Майстер-клас для себе', text: `Гончарство, ліплення, побачення, заняття для дітей у ${s.cities} містах і селах.`, href: '/maister-klasy' },
+            { img: '/images/stock/wheel-top.jpg', alt: 'Гончарне коло, вигляд згори', title: 'Майстер-клас для себе', text: 'Гончарство, ліплення, побачення, заняття для дітей — по всій Україні.', href: '/maister-klasy' },
             { img: '/images/stock/teal-mug.jpg', alt: 'Керамічна чашка ручної роботи', title: 'Подарунковий сертифікат', text: 'Сертифікати на гончарство: ціни, термін дії й формати за містами.', href: '/sertyfikaty' },
           ].map((c) => (
             <Link key={c.href} href={c.href} className="grid grid-cols-[110px_minmax(0,1fr)] items-center gap-3.5 rounded-[20px] border border-line bg-cream p-2.5 text-ink no-underline hover:text-ink">
@@ -158,7 +158,7 @@ export default async function HomePage() {
             <p className="m-0 text-[13px] text-umber">Джерело: прайси, сайти і сторіс українських студій, зібрані глина.юа у 2026 році. Ціни для кожної студії — у її профілі.</p>
           </div>
           <dl className="m-0 grid grid-cols-2 gap-3">
-            {[[nf(s.makers), 'студій, майстрів і брендів у каталозі'], [String(s.masterClassPlaces), 'місця з майстер-класами'], [String(s.cities), 'міст і сіл'], [String(s.withPrices), 'профілів з цінами з прайсу']].map(([n, l]) => (
+            {[[nf(s.makers), `${pluralUk(s.makers, ['студія, майстер чи бренд', 'студії, майстри й бренди', 'студій, майстрів і брендів'])} у каталозі`], [String(s.masterClassPlaces), `${pluralUk(s.masterClassPlaces, ['місце', 'місця', 'місць'])} з майстер-класами`], [String(s.cities), pluralUk(s.cities, ['місто чи село', 'міста й села', 'міст і сіл'])], [String(s.withPrices), `${pluralUk(s.withPrices, ['профіль', 'профілі', 'профілів'])} з цінами з прайсу`]].map(([n, l]) => (
               <div key={l} className="grid gap-0.5 rounded-2xl bg-card p-4"><dt className="font-display text-[clamp(22px,3vw,30px)] leading-tight text-cobalt">{n}</dt><dd className="m-0 text-sm text-umber">{l}</dd></div>
             ))}
           </dl>

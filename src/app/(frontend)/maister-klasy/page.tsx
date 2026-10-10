@@ -4,13 +4,13 @@ import React from 'react'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { site } from '@/content/site'
-import { fmt, getAllStudios, groupByCity, hryvniaAmounts, MIN_LIST, offersMasterClasses, range } from '@/lib/catalog'
+import { fmt, getAllStudios, groupByCity, hryvniaAmounts, MIN_LIST, offersMasterClasses, pluralUk, range } from '@/lib/catalog'
 
 export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: 'Майстер-класи з кераміки в Україні: студії за містами і ціни 2026',
-  description: `Де спробувати гончарство і ліплення з глини: студії в ${site.stats.cities} містах і селах, ціни, сертифікати, формати для двох, для дітей і для команди.`,
+  description: `Де спробувати гончарство і ліплення з глини: студії по всій Україні, ціни, сертифікати, формати для двох, для дітей і для команди.`,
   alternates: { canonical: '/maister-klasy' },
 }
 
@@ -26,7 +26,7 @@ export default async function MasterClassesIndex() {
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи' }]} />
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки в Україні</h1>
         <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі — {fmt(total)} місць у {groups.length} містах і селах, де проводять заняття з гончарства чи ліплення з глини. Груповий майстер-клас коштує приблизно {site.prices.groupClass}, індивідуальний — {site.prices.privateClass}. Оберіть місто, щоб побачити студії, ціни й сертифікати.
+          У каталозі — {fmt(total)} {pluralUk(total, ['місце', 'місця', 'місць'])} у {groups.length} містах і селах, де проводять заняття з гончарства чи ліплення з глини. Груповий майстер-клас коштує приблизно {site.prices.groupClass}, індивідуальний — {site.prices.privateClass}. Оберіть місто, щоб побачити студії, ціни й сертифікати.
         </p>
         <Updated />
       </div>

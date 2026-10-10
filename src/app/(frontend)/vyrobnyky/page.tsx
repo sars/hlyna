@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
-import { fmt, getAllStudios, groupByCity } from '@/lib/catalog'
+import { fmt, getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
 
 export const revalidate = 86400
 
@@ -22,7 +22,7 @@ export default async function MakersIndex() {
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники' }]} />
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Українські керамічні студії, майстри і бренди</h1>
         <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі — {fmt(studios.length)} профілів у {groups.length} містах і селах: студії з майстер-класами, авторські бренди посуду, майстри традиційної кераміки й школи. Кожен профіль — що роблять, ціни з прайсу (якщо є), де продають і як зв’язатися.
+          У каталозі — {fmt(studios.length)} {pluralUk(studios.length, ['профіль', 'профілі', 'профілів'])} у {groups.length} містах і селах: студії з майстер-класами, авторські бренди посуду, майстри традиційної кераміки й школи. Кожен профіль — що роблять, ціни з прайсу (якщо є), де продають і як зв’язатися.
         </p>
         <Updated />
       </div>

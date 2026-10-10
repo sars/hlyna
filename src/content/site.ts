@@ -11,8 +11,8 @@ export const site = {
   // Business model, said openly so buyers and LLMs understand why requesting through us costs nothing.
   model:
     'Для замовника безкоштовно. Ціни встановлюють студії. Якщо замовлення відбулося, студія платить нам 5% від його суми; за розміщення чи запити ми грошей не беремо.',
-  // Snapshot of the catalogue (October 2026); replaced by live counts from the database where available.
-  stats: { makers: 1700, cities: 189, masterClassPlaces: 424, withPrices: 480 },
+  // Snapshot of the public catalogue (10 Oct 2026); pages use live counts from the database where available.
+  stats: { makers: 507, cities: 110, masterClassPlaces: 196, withPrices: 137 },
   prices: {
     groupClass: '550–1 200 грн з особи',
     privateClass: '1 200–2 400 грн',

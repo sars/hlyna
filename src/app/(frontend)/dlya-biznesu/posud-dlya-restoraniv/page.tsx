@@ -8,7 +8,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
-import { getAllStudios, groupByCity, igHandle, TYPE_LABEL, worksWithVenues } from '@/lib/catalog'
+import { getAllStudios, groupByCity, igHandle, pluralUk, TYPE_LABEL, worksWithVenues } from '@/lib/catalog'
 
 export const revalidate = 86400
 
@@ -51,7 +51,7 @@ export default async function HorecaTablewarePage() {
           <span className="kicker">Для ресторанів, кав’ярень і готелів</span>
           <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Посуд ручної роботи для ресторанів і кав’ярень</h1>
           <p className="m-0 max-w-[70ch] text-lg">
-            У каталозі — {studios.length} українських студій і майстрів у {cities.length} містах, які згадують роботу із закладами або посуд на замовлення. Мінімальна партія залежить від студії, виготовлення зазвичай займає {site.prices.batchLeadTime}. Нижче — студії, що варто перевірити перед замовленням, і запит одразу кільком.
+            У каталозі — {studios.length} {pluralUk(studios.length, ['українська студія чи майстер', 'українські студії й майстри', 'українських студій і майстрів'])} у {cities.length} містах, які згадують роботу із закладами або посуд на замовлення. Мінімальна партія залежить від студії, виготовлення зазвичай займає {site.prices.batchLeadTime}. Нижче — студії, що варто перевірити перед замовленням, і запит одразу кільком.
           </p>
           <Updated />
         </div>
