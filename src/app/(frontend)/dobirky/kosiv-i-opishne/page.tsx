@@ -3,10 +3,10 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
+import { ldItemList } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
 import { Faq } from '@/components/site/SelectionFaq'
 import { StudioCard } from '@/components/site/StudioCard'
-import { site } from '@/content/site'
 import { pluralUk } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
 import { kosivOpishne } from '@/lib/selections'
@@ -35,7 +35,7 @@ export default async function KosivOpishne() {
   ]
   return (
     <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 pb-16`}>
-      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Косів і Опішне: майстри й студії', numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/${s.slug}`, name: cleanName(s.name) })) }} />
+      <JsonLd data={ldItemList('Косів і Опішне: майстри й студії', all)} />
       <div className="grid grid-cols-1 items-start gap-8">
         <div className="grid grid-cols-1 gap-4">
           <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Добірки', href: '/dobirky' }, { label: 'Косів і Опішне' }]} />

@@ -88,6 +88,9 @@ export function publicPrices(s: Studio): PriceLine[] {
     const key = norm(line.text)
     if (seen.has(key)) continue
     seen.add(key)
+    // Prices in dollars or euros come from shops abroad (Etsy, own site for export); say so instead of leaving a bare «43 USD».
+    if (/(?<!\p{L})(?:usd|eur)(?!\p{L})|\$|€/iu.test(line.text) && !/грн|₴/.test(line.text))
+      line.source = [line.source, /etsy/i.test(line.source ?? '') ? 'ціна для покупців за кордоном' : 'ціна в іноземній валюті, для покупців за кордоном'].filter(Boolean).join('; ')
     out.push(line)
   }
   return out
@@ -193,10 +196,19 @@ export function firstAddress(addr?: string | null): string {
     .replace(/\([^)]*\)/g, '')
     .replace(/,?\s*(?:ст\.\s*)?м\.\s*[«"]?[А-ЯІЇЄҐ][^,;]*$/u, '')
     .replace(/^м\.\s*[^,]+,\s*/, '')
+    // «Mercury Art Center, вул. Січових Стрільців, 3» → start at the street (schema.org streetAddress).
+    .replace(/^[^,]*?[A-Za-zА-ЯІЇЄҐа-яіїєґ«»"'’ ]+,\s*(?=(?:вул|просп|пров|пл|бульв|шосе|узвіз)\.?\s)/u, '')
     .replace(/\s{2,}/g, ' ')
     .replace(/[,\s]+$/, '')
     .trim()
 }
+
+// Display address: tidy punctuation and drop a lone postal code («…, Одеса 65000» → «…, Одеса»).
+export const cleanAddress = (a?: string | null) =>
+  cleanPublic(a)
+    .replace(/(?<=\p{L})\s+\d{5}(?=\s*(?:,|$))/gu, '')
+    .replace(/,\s*,/g, ',')
+    .replace(/[,\s]+$/, '')
 
 // ---------- who is a business ----------
 
@@ -217,9 +229,22 @@ export function isExhibitingOnly(s: Studio): boolean {
 
 // Names imported from listings sometimes carry a phone or a partner note in brackets:
 // «Гончарні майстер-класи у Миколаєві (партнер KAVA, тел. 066 569 19 64)» → without the bracket.
+// Display name: research titles carry addresses, marketplaces and spelling variants («Гончарна студія (Луцьк,
+// вул. Драгоманова, 1а) — МК на ТВОЄ», «Mercury Art Center (Меркурій)»). The variants live in alternateNames and
+// show on the profile as «Також відомі як»; the heading keeps the name itself. City qualifiers like «(Суми)» stay.
+const ADDRESS = /(?<!\p{L})(?:вул|просп|пров|пл|бульв|шосе|узвіз|м-н)\.?\s|(?<!\p{L})\d+[а-яa-z]?(?:\/\d+)?(?!\p{L})/iu
+const hasLatin = (t: string) => /[a-z]/i.test(t)
+const hasCyr = (t: string) => /[а-яіїєґ]/i.test(t)
 export function cleanName(name: string): string {
-  return name
+  let n = name
     .replace(/\s*\((?=[^)]*(?:тел\.?|\+?\d[\d\s-]{6,}|партнер))[^)]*\)/giu, '')
-    .replace(/\s{2,}/g, ' ')
-    .trim()
+    .replace(/\s+[—–-]\s+(?:мк|майстер-клас\p{L}*)\s+на\s+.+$/iu, '')
+  n = n.replace(/\s*\(([^()]*)\)/g, (m, inner: string) => {
+    const outer = n.replace(m, '')
+    if (ADDRESS.test(inner)) return ''
+    const alias = inner.trim().split(/\s+/).length <= 3 && ((hasLatin(inner) && !hasLatin(outer)) || (hasCyr(inner) && !hasCyr(outer)))
+    return alias ? '' : m
+  })
+  n = n.replace(/,\s*(?:вул|просп|пров|пл|бульв)\.?\s[^()]+$/iu, '')
+  return n.replace(/\s{2,}/g, ' ').replace(/\s+([,.])/g, '$1').trim() || name
 }

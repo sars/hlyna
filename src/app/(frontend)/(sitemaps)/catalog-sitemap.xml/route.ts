@@ -10,7 +10,7 @@ import { certificateCities } from '@/lib/topics'
 // Every public catalogue page: hubs, topic and product pages, master-class, certificate and maker cities, studio profiles.
 export const revalidate = 3600
 
-const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/vyrobnyky/misto', '/vyrobnyky/vyrib', '/dlya-biznesu', '/tsiny-2026', '/hayidy', '/dlya-studiy', '/dobirky', '/dobirky/suchasni-keramisty', '/dobirky/kosiv-i-opishne', '/mapa', '/llms.txt']
+const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/vyrobnyky/misto', '/vyrobnyky/vyrib', '/dlya-biznesu', '/tsiny-2026', '/hayidy', '/dlya-studiy', '/pro-nas', '/dobirky', '/dobirky/suchasni-keramisty', '/dobirky/kosiv-i-opishne', '/mapa', '/llms.txt']
 
 export async function GET() {
   const studios = await getAllStudios()

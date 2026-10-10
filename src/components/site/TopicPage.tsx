@@ -4,10 +4,10 @@ import React from 'react'
 import { Breadcrumbs, container, DocPhoto, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { fixPriceRef, mergeFaq, type PlaceContent } from '@/lib/places'
+import { ldStudio } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF } from '@/content/navigation'
-import { site } from '@/content/site'
 import type { Topic } from '@/content/topics'
 import { groupByCity, MIN_LIST, TYPE_LABEL, type StudioCard } from '@/lib/catalog'
 import { cleanName, stripPersonal } from '@/lib/present'
@@ -55,7 +55,7 @@ function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp
   return (
     <div className="grid grid-cols-1 gap-7">
       {big.map((g) => (
-        <section key={g.city.slug} className="grid grid-cols-1 gap-3">
+        <section key={g.city.slug} id={`misto-${g.city.slug}`} className="grid grid-cols-1 scroll-mt-24 gap-3">
           <h3 className="h-display m-0 text-[17px]">
             {g.city.name} <span className="text-terra">{g.studios.length}</span>
           </h3>
@@ -84,6 +84,29 @@ function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp
   )
 }
 
+// Long by-city lists: a jump list («Київ 20 · Львів 8 …») — chips above the list on phones, a sticky card in the
+// aside on desktop. It is navigation for people and plain internal links for crawlers.
+function CityJump({ groups, variant }: { groups: { slug: string; name: string; n: number }[]; variant: 'chips' | 'card' }) {
+  if (groups.length < 3) return null
+  const links = groups.map((g) => (
+    <li key={g.slug}>
+      <a href={`#misto-${g.slug}`} className={variant === 'chips' ? 'inline-block rounded-full bg-card px-3 py-1.5 text-sm whitespace-nowrap text-ink no-underline' : 'text-ink no-underline hover:text-cobalt'}>
+        {g.name} <span className="text-terra">{g.n}</span>
+      </a>
+    </li>
+  ))
+  return variant === 'chips' ? (
+    <nav aria-label="Міста у списку" className="-mx-4 overflow-x-auto px-4 lg:hidden">
+      <ul className="m-0 flex list-none gap-2 p-0">{links}</ul>
+    </nav>
+  ) : (
+    <nav aria-label="Міста у списку" className="hidden rounded-[20px] border border-line bg-card p-[18px] lg:block">
+      <p className="font-display m-0 mb-2 text-sm tracking-wide uppercase">Міста у списку</p>
+      <ul className="m-0 grid list-none grid-cols-2 gap-x-4 gap-y-1.5 p-0 text-[15px]">{links}</ul>
+    </nav>
+  )
+}
+
 // Shared layout for topic pages (src/content/topics.ts). Business topics get the request form in the aside.
 export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, known }: { topic: Topic; data: TopicData; h1?: string; crumb?: string; extraParents?: { label: string; href: string }[]; content?: PlaceContent | null; known?: Map<string, StudioCard> }) {
   const { ctx, lists, all, examples } = data
@@ -91,11 +114,15 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
   const priceWhere = examples.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
   const faq = mergeFaq(topic.faq(ctx), (place?.faq ?? []).map((f) => ({ q: f.q, a: fixPriceRef(f.a, priceWhere) })))
   const title = h1 ?? topic.h1
+  const jump = lists
+    .filter((l) => l.byCity)
+    .flatMap((l) => groupByCity(l.studios).filter((g) => g.studios.length >= MIN_LIST))
+    .reduce<{ slug: string; name: string; n: number }[]>((acc, g) => (acc.some((x) => x.slug === g.city.slug) ? acc : [...acc, { slug: g.city.slug!, name: g.city.name, n: g.studios.length }]), [])
 
   return (
     <main className={`${container} grid grid-cols-1 gap-10 pt-8 ${topic.form ? 'pb-28 lg:pb-16' : 'pb-16'}`}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
-      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: title, numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, item: listItem(s) })) }} />
+      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: title, numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, item: ldStudio(s) })) }} />
 
       <div className={`grid grid-cols-1 items-start gap-8 ${topic.photo ? 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]' : ''}`}>
         <div className="grid grid-cols-1 gap-4">
@@ -162,6 +189,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
                 <SectionHead title={l.title} id={`list${k}`}>
                   <p className="m-0 text-sm text-umber">{l.note ?? 'Список за відкритими даними студій (сайти, Instagram, медіа). Умови кожна студія підтверджує сама.'}</p>
                 </SectionHead>
+                {k === lists.findIndex((x) => x.byCity && x.studios.length) && <div className="mb-4"><CityJump groups={jump} variant="chips" /></div>}
                 <StudioList studios={l.studios} re={topic.evidence} byCity={l.byCity} />
               </section>
             ) : null,
@@ -201,6 +229,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
         </div>
 
         <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24">
+          <CityJump groups={jump} variant="card" />
           {topic.form ? (
             <RequestForm sourcePage={topic.path} defaultWhat={topic.form} defaultCity={ctx.place} />
           ) : topic.section === 'makers' ? (
@@ -242,9 +271,3 @@ export function MobileRequestBar() {
   )
 }
 
-const listItem = (s: StudioCard) => ({
-  '@type': s.type === 'maker' ? 'Person' : 'LocalBusiness',
-  name: cleanName(s.name),
-  url: `${site.url}/vyrobnyky/${s.slug}`,
-  ...(s.cityDoc ? { address: { '@type': 'PostalAddress', addressLocality: s.cityDoc.name, addressCountry: 'UA' } } : {}),
-})

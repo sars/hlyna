@@ -86,7 +86,9 @@ export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx
           description: guide.description,
           inLanguage: 'uk',
           url: site.url + guide.path,
-          dateModified: '2026-10-10',
+          datePublished: '2026-10-10',
+          dateModified: site.dataModified,
+          author: { '@type': 'Organization', name: site.name, url: site.url },
           publisher: { '@type': 'Organization', name: site.name, url: site.url },
         }}
       />

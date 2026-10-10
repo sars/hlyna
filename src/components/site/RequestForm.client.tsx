@@ -11,6 +11,16 @@ const WHAT = [
   { value: 'other', label: 'Інше' },
 ]
 
+// Field wording by request kind: things are counted in pieces, classes in people; a logo only makes sense for things.
+const KIND: Record<string, { qty: string; qtyPh: string; date: string; datePh: string; details: string; logo: boolean }> = {
+  tableware: { qty: 'Кількість', qtyPh: 'напр. 50 тарілок', date: 'До якої дати', datePh: 'напр. 15 грудня', details: 'Які вироби, стиль, кольори, бюджет за штуку…', logo: true },
+  'logo-mugs': { qty: 'Кількість', qtyPh: 'напр. 50', date: 'До якої дати', datePh: 'напр. 15 грудня', details: 'Об’єм, колір, де логотип, бюджет за штуку…', logo: true },
+  'corporate-gifts': { qty: 'Кількість', qtyPh: 'напр. 30', date: 'До якої дати', datePh: 'напр. 15 грудня', details: 'Що дарувати, бюджет на подарунок, пакування…', logo: true },
+  'corporate-workshop': { qty: 'Скільки людей', qtyPh: 'напр. 15', date: 'Дата', datePh: 'напр. п’ятниця, 24 жовтня', details: 'Формат (ліплення, коло, розпис), у студії чи у вас, побажання…', logo: false },
+  'master-class': { qty: 'Скільки людей', qtyPh: 'напр. 2', date: 'Дата', datePh: 'напр. субота', details: 'Формат (коло, ліплення, розпис), для кого, вік дітей…', logo: false },
+  other: { qty: 'Кількість', qtyPh: '', date: 'Коли', datePh: '', details: 'Що потрібно…', logo: false },
+}
+
 const field =
   'w-full min-w-0 rounded-xl border-[1.5px] border-line bg-cream px-3 py-2.5 text-[15px] text-ink placeholder:text-umber/60'
 const label = 'grid gap-1 text-[13px] font-semibold text-umber'
@@ -23,6 +33,7 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
   const [error, setError] = useState('')
   const [what, setWhat] = useState(forStudio ? 'other' : defaultWhat)
   const [studio, setStudio] = useState(forStudio)
+  const kind = KIND[what] ?? KIND.other
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).get('vid') === 'studiya') {
@@ -76,12 +87,12 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
           </select>
         </label>
         <label className={label}>
-          Кількість
-          <input name="quantity" inputMode="numeric" placeholder="напр. 50" className={field} />
+          {kind.qty}
+          <input name="quantity" inputMode="numeric" placeholder={kind.qtyPh} className={field} />
         </label>
         <label className={label}>
-          До якої дати
-          <input name="deadline" placeholder="напр. 15 грудня" className={field} />
+          {kind.date}
+          <input name="deadline" placeholder={kind.datePh} className={field} />
         </label>
         <label className={label}>
           Місто
@@ -95,7 +106,7 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
               name="details"
               rows={3}
               defaultValue={studio ? 'Я студія / майстер. Хочу додати або оновити профіль: назва, Instagram чи сайт, місто, що робимо.' : undefined}
-              placeholder="Стиль, кольори, бюджет за штуку, логотип…"
+              placeholder={kind.details}
               className={field}
             />
           </label>
@@ -109,9 +120,11 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
           <input name="contactEmail" type="email" placeholder="ви@компанія.ua" className={field} />
         </label>
       </div>
-      <label className="flex items-center gap-2 text-sm text-umber">
-        <input type="checkbox" name="logo" className="size-4 accent-[var(--color-terra)]" /> Потрібен логотип
-      </label>
+      {kind.logo && !studio && (
+        <label className="flex items-center gap-2 text-sm text-umber">
+          <input type="checkbox" name="logo" className="size-4 accent-[var(--color-terra)]" /> Потрібен логотип
+        </label>
+      )}
       <input type="text" name="website2" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
       <button type="submit" disabled={state === 'sending'} className="justify-self-start rounded-full bg-terra px-5 py-3 font-bold text-cream hover:bg-terra-dark disabled:opacity-60">
         {state === 'sending' ? 'Надсилаємо…' : 'Отримати пропозиції'}

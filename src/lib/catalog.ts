@@ -4,7 +4,7 @@ import { unstable_cache } from 'next/cache'
 import { cache } from 'react'
 
 import type { City, Studio } from '@/payload-types'
-import { cleanPublic } from './present'
+import { cleanAddress, cleanPublic } from './present'
 
 // Read-only data layer for public pages. One cached query per request; pages are statically
 // generated and revalidated, so the database is hit rarely.
@@ -57,7 +57,7 @@ const publicText = (s: Studio): Studio => ({
   publicDescription: cleanPublic(s.publicDescription),
   description: cleanPublic(s.description),
   recentNote: cleanPublic(s.recentNote),
-  address: cleanPublic(s.address),
+  address: cleanAddress(s.address),
   services: cleanList(s.services),
   products: cleanList(s.products),
   prices: cleanList(s.prices),

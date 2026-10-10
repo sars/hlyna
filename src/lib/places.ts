@@ -39,4 +39,8 @@ export function mergeFaq<T extends { q: string; a: string }>(base: T[], extra: {
 }
 
 // Editorial answers point at «the price table below»; say where prices really are on this page.
-export const fixPriceRef = (a: string, where: string) => a.replace(/[Дд]ив\.\s*таблицю цін нижче/g, (m) => (m[0] === 'Д' ? 'Ціни' : 'ціни') + ` — ${where}`)
+export const fixPriceRef = (a: string, where: string) =>
+  a
+    // «Вартість — див. таблицю цін нижче» → «Вартість — у розділі «Ціни»…», not «Вартість — ціни — у розділі…»
+    .replace(/\s*[—–-]\s*див\.\s*таблицю цін нижче/g, ` — ${where}`)
+    .replace(/[Дд]ив\.\s*таблицю цін нижче/g, (m) => (m[0] === 'Д' ? 'Ціни' : 'ціни') + ` — ${where}`)

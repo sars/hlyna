@@ -19,7 +19,7 @@ export const REQUEST_HREF = '/zapyt'
 export const STUDIO_JOIN_HREF = '/zapyt?vid=studiya'
 
 const PLANNED = [
-  '/keisy', '/yak-tse-pratsyuye', '/pro-nas', '/dobirky/pratsyuyut-z-biznesom',
+  '/keisy', '/yak-tse-pratsyuye', '/dobirky/pratsyuyut-z-biznesom',
 ]
 export const isBuilt = (href: string) => !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?'))
 const liveLinks = (links: NavLink[]) => links.filter((l) => isBuilt(l.href))
@@ -194,7 +194,7 @@ const simpleNavPlan: NavLink[] = [
 const utilityNavPlan: NavLink[] = [
   { label: 'Для бізнесу', href: '/dlya-biznesu' },
   { label: 'Для студій і майстрів', href: '/dlya-studiy' },
-  { label: 'Як це працює', href: '/yak-tse-pratsyuye' },
+  { label: 'Як це працює', href: '/pro-nas#zapyty' },
 ]
 
 // What is rendered: built routes only. Sections whose own page isn't built are dropped; so are empty columns and promos.
@@ -259,7 +259,8 @@ export const footerColumns: NavColumn[] = [
       { label: 'Добірки', href: '/dobirky' },
       { label: 'Гайди', href: '/hayidy' },
       { label: 'Для студій і майстрів', href: '/dlya-studiy' },
-      { label: 'Для LLM: llms.txt', href: '/llms.txt' },
+      { label: 'Про «Глину»', href: '/pro-nas' },
+      { label: 'llms.txt — для ШІ-асистентів', href: '/llms.txt' },
     ],
   },
 ]

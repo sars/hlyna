@@ -12,7 +12,7 @@ import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { getAllStudios, getCatalog, getStudioBySlug, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
-import { cleanName, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
+import { amountsIn, cleanName, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -138,6 +138,9 @@ export default async function StudioPage({ params }: Args) {
   const products = dedupeTexts((s.products ?? []).map((x) => x.text))
   const services = dedupeTexts((s.services ?? []).map((x) => x.text))
   const prices = publicPrices(s)
+  // schema.org priceRange from the studio's own hryvnia prices (typical span, not extremes).
+  const span = typicalRange(prices.flatMap((p) => amountsIn(p.text)))
+  const priceRange = span ? (span.min === span.max ? `${span.min} UAH` : `${span.min}–${span.max} UAH`) : ''
   const priceGroups = groupPrices(prices)
   const description = stripPersonal(s.publicDescription || s.description || '')
   const recentNote = stripPersonal(s.recentNote || '')
@@ -172,7 +175,8 @@ export default async function StudioPage({ params }: Args) {
               : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(street ? { streetAddress: street } : {}) } }
             : {}),
           ...(altNames.length ? { alternateName: altNames } : {}),
-          sameAs: profileUrls(s),
+          ...(profileUrls(s).length ? { sameAs: profileUrls(s) } : {}),
+          ...(priceRange && s.type !== 'maker' && !dormant ? { priceRange } : {}),
         }}
       />
       <div className="grid grid-cols-1 gap-4">
@@ -186,7 +190,7 @@ export default async function StudioPage({ params }: Args) {
           ))}
           {recentNote && (
             <p className="m-0">
-              <span className="kicker mr-2">Що нового</span>
+              <span className="kicker mr-2">Що нового:</span>{' '}
               {recentNote}
             </p>
           )}
@@ -272,7 +276,7 @@ export default async function StudioPage({ params }: Args) {
           {igPosts.length > 0 && (
             <section aria-labelledby="ig">
               <SectionHead title="Останнє в Instagram" id="ig">
-                {s.instagram && <p className="m-0 text-sm text-umber">Пости з профілю <a href={s.instagram} target="_blank" rel="noopener nofollow">@{igHandle(s.instagram)}</a>; завантажуються з Instagram, коли ви до них гортаєте.</p>}
+                {s.instagram && <p className="m-0 text-sm text-umber">Вибрані пости з Instagram студії <a href={s.instagram} target="_blank" rel="noopener nofollow">@{igHandle(s.instagram)}</a> і її колаборацій; завантажуються, коли ви до них гортаєте.</p>}
               </SectionHead>
               <InstagramPosts urls={igPosts} handle={igHandle(s.instagram)} />
             </section>

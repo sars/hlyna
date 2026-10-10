@@ -3,13 +3,13 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
+import { site } from '@/content/site'
+import { ldItemList } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
 import { Faq } from '@/components/site/SelectionFaq'
 import { StudioCard } from '@/components/site/StudioCard'
-import { site } from '@/content/site'
 import { verses } from '@/content/verses'
 import { groupByCity, pluralUk } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
 import { contemporaryPicks } from '@/lib/selections'
 import { ogImage } from '@/utilities/ogImage'
 
@@ -33,7 +33,7 @@ export default async function Contemporary() {
   ]
   return (
     <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 pb-16`}>
-      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Сучасні українські керамісти', numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/${s.slug}`, name: cleanName(s.name) })) }} />
+      <JsonLd data={ldItemList('Сучасні українські керамісти', all)} />
       <div className="grid grid-cols-1 gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Добірки', href: '/dobirky' }, { label: 'Сучасні керамісти' }]} />
         <span className="kicker">Добірка · 2026</span>

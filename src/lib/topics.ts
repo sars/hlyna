@@ -4,7 +4,14 @@ import { topics, type Topic, type TopicCtx } from '@/content/topics'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt, getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
 import { facts } from './facts'
-import { amountsIn, publicPrices, splitSource, typicalRange } from './present'
+import { amountsIn, isExhibitingOnly, publicPrices, splitSource, typicalRange } from './present'
+
+// A museum or museum shop is listed on class pages only if its own services name a class it runs.
+const museumOnly = (s: StudioCard) =>
+  /музей|museum/iu.test(s.name) && !(s.services ?? []).some((x) => /майстер-клас|(?<!\p{L})мк(?!\p{L})|заняття|гурт/iu.test(x.text))
+
+const GROUP_TOTAL = /до\s+\d+\s*(?:ос|учасн|люд|чол)|\d+\s*(?:учасник\p{L}*|осіб)\s*[—–-]|за\s+груп|для\s+(?:своєї\s+)?груп|для\s+(?:своєї\s+)?компані|компані\p{L}*\s+до|наступн/iu
+const COUPLE_TOTAL = /для двох|удвох|вдвох|на двох|для пари|\(2\)/iu
 
 export type TopicListData = { title: string; note?: string; byCity?: boolean; studios: StudioCard[] }
 export type PriceExample = { studio: StudioCard; text: string; source?: string }
@@ -19,7 +26,7 @@ const eligible = (topic: Topic, l: Topic['lists'][number], s: StudioCard) =>
   (!l.types || l.types.includes(s.type ?? '')) &&
   (l.match ? l.match(s) : l.formats.some((f) => hasFormat(s, f))) &&
   (!l.filter || l.filter(s)) &&
-  (topic.section === 'mk' || topic.section === 'cert' ? offersMasterClasses(s) : true)
+  (topic.section === 'mk' || topic.section === 'cert' ? offersMasterClasses(s) && !museumOnly(s) && !isExhibitingOnly(s) : true)
 
 export async function topicData(topic: Topic, citySlug?: string): Promise<TopicData> {
   const studios = (await getAllStudios()).filter((s) => !citySlug || s.cityDoc?.slug === citySlug)
@@ -33,11 +40,16 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
   })
   const all = lists.flatMap((l) => l.studios)
   const examples: PriceExample[] = []
+  const couplePage = /двох/.test(topic.price.re.source)
   const amounts: number[] = []
   for (const s of all) {
     const lines = publicPrices(s).filter((p) => topic.price.re.test(p.text) && !topic.price.exclude?.test(p.text) && amountsIn(p.text).length)
     // The range uses only lines in the page's unit (e.g. per person for corporate events).
-    lines.filter((p) => !topic.price.unit || (topic.price.unit.test(p.text) && !topic.price.unitNot?.test(p.text))).forEach((p) => amounts.push(...amountsIn(p.text)))
+    lines
+      .filter((p) => !topic.price.unit || (topic.price.unit.test(p.text) && !topic.price.unitNot?.test(p.text)))
+      // Totals for a group or a couple are not a per-person price: they stay as examples, out of the range.
+      .filter((p) => !GROUP_TOTAL.test(p.text) && (couplePage || !COUPLE_TOTAL.test(p.text)))
+      .forEach((p) => amounts.push(...amountsIn(p.text)))
     // Prefer an example in the page's unit; recent lines first.
     const best = [...lines].sort((a, b) => Number(!!topic.price.unit?.test(b.text)) - Number(!!topic.price.unit?.test(a.text)) || (b.year ?? 0) - (a.year ?? 0))[0]
     if (best) examples.push({ studio: s, text: best.text, source: best.source })
