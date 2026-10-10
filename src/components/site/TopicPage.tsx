@@ -32,7 +32,7 @@ function Row({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: boolean
 const grid = 'm-0 grid grid-cols-1 list-none gap-3 p-0 sm:grid-cols-2'
 const SHOW = 12
 
-function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp; byCity?: boolean }) {
+export function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp; byCity?: boolean }) {
   if (!byCity) {
     const rows = (list: StudioCard[]) => <ul className={grid}>{list.map((s) => <Row key={s.id} s={s} re={re} showCity />)}</ul>
     if (studios.length <= SHOW + 2) return rows(studios)

@@ -12,7 +12,7 @@ import { verses } from './verses'
 // min/max: «здебільшого» range. For whole-Ukraine pages whose price has an `index` category it is the price
 // index's range (same numbers as /tsiny-2026); otherwise the range of this page's own price lines.
 // price(key): the price index range for any category, e.g. c.price('corporate').
-export type TopicCtx = { n: number; cities: number; min?: number; max?: number; place?: string; price: (key: string) => string }
+export type TopicCtx = { n: number; cities: number; min?: number; max?: number; median?: number; place?: string; price: (key: string) => string }
 
 export type TopicList = {
   title: string

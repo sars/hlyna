@@ -1,0 +1,68 @@
+[
+ {
+  "name": "ҐАVA — Галерея українських ремесел",
+  "city": "Львів",
+  "address": "Львів, вул. Івана Федорова, 8",
+  "website": "https://gavahandmade.com.ua",
+  "instagram": "https://www.instagram.com/gava.handmade.ua",
+  "brands": "Кераміка: Olha Mukha, Zola_Sense, NADRA, Nastka ceramics, Bigla Kizka, Holomei Clay&Plaster, Irman",
+  "slug": "gava-halereia-ukrainskykh-remesel"
+ },
+ {
+  "name": "BADO",
+  "city": "Чернівці",
+  "address": "Чернівці, вул. Героїв Майдану, 150",
+  "website": "https://bado.ua",
+  "instagram": "https://www.instagram.com/bado_multibrand",
+  "brands": "",
+  "slug": "bado-kontsept-stor"
+ },
+ {
+  "name": "White Label Project (WLP Store)",
+  "city": "Берлін (Німеччина)",
+  "address": "Berlin Mitte",
+  "website": "https://whitelabel-project.com",
+  "instagram": "",
+  "brands": ""
+ },
+ {
+  "name": "ZELEN' showroom & coffee",
+  "city": "Львів",
+  "address": "Львів, вул. Братів Рогатинців, 12",
+  "website": "",
+  "instagram": "https://www.instagram.com/zelen.showroom/",
+  "brands": ""
+ },
+ {
+  "name": "Щось цікаве (крамниця художніх виробів)",
+  "city": "Львів",
+  "address": "Львів, площа Соборна, 2а",
+  "website": "https://www.shchos-tsikave.ua",
+  "instagram": "",
+  "brands": "Кераміка: Marharyta Kopylova ceramics (Маргарита Копилова), Art room, Quite form, Богдан Кухарський, Zguro, Ptitsamiok, Morkva ceramics, Imho"
+ },
+ {
+  "name": "SKLAD Showroom",
+  "city": "Львів",
+  "address": "Львів, вул. Дрогобича, 5",
+  "website": "",
+  "instagram": "",
+  "brands": ""
+ },
+ {
+  "name": "Open Store Lviv / Open Gifts",
+  "city": "Львів",
+  "address": "Львів, вул. Федорова, 8 (Open Store); вул. Вірменська, 25 (Open Gifts)",
+  "website": "",
+  "instagram": "https://www.instagram.com/openstorelviv",
+  "brands": ""
+ },
+ {
+  "name": "Galerie Philia",
+  "city": "Женева / Нью-Йорк / Сінгапур",
+  "address": "",
+  "website": "",
+  "instagram": "",
+  "brands": ""
+ }
+]

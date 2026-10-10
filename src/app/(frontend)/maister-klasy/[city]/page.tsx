@@ -14,6 +14,7 @@ import { fmt, getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersM
 import { cleanName, firstAddress, inCity, oblastLabel, singleClassAmounts, typicalRange } from '@/lib/present'
 import { cityContent } from '@/lib/places'
 import { certificateCities } from '@/lib/topics'
+import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/lib/waveA'
 
 export const revalidate = 86400
 
@@ -49,6 +50,8 @@ const CHIPS: [Format, string][] = [
   ['certificates', 'сертифікати'],
   ['corporate-workshop', 'корпоративи'],
 ]
+// Tag → wave A format slug (/maister-klasy/<city>/<slug>).
+const SLUG_OF: Partial<Record<Format, FormatSlug>> = { wheel: 'honcharne-kolo', handbuilding: 'lipennya', painting: 'rozpys', couples: 'dlya-dvokh', kids: 'dlya-ditey', courses: 'kursy' }
 const FORMAT_PAGES: [Format, string, string][] = [
   ['wheel', 'Гончарне коло', '/maister-klasy/honcharne-kolo'],
   ['handbuilding', 'Ліплення з глини', '/maister-klasy/lipennya'],
@@ -89,6 +92,10 @@ export default async function CityMasterClassesPage({ params }: Args) {
   const hasCertPage = (await certificateCities()).some((c) => c.slug === city.slug)
   const count = (f: Format) => studios.filter((s) => hasFormat(s, f)).length
   const formatLinks = FORMAT_PAGES.filter(([f]) => count(f) >= 2)
+  // A format with its own page for this city (wave A copy written, enough places) links there instead.
+  const cityFormat = new Set<FormatSlug>()
+  for (const slug of Object.keys(WAVE_FORMATS) as FormatSlug[])
+    if (hasCopy(formatCityId(city.slug!, slug)) && (await formatCityData(city.slug!, slug)).data.all.length >= MIN_LIST) cityFormat.add(slug)
   const breakdown = ([['wheel', 'на гончарному колі'], ['couples', 'для двох'], ['kids', 'для дітей']] as [Format, string][])
     .filter(([f]) => count(f))
     .map(([f, label]) => `${label} — ${count(f)}`)
@@ -206,7 +213,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
                 )}
                 {formatLinks.map(([f, label, href]) => (
                   <li key={f}>
-                    <Link href={href} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
+                    <Link href={SLUG_OF[f] && cityFormat.has(SLUG_OF[f]!) ? `/maister-klasy/${city.slug}/${SLUG_OF[f]}` : href} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
                       {label}
                     </Link>
                   </li>

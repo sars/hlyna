@@ -25,8 +25,7 @@ export const TYPE_LABEL: Record<string, string> = {
 export type StudioCard = Studio & { cityDoc: City | null; unverified?: boolean }
 
 // depth 0 + a separate city lookup keeps the cached payload small (Next's data cache limit is 2 MB per entry).
-const loadStudios = unstable_cache(
-  async (): Promise<StudioCard[]> => {
+const loadStudiosRaw = async (): Promise<StudioCard[]> => {
     // The Docker build has no database: render empty and let /revalidate refill after deploy.
     if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
     const payload = await getPayload({ config: configPromise })
@@ -44,10 +43,12 @@ const loadStudios = unstable_cache(
     ])
     const byId = new Map(cities.docs.map((c) => [c.id, c]))
     return studios.docs.map((s) => ({ ...publicText(s as Studio), unverified: isUnverified(s as Studio), cityDoc: (typeof s.city === 'object' ? s.city : byId.get(s.city as number)) ?? null }))
-  },
-  ['studios-all-v6'],
-  { revalidate: 3600, tags: ['studios'] },
-)
+}
+
+// Scripts (pnpm payload run …) have no Next data cache: HLYNA_SCRIPT=1 reads the database directly,
+// so build scripts see exactly what the pages see.
+let scriptLoad: Promise<StudioCard[]> | null = null
+const loadStudios = process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= loadStudiosRaw()) : unstable_cache(loadStudiosRaw, ['studios-all-v6'], { revalidate: 3600, tags: ['studios'] })
 
 // Research annotations stay in the database (admin sees them) but never reach public pages.
 const cleanList = <T extends { text: string }>(xs?: T[] | null) => (xs ?? []).map((x) => ({ ...x, text: cleanPublic(x.text) })).filter((x) => x.text)

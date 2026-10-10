@@ -3,6 +3,8 @@
 // routes that are not built yet (PLANNED) are filtered out of what is rendered, so no page links
 // to a 404. When a planned page ships, remove its prefix from PLANNED. `node scripts/check-links.mjs` verifies.
 
+import { liveWaveIds } from './waveA/live'
+
 export type NavLink = { label: string; href: string; note?: string }
 export type NavColumn = { title: string; links: NavLink[] }
 export type NavSection = {
@@ -21,7 +23,16 @@ export const STUDIO_JOIN_HREF = '/zapyt?vid=studiya'
 const PLANNED = [
   '/keisy', '/yak-tse-pratsyuye', '/dobirky/pratsyuyut-z-biznesom',
 ]
-export const isBuilt = (href: string) => !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?'))
+// Wave A pages exist only once their copy is written (src/content/waveA, scripts/sync-wave-a.mjs).
+const WAVE_HREFS: Record<string, string> = {
+  '/de-kupyty-keramiku': 'de-kupyty-keramiku',
+  '/podarunky-z-keramiky': 'podarunky-z-keramiky',
+  '/maister-klasy/den-narodzhennya': 'mk-den-narodzhennya',
+}
+const waveLive = new Set(liveWaveIds)
+export const isBuilt = (href: string) =>
+  !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?')) &&
+  (!(href.split(/[?#]/)[0] in WAVE_HREFS) || waveLive.has(WAVE_HREFS[href.split(/[?#]/)[0]]))
 const liveLinks = (links: NavLink[]) => links.filter((l) => isBuilt(l.href))
 
 const mainNavPlan: NavSection[] = [
@@ -136,12 +147,14 @@ const mainNavPlan: NavSection[] = [
           { label: 'Ліплення з глини', href: '/maister-klasy/lipennya' },
           { label: 'Розпис кераміки', href: '/maister-klasy/rozpys' },
           { label: 'Курси й абонементи', href: '/maister-klasy/kursy' },
+          { label: 'День народження в студії', href: '/maister-klasy/den-narodzhennya' },
         ],
       },
       {
         title: 'Подарунок',
         links: [
           { label: 'Сертифікати на гончарство', href: '/sertyfikaty', note: 'Ціни, термін дії, формати' },
+          { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky', note: 'За бюджетом і приводом' },
           { label: 'Сертифікат у Києві', href: '/sertyfikaty/kyiv' },
           { label: 'Сертифікат у Львові', href: '/sertyfikaty/lviv' },
           { label: 'Сертифікат в Одесі', href: '/sertyfikaty/odesa' },
@@ -209,7 +222,7 @@ export const simpleNav = liveLinks(simpleNavPlan)
 export const utilityNav = liveLinks(utilityNavPlan)
 
 // Footer: only pages that exist (it is on every page); the full plan lives in mainNav.
-export const footerColumns: NavColumn[] = [
+export const footerColumns: NavColumn[] = ([
   {
     title: 'Для бізнесу',
     links: [
@@ -245,6 +258,7 @@ export const footerColumns: NavColumn[] = [
       { label: 'Для дітей', href: '/maister-klasy/dlya-ditey' },
       { label: 'Курси й абонементи', href: '/maister-klasy/kursy' },
       { label: 'Сертифікати', href: '/sertyfikaty' },
+      { label: 'День народження в студії', href: '/maister-klasy/den-narodzhennya' },
     ],
   },
   {
@@ -254,6 +268,8 @@ export const footerColumns: NavColumn[] = [
       { label: 'За містами', href: '/vyrobnyky/misto' },
       { label: 'За виробами', href: '/vyrobnyky/vyrib' },
       { label: 'Мапа студій', href: '/mapa' },
+      { label: 'Де купити кераміку', href: '/de-kupyty-keramiku' },
+      { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' },
       { label: 'Ціни 2026', href: '/tsiny-2026' },
       { label: 'Для бізнесу', href: '/dlya-biznesu' },
       { label: 'Добірки', href: '/dobirky' },
@@ -263,4 +279,4 @@ export const footerColumns: NavColumn[] = [
       { label: 'llms.txt — для ШІ-асистентів', href: '/llms.txt' },
     ],
   },
-]
+] as NavColumn[]).map((c) => ({ ...c, links: liveLinks(c.links) }))

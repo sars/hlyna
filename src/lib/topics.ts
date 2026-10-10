@@ -15,7 +15,9 @@ const COUPLE_TOTAL = /для двох|удвох|вдвох|на двох|для
 
 export type TopicListData = { title: string; note?: string; byCity?: boolean; studios: StudioCard[] }
 export type PriceExample = { studio: StudioCard; text: string; source?: string }
-export type TopicData = { lists: TopicListData[]; all: StudioCard[]; ctx: TopicCtx; examples: PriceExample[] }
+export type TopicData = { lists: TopicListData[]; all: StudioCard[]; ctx: TopicCtx; examples: PriceExample[]; amounts: number[] }
+
+const medianOf = (xs: number[]) => (xs.length ? [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] : undefined)
 
 // Rank: studios with prices first, then with Instagram, then by name (stable and explainable).
 const rank = (s: StudioCard) => (s.prices?.length ? 2 : 0) + (s.instagram ? 1 : 0)
@@ -63,7 +65,8 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     lists,
     all,
     examples: examples.slice(0, 8),
-    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
+    amounts,
+    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, median: medianOf(amounts), place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
   }
 }
 
