@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: `Майстер-класи з кераміки: ${g.city.name} — ${g.studios.length} ${pluralUk(g.studios.length, ['студія', 'студії', 'студій'])} і ціни 2026`,
     description: `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])} у місті ${g.city.name}, де проводять майстер-класи з гончарства і ліплення з глини${r ? `; ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : ''}. Формати, сертифікати, контакти.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
-    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}, ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : undefined, pattern: g.city.slug as string }) },
+    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}, ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : undefined, pattern: g.city.slug as string, coa: g.city.slug as string }) },
   }
 }
 

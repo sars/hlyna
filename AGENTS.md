@@ -17,7 +17,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 - **Scope:** studio-scale ceramics made in Ukraine. Makers who now work abroad, suppliers, factories, media, course platforms and gift-certificate aggregators stay as drafts.
 - **Photos:** only with the maker's consent; stock photos (`public/images/stock`, CC0) only for site chrome.
 - **Mobile first and fast:** server components by default, client components only for interaction, `next/image`, fonts self-hosted by `next/font`.
-- **No paid services** without the owner's explicit approval.
+- **No paid services** without the owner's explicit approval. No GitHub Actions/CI (paid minutes) — checks run locally (Stop hook, `pnpm lint`, `pnpm build`).
 
 ## Stack
 Next.js 16 (App Router) + Payload 3 (admin at `/admin`, Postgres) + Tailwind 4 with design tokens 1A in `src/app/(frontend)/globals.css` (`bg-clay`, `text-cobalt`, `bg-terra`, `text-umber`, `border-line`, `font-display`, utilities `kicker`, `h-display`, `band`). Fonts: Unbounded (headings) + Raleway (body).

@@ -21,9 +21,13 @@ export async function GET(req: Request) {
   const img = (u.searchParams.get('img') || '').replace(/[^a-z0-9-]/g, '')
   const photo = img ? `data:image/jpeg;base64,${(await readFile(path.join(process.cwd(), 'public/images/stock', `${img}.jpg`)).catch(() => Buffer.from(''))).toString('base64')}` : ''
   const seed = (u.searchParams.get('pattern') || '').slice(0, 40)
+  // City coat of arms (public/images/coa/<slug>.png, from Wikimedia Commons); falls back to the mosaic.
+  const coaSlug = (u.searchParams.get('coa') || '').replace(/[^a-z0-9-]/g, '')
+  const coaBuf = coaSlug ? await readFile(path.join(process.cwd(), 'public/images/coa', `${coaSlug}.png`)).catch(() => null) : null
+  const coa = coaBuf && coaBuf.length > 10000 ? `data:image/png;base64,${coaBuf.toString('base64')}` : ''
   const [unbounded, raleway] = await fonts
   const band = Array.from({ length: 30 }, (_, i) => [C.terra, C.cobalt, C.ochre][i % 3])
-  const size = (img || u.searchParams.get('pattern') ? 0.82 : 1) * (title.length > 60 ? 50 : title.length > 36 ? 60 : 72)
+  const size = (img || u.searchParams.get('pattern') || coaSlug ? 0.82 : 1) * (title.length > 60 ? 50 : title.length > 36 ? 60 : 72)
 
   return new ImageResponse(
     (
@@ -34,7 +38,7 @@ export async function GET(req: Request) {
           ))}
         </div>
         <div style={{ display: 'flex', flex: 1 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: photo || seed ? '52px 48px 44px 64px' : '56px 72px 48px', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: photo || seed || coa ? '52px 48px 44px 64px' : '56px 72px 48px', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {kicker && <div style={{ fontFamily: 'Unbounded', fontSize: 22, letterSpacing: 3, color: C.terra, textTransform: 'uppercase' }}>{kicker}</div>}
             <div style={{ fontFamily: 'Unbounded', fontSize: size, lineHeight: 1.05, color: C.ink, textTransform: 'uppercase' }}>{title}</div>
@@ -47,7 +51,13 @@ export async function GET(req: Request) {
             <div style={{ display: 'flex', fontSize: 26, color: C.umber }}>hlyna.com.ua</div>
           </div>
         </div>
-        {seed && !photo && <Mosaic seed={seed} />}
+        {coa && !photo && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 420, height: 548, margin: '32px 32px 32px 0', background: C.card, borderRadius: 36 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={coa} alt="" style={{ maxWidth: 330, maxHeight: 440, objectFit: 'contain' }} />
+          </div>
+        )}
+        {seed && !photo && !coa && <Mosaic seed={seed} />}
         {photo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo} width={420} height={548} alt="" style={{ width: 420, height: 548, objectFit: 'cover', borderRadius: 36, margin: '32px 32px 32px 0' }} />

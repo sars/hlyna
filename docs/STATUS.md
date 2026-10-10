@@ -20,3 +20,8 @@ Updated 2026-10-10.
 - Collections for studios, master classes, prices, requests; import from `UkraineCeramics/_master/`.
 - Design tokens 1A in Tailwind, component kit, home page.
 - Request form → admin → Telegram notification.
+
+## Reminders (2026-10-10)
+- **Instagram pass** (needs a `claude --chrome` session): collect 1–3 pinned/latest post URLs per public studio for lazy-loaded embeds; read captions and images to add a unique, paraphrased paragraph to each profile.
+- **Telegram:** add TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID to the server `.env` after deploy.
+- **Photos for hub pages:** pick less "stocky", documentary photos (e.g. Wikimedia Commons workshops in Opishne/Kosiv, with credit) until studios send their own.
