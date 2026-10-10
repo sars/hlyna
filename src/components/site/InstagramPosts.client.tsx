@@ -17,22 +17,22 @@ export function InstagramPosts({ urls, handle }: { urls: string[]; handle?: stri
   }, [show])
 
   return (
-    <div ref={ref} className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    <div ref={ref} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
       {urls.map((u) => {
         const code = u.match(/\/(p|reel)\/([\w-]+)/)
         if (!code) return null
         return (
-          <div key={u} className="overflow-hidden rounded-2xl border border-line bg-card" style={{ minHeight: 480 }}>
+          <div key={u} className="overflow-hidden rounded-2xl border border-line bg-card" style={{ minHeight: 560 }}>
             {show ? (
               <iframe
                 src={`https://www.instagram.com/${code[1]}/${code[2]}/embed/`}
                 title={handle ? `Пост @${handle} в Instagram` : 'Пост в Instagram'}
                 loading="lazy"
-                className="block h-[480px] w-full border-0"
+                className="block h-[560px] w-full border-0"
                 allowTransparency
               />
             ) : (
-              <a href={u} target="_blank" rel="noopener nofollow" className="grid h-[480px] place-items-center text-sm text-umber">
+              <a href={u} target="_blank" rel="noopener nofollow" className="grid h-[560px] place-items-center text-sm text-umber">
                 Пост в Instagram
               </a>
             )}
