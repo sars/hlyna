@@ -19,7 +19,7 @@ export const REQUEST_HREF = '/zapyt'
 export const STUDIO_JOIN_HREF = '/zapyt?vid=studiya'
 
 const PLANNED = [
-  '/keisy', '/mapa', '/yak-tse-pratsyuye', '/pro-nas', '/dobirky/pratsyuyut-z-biznesom',
+  '/keisy', '/yak-tse-pratsyuye', '/pro-nas', '/dobirky/pratsyuyut-z-biznesom',
 ]
 export const isBuilt = (href: string) => !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?'))
 const liveLinks = (links: NavLink[]) => links.filter((l) => isBuilt(l.href))
@@ -253,6 +253,7 @@ export const footerColumns: NavColumn[] = [
       { label: 'Усі студії й майстри', href: '/vyrobnyky' },
       { label: 'За містами', href: '/vyrobnyky/misto' },
       { label: 'За виробами', href: '/vyrobnyky/vyrib' },
+      { label: 'Мапа студій', href: '/mapa' },
       { label: 'Ціни 2026', href: '/tsiny-2026' },
       { label: 'Для бізнесу', href: '/dlya-biznesu' },
       { label: 'Добірки', href: '/dobirky' },

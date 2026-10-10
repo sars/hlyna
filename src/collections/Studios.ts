@@ -110,6 +110,34 @@ export const Studios: CollectionConfig = {
             },
             { name: 'address', label: 'Адреса', type: 'text' },
             {
+              name: 'geo',
+              label: 'Координати (для мапи)',
+              type: 'group',
+              admin: { description: 'Заповнює scripts/geocode.ts (OpenStreetMap Nominatim). Точність «населений пункт» — маркер на центрі міста.' },
+              fields: [
+                {
+                  type: 'row',
+                  fields: [
+                    { name: 'lat', label: 'Широта', type: 'number', admin: { width: '25%' } },
+                    { name: 'lng', label: 'Довгота', type: 'number', admin: { width: '25%' } },
+                    {
+                      name: 'precision',
+                      label: 'Точність',
+                      type: 'select',
+                      options: [
+                        { label: 'Адреса', value: 'address' },
+                        { label: 'Вулиця', value: 'street' },
+                        { label: 'Населений пункт', value: 'settlement' },
+                      ],
+                      admin: { width: '25%' },
+                    },
+                    { name: 'geocodedAt', label: 'Коли', type: 'date', admin: { width: '25%' } },
+                  ],
+                },
+                { name: 'source', label: 'Джерело / запит', type: 'text' },
+              ],
+            },
+            {
               name: 'summary',
               label: 'Короткий опис для карток і пошуку (до 160 символів)',
               type: 'text',

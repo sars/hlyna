@@ -229,3 +229,12 @@ html[data-theme='light'] {
   text-wrap: balance;
   font-weight: 700;
 }
+
+/* Map popups (/mapa) */
+.maplibregl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: var(--font-sans); color: #2a2018; }
+.map-pop { display: grid; gap: 4px; font-size: 14px; line-height: 1.35; }
+.map-pop a { color: #2a4fa8; }
+.map-pop ul { margin: 4px 0 0; padding-left: 16px; max-height: 220px; overflow: auto; }
+.map-pop small { color: #6c5243; }
+.map-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.map-chips span { background: #f3e7da; border-radius: 999px; padding: 2px 8px; font-size: 12px; color: #6c5243; }

@@ -41,7 +41,7 @@ export async function GET() {
   lines.push('## Гайди', ...guides.map((g) => `- [${g.h1}](${site.url}${g.path}): ${g.short}`), '')
   lines.push('## Добірки', `- [Сучасні українські керамісти](${site.url}/dobirky/suchasni-keramisty): бренди, авторки й автори, студії за відкритими даними (не рейтинг)`, `- [Косів і Опішне сьогодні](${site.url}/dobirky/kosiv-i-opishne): хто працює з глиною в двох гончарних осередках`, '')
   lines.push('## Для студій', `- [${studioPage.h1}](${site.url}${studioPage.path}): ${studioPage.short}`, '')
-  lines.push('## Каталог', `- [Усі студії, бренди й майстри](${site.url}/vyrobnyky): профілі з містом, послугами, цінами й посиланнями`, `- Карта сайту: ${site.url}/catalog-sitemap.xml`)
+  lines.push('## Каталог', `- [Усі студії, бренди й майстри](${site.url}/vyrobnyky): профілі з містом, послугами, цінами й посиланнями`, `- [Мапа студій](${site.url}/mapa): інтерактивна мапа з фільтрами за форматами (дані: ${site.url}/mapa/studios.geojson)`, `- Карта сайту: ${site.url}/catalog-sitemap.xml`)
   lines.push('', `Надіслати запит: ${site.url}/zapyt`)
   return new Response(lines.join('\n'), { headers: { 'Content-Type': 'text/plain; charset=utf-8' } })
 }

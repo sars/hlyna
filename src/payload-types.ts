@@ -179,6 +179,16 @@ export interface Studio {
   city?: (number | null) | City;
   oblast?: string | null;
   address?: string | null;
+  /**
+   * Заповнює scripts/geocode.ts (OpenStreetMap Nominatim). Точність «населений пункт» — маркер на центрі міста.
+   */
+  geo?: {
+    lat?: number | null;
+    lng?: number | null;
+    precision?: ('address' | 'street' | 'settlement') | null;
+    geocodedAt?: string | null;
+    source?: string | null;
+  };
   summary?: string | null;
   /**
    * Показується на сайті. Якщо порожньо — показуємо «Опис (з досліджень)».
@@ -1274,6 +1284,15 @@ export interface StudiosSelect<T extends boolean = true> {
   city?: T;
   oblast?: T;
   address?: T;
+  geo?:
+    | T
+    | {
+        lat?: T;
+        lng?: T;
+        precision?: T;
+        geocodedAt?: T;
+        source?: T;
+      };
   summary?: T;
   publicDescription?: T;
   recentNote?: T;

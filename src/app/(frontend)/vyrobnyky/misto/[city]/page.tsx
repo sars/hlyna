@@ -107,6 +107,7 @@ export default async function CityMakersPage({ params }: Args) {
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
             {mkPage && <li><Link href={`/maister-klasy/${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Майстер-класи: {city.name} →</Link></li>}
             {certPage && <li><Link href={`/sertyfikaty/${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Сертифікати: {city.name} →</Link></li>}
+            <li><Link href={`/mapa?misto=${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Показати на мапі →</Link></li>
           </ul>
         )}
       </div>
