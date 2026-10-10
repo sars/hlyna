@@ -7,6 +7,7 @@ import { getAllStudios, getCatalog, groupByCity, MIN_LIST, offersMasterClasses }
 import { makerCities } from '@/lib/makers'
 import { certificateCities } from '@/lib/topics'
 import { liveWavePages } from '@/lib/waveA'
+import { liveWaveBPages } from '@/lib/waveB'
 
 // Every public catalogue page: hubs, topic and product pages, master-class, certificate and maker cities, studio profiles.
 export const revalidate = 3600
@@ -22,6 +23,7 @@ export async function GET() {
     ...topicList.map((t) => ({ loc: site.url + t.path, lastmod: now })),
     ...guides.map((g) => ({ loc: site.url + g.path, lastmod: now })),
     ...(await liveWavePages()).map((p) => ({ loc: site.url + p.path, lastmod: now })),
+    ...(await liveWaveBPages()).map((p) => ({ loc: site.url + p.path, lastmod: now })),
     ...(await certificateCities()).map((c) => ({ loc: `${site.url}/sertyfikaty/${c.slug}`, lastmod: now })),
     ...cities.map((g) => ({ loc: `${site.url}/maister-klasy/${g.city.slug}`, lastmod: now })),
     ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: now })),

@@ -6,6 +6,7 @@ import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/
 import { JsonLd } from '@/components/site/JsonLd'
 import { guides } from '@/content/guides'
 import { site } from '@/content/site'
+import { liveWaveBPages } from '@/lib/waveB'
 import { ogImage } from '@/utilities/ogImage'
 
 export const metadata: Metadata = {
@@ -21,10 +22,14 @@ const more = [
   { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny', note: 'Формати, ціни з особи, у студії чи у вас' },
 ]
 
-export default function GuidesIndex() {
+export const revalidate = 86400
+
+export default async function GuidesIndex() {
+  const extra = (await liveWaveBPages()).filter((p) => p.section === 'hayidy')
+  const list = [...guides.map((g) => ({ key: g.slug, href: g.path, kicker: g.kicker, title: g.h1, note: g.short })), ...extra.map((p) => ({ key: p.id, href: p.path, kicker: 'Гайд', title: p.title, note: p.summary }))]
   return (
     <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 pb-16`}>
-      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Гайди', itemListElement: guides.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: site.url + g.path, name: g.h1 })) }} />
+      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Гайди', itemListElement: list.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: site.url + g.href, name: g.title })) }} />
       <div className="grid grid-cols-1 gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Гайди' }]} />
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Гайди про кераміку ручної роботи</h1>
@@ -36,12 +41,12 @@ export default function GuidesIndex() {
       <section aria-labelledby="all">
         <SectionHead title="Усі гайди" id="all" />
         <ul className="m-0 grid grid-cols-1 list-none gap-3 p-0 sm:grid-cols-2">
-          {guides.map((g) => (
-            <li key={g.slug}>
-              <Link href={g.path} className="grid h-full grid-cols-1 content-start gap-1.5 rounded-[18px] bg-card p-5 text-ink no-underline hover:bg-sand hover:text-ink">
+          {list.map((g) => (
+            <li key={g.key}>
+              <Link href={g.href} className="grid h-full grid-cols-1 content-start gap-1.5 rounded-[18px] bg-card p-5 text-ink no-underline hover:bg-sand hover:text-ink">
                 <span className="kicker">{g.kicker}</span>
-                <b className="text-[17px] leading-snug">{g.h1}</b>
-                <span className="text-[15px] text-umber">{g.short}</span>
+                <b className="text-[17px] leading-snug">{g.title}</b>
+                <span className="text-[15px] text-umber">{g.note}</span>
               </Link>
             </li>
           ))}

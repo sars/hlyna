@@ -4,6 +4,7 @@
 // to a 404. When a planned page ships, remove its prefix from PLANNED. `node scripts/check-links.mjs` verifies.
 
 import { liveWaveIds } from './waveA/live'
+import { liveWaveBIds } from './waveB/live'
 
 export type NavLink = { label: string; href: string; note?: string }
 export type NavColumn = { title: string; links: NavLink[] }
@@ -21,15 +22,25 @@ export const REQUEST_HREF = '/zapyt'
 export const STUDIO_JOIN_HREF = '/zapyt?vid=studiya'
 
 const PLANNED = [
-  '/keisy', '/yak-tse-pratsyuye', '/dobirky/pratsyuyut-z-biznesom',
+  '/keisy', '/yak-tse-pratsyuye',
 ]
 // Wave A pages exist only once their copy is written (src/content/waveA, scripts/sync-wave-a.mjs).
 const WAVE_HREFS: Record<string, string> = {
   '/de-kupyty-keramiku': 'de-kupyty-keramiku',
   '/podarunky-z-keramiky': 'podarunky-z-keramiky',
   '/maister-klasy/den-narodzhennya': 'mk-den-narodzhennya',
+  // Wave B (src/content/waveB, scripts/sync-wave-b.mjs)
+  '/dobirky/brendy-posudu': 'brendy-posudu',
+  '/dobirky/etsy': 'etsy',
+  '/podiyi': 'podiyi',
+  '/muzei-keramiky': 'muzei-keramiky',
+  '/dobirky/yalynkovi-prykrasy': 'yalynkovi-prykrasy',
+  '/hayidy/vydy-keramiky': 'vydy-keramiky',
+  '/hayidy/dohliad-za-keramikoyu': 'dohliad-za-keramikoyu',
+  '/hayidy/chornodymlena-i-molochena': 'chornodymlena-i-molochena',
+  '/dobirky/pratsyuyut-z-biznesom': 'pratsyuyut-z-biznesom',
 }
-const waveLive = new Set(liveWaveIds)
+const waveLive = new Set([...liveWaveIds, ...liveWaveBIds])
 export const isBuilt = (href: string) =>
   !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?')) &&
   (!(href.split(/[?#]/)[0] in WAVE_HREFS) || waveLive.has(WAVE_HREFS[href.split(/[?#]/)[0]]))
@@ -109,6 +120,8 @@ const mainNavPlan: NavSection[] = [
           { label: 'Сучасні українські керамісти', href: '/dobirky/suchasni-keramisty', note: 'Автори, бренди, студії' },
           { label: 'Косів і Опішне сьогодні', href: '/dobirky/kosiv-i-opishne', note: 'Традиція в сучасному виконанні' },
           { label: 'Хто працює з бізнесом', href: '/dobirky/pratsyuyut-z-biznesom', note: 'Партії, логотипи, терміни' },
+          { label: 'Бренди посуду', href: '/dobirky/brendy-posudu', note: 'Сучасні українські колекції' },
+          { label: 'Кераміка на Etsy', href: '/dobirky/etsy', note: 'Українські магазини в цифрах' },
           { label: 'Працюють із закладами', href: '/dlya-biznesu/posud-dlya-restoraniv', note: 'Посуд на замовлення' },
           { label: 'Персоналізовані вироби', href: '/dlya-biznesu/chashky-z-lohotypom', note: 'Логотип, написи, корпоративні подарунки' },
           { label: 'Каталог усіх виробників', href: '/vyrobnyky' },
@@ -270,6 +283,8 @@ export const footerColumns: NavColumn[] = ([
       { label: 'Мапа студій', href: '/mapa' },
       { label: 'Де купити кераміку', href: '/de-kupyty-keramiku' },
       { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' },
+      { label: 'Ярмарки й події', href: '/podiyi' },
+      { label: 'Музеї й галереї кераміки', href: '/muzei-keramiky' },
       { label: 'Ціни 2026', href: '/tsiny-2026' },
       { label: 'Для бізнесу', href: '/dlya-biznesu' },
       { label: 'Добірки', href: '/dobirky' },

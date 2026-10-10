@@ -3,6 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, Updated } from '@/components/site/Bits'
+import { liveWaveBPages } from '@/lib/waveB'
 import { ogImage } from '@/utilities/ogImage'
 
 export const metadata: Metadata = {
@@ -19,7 +20,11 @@ const items = [
   { href: '/vyrobnyky/misto', title: 'За містами', note: 'Студії, бренди й майстри у вашому місті' },
 ]
 
-export default function Selections() {
+export const revalidate = 86400
+
+export default async function Selections() {
+  const extra = (await liveWaveBPages()).filter((p) => p.section === 'dobirky').map((p) => ({ href: p.path, title: p.title, note: p.summary }))
+  const list = [...items.slice(0, 2), ...extra, ...items.slice(2)]
   return (
     <main className={`${container} grid w-full grid-cols-1 gap-8 pt-8 pb-16`}>
       <div className="grid grid-cols-1 gap-4">
@@ -29,7 +34,7 @@ export default function Selections() {
         <Updated />
       </div>
       <ul className="m-0 grid grid-cols-1 list-none gap-3 p-0 sm:grid-cols-2">
-        {items.map((x) => (
+        {list.map((x) => (
           <li key={x.href}>
             <Link href={x.href} className="grid h-full grid-cols-1 content-start gap-1.5 rounded-[18px] bg-card p-5 text-ink no-underline hover:bg-sand hover:text-ink">
               <b className="text-[17px]">{x.title}</b>
