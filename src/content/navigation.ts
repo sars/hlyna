@@ -1,6 +1,7 @@
 // Site navigation. Content lives in code and is edited with an LLM; keep labels in Ukrainian.
-// Business first (see AGENTS.md → ICP). Links to pages that don't exist yet are fine: they are
-// the publishing plan, and 404s are caught by the sitemap check before launch.
+// Business first (see AGENTS.md → ICP). The arrays below are the full publishing plan; links to
+// routes that are not built yet (PLANNED) are filtered out of what is rendered, so no page links
+// to a 404. When a planned page ships, remove its prefix from PLANNED. `node scripts/check-links.mjs` verifies.
 
 export type NavLink = { label: string; href: string; note?: string }
 export type NavColumn = { title: string; links: NavLink[] }
@@ -14,8 +15,18 @@ export type NavSection = {
 }
 
 export const REQUEST_HREF = '/zapyt'
+// Studios and makers use the same request form («Інше») until there is a page for them.
+export const STUDIO_JOIN_HREF = '/zapyt?vid=studiya'
 
-export const mainNav: NavSection[] = [
+const PLANNED = [
+  '/tsiny-2026', '/hayidy', '/keisy', '/mapa', '/dlya-studiy', '/yak-tse-pratsyuye', '/pro-nas',
+  '/vyrobnyky/vyrib', '/vyrobnyky/misto', '/dobirky',
+  '/dlya-biznesu/posud-dlya-kavyaren', '/dlya-biznesu/posud-dlya-hoteliv', '/dlya-biznesu/korporatyvni-podarunky',
+]
+export const isBuilt = (href: string) => !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?'))
+const liveLinks = (links: NavLink[]) => links.filter((l) => isBuilt(l.href))
+
+const mainNavPlan: NavSection[] = [
   {
     id: 'biz',
     label: 'Для бізнесу',
@@ -89,6 +100,8 @@ export const mainNav: NavSection[] = [
           { label: 'Сучасні українські керамісти', href: '/dobirky/suchasni-keramisty', note: 'Автори, бренди, студії' },
           { label: 'Косів і Опішне сьогодні', href: '/dobirky/kosiv-i-opishne', note: 'Традиція в сучасному виконанні' },
           { label: 'Хто працює з бізнесом', href: '/dobirky/pratsyuyut-z-biznesom', note: 'Партії, логотипи, терміни' },
+          { label: 'Працюють із закладами', href: '/dlya-biznesu/posud-dlya-restoraniv', note: 'Посуд на замовлення' },
+          { label: 'Персоналізовані вироби', href: '/dlya-biznesu/chashky-z-lohotypom', note: 'Логотип, написи, корпоративні подарунки' },
           { label: 'Каталог усіх виробників', href: '/vyrobnyky' },
         ],
       },
@@ -96,7 +109,7 @@ export const mainNav: NavSection[] = [
     promo: {
       title: 'Ви студія або майстер?',
       text: 'Додайте профіль безкоштовно й отримуйте запити від ресторанів і компаній.',
-      cta: { label: 'Додати студію', href: '/dlya-studiy' },
+      cta: { label: 'Додати студію', href: STUDIO_JOIN_HREF },
     },
   },
   {
@@ -174,17 +187,28 @@ export const mainNav: NavSection[] = [
   },
 ]
 
-export const simpleNav: NavLink[] = [
+const simpleNavPlan: NavLink[] = [
   { label: 'Кейси', href: '/keisy' },
   { label: 'Гайди', href: '/hayidy' },
   { label: 'Мапа', href: '/mapa' },
 ]
 
-export const utilityNav: NavLink[] = [
+const utilityNavPlan: NavLink[] = [
   { label: 'Для бізнесу', href: '/dlya-biznesu' },
   { label: 'Для студій і майстрів', href: '/dlya-studiy' },
   { label: 'Як це працює', href: '/yak-tse-pratsyuye' },
 ]
+
+// What is rendered: built routes only. Sections whose own page isn't built are dropped; so are empty columns and promos.
+export const mainNav: NavSection[] = mainNavPlan
+  .filter((s) => isBuilt(s.href))
+  .map((s) => ({
+    ...s,
+    columns: s.columns.map((c) => ({ ...c, links: liveLinks(c.links) })).filter((c) => c.links.length),
+    promo: s.promo && isBuilt(s.promo.cta.href) ? s.promo : undefined,
+  }))
+export const simpleNav = liveLinks(simpleNavPlan)
+export const utilityNav = liveLinks(utilityNavPlan)
 
 // Footer: only pages that exist (it is on every page); the full plan lives in mainNav.
 export const footerColumns: NavColumn[] = [

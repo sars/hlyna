@@ -5,7 +5,8 @@ import React from 'react'
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { site } from '@/content/site'
 import { topicList } from '@/content/topics'
-import { fmt, getAllStudios, groupByCity, hryvniaAmounts, MIN_LIST, offersMasterClasses, pluralUk, range } from '@/lib/catalog'
+import { fmt, getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { singleClassAmounts, typicalRange } from '@/lib/present'
 
 export const revalidate = 86400
 
@@ -49,7 +50,7 @@ export default async function MasterClassesIndex() {
         <SectionHead title="Міста" id="cities" />
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2.5 p-0">
           {big.map((g) => {
-            const r = range(g.studios.flatMap(hryvniaAmounts))
+            const r = typicalRange(g.studios.flatMap(singleClassAmounts))
             return (
               <li key={g.city.slug}>
                 <Link href={`/maister-klasy/${g.city.slug}`} className="grid grid-cols-1 gap-0.5 rounded-[14px] bg-card px-3.5 py-3 text-ink no-underline hover:bg-sand hover:text-ink">
@@ -64,20 +65,19 @@ export default async function MasterClassesIndex() {
       {small.length > 0 && (
         <section aria-labelledby="more">
           <SectionHead title="Ще міста і села" id="more" />
-          <p className="m-0 leading-8">
-            {small.map((g, i) => (
-              <React.Fragment key={g.city.slug}>
-                {i > 0 && ' · '}
+          <ul className="m-0 grid grid-cols-1 list-none gap-x-6 gap-y-2.5 p-0 sm:grid-cols-2 lg:grid-cols-3">
+            {small.map((g) => (
+              <li key={g.city.slug} className="text-[15px] leading-snug">
+                <b>{g.city.name}:</b>{' '}
                 {g.studios.map((s, j) => (
                   <React.Fragment key={s.id}>
                     {j > 0 && ', '}
                     <Link href={`/vyrobnyky/${s.slug}`}>{s.name}</Link>
                   </React.Fragment>
-                ))}{' '}
-                <span className="text-umber">({g.city.name})</span>
-              </React.Fragment>
+                ))}
+              </li>
             ))}
-          </p>
+          </ul>
         </section>
       )}
     </main>

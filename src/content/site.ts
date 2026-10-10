@@ -18,5 +18,8 @@ export const site = {
     privateClass: '1 200–2 400 грн',
     corporate: '550–1 550 грн з особи',
     batchLeadTime: '3–8 тижнів',
+    // Logo batches: the same 3–8 weeks plus making the stamp or decal. Used on the home table and the logo page.
+    logoLeadTime: '3–8 тижнів плюс 1–2 тижні на штамп чи деколь',
+    logoLeadTimeShort: '4–10 тижнів',
   },
 }

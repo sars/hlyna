@@ -42,7 +42,7 @@ const loadStudios = unstable_cache(
     const byId = new Map(cities.docs.map((c) => [c.id, c]))
     return studios.docs.map((s) => ({ ...(s as Studio), cityDoc: (typeof s.city === 'object' ? s.city : byId.get(s.city as number)) ?? null }))
   },
-  ['studios-all'],
+  ['studios-all-v2'],
   { revalidate: 3600, tags: ['studios'] },
 )
 
@@ -61,27 +61,30 @@ export type Format = NonNullable<Studio['formats']>[number]
 // Format tags come from scripts/tag-studios.ts (and admin edits); the regexes below are a fallback for untagged studios.
 export const hasFormat = (s: Studio, f: Format) => Boolean(s.formats?.includes(f))
 
-// JS \w and \b don't match Cyrillic, so the fallbacks use \p{L} with the u flag.
-export const offersMasterClasses = (s: Studio) =>
-  s.type === 'studio' ||
-  s.type === 'school' ||
-  (['wheel', 'handbuilding', 'painting', 'couples', 'kids', 'courses'] as Format[]).some((f) => hasFormat(s, f)) ||
-  /майстер-клас|(?<!\p{L})мк(?!\p{L})|гончарн\p{L}* кол|ліплен|заняття з кераміки/u.test(texts(s))
+// Master-class places come from format tags only (scripts/tag-studios.ts). Studios and schools need any
+// class tag; makers and brands need a class-specific tag or a class word next to a technique tag, so an
+// artist who simply paints ceramics is not listed as a place to take a class. Shops and academic
+// departments are never listed.
+const CLASS_TAGS: Format[] = ['wheel', 'handbuilding', 'painting', 'kids', 'couples', 'courses', 'certificates', 'corporate-workshop']
+const CLASS_ONLY_TAGS: Format[] = ['kids', 'couples', 'courses', 'corporate-workshop']
+const ACADEMIC = /університет|академі[яї]|кафедр|факультет|інститут|коледж|ліцей|училищ/iu
+const CLASS_WORDS = /майстер-клас|(?<!\p{L})мк(?!\p{L})|заняття|урок|навчан|гурт[оі]к/iu
+
+export const offersMasterClasses = (s: Studio) => {
+  if (ACADEMIC.test(s.name)) return false
+  if (s.type === 'studio' || s.type === 'school') return CLASS_TAGS.some((f) => hasFormat(s, f)) || CLASS_WORDS.test(texts(s))
+  if (!s.formats?.length) return false
+  if (s.type === 'shop' || s.type === 'supplier') return false
+  return CLASS_ONLY_TAGS.some((f) => hasFormat(s, f)) || (CLASS_TAGS.some((f) => hasFormat(s, f)) && CLASS_WORDS.test(texts(s)))
+}
 
 const MAKER_TYPES = new Set(['studio', 'brand', 'maker', 'school'])
 
-export const worksWithVenues = (s: Studio) =>
-  MAKER_TYPES.has(s.type ?? '') &&
-  (hasFormat(s, 'horeca') ||
-    Boolean(s.b2b?.worksWithHoreca) ||
-    /ресторан|кав.ярн|horeca|хорека|для заклад|готел|кафе(?!\p{L})|посуд на замовлення/u.test(texts(s)))
+// Business tags come from scripts/tag-studios.ts (same phrases the old regexes used) or admin checkboxes.
+export const worksWithVenues = (s: Studio) => MAKER_TYPES.has(s.type ?? '') && (hasFormat(s, 'horeca') || Boolean(s.b2b?.worksWithHoreca))
 
 export const worksWithCompanies = (s: Studio) =>
-  hasFormat(s, 'corporate-gifts') ||
-  hasFormat(s, 'corporate-workshop') ||
-  hasFormat(s, 'logo') ||
-  Boolean(s.b2b?.worksWithCorporate) ||
-  /корпоратив|логотип|мерч|подарунк\p{L}* для (?:клієнт|партнер|співроб|команд)/u.test(texts(s))
+  hasFormat(s, 'corporate-gifts') || hasFormat(s, 'corporate-workshop') || hasFormat(s, 'logo') || Boolean(s.b2b?.worksWithCorporate)
 
 // Hryvnia amounts mentioned in a studio's price lines (used for honest "from–to" ranges).
 export function hryvniaAmounts(s: Studio): number[] {

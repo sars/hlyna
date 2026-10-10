@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 const WHAT = [
   { value: 'tableware', label: 'Посуд для закладу' },
@@ -16,9 +16,20 @@ const field =
 const label = 'grid gap-1 text-[13px] font-semibold text-umber'
 
 // Posts to Payload's REST API (collection `requests`, public create). `website2` is a honeypot.
-export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tableware' }: { sourcePage: string; compact?: boolean; defaultWhat?: string }) {
+// defaultWhat / defaultCity come from the page (a master-class city page asks about a master class in that city).
+// /zapyt?vid=studiya opens the form for studios that want to add or update their profile.
+export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tableware', defaultCity = '' }: { sourcePage: string; compact?: boolean; defaultWhat?: string; defaultCity?: string }) {
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
+  const [what, setWhat] = useState(defaultWhat)
+  const [studio, setStudio] = useState(false)
+
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('vid') === 'studiya') {
+      setStudio(true)
+      setWhat('other')
+    }
+  }, [])
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -52,11 +63,11 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
 
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
-      <p className="font-display m-0 text-sm tracking-wide uppercase">Швидкий запит</p>
+      <p className="font-display m-0 text-sm tracking-wide uppercase">{studio ? 'Додати студію' : 'Швидкий запит'}</p>
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <label className={label}>
           Що потрібно
-          <select name="what" className={field} defaultValue={defaultWhat}>
+          <select name="what" className={field} value={what} onChange={(e) => setWhat(e.target.value)}>
             {WHAT.map((w) => (
               <option key={w.value} value={w.value}>
                 {w.label}
@@ -74,12 +85,19 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
         </label>
         <label className={label}>
           Місто
-          <input name="city" placeholder="Київ" className={field} />
+          <input name="city" defaultValue={defaultCity} placeholder="Ваше місто" autoComplete="address-level2" className={field} />
         </label>
         {!compact && (
           <label className={`${label} sm:col-span-2`}>
             Деталі
-            <textarea name="details" rows={3} placeholder="Стиль, кольори, бюджет за штуку, логотип…" className={field} />
+            <textarea
+              key={studio ? 'studio' : 'buyer'}
+              name="details"
+              rows={3}
+              defaultValue={studio ? 'Я студія / майстер. Хочу додати або оновити профіль: назва, Instagram чи сайт, місто, що робимо.' : undefined}
+              placeholder="Стиль, кольори, бюджет за штуку, логотип…"
+              className={field}
+            />
           </label>
         )}
         <label className={label}>

@@ -1,8 +1,9 @@
 // Topic pages (business offers, master-class formats, certificates): one config per page,
 // rendered by src/components/site/TopicPage.tsx. Lists come from studio format tags
 // (scripts/tag-studios.ts); counts and prices are computed live, the text here stays factual.
-import type { Format } from '@/lib/catalog'
-import { fmt, pluralUk } from '@/lib/catalog'
+import type { Format, StudioCard } from '@/lib/catalog'
+import { fmt, pluralUk, texts } from '@/lib/catalog'
+import { inCity } from '@/lib/present'
 import { docPhotos, type DocPhoto } from './photos'
 import { site } from './site'
 import { verses } from './verses'
@@ -15,6 +16,7 @@ export type TopicList = {
   formats: Format[]
   types?: string[]
   byCity?: boolean
+  filter?: (s: StudioCard) => boolean
 }
 
 export type Topic = {
@@ -32,7 +34,8 @@ export type Topic = {
   ogImg: string
   lists: TopicList[]
   evidence: RegExp
-  price: { re: RegExp; exclude?: RegExp; title: string; note: string }
+  // unit: only lines matching it count toward the «from–to» range (e.g. per person); unitLabel follows the range.
+  price: { re: RegExp; exclude?: RegExp; unit?: RegExp; unitNot?: RegExp; unitLabel?: string; title: string; note: string }
   sections: { kicker?: string; title: string; items: [string, string][] }[]
   faq: (c: TopicCtx) => { q: string; a: string }[]
   related: { label: string; href: string }[]
@@ -43,10 +46,13 @@ const n = (k: number, forms: [string, string, string]) => `${fmt(k)} ${pluralUk(
 const studios = (k: number) => n(k, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])
 const places = (k: number) => n(k, ['місце', 'місця', 'місць'])
 const inCities = (k: number) => `у ${fmt(k)} ${pluralUk(k, ['місті', 'містах', 'містах'])}`
-const where = (c: TopicCtx) => (c.place ? `у місті ${c.place}` : inCities(c.cities))
+const where = (c: TopicCtx) => (c.place ? inCity(c.place) : inCities(c.cities))
 const priceRange = (c: TopicCtx) => (c.min && c.max ? `від ${fmt(c.min)} до ${fmt(c.max)} грн` : '')
 
 const WORKSHOP = ['studio', 'school', 'maker', 'heritage', 'other']
+// Makers of tableware (the logo page's second list): no cafés, no jewellery-only brands.
+const TABLEWARE = /посуд|чашк|горнят|кухл|тарілк|миск|піал|сервіз|чайник|глечик/iu
+const makesTableware = (s: StudioCard) => TABLEWARE.test(`${s.summary ?? ''} ${texts(s)}`) && !/кав.ярн|кафе(?!\p{L})|ресторан/iu.test(s.name)
 const MAKERS = ['studio', 'brand', 'maker', 'heritage']
 
 const BIZ = [{ label: 'Головна', href: '/' }, { label: 'Для бізнесу', href: '/dlya-biznesu' }]
@@ -67,16 +73,16 @@ export const topics: Record<string, Topic> = {
     h1: 'Чашки з логотипом від українських керамічних студій',
     metaTitle: () => 'Чашки з логотипом ручної роботи: українські студії, способи нанесення, терміни',
     metaDescription: (c) => `Керамічні чашки з логотипом компанії чи закладу: ${studios(c.n)}, які роблять персоналізовані вироби й партії на замовлення. Штамп, деколь, розпис, терміни ${site.prices.batchLeadTime}. Один запит — пропозиції від кількох студій.`,
-    lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять персоналізовані вироби, корпоративні подарунки або посуд партіями на замовлення. Логотип наносять штампом, деколлю чи розписом; партію зазвичай виготовляють ${site.prices.batchLeadTime}, плюс час на штамп або деколь за вашим макетом.`,
+    lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять персоналізовані вироби, корпоративні подарунки або посуд партіями на замовлення. Логотип наносять штампом, деколлю чи розписом; партію зазвичай виготовляють ${site.prices.logoLeadTime}.`,
     verse: verses.logo,
-    photo: docPhotos.barCups,
-    ogImg: 'doc-bar-cups',
+    photo: docPhotos.tealMug,
+    ogImg: 'teal-mug',
     lists: [
       { title: 'Прямо пишуть про логотип чи персоналізацію', note: 'Ці студії згадують нанесення логотипа, написів або персоналізовані вироби на своїх сайтах чи в Instagram.', formats: ['logo'], types: MAKERS },
-      { title: 'Роблять корпоративні подарунки й партії на замовлення', note: 'Логотип тут окремо не згадано, але студії працюють з компаніями й закладами. Багато хто зробить знак на замовлення — спитайте в запиті.', formats: ['corporate-gifts', 'horeca'], types: MAKERS },
+      { title: 'Роблять корпоративні подарунки й партії на замовлення', note: 'Логотип тут окремо не згадано, але студії працюють з компаніями й закладами. Багато хто зробить знак на замовлення — спитайте в запиті.', formats: ['corporate-gifts', 'horeca'], types: ['studio', 'brand', 'maker'], filter: makesTableware },
     ],
     evidence: /логотип|персоналізован|кастомн|напис|деколь|корпоративн|ресторан|кав.ярн|заклад|на замовлення|парті/iu,
-    price: { re: /чашк|горнят|кухл/iu, exclude: /(?<!\p{L})мк(?!\p{L})|майстер-клас|занят|ліпк|ліплен|гончарств|оренд/iu, title: 'Скільки коштують чашки в прайсах студій', note: 'Це роздрібні ціни звичайних чашок. Ціну партії з логотипом студія рахує окремо: вона залежить від кількості, способу нанесення і терміну.' },
+    price: { re: /чашк|горнят|кухл/iu, exclude: /(?<!\p{L})мк(?!\p{L})|майстер-клас|занят|ліпк|ліплен|гончарств|оренд|(?<!\p{L})сет(?!\p{L})|набір|комплект|сервіз/iu, title: 'Скільки коштують чашки в прайсах студій', note: 'Це роздрібні ціни звичайних чашок. Ціну партії з логотипом студія рахує окремо: вона залежить від кількості, способу нанесення і терміну.' },
     sections: [
       {
         kicker: 'Способи нанесення',
@@ -133,7 +139,7 @@ export const topics: Record<string, Topic> = {
     ogImg: 'doc-workshop-table',
     lists: [{ title: 'Студії, які проводять корпоративи', formats: ['corporate-workshop'], types: WORKSHOP, byCity: true }],
     evidence: /корпоратив|тімбілд|тимбілд|для компан|для команд|закрит|колектив|виїзн/iu,
-    price: { re: /корпоратив|тімбілд|тимбілд|для компан|для команд|закрит|колектив|виїзн/iu, title: 'Ціни на корпоративи', note: 'Ціни з прайсів студій; для корпоративу студія зазвичай рахує окрему пропозицію під кількість людей, формат і місце.' },
+    price: { re: /корпоратив|тімбілд|тимбілд|для компан|для команд|закрит|колектив|виїзн/iu, unit: /з\s+особи|\/\s*особ|за\s+особу|(?<!\p{L})особа(?!\p{L})|на\s+людину|з\s+людини/iu, unitNot: /до\s+\d+\s+ос|за\s+груп|для\s+груп|компані\p{L}*\s+до|наступн/iu, unitLabel: 'з особи', title: 'Ціни на корпоративи', note: 'Ціни з прайсів студій; для корпоративу студія зазвичай рахує окрему пропозицію під кількість людей, формат і місце.' },
     sections: [
       {
         kicker: 'Як це проходить',
@@ -261,7 +267,7 @@ export const topics: Record<string, Topic> = {
       },
     ],
     faq: (c) => [
-      { q: 'Скільки коштує гончарство для двох?', a: priceRange(c) ? `У прайсах студій каталогу — здебільшого ${priceRange(c)}, здебільшого за двох. Різниця залежить від тривалості, кількості виробів і того, чи входять випал та полива.` : 'Ціни уточнюйте у студій: вони залежать від тривалості, кількості виробів і того, чи входять випал та полива.' },
+      { q: 'Скільки коштує гончарство для двох?', a: priceRange(c) ? `У прайсах студій каталогу — найчастіше ${priceRange(c)}, як правило за двох. Різниця залежить від тривалості, кількості виробів і того, чи входять випал та полива.` : 'Ціни уточнюйте у студій: вони залежать від тривалості, кількості виробів і того, чи входять випал та полива.' },
       { q: 'Чи потрібен досвід?', a: 'Ні. Побачення розраховані на тих, хто бачить глину вперше.' },
       { q: 'Коли можна забрати вироби?', a: 'Зазвичай через 2–4 тижні: після сушіння, двох випалів і поливи.' },
       { q: 'Чи можна подарувати таке побачення?', a: 'Так, більшість студій продають подарункові сертифікати, зокрема на двох.' },
@@ -497,8 +503,8 @@ export const topics: Record<string, Topic> = {
     metaDescription: (c) => `Подарунковий сертифікат на майстер-клас з кераміки: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни ${priceRange(c)}` : ''}. Формати, термін дії, електронні сертифікати.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, які продають подарункові сертифікати на майстер-класи з кераміки.${priceRange(c) ? ` У прайсах студій сертифікати коштують здебільшого ${priceRange(c)}.` : ''} Сертифікат можна взяти на заняття на колі, ліплення, розпис чи побачення для двох; найчастіше він діє 3–6 місяців.`,
     verse: verses.certificates,
-    photo: docPhotos.paintingGroup,
-    ogImg: 'doc-painting-group',
+    photo: docPhotos.wheelTop,
+    ogImg: 'wheel-top',
     lists: [{ title: 'Де купити сертифікат', formats: ['certificates'], types: [...WORKSHOP, 'brand'], byCity: true }],
     evidence: /сертифікат/iu,
     price: { re: /сертифікат/iu, exclude: /(?<!\p{L})курс|абонемент|місяц|\d+\s*занять|коворкінг|оренд|\+\s*\d/iu, title: 'Скільки коштує сертифікат', note: 'Ціни з прайсів студій; ціна сертифіката зазвичай дорівнює ціні заняття.' },

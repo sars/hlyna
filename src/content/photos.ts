@@ -1,6 +1,6 @@
 // Documentary photos from Wikimedia Commons (public/images/doc, credits in CREDITS.md there).
 // CC BY-SA needs a visible credit: render with <DocPhoto>, which prints author and license.
-export type DocPhoto = { src: string; width: number; height: number; alt: string; author: string; license: string; href: string }
+export type DocPhoto = { src: string; width: number; height: number; alt: string; author: string; license: string; href: string; source?: string }
 
 export const docPhotos = {
   wheelHands: { src: '/images/doc/wheel-hands.jpg', width: 960, height: 640, alt: 'Руки гончаря формують виріб на гончарному колі', author: 'Віталій Попков', license: 'CC BY-SA 4.0', href: 'https://commons.wikimedia.org/wiki/File:%D0%A0%D1%83%D0%BA%D0%B8_%D0%B3%D0%BE%D0%BD%D1%87%D0%B0%D1%80%D0%B0.jpg' },
@@ -13,6 +13,9 @@ export const docPhotos = {
   potterOutdoors: { src: '/images/doc/potter-outdoors.jpg', width: 934, height: 1400, alt: 'Гончар працює на ножному колі просто неба', author: 'Yurii-mr', license: 'CC BY-SA 4.0', href: 'https://commons.wikimedia.org/wiki/File:Potter_02.jpg' },
   paintingGroup: { src: '/images/doc/painting-group.jpg', width: 960, height: 720, alt: 'Учасниці майстер-класу розписують кераміку за спільним столом', author: 'Качуровська', license: 'CC BY-SA 4.0', href: 'https://commons.wikimedia.org/wiki/File:%D0%93%D0%BE%D0%BD%D1%87%D0%B0%D1%80%D1%96_%D0%BF%D1%96%D0%B4_%D1%87%D0%B0%D1%81_%D1%81%D1%82%D0%B2%D0%BE%D1%80%D0%B5%D0%BD%D0%BD%D1%8F_%D0%B2%D0%B8%D1%80%D0%BE%D0%B1%D1%96%D0%B2_20240912_03.jpg' },
   workshopTable: { src: '/images/doc/workshop-table.jpg', width: 960, height: 720, alt: 'Великий стіл майстерні з розписаними виробами і людьми за роботою', author: 'Качуровська', license: 'CC BY-SA 4.0', href: 'https://commons.wikimedia.org/wiki/File:%D0%93%D0%BE%D0%BD%D1%87%D0%B0%D1%80%D1%96_%D0%BF%D1%96%D0%B4_%D1%87%D0%B0%D1%81_%D1%81%D1%82%D0%B2%D0%BE%D1%80%D0%B5%D0%BD%D0%BD%D1%8F_%D0%B2%D0%B8%D1%80%D0%BE%D0%B1%D1%96%D0%B2_20240912_05.jpg' },
+  // Temporary CC0 stock (Unsplash via Wikimedia Commons, public/images/stock) where no documentary photo fits.
+  tealMug: { src: '/images/stock/teal-mug.jpg', width: 960, height: 653, alt: 'Керамічна чашка ручної роботи з бірюзовою поливою', author: 'Unsplash', license: 'CC0', href: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'Wikimedia Commons' },
+  wheelTop: { src: '/images/stock/wheel-top.jpg', width: 960, height: 640, alt: 'Руки формують миску на гончарному колі, вигляд згори', author: 'Unsplash', license: 'CC0', href: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'Wikimedia Commons' },
 } satisfies Record<string, DocPhoto>
 
 export type DocPhotoKey = keyof typeof docPhotos

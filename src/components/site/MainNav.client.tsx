@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
-import { mainNav, REQUEST_HREF, simpleNav } from '@/content/navigation'
+import { mainNav, REQUEST_HREF, simpleNav, STUDIO_JOIN_HREF } from '@/content/navigation'
 
 // Desktop: mega menus opened by click (and closed by Escape, outside click or navigation).
 // Mobile: a full-screen drawer with collapsible sections. Plain markup, no animation library.
@@ -150,10 +150,10 @@ export function MainNav() {
                 {s.label}
                 <span aria-hidden className="text-terra">+</span>
               </summary>
-              <ul className="mb-3.5 grid grid-cols-1 gap-2.5">
+              <ul className="mb-3.5 grid grid-cols-1 gap-1">
                 {s.columns.flatMap((c) => c.links).map((l) => (
                   <li key={l.href + l.label}>
-                    <Link href={l.href} className="font-semibold text-ink no-underline">
+                    <Link href={l.href} className="block py-1.5 font-semibold text-ink no-underline">
                       {l.label}
                     </Link>
                   </li>
@@ -165,10 +165,10 @@ export function MainNav() {
             <summary className="font-display flex cursor-pointer list-none justify-between py-4 text-base font-semibold uppercase">
               Ще <span aria-hidden className="text-terra">+</span>
             </summary>
-            <ul className="mb-3.5 grid grid-cols-1 gap-2.5">
-              {[...simpleNav, { label: 'Для студій', href: '/dlya-studiy' }].map((l) => (
+            <ul className="mb-3.5 grid grid-cols-1 gap-1">
+              {[...simpleNav, { label: 'Для студій', href: STUDIO_JOIN_HREF }].map((l) => (
                 <li key={l.href}>
-                  <Link href={l.href} className="font-semibold text-ink no-underline">
+                  <Link href={l.href} className="block py-1.5 font-semibold text-ink no-underline">
                     {l.label}
                   </Link>
                 </li>

@@ -175,6 +175,10 @@ export interface Studio {
    * Показується на сайті. Якщо порожньо — показуємо «Опис (з досліджень)».
    */
   publicDescription?: string | null;
+  /**
+   * Абзац своїми словами за останніми постами. Оновлює scripts/import-ig.ts; можна редагувати.
+   */
+  recentNote?: string | null;
   description?: string | null;
   /**
    * Фільтри для сторінок «Гончарне коло», «Для дітей», «Чашки з логотипом» тощо.
@@ -257,6 +261,15 @@ export interface Studio {
     websiteAlive?: boolean | null;
     etsySales?: number | null;
     checkedAt?: string | null;
+    /**
+     * Показуються на сторінці студії (вбудовування підвантажується при прокрутці).
+     */
+    instagramPosts?:
+      | {
+          url: string;
+          id?: string | null;
+        }[]
+      | null;
   };
   consent?: {
     photos?: boolean | null;
@@ -1248,6 +1261,7 @@ export interface StudiosSelect<T extends boolean = true> {
   address?: T;
   summary?: T;
   publicDescription?: T;
+  recentNote?: T;
   description?: T;
   formats?: T;
   services?:
@@ -1313,6 +1327,12 @@ export interface StudiosSelect<T extends boolean = true> {
         websiteAlive?: T;
         etsySales?: T;
         checkedAt?: T;
+        instagramPosts?:
+          | T
+          | {
+              url?: T;
+              id?: T;
+            };
       };
   consent?:
     | T

@@ -5,7 +5,7 @@ import React from 'react'
 
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
-import { REQUEST_HREF } from '@/content/navigation'
+import { REQUEST_HREF, STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { verses } from '@/content/verses'
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 const nf = (n: number) => n.toLocaleString('uk-UA')
 
 const paths = [
-  { img: '/images/stock/terracotta.jpg', alt: 'Глиняний посуд ручної роботи', title: 'Посуд для ресторанів і кав’ярень', text: 'Тарілки, миски, чашки під стиль закладу. Посудомийка, зразки, дозамовлення.', cta: 'Студії та ціни', href: '/dlya-biznesu/posud-dlya-restoraniv' },
-  { img: '/images/stock/stacked-cups.jpg', alt: 'Стос керамічних чашок', title: 'Чашки та посуд з логотипом', text: 'Штамп, деколь або полива у фірмових кольорах. Ціни залежно від кількості.', cta: 'Як це роблять', href: '/dlya-biznesu/chashky-z-lohotypom' },
+  { img: '/images/stock/restaurant-table.jpg', alt: 'Керамічні тарілки і піала на столі ресторану', title: 'Посуд для ресторанів і кав’ярень', text: 'Тарілки, миски, чашки під стиль закладу. Посудомийка, зразки, дозамовлення.', cta: 'Студії та ціни', href: '/dlya-biznesu/posud-dlya-restoraniv' },
+  { img: '/images/stock/teal-mug.jpg', alt: 'Керамічна чашка ручної роботи з бірюзовою поливою', title: 'Чашки та посуд з логотипом', text: 'Штамп, деколь або полива у фірмових кольорах. Ціни залежно від кількості.', cta: 'Як це роблять', href: '/dlya-biznesu/chashky-z-lohotypom' },
   { img: '/images/doc/festive-ware.jpg', alt: 'Святковий розписний посуд бубнівської кераміки', title: 'Новорічні подарунки 2026', text: 'Для команди і клієнтів: що встигнуть зробити до свят і коли замовляти.', cta: 'Ідеї та терміни', href: '/dlya-biznesu/novorichni-podarunky-2026' },
   { img: '/images/doc/workshop-table.jpg', alt: 'Стіл майстерні з розписаними виробами і людьми за роботою', title: 'Корпоратив з ліплення з глини', text: 'У студії чи у вашому офісі, від 10 до 40+ людей. 550–1 550 грн з особи.', cta: 'Формати', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
 ]
@@ -82,7 +82,7 @@ export default async function HomePage() {
       <section className={`${container} grid grid-cols-1 items-start gap-8 pt-11 pb-14 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,.95fr)]`}>
         <div className="grid grid-cols-1 gap-[18px]">
           <span className="kicker">Українська кераміка ручної роботи</span>
-          <h1 className="h-display m-0 text-[clamp(28px,4.6vw,52px)] leading-[1.04]">Посуд і подарунки ручної роботи від українських студій</h1>
+          <h1 className="h-display m-0 text-[clamp(28px,4.2vw,46px)] leading-[1.05]">Посуд і подарунки ручної роботи від українських студій</h1>
           <p className="m-0 max-w-[58ch] text-lg text-umber">
             Для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови, терміни й ціни та надішліть один запит одразу кільком студіям.
           </p>
@@ -98,7 +98,7 @@ export default async function HomePage() {
           </dl>
         </div>
         <div className="grid grid-cols-1 gap-3.5">
-          <Image src="/images/stock/restaurant-table.jpg" alt="Керамічні тарілки і чашка на столі ресторану" width={1400} height={933} priority sizes="(min-width:1024px) 560px, 100vw" className="aspect-[16/10] w-full rounded-[26px] object-cover" />
+          <Image src="/images/stock/glazed-bottles.jpg" alt="Керамічні пляшки й вази з матовою поливою" width={960} height={640} priority sizes="(min-width:1024px) 560px, 100vw" className="aspect-[16/10] w-full rounded-[26px] object-cover" />
           <RequestForm sourcePage="/" compact />
         </div>
       </section>
@@ -121,7 +121,7 @@ export default async function HomePage() {
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           {[
             { img: '/images/doc/wheel-hands.jpg', alt: 'Руки гончаря на гончарному колі', title: 'Майстер-клас для себе', text: 'Гончарство, ліплення, побачення, заняття для дітей — по всій Україні.', href: '/maister-klasy' },
-            { img: '/images/stock/teal-mug.jpg', alt: 'Керамічна чашка ручної роботи', title: 'Подарунковий сертифікат', text: 'Сертифікати на гончарство: ціни, термін дії й формати за містами.', href: '/sertyfikaty' },
+            { img: '/images/stock/wheel-top.jpg', alt: 'Руки формують миску на гончарному колі', title: 'Подарунковий сертифікат', text: 'Сертифікати на гончарство: ціни, термін дії й формати за містами.', href: '/sertyfikaty' },
           ].map((c) => (
             <Link key={c.href} href={c.href} className="grid grid-cols-[110px_minmax(0,1fr)] items-center gap-3.5 rounded-[20px] border border-line bg-cream p-2.5 text-ink no-underline hover:text-ink">
               <Image src={c.img} alt={c.alt} width={220} height={220} className="aspect-square w-full rounded-[14px] object-cover" />
@@ -178,7 +178,7 @@ export default async function HomePage() {
             <tbody>
               {[
                 ['Партія посуду для закладу', 'за запитом, залежить від кількості', site.prices.batchLeadTime, 'Посуд для ресторанів', '/dlya-biznesu/posud-dlya-restoraniv'],
-                ['Чашки з логотипом', 'за запитом', '3–6 тижнів', 'Чашки з логотипом', '/dlya-biznesu/chashky-z-lohotypom'],
+                ['Чашки з логотипом', 'за запитом', site.prices.logoLeadTimeShort, 'Чашки з логотипом', '/dlya-biznesu/chashky-z-lohotypom'],
                 ['Корпоратив з ліплення з глини', site.prices.corporate, 'бронювання за 1–3 тижні', 'Корпоративи', '/dlya-biznesu/korporatyv-lipennya-z-hlyny'],
                 ['Груповий майстер-клас', site.prices.groupClass, 'запис на тиждень уперед', 'За містами', '/maister-klasy'],
                 ['Індивідуальний майстер-клас', site.prices.privateClass, 'за домовленістю', 'За містами', '/maister-klasy'],
@@ -195,7 +195,7 @@ export default async function HomePage() {
         <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Для себе і в подарунок</span><h2 id="mk" className={h2}>Майстер-класи з кераміки за містами</h2><p className="m-0 text-umber">Усі студії міста на одній сторінці: формати, ціни, сертифікати й контакти.</p></div>
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(170px,1fr))] gap-2.5 p-0">
           {cities.filter(([, , slug]) => (s.cityCounts.get(slug) ?? 0) >= 3 || !s.cityCounts.size).map(([n, c, slug]) => (
-            <li key={slug}><Link href={`/maister-klasy/${slug}`} className="flex justify-between gap-2 rounded-[14px] bg-card px-3.5 py-3 font-semibold text-ink no-underline hover:bg-sand hover:text-ink">{n}<span className="text-terra">{s.cityCounts.get(slug) ?? c}</span></Link></li>
+            <li key={slug}><Link href={`/maister-klasy/${slug}`} className="flex justify-between gap-2 rounded-[14px] bg-card px-3.5 py-3 font-semibold text-ink no-underline hover:bg-sand hover:text-ink"><span className="min-w-0 truncate">{n === 'Івано-Франківськ' ? 'Франківськ' : n}</span><span className="text-terra">{s.cityCounts.get(slug) ?? c}</span></Link></li>
           ))}
           <li><Link href="/maister-klasy" className="flex justify-between gap-2 rounded-[14px] bg-card px-3.5 py-3 font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Усі міста<span className="text-terra">→</span></Link></li>
         </ul>
@@ -209,12 +209,12 @@ export default async function HomePage() {
 
       {/* Guides */}
       <section className={`${container} pb-14`} aria-labelledby="guides">
-        <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Гайди</span><h2 id="guides" className={h2}>Як замовити кераміку без сюрпризів</h2></div>
+        <div className="mb-6 grid grid-cols-1 max-w-[760px] gap-2.5"><span className="kicker">Корисне</span><h2 id="guides" className={h2}>Як замовити кераміку без сюрпризів</h2></div>
         <ul className="m-0 grid grid-cols-1 list-none gap-3.5 p-0 lg:grid-cols-3">
           {[
-            ['Для закладів', 'Як замовити посуд для ресторану', 'Зразки, харчова безпечність, посудомийка, дозамовлення через пів року.', '/hayidy/yak-zamovyty-posud-dlya-restoranu'],
-            ['Для компаній', 'Новорічні подарунки з кераміки: коли замовляти', 'Чому партію до свят краще замовити до середини листопада.', '/hayidy/novorichni-podarunky-terminy'],
-            ['Логотип', 'Штамп, деколь чи полива', 'Як виглядає логотип на кераміці і від чого залежить ціна.', '/hayidy/lohotyp-na-keramitsi'],
+            ['Для закладів', 'Що перевірити у студії перед замовленням посуду', 'Зразки, харчова полива, посудомийка, дозамовлення через пів року.', '/dlya-biznesu/posud-dlya-restoraniv#check'],
+            ['Для компаній', 'Новорічні подарунки з кераміки: коли замовляти', 'Календар: до якої дати надіслати запит і погодити зразок, щоб партія встигла до свят.', '/dlya-biznesu/novorichni-podarunky-2026#sec0'],
+            ['Логотип', 'Штамп, деколь чи полива', 'П’ять способів нанести логотип на кераміку і що узгодити зі студією.', '/dlya-biznesu/chashky-z-lohotypom#sec0'],
           ].map(([tag, t, d, href]) => (
             <li key={href}><Link href={href} className="grid grid-cols-1 h-full gap-1.5 rounded-[20px] border border-line bg-cream p-[18px] text-ink no-underline hover:text-ink"><small className="text-xs font-bold tracking-wider text-terra uppercase">{tag}</small><span className="text-[17px] font-semibold">{t}</span><span className="text-sm text-umber">{d}</span></Link></li>
           ))}
@@ -246,7 +246,7 @@ export default async function HomePage() {
               <li>Ми беремо лише 5% і тільки з замовлень, які відбулися</li>
             </ul>
           </div>
-          <Link href="/dlya-studiy" className="justify-self-start rounded-full bg-ochre px-[22px] py-[13px] font-bold text-ink no-underline hover:text-ink">Додати студію</Link>
+          <Link href={STUDIO_JOIN_HREF} className="justify-self-start rounded-full bg-ochre px-[22px] py-[13px] font-bold text-ink no-underline hover:text-ink">Додати студію</Link>
         </div>
       </section>
     </main>

@@ -77,7 +77,7 @@ export function DocPhoto({ photo, priority = false, className = '' }: { photo: i
     <figure className={`m-0 grid grid-cols-1 gap-1.5 ${className}`}>
       <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} priority={priority} sizes="(min-width:1024px) 520px, 100vw" className="aspect-[16/11] w-full rounded-[26px] object-cover" />
       <figcaption className="text-[11.5px] text-umber">
-        Фото: {photo.author}, <a href={photo.href} target="_blank" rel="noopener nofollow" className="text-umber">{photo.license}</a>, Wikimedia Commons
+        Фото: {photo.author}, <a href={photo.href} target="_blank" rel="noopener nofollow" className="text-umber">{photo.license}</a>, {photo.source ?? 'Wikimedia Commons'}
       </figcaption>
     </figure>
   )
