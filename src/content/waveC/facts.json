@@ -1,0 +1,39 @@
+{
+ "checked": "2026-10-11",
+ "taxFreeGift": {
+  "value": "2 161,75 грн на місяць на працівника",
+  "rule": "негрошовий подарунок до 25% мінімальної зарплати (пп. 165.1.39 ПКУ) не оподатковується ПДФО і військовим збором; мінімальна зарплата 2026 — 8 647 грн",
+  "source": "https://7eminar.ua/news/2653-novoricnii-korporativ-i-podarunki-pracivnikam-na-korporativi",
+  "date": "2025-11-21",
+  "note": "звірте з бухгалтером"
+ },
+ "holidaysMartialLaw": {
+  "value": "Під час воєнного стану святкові дні не є вихідними: ч. 6 ст. 6 Закону № 2136-IX виключає застосування статей 71–73 КЗпП.",
+  "pending": "Законопроєкт № 14403 (26.01.2026) пропонує повернути вихідні на свята; на початок 2026 року — на розгляді в комітеті, станом на жовтень 2026 не ухвалений (за наявними даними).",
+  "sources": [
+   "https://prokadry.com.ua/question/10724-den-nezalezhnosti-svyatkovi-dni-pid-chas-voennogo-stanu",
+   "https://i.factor.ua/ukr/news/ci-povernut-svatkovi-dni-pid-cas-voennogo-stanu/"
+  ],
+  "verified": "2026-10-11",
+  "status": "verified"
+ },
+ "christmasDate": {
+  "value": "Різдво Христове — 25 грудня (Закон № 3258-IX від 14.07.2023; 7 січня як свято скасовано). У дослідженні помилково був номер 3221-IX.",
+  "sources": [
+   "https://prokadry.com.ua/news/2458-prezident-pdpisav-zakon-pro-noviy-svyatkoviy-den-25-grudnya",
+   "https://osvita.ua/news/58150/"
+  ],
+  "verified": "2026-10-11",
+  "status": "verified"
+ },
+ "deloitte": {
+  "value": "64% українців планують спрямувати частину святкового бюджету на благодійність; 18% починають покупки до грудня, пік — 1–24 грудня (62%)",
+  "source": "https://epravda.com.ua/finances/64-ukrajinciv-planuyut-spryamuvati-chastinu-novorichnogo-byudzhetu-na-blagodiynist-deloitte-815199/",
+  "date": "2025-12-10"
+ },
+ "booking": {
+  "value": "KAVA радить звертатися щонайменше за 2–3 тижні, у грудні — раніше; великі заходи «під ключ» — за місяць",
+  "source": "https://kava.ua/uk/corporate",
+  "date": "2026-10-11"
+ }
+}

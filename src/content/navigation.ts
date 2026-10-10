@@ -5,6 +5,7 @@
 
 import { liveWaveIds } from './waveA/live'
 import { liveWaveBIds } from './waveB/live'
+import { liveWaveCIds } from './waveC/live'
 
 export type NavLink = { label: string; href: string; note?: string }
 export type NavColumn = { title: string; links: NavLink[] }
@@ -39,8 +40,12 @@ const WAVE_HREFS: Record<string, string> = {
   '/hayidy/dohliad-za-keramikoyu': 'dohliad-za-keramikoyu',
   '/hayidy/chornodymlena-i-molochena': 'chornodymlena-i-molochena',
   '/dobirky/pratsyuyut-z-biznesom': 'pratsyuyut-z-biznesom',
+  // Wave C (src/content/waveC, scripts/sync-wave-c.mjs)
+  '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi': 'richnytsya-kompaniyi',
+  '/dlya-biznesu/podarunky-spivrobitnykam': 'podarunky-spivrobitnykam',
+  '/novyi-rik-i-rizdvo': 'novyi-rik-i-rizdvo',
 }
-const waveLive = new Set([...liveWaveIds, ...liveWaveBIds])
+const waveLive = new Set([...liveWaveIds, ...liveWaveBIds, ...liveWaveCIds])
 export const isBuilt = (href: string) =>
   !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?')) &&
   (!(href.split(/[?#]/)[0] in WAVE_HREFS) || waveLive.has(WAVE_HREFS[href.split(/[?#]/)[0]]))
@@ -69,6 +74,8 @@ const mainNavPlan: NavSection[] = [
           { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky', note: 'Для команди і клієнтів' },
           { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026', note: 'Що встигнуть зробити до свят' },
           { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny', note: 'У студії або у вашому офісі' },
+          { label: 'Як відсвяткувати річницю компанії', href: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi', note: '14 форматів поруч: ціни, групи, терміни' },
+          { label: 'Подарунки співробітникам', href: '/dlya-biznesu/podarunky-spivrobitnykam', note: 'Кераміка, сертифікати, ліміт без податку' },
         ],
       },
       {
@@ -168,6 +175,7 @@ const mainNavPlan: NavSection[] = [
         links: [
           { label: 'Сертифікати на гончарство', href: '/sertyfikaty', note: 'Ціни, термін дії, формати' },
           { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky', note: 'За бюджетом і приводом' },
+          { label: 'Новий рік і Різдво', href: '/novyi-rik-i-rizdvo', note: 'Прикраси, набори, дедлайни сезону' },
           { label: 'Сертифікат у Києві', href: '/sertyfikaty/kyiv' },
           { label: 'Сертифікат у Львові', href: '/sertyfikaty/lviv' },
           { label: 'Сертифікат в Одесі', href: '/sertyfikaty/odesa' },
@@ -246,6 +254,9 @@ export const footerColumns: NavColumn[] = ([
       { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
       { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Річниця компанії: формати', href: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi' },
+      { label: 'Подарунки співробітникам', href: '/dlya-biznesu/podarunky-spivrobitnykam' },
+      { label: 'Новий рік і Різдво з керамікою', href: '/novyi-rik-i-rizdvo' },
       { label: 'Надіслати запит', href: REQUEST_HREF },
     ],
   },

@@ -1,6 +1,7 @@
 import { aboutPage, guides, studioPage } from '@/content/guides'
 import { liveWavePages } from '@/lib/waveA'
 import { liveWaveBPages } from '@/lib/waveB'
+import { liveWaveCPages } from '@/lib/waveC'
 import { site } from '@/content/site'
 import { topicList } from '@/content/topics'
 import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
@@ -40,7 +41,7 @@ export async function GET() {
   await section('Подарункові сертифікати', ['cert'], (await certificateCities()).map((c) => `- [Сертифікати на гончарство: ${c.name}](${site.url}/sertyfikaty/${c.slug})`))
   await section('Вироби', ['makers'])
   lines.push('## Виробники за містами', ...(await makerCities()).map((g) => `- [Кераміка ручної роботи: ${g.city.name}](${site.url}/vyrobnyky/misto/${g.city.slug}): ${g.studios.length} студій, брендів і майстрів`), '')
-  const wave = [...(await liveWavePages()), ...(await liveWaveBPages())]
+  const wave = [...(await liveWavePages()), ...(await liveWaveBPages()), ...(await liveWaveCPages())]
   if (wave.length) lines.push('## Детальні добірки', ...wave.map((w) => `- [${w.title}](${site.url}${w.path}): ${w.summary}`), '')
   lines.push('## Гайди', ...guides.map((g) => `- [${g.h1}](${site.url}${g.path}): ${g.short}`), '')
   lines.push('## Добірки', `- [Сучасні українські керамісти](${site.url}/dobirky/suchasni-keramisty): бренди, авторки й автори, студії за відкритими даними (не рейтинг)`, `- [Косів і Опішне сьогодні](${site.url}/dobirky/kosiv-i-opishne): хто працює з глиною в двох гончарних осередках`, '')
