@@ -1,3 +1,4 @@
+import type React from 'react'
 import { ImageResponse } from 'next/og'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
@@ -57,7 +58,11 @@ export async function GET(req: Request) {
             <img src={coa} alt="" style={{ maxWidth: 330, maxHeight: 440, objectFit: 'contain' }} />
           </div>
         )}
-        {seed && !photo && !coa && <Mosaic seed={seed} />}
+        {seed && !photo && !coa && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 420, height: 548, margin: '32px 32px 32px 0', background: C.card, borderRadius: 36 }}>
+            <ShieldMosaic seed={seed} />
+          </div>
+        )}
         {photo && (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={photo} width={420} height={548} alt="" style={{ width: 420, height: 548, objectFit: 'cover', borderRadius: 36, margin: '32px 32px 32px 0' }} />
@@ -77,20 +82,31 @@ export async function GET(req: Request) {
   )
 }
 
-// A city's own ceramic-tile mosaic: same palette, different arrangement per city (no stock photos, no city symbols).
-function Mosaic({ seed }: { seed: string }) {
+// Fallback "coat of arms": a heater shield filled with the city's own ceramic-tile mosaic.
+function ShieldMosaic({ seed }: { seed: string }) {
   let h = 0
   for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0
   const rnd = () => ((h = (h * 1103515245 + 12345) >>> 0) % 1000) / 1000
-  const colors = [C.terra, C.cobalt, C.ochre, C.card, '#5f7e6a']
-  const cells = Array.from({ length: 20 }, () => ({ c: colors[Math.floor(rnd() * colors.length)], shape: Math.floor(rnd() * 3) }))
+  const colors = [C.terra, C.cobalt, C.ochre, '#5f7e6a']
+  const shield = 'M12 12 H318 V228 C318 318 250 382 165 412 C80 382 12 318 12 228 Z'
+  const tiles: React.ReactNode[] = []
+  for (let r = 0; r < 7; r++)
+    for (let c = 0; c < 5; c++) {
+      const x = 12 + c * 61.2, y = 12 + r * 61, fill = colors[Math.floor(rnd() * colors.length)], k = Math.floor(rnd() * 3)
+      tiles.push(<rect key={`b${r}${c}`} x={x} y={y} width={61.2} height={61} fill="#f6ead9" stroke="#e1c7ae" strokeWidth={2} />)
+      tiles.push(
+        k === 0 ? <circle key={`s${r}${c}`} cx={x + 30.6} cy={y + 30.5} r={18} fill={fill} />
+        : k === 1 ? <path key={`s${r}${c}`} d={`M${x + 12} ${y + 22} H${x + 49} A18.5 18.5 0 0 1 ${x + 12} ${y + 22} Z`} fill={fill} />
+        : <rect key={`s${r}${c}`} x={x + 13} y={y + 13} width={35} height={35} rx={8} fill={fill} />,
+      )
+    }
   return (
-    <div style={{ display: 'flex', flexWrap: 'wrap', width: 420, height: 548, margin: '32px 32px 32px 0', columnGap: 12, rowGap: 12, alignContent: 'flex-start' }}>
-      {cells.map((x, i) => (
-        <div key={i} style={{ width: 96, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.card, borderRadius: 16 }}>
-          <div style={{ width: x.shape === 2 ? 70 : 54, height: x.shape === 1 ? 30 : 54, background: x.c === C.card ? C.ochre : x.c, borderRadius: x.shape === 0 ? 999 : x.shape === 1 ? '0 0 999px 999px' : 12 }} />
-        </div>
-      ))}
-    </div>
+    <svg width={330} height={424} viewBox="0 0 330 424">
+      <defs>
+        <clipPath id="shield"><path d={shield} /></clipPath>
+      </defs>
+      <g clipPath="url(#shield)">{tiles}</g>
+      <path d={shield} fill="none" stroke={C.ochre} strokeWidth={10} />
+    </svg>
   )
 }
