@@ -13,6 +13,13 @@ export function MainNav() {
   const [drawer, setDrawer] = useState(false)
   const pathname = usePathname()
   const rootRef = useRef<HTMLDivElement>(null)
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // Hover intent on desktop (mouse): open after a short pause, close after leaving the menu area.
+  const canHover = () => typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
+  const later = (fn: () => void, ms: number) => {
+    if (timer.current) clearTimeout(timer.current)
+    timer.current = setTimeout(fn, ms)
+  }
 
   useEffect(() => {
     setOpen(null)
@@ -42,7 +49,12 @@ export function MainNav() {
   }, [drawer])
 
   return (
-    <div ref={rootRef} className="flex min-w-0 flex-1 items-center gap-4">
+    <div
+      ref={rootRef}
+      className="flex min-w-0 flex-1 items-center gap-4"
+      onMouseLeave={() => canHover() && later(() => setOpen(null), 220)}
+      onMouseEnter={() => timer.current && clearTimeout(timer.current)}
+    >
       <ul className="hidden min-w-0 flex-1 items-center gap-0.5 lg:flex">
         {mainNav.map((s) => (
           <li key={s.id}>
@@ -50,7 +62,8 @@ export function MainNav() {
               type="button"
               aria-expanded={open === s.id}
               aria-controls={`mega-${s.id}`}
-              onClick={() => setOpen(open === s.id ? null : s.id)}
+              onClick={() => setOpen(open === s.id && !canHover() ? null : s.id)}
+              onMouseEnter={() => canHover() && later(() => setOpen(s.id), open ? 0 : 120)}
               className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2.5 text-[15px] font-semibold hover:bg-card aria-expanded:bg-card ${s.emphasis ? 'text-cobalt' : 'text-ink'}`}
             >
               {s.label}
@@ -60,7 +73,7 @@ export function MainNav() {
         ))}
         {simpleNav.map((l) => (
           <li key={l.href}>
-            <Link href={l.href} className="rounded-full px-3 py-2.5 text-[15px] font-semibold text-ink no-underline hover:bg-card">
+            <Link href={l.href} onMouseEnter={() => canHover() && later(() => setOpen(null), 120)} className="rounded-full px-3 py-2.5 text-[15px] font-semibold text-ink no-underline hover:bg-card">
               {l.label}
             </Link>
           </li>
