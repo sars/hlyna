@@ -16,6 +16,22 @@ export const STUDIO_TYPES = [
   { label: 'Інше', value: 'other' },
 ] as const
 
+// What a studio offers, as filter tags for hub pages. Set by scripts/tag-studios.ts from the research data; editable in admin.
+export const STUDIO_FORMATS = [
+  { label: 'Гончарне коло', value: 'wheel' },
+  { label: 'Ліплення з глини', value: 'handbuilding' },
+  { label: 'Розпис кераміки', value: 'painting' },
+  { label: 'Заняття для дітей', value: 'kids' },
+  { label: 'Для двох / побачення', value: 'couples' },
+  { label: 'Курси й абонементи', value: 'courses' },
+  { label: 'Подарункові сертифікати', value: 'certificates' },
+  { label: 'Корпоративи / майстер-класи для команд', value: 'corporate-workshop' },
+  { label: 'Корпоративні подарунки', value: 'corporate-gifts' },
+  { label: 'Логотип / персоналізація', value: 'logo' },
+  { label: 'Посуд для закладів (HoReCa)', value: 'horeca' },
+  { label: 'Новорічні вироби', value: 'new-year' },
+] as const
+
 export const STUDIO_STATUSES = [
   { label: 'Активна', value: 'active' },
   { label: 'Невідомо', value: 'unclear' },
@@ -104,6 +120,15 @@ export const Studios: CollectionConfig = {
               label: 'Опис (з досліджень, внутрішній)',
               type: 'textarea',
               localized: true,
+            },
+            {
+              name: 'formats',
+              label: 'Формати й послуги (теги)',
+              type: 'select',
+              hasMany: true,
+              index: true,
+              options: [...STUDIO_FORMATS],
+              admin: { description: 'Фільтри для сторінок «Гончарне коло», «Для дітей», «Чашки з логотипом» тощо.' },
             },
             {
               name: 'services',

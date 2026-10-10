@@ -16,7 +16,7 @@
  * Population / isOver100k come from cities_100k.md next to the data (CITIES_FILE overrides).
  */
 import config from '@payload-config'
-import { createHash } from 'crypto'
+import { normalize, sourceIdFor } from './source-id'
 import fs from 'fs'
 import path from 'path'
 import { getPayload } from 'payload'
@@ -56,19 +56,6 @@ type Entry = {
 const str = (v: unknown): string => (typeof v === 'string' ? v.trim() : '')
 const list = (v: unknown): string[] =>
   Array.isArray(v) ? v.map(str).filter(Boolean) : str(v) ? [str(v)] : []
-
-const normalize = (s: string): string =>
-  s
-    .toLowerCase()
-    .replace(/[«»"'’ʼ`]/g, '')
-    .replace(/[^\p{L}\p{N}]+/gu, ' ')
-    .trim()
-
-export const sourceIdFor = (name: string, city: string): string =>
-  createHash('sha1')
-    .update(`${normalize(name)}|${normalize(city)}`)
-    .digest('hex')
-    .slice(0, 16)
 
 const PRUNE = process.argv.includes('--prune') || process.env.PRUNE === '1'
 

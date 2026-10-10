@@ -176,6 +176,25 @@ export interface Studio {
    */
   publicDescription?: string | null;
   description?: string | null;
+  /**
+   * Фільтри для сторінок «Гончарне коло», «Для дітей», «Чашки з логотипом» тощо.
+   */
+  formats?:
+    | (
+        | 'wheel'
+        | 'handbuilding'
+        | 'painting'
+        | 'kids'
+        | 'couples'
+        | 'courses'
+        | 'certificates'
+        | 'corporate-workshop'
+        | 'corporate-gifts'
+        | 'logo'
+        | 'horeca'
+        | 'new-year'
+      )[]
+    | null;
   services?:
     | {
         text: string;
@@ -1230,6 +1249,7 @@ export interface StudiosSelect<T extends boolean = true> {
   summary?: T;
   publicDescription?: T;
   description?: T;
+  formats?: T;
   services?:
     | T
     | {
