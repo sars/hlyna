@@ -90,3 +90,6 @@ docker compose restart app
 docker compose exec db psql -U hlyna hlyna       # SQL console
 ```
 Never run `docker compose down -v`: `-v` deletes the database volume.
+
+## Deploy from the Mac
+`bash deploy/push.sh` ships the committed HEAD to the VPS (ssh alias `hlyna` in ~/.ssh/config), rebuilds the containers and refreshes all catalogue pages via `/revalidate`. The server has no GitHub access on purpose.
