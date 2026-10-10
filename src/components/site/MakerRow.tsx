@@ -2,12 +2,13 @@ import Link from 'next/link'
 import React from 'react'
 
 import { hasFormat, igHandle, offersMasterClasses, worksWithVenues, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, isExhibitingOnly, stripPersonal } from '@/lib/present'
+import { cleanName, firstAddress, isExhibitingOnly, staleNote, stripPersonal } from '@/lib/present'
 import { productChips } from '@/lib/products'
 
 // One studio in a city list: name, address, Instagram, what it makes and offers, one line about it.
 export function MakerRow({ s }: { s: StudioCard }) {
   const addr = firstAddress(s.address)
+  const stale = staleNote(s)
   const chips = [
     ...productChips(s),
     ...(offersMasterClasses(s) ? ['майстер-класи'] : []),
@@ -33,6 +34,7 @@ export function MakerRow({ s }: { s: StudioCard }) {
         </span>
       )}
       {about && <span className="line-clamp-2 text-sm text-umber">{about}</span>}
+      {stale && <span className="text-[12.5px] text-terra">{stale}</span>}
       {(chips.length > 0 || exhibiting) && (
         <span className="flex flex-wrap gap-1.5 pt-0.5">
           {exhibiting && <span className="rounded-full bg-sand px-2 py-0.5 text-[12px] font-semibold text-umber">виставки</span>}

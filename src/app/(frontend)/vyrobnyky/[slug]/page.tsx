@@ -12,7 +12,7 @@ import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { getAllStudios, getCatalog, getStudioBySlug, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
-import { amountsIn, cleanName, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
+import { amountsIn, cleanAddress, cleanName, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -151,7 +151,7 @@ export default async function StudioPage({ params }: Args) {
   const facts: [string, React.ReactNode][] = [
     ['Тип', typeLabel],
     ...(city ? [['Місто', cityPage ? <Link key="c" href={`/maister-klasy/${city.slug}`}>{city.name}</Link> : city.name] as [string, React.ReactNode]] : []),
-    ...(s.address ? [['Адреса', s.address] as [string, React.ReactNode]] : []),
+    ...(cleanAddress(s.address) ? [['Адреса', cleanAddress(s.address)] as [string, React.ReactNode]] : []),
     ...(s.instagram ? [['Instagram', link(s.instagram, '@' + igHandle(s.instagram))] as [string, React.ReactNode]] : []),
     ...(lastPost ? [['Останній пост', `${lastPost}${followers ? ` · ${followers} підписників` : ''}`] as [string, React.ReactNode]] : []),
     ...(s.website ? [['Сайт', link(s.website, s.website.replace(/^https?:\/\//, '').replace(/\/$/, ''))] as [string, React.ReactNode]] : []),

@@ -10,11 +10,12 @@ import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF } from '@/content/navigation'
 import type { Topic } from '@/content/topics'
 import { groupByCity, MIN_LIST, TYPE_LABEL, type StudioCard } from '@/lib/catalog'
-import { cleanName, stripPersonal } from '@/lib/present'
+import { cleanName, stripPersonal, staleNote } from '@/lib/present'
 import { evidenceLine, type TopicData } from '@/lib/topics'
 
 function Row({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: boolean }) {
   const line = stripPersonal(evidenceLine(s, re))
+  const stale = staleNote(s)
   return (
     <li>
       <Link href={`/vyrobnyky/${s.slug}`} className="grid grid-cols-1 h-full content-start gap-1.5 rounded-[18px] border border-transparent bg-card p-4 text-ink no-underline hover:border-line hover:text-ink">
@@ -24,6 +25,7 @@ function Row({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: boolean
         </span>
         <span className="text-[16.5px] leading-snug font-semibold">{cleanName(s.name)}</span>
         {line && <span className="line-clamp-3 text-sm text-umber">{line}</span>}
+        {stale && <span className="text-[12.5px] text-terra">{stale}</span>}
       </Link>
     </li>
   )

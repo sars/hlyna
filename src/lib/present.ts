@@ -189,8 +189,11 @@ export function profileUrls(s: Studio): string[] {
 }
 
 // First address only, without metro stations and entrance notes (for JSON-LD streetAddress).
+// Addresses that research marked as no longer current («історично: …», «актуальні адреси не вказані»).
+const STALE_ADDRESS = /^\s*(?:історично|раніше|колишн)|актуальн\p{L}* адрес\p{L}* .{0,30}не вказан/iu
+
 export function firstAddress(addr?: string | null): string {
-  if (!addr) return ''
+  if (!addr || STALE_ADDRESS.test(addr)) return ''
   return addr
     .split(/;|\s+та\s+|\s+і\s+(?=вул)/)[0]
     .replace(/\([^)]*\)/g, '')
@@ -205,7 +208,7 @@ export function firstAddress(addr?: string | null): string {
 
 // Display address: tidy punctuation and drop a lone postal code («…, Одеса 65000» → «…, Одеса»).
 export const cleanAddress = (a?: string | null) =>
-  cleanPublic(a)
+  (a && STALE_ADDRESS.test(a) ? '' : cleanPublic(a))
     .replace(/(?<=\p{L})\s+\d{5}(?=\s*(?:,|$))/gu, '')
     .replace(/,\s*,/g, ',')
     .replace(/[,\s]+$/, '')
@@ -247,4 +250,17 @@ export function cleanName(name: string): string {
   })
   n = n.replace(/,\s*(?:вул|просп|пров|пл|бульв)\.?\s[^()]+$/iu, '')
   return n.replace(/\s{2,}/g, ' ').replace(/\s+([,.])/g, '$1').trim() || name
+}
+
+// ---------- staleness ----------
+
+// «останній пост — лютий 2022» when the latest Instagram post is more than a year old; shown next to the
+// studio in lists so people check before they go.
+export function staleNote(s: { activity?: { lastPostDate?: string | null } | null }, now = Date.now()): string {
+  const d = s.activity?.lastPostDate
+  if (!d) return ''
+  const t = new Date(d).getTime()
+  if (!Number.isFinite(t) || now - t < 365 * 86400000) return ''
+  const parts = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(t))
+  return `останній пост — ${parts.filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ')}`
 }

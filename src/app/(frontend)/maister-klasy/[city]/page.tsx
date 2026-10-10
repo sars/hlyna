@@ -11,7 +11,7 @@ import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
 import { fmt, getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, inCity, oblastLabel, singleClassAmounts, typicalRange } from '@/lib/present'
+import { cleanName, firstAddress, inCity, oblastLabel, singleClassAmounts, typicalRange, staleNote } from '@/lib/present'
 import { cityContent } from '@/lib/places'
 import { certificateCities } from '@/lib/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/lib/waveA'
@@ -165,6 +165,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
                 const from = minClass(s)
                 const chips = CHIPS.filter(([f]) => hasFormat(s, f))
                 const addr = firstAddress(s.address)
+                const stale = staleNote(s)
                 return (
                   <li key={s.id} className="grid grid-cols-1 gap-x-4 gap-y-1.5 rounded-2xl bg-card px-4 py-3.5 sm:grid-cols-[minmax(0,1fr)_auto]">
                     <div className="grid grid-cols-1 gap-1">
@@ -183,6 +184,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
                           </>
                         ) : null}
                       </span>
+                      {stale && <span className="text-[12.5px] text-terra">{stale}</span>}
                       {chips.length > 0 && (
                         <span className="flex flex-wrap gap-1.5 pt-0.5">
                           {chips.map(([f, label]) => (

@@ -4,7 +4,7 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { slugifyUk } from '../src/utilities/transliterateUk'
 
-type F = { slug: string; name?: string; summary?: string; publicDescription?: string; city?: string }
+type F = { slug: string; name?: string; summary?: string; publicDescription?: string; city?: string; address?: string }
 const fixes = JSON.parse(fs.readFileSync(process.env.FIXES || '/tmp/hlyna-copy/fixes.json', 'utf8')) as F[]
 const payload = await getPayload({ config })
 let n = 0
@@ -15,6 +15,7 @@ for (const f of fixes) {
   if (f.name) data.name = f.name
   if (f.summary) data.summary = f.summary.slice(0, 200)
   if (f.publicDescription) data.publicDescription = f.publicDescription
+  if (f.address !== undefined) data.address = f.address
   if (f.city) {
     const slug = slugifyUk(f.city)
     let city = (await payload.find({ collection: 'cities', where: { slug: { equals: slug } }, limit: 1 })).docs[0]

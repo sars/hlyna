@@ -151,6 +151,13 @@ for (const c of candidates) {
 
 const etsyRaw = jsonl(path.join(ROOT, '05_marketplaces_prices/entries_etsy_browser.jsonl'))
 const byInsta = new Map(all.filter((s) => s.instagram).map((s) => [s.instagram!.replace(/\/$/, '').toLowerCase(), s]))
+// Etsy shop headers give "1.1k" for counts over a thousand.
+const etsyNum = (v?: string) => {
+  if (!v) return undefined
+  const t = v.replace(/\s/g, '').replace(',', '.')
+  const n = t.endsWith('k') ? Math.round(Number(t.slice(0, -1)) * 1000) : Number(t)
+  return Number.isFinite(n) && n > 0 ? n : undefined
+}
 const etsy = etsyRaw
   .map((e) => {
     const desc = str(e.description)
@@ -162,8 +169,8 @@ const etsy = etsyRaw
       url,
       location: loc,
       rating: Number(desc.match(/рейтинг ([\d.]+)/)?.[1]) || undefined,
-      reviews: Number(desc.match(/\((\d+) відгук/)?.[1]) || undefined,
-      sales: Number(desc.match(/продажів ([\d\s]+)/)?.[1]?.replace(/\s/g, '')) || undefined,
+      reviews: etsyNum(desc.match(/\(([\d.,]+k?) відгук/)?.[1]),
+      sales: etsyNum(desc.match(/продажів ([\d.,\s]+k?)/)?.[1]),
       years: desc.match(/на Etsy ([^,]+)/)?.[1],
       items: Number(desc.match(/товарів (\d+)/)?.[1]) || undefined,
       slug: s?.slug ?? undefined,
