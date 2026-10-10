@@ -7,13 +7,13 @@ const SITE_URL =
 module.exports = {
   siteUrl: SITE_URL,
   generateRobotsTxt: true,
-  exclude: ['/posts-sitemap.xml', '/pages-sitemap.xml', '/*', '/posts/*'],
+  exclude: ['/catalog-sitemap.xml', '/posts-sitemap.xml', '/pages-sitemap.xml', '/*', '/posts/*'],
   robotsTxtOptions: {
     // Search engines and AI assistants are welcome everywhere except the admin and the API.
     policies: [
       { userAgent: '*', allow: '/', disallow: ['/admin', '/api', '/next'] },
       ...['GPTBot', 'OAI-SearchBot', 'ChatGPT-User', 'ClaudeBot', 'Claude-User', 'Claude-SearchBot', 'PerplexityBot', 'Perplexity-User', 'Google-Extended', 'Bingbot', 'Applebot-Extended', 'CCBot'].map((ua) => ({ userAgent: ua, allow: '/', disallow: ['/admin', '/api'] })),
     ],
-    additionalSitemaps: [`${SITE_URL}/pages-sitemap.xml`, `${SITE_URL}/posts-sitemap.xml`],
+    additionalSitemaps: [`${SITE_URL}/catalog-sitemap.xml`, `${SITE_URL}/pages-sitemap.xml`, `${SITE_URL}/posts-sitemap.xml`],
   },
 }
