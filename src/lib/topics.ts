@@ -77,7 +77,7 @@ export function topicMetadata(topic: Topic, data: TopicData, over: { title?: str
       images: ogImage({
         title: over.h1 ?? topic.h1,
         kicker: topic.kicker,
-        sub: ctx.min && ctx.max ? `${ctx.n} ${pluralUk(ctx.n, ['місце', 'місця', 'місць'])} · від ${fmt(ctx.min)} грн` : undefined,
+        sub: ctx.min && ctx.max ? `${ctx.n} ${topic.section === 'mk' || topic.section === 'cert' ? pluralUk(ctx.n, ['місце', 'місця', 'місць']) : pluralUk(ctx.n, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])} · від ${fmt(ctx.min)} грн` : undefined,
         ...(over.coa ? { coa: over.coa, pattern: over.coa } : topic.photo ? { img: topic.ogImg, credit: `Фото: ${topic.photo.author}, ${topic.photo.license}` } : { pattern: topic.ogImg }),
       }),
     },
