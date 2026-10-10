@@ -7,7 +7,6 @@ import { guides } from '@/content/guides'
 import { guideCtx, guideMetadata } from '@/lib/guides'
 
 export const revalidate = 86400
-export const dynamicParams = false
 
 export function generateStaticParams() {
   return guides.map((g) => ({ slug: g.slug }))
