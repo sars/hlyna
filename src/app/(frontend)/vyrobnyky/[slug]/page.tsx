@@ -8,6 +8,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
+import { ogImage } from '@/utilities/ogImage'
 import { getAllStudios, getStudioBySlug, igHandle, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
 
 export const revalidate = 86400
@@ -33,6 +34,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: `${s.name}${city ? ` — ${what}, ${city}` : ''}`,
     description: (s.summary || s.publicDescription || s.description || '').slice(0, 160),
     alternates: { canonical: `/vyrobnyky/${s.slug}` },
+    openGraph: { images: ogImage({ title: s.name, kicker: [TYPE_LABEL[s.type ?? 'other'], city].filter(Boolean).join(' · '), sub: s.summary ?? '' }) },
   }
 }
 

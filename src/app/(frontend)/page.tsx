@@ -7,6 +7,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
+import { ogImage } from '@/utilities/ogImage'
 import { verses } from '@/content/verses'
 import { Epigraph } from '@/components/site/Bits'
 import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses, pluralUk } from '@/lib/catalog'
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
   description:
     'Посуд і подарунки ручної роботи від українських студій для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови й ціни та надішліть один запит кільком студіям. Майстер-класи з кераміки по всій Україні.',
   alternates: { canonical: '/' },
+  openGraph: { images: ogImage({ title: 'Посуд і подарунки ручної роботи від українських студій', kicker: 'Українська кераміка', sub: 'Для ресторанів, кав’ярень, готелів і компаній. Один запит — кілька пропозицій', img: 'restaurant-table' }) },
 }
 
 const nf = (n: number) => n.toLocaleString('uk-UA')

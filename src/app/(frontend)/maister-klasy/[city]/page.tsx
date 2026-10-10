@@ -8,6 +8,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
+import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
 import { fmt, getAllStudios, groupByCity, hryvniaAmounts, igHandle, MIN_LIST, offersMasterClasses, pluralUk, range, TYPE_LABEL } from '@/lib/catalog'
 
@@ -39,6 +40,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: `Майстер-класи з кераміки: ${g.city.name} — ${g.studios.length} ${pluralUk(g.studios.length, ['студія', 'студії', 'студій'])} і ціни 2026`,
     description: `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])} у місті ${g.city.name}, де проводять майстер-класи з гончарства і ліплення з глини${r ? `; ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : ''}. Формати, сертифікати, контакти.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
+    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}, ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : undefined, img: 'wheel-top' }) },
   }
 }
 

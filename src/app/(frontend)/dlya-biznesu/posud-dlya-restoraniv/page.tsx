@@ -8,6 +8,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
+import { ogImage } from '@/utilities/ogImage'
 import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, igHandle, pluralUk, TYPE_LABEL, worksWithVenues } from '@/lib/catalog'
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
   description:
     'Українські керамічні студії, які роблять посуд для ресторанів, кав’ярень і готелів: хто вони, де працюють, як замовити партію, терміни 3–8 тижнів. Один запит — пропозиції від кількох студій.',
   alternates: { canonical: '/dlya-biznesu/posud-dlya-restoraniv' },
+  openGraph: { images: ogImage({ title: 'Посуд ручної роботи для ресторанів і кав’ярень', kicker: 'Для бізнесу', sub: 'Українські студії, терміни 3–8 тижнів', img: 'restaurant-table' }) },
 }
 
 const checklist = [
