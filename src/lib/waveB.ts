@@ -33,8 +33,8 @@ export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: st
   podiyi: { path: '/podiyi', section: null, crumb: 'Ярмарки й події', kicker: 'Події', form: 'other', pattern: 'events' },
   'muzei-keramiky': { path: '/muzei-keramiky', section: null, crumb: 'Музеї й галереї', kicker: 'Де подивитися', form: 'other', pattern: 'museums' },
   'yalynkovi-prykrasy': { path: '/dobirky/yalynkovi-prykrasy', section: 'dobirky', crumb: 'Ялинкові прикраси', kicker: 'Добірки', form: 'corporate-gifts', pattern: 'newyear' },
-  'vydy-keramiky': { path: '/hayidy/vydy-keramiky', section: 'hayidy', crumb: 'Види кераміки', kicker: 'Гайди', form: 'other', pattern: 'materials' },
-  'dohliad-za-keramikoyu': { path: '/hayidy/dohliad-za-keramikoyu', section: 'hayidy', crumb: 'Догляд за керамікою', kicker: 'Гайди', form: 'other', pattern: 'care' },
+  'vydy-keramiky': { path: '/hayidy/vydy-keramiky', section: 'hayidy', crumb: 'Види кераміки', kicker: 'Гайди', form: 'tableware', pattern: 'materials' },
+  'dohliad-za-keramikoyu': { path: '/hayidy/dohliad-za-keramikoyu', section: 'hayidy', crumb: 'Догляд за керамікою', kicker: 'Гайди', form: 'tableware', pattern: 'care' },
   'chornodymlena-i-molochena': { path: '/hayidy/chornodymlena-i-molochena', section: 'hayidy', crumb: 'Чорнодимлена й молочена', kicker: 'Гайди', form: 'other', pattern: 'smoke' },
   'pratsyuyut-z-biznesom': { path: '/dobirky/pratsyuyut-z-biznesom', section: 'dobirky', crumb: 'Хто працює з бізнесом', kicker: 'Добірки', form: 'tableware', pattern: 'business' },
 }

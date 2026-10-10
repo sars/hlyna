@@ -18,7 +18,8 @@ const KIND: Record<string, { qty: string; qtyPh: string; date: string; datePh: s
   'corporate-gifts': { qty: 'Кількість', qtyPh: 'напр. 30', date: 'До якої дати', datePh: 'напр. 15 грудня', details: 'Що дарувати, бюджет на подарунок, пакування…', logo: true },
   'corporate-workshop': { qty: 'Скільки людей', qtyPh: 'напр. 15', date: 'Дата', datePh: 'напр. п’ятниця, 24 жовтня', details: 'Формат (ліплення, коло, розпис), у студії чи у вас, побажання…', logo: false },
   'master-class': { qty: 'Скільки людей', qtyPh: 'напр. 2', date: 'Дата', datePh: 'напр. субота', details: 'Формат (коло, ліплення, розпис), для кого, вік дітей…', logo: false },
-  other: { qty: 'Кількість', qtyPh: '', date: 'Коли', datePh: '', details: 'Що потрібно…', logo: false },
+  // «Інше» (events, museums, guides, Etsy): no quantity field — there is nothing to count yet.
+  other: { qty: '', qtyPh: '', date: 'Коли', datePh: 'напр. до кінця листопада', details: 'Що потрібно: виріб, майстер-клас, подарунок, місто, бюджет…', logo: false },
 }
 
 const field =
@@ -86,10 +87,12 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
             ))}
           </select>
         </label>
-        <label className={label}>
-          {kind.qty}
-          <input name="quantity" inputMode="numeric" placeholder={kind.qtyPh} className={field} />
-        </label>
+        {kind.qty && (
+          <label className={label}>
+            {kind.qty}
+            <input name="quantity" inputMode="numeric" placeholder={kind.qtyPh} className={field} />
+          </label>
+        )}
         <label className={label}>
           {kind.date}
           <input name="deadline" placeholder={kind.datePh} className={field} />
