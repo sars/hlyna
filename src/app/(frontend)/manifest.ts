@@ -2,8 +2,8 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'глина.юа — українська кераміка ручної роботи',
-    short_name: 'глина.юа',
+    name: 'Глина — українська кераміка ручної роботи (hlyna.com.ua)',
+    short_name: 'Глина',
     lang: 'uk',
     start_url: '/',
     display: 'standalone',

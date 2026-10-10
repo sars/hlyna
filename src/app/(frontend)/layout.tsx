@@ -51,7 +51,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
 export const metadata: Metadata = {
   metadataBase: new URL(getServerSideURL()),
-  title: { default: 'Українська кераміка ручної роботи для бізнесу і для себе — глина.юа', template: '%s — глина.юа' },
+  title: { default: 'Українська кераміка ручної роботи для бізнесу і для себе — Глина', template: '%s — Глина' },
   description: site.description,
   openGraph: mergeOpenGraph(),
   twitter: { card: 'summary_large_image' },

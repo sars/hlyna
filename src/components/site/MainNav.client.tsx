@@ -138,7 +138,7 @@ export function MainNav() {
         <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" className="fixed inset-0 z-50 overflow-y-auto bg-clay px-4 pt-[calc(env(safe-area-inset-top,0px)+14px)] pb-10">
           <div className="mb-3 flex items-center justify-between">
             <Link href="/" className="font-display text-xl font-bold text-cobalt no-underline">
-              глина<span className="text-terra">.</span>юа
+              глина
             </Link>
             <button type="button" onClick={() => setDrawer(false)} className="rounded-full border border-line bg-card px-4 py-2 font-bold text-ink">
               Закрити

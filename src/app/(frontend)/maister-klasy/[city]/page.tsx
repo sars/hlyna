@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: `Майстер-класи з кераміки: ${g.city.name} — ${g.studios.length} ${pluralUk(g.studios.length, ['студія', 'студії', 'студій'])} і ціни 2026`,
     description: `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])} у місті ${g.city.name}, де проводять майстер-класи з гончарства і ліплення з глини${r ? `; ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : ''}. Формати, сертифікати, контакти.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
-    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}, ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : undefined, img: 'wheel-top' }) },
+    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}, ціни в прайсах від ${fmt(r.min)} до ${fmt(r.max)} грн` : undefined, pattern: g.city.slug as string }) },
   }
 }
 
@@ -81,7 +81,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
         <span className="kicker">Майстер-класи · {city.oblast || 'Україна'}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки: {city.name}</h1>
         <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі глина.юа — {studios.length} {pluralUk(studios.length, ['місце', 'місця', 'місць'])} у місті {city.name}, де проводять заняття з гончарства чи ліплення з глини.
+          У каталозі «Глина» — {studios.length} {pluralUk(studios.length, ['місце', 'місця', 'місць'])} у місті {city.name}, де проводять заняття з гончарства чи ліплення з глини.
           {r ? ` У прайсах студій трапляються ціни від ${fmt(r.min)} до ${fmt(r.max)} грн (дані ${site.dataUpdated}).` : ''} Нижче — студії, формати й контакти; один запит можна надіслати одразу кільком.
         </p>
         <Updated />

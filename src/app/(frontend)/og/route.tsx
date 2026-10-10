@@ -20,9 +20,10 @@ export async function GET(req: Request) {
   const sub = (u.searchParams.get('sub') || '').slice(0, 140)
   const img = (u.searchParams.get('img') || '').replace(/[^a-z0-9-]/g, '')
   const photo = img ? `data:image/jpeg;base64,${(await readFile(path.join(process.cwd(), 'public/images/stock', `${img}.jpg`)).catch(() => Buffer.from(''))).toString('base64')}` : ''
+  const seed = (u.searchParams.get('pattern') || '').slice(0, 40)
   const [unbounded, raleway] = await fonts
   const band = Array.from({ length: 30 }, (_, i) => [C.terra, C.cobalt, C.ochre][i % 3])
-  const size = (img ? 0.82 : 1) * (title.length > 60 ? 50 : title.length > 36 ? 60 : 72)
+  const size = (img || u.searchParams.get('pattern') ? 0.82 : 1) * (title.length > 60 ? 50 : title.length > 36 ? 60 : 72)
 
   return new ImageResponse(
     (
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
           ))}
         </div>
         <div style={{ display: 'flex', flex: 1 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: photo ? '52px 48px 44px 64px' : '56px 72px 48px', justifyContent: 'space-between' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: photo || seed ? '52px 48px 44px 64px' : '56px 72px 48px', justifyContent: 'space-between' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
             {kicker && <div style={{ fontFamily: 'Unbounded', fontSize: 22, letterSpacing: 3, color: C.terra, textTransform: 'uppercase' }}>{kicker}</div>}
             <div style={{ fontFamily: 'Unbounded', fontSize: size, lineHeight: 1.05, color: C.ink, textTransform: 'uppercase' }}>{title}</div>
@@ -41,14 +42,15 @@ export async function GET(req: Request) {
           </div>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div style={{ display: 'flex', fontFamily: 'Unbounded', fontSize: 34, color: C.cobalt }}>
-              глина<span style={{ color: C.terra }}>.</span>юа
+              глина
             </div>
-            {!photo && <div style={{ display: 'flex', fontSize: 24, color: C.umber }}>українська кераміка ручної роботи</div>}
+            <div style={{ display: 'flex', fontSize: 26, color: C.umber }}>hlyna.com.ua</div>
           </div>
         </div>
+        {seed && !photo && <Mosaic seed={seed} />}
         {photo && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} width={440} height={612} alt="" style={{ width: 440, height: 612, objectFit: 'cover', borderTopLeftRadius: 40 }} />
+          <img src={photo} width={420} height={548} alt="" style={{ width: 420, height: 548, objectFit: 'cover', borderRadius: 36, margin: '32px 32px 32px 0' }} />
         )}
         </div>
       </div>
@@ -62,5 +64,23 @@ export async function GET(req: Request) {
       ],
       headers: { 'Cache-Control': 'public, max-age=86400, s-maxage=604800' },
     },
+  )
+}
+
+// A city's own ceramic-tile mosaic: same palette, different arrangement per city (no stock photos, no city symbols).
+function Mosaic({ seed }: { seed: string }) {
+  let h = 0
+  for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0
+  const rnd = () => ((h = (h * 1103515245 + 12345) >>> 0) % 1000) / 1000
+  const colors = [C.terra, C.cobalt, C.ochre, C.card, '#5f7e6a']
+  const cells = Array.from({ length: 20 }, () => ({ c: colors[Math.floor(rnd() * colors.length)], shape: Math.floor(rnd() * 3) }))
+  return (
+    <div style={{ display: 'flex', flexWrap: 'wrap', width: 420, height: 548, margin: '32px 32px 32px 0', columnGap: 12, rowGap: 12, alignContent: 'flex-start' }}>
+      {cells.map((x, i) => (
+        <div key={i} style={{ width: 96, height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: C.card, borderRadius: 16 }}>
+          <div style={{ width: x.shape === 2 ? 70 : 54, height: x.shape === 1 ? 30 : 54, background: x.c === C.card ? C.ochre : x.c, borderRadius: x.shape === 0 ? 999 : x.shape === 1 ? '0 0 999px 999px' : 12 }} />
+        </div>
+      ))}
+    </div>
   )
 }

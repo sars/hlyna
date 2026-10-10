@@ -12,7 +12,7 @@ export function SiteFooter() {
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.3fr)_repeat(4,minmax(0,1fr))]">
           <div>
             <Link href="/" className="font-display text-xl font-bold text-cobalt no-underline">
-              глина<span className="text-terra">.</span>юа
+              глина
             </Link>
             <p className="mt-2 text-sm text-umber">{site.description}</p>
             <p className="mt-2 text-sm text-umber">Дані оновлено: {site.dataUpdated}</p>
@@ -33,7 +33,7 @@ export function SiteFooter() {
           ))}
         </div>
         <div className="mt-8 flex flex-wrap justify-between gap-2.5 border-t border-line pt-4 text-[13px] text-umber">
-          <span>© {new Date().getFullYear()} глина.юа · Українська кераміка ручної роботи</span>
+          <span>© {new Date().getFullYear()} Глина · hlyna.com.ua · Українська кераміка ручної роботи</span>
           <span>Українською</span>
         </div>
       </div>

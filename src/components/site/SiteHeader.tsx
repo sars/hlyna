@@ -24,8 +24,9 @@ export function SiteHeader() {
       <header className="sticky top-[env(safe-area-inset-top,0px)] z-30 border-b border-line bg-clay">
         <div className="band" aria-hidden />
         <nav aria-label="Головне меню" className="mx-auto flex max-w-[1200px] items-center gap-4 px-4 py-3 sm:px-5">
-          <Link href="/" className="font-display text-xl font-bold whitespace-nowrap text-cobalt no-underline hover:text-cobalt" aria-label="Глина — на головну">
-            глина<span className="text-terra">.</span>юа
+          <Link href="/" className="grid leading-none whitespace-nowrap no-underline" aria-label="Глина, hlyna.com.ua — на головну">
+            <span className="font-display text-xl font-bold text-cobalt">глина</span>
+            <span className="mt-1 text-[11px] font-semibold tracking-wide text-umber">hlyna.com.ua</span>
           </Link>
           <MainNav />
         </nav>

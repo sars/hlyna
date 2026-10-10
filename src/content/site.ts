@@ -1,6 +1,6 @@
 // Facts about the site used in metadata, JSON-LD, llms.txt and copy. Keep numbers honest and dated.
 export const site = {
-  name: 'глина.юа',
+  name: 'Глина',
   legalName: 'Глина',
   domain: 'hlyna.com.ua',
   url: process.env.NEXT_PUBLIC_SERVER_URL || 'https://hlyna.com.ua',

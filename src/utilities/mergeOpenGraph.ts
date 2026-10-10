@@ -13,8 +13,8 @@ const defaultOpenGraph: Metadata['openGraph'] = {
     },
   ],
   locale: 'uk_UA',
-  siteName: 'глина.юа',
-  title: 'глина.юа — українська кераміка ручної роботи',
+  siteName: 'Глина · hlyna.com.ua',
+  title: 'Глина — українська кераміка ручної роботи',
 }
 
 export const mergeOpenGraph = (og?: Metadata['openGraph']): Metadata['openGraph'] => {

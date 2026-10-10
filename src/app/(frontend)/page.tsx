@@ -15,7 +15,7 @@ import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses, plural
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: { absolute: 'Українська кераміка ручної роботи для бізнесу і для себе — глина.юа' },
+  title: { absolute: 'Українська кераміка ручної роботи для бізнесу і для себе — Глина' },
   description:
     'Посуд і подарунки ручної роботи від українських студій для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови й ціни та надішліть один запит кільком студіям. Майстер-класи з кераміки по всій Україні.',
   alternates: { canonical: '/' },
@@ -160,7 +160,7 @@ export default async function HomePage() {
           <div className="grid gap-2.5 rounded-2xl border border-l-[6px] border-line border-l-ochre bg-cream p-[22px]">
             <p className="m-0 text-[16.5px]"><b>Посуд ручної роботи</b> від українських студій можна замовити і невеликою, і великою партією: мінімальна кількість залежить від студії та виробу. Виготовлення зазвичай займає {site.prices.batchLeadTime}, бо кожна партія проходить сушіння і два випали.</p>
             <p className="m-0 text-[16.5px]"><b>Майстер-клас з гончарства</b> у групі коштує приблизно {site.prices.groupClass}, індивідуальний — {site.prices.privateClass}. Корпоративні формати — {site.prices.corporate}.</p>
-            <p className="m-0 text-[13px] text-umber">Джерело: прайси, сайти і сторіс українських студій, зібрані глина.юа у 2026 році. Ціни для кожної студії — у її профілі.</p>
+            <p className="m-0 text-[13px] text-umber">Джерело: прайси, сайти і сторіс українських студій, зібрані «Глиною» у 2026 році. Ціни для кожної студії — у її профілі.</p>
           </div>
           <dl className="m-0 grid grid-cols-2 gap-3">
             {[[nf(s.makers), `${pluralUk(s.makers, ['студія, майстер чи бренд', 'студії, майстри й бренди', 'студій, майстрів і брендів'])} у каталозі`], [String(s.masterClassPlaces), `${pluralUk(s.masterClassPlaces, ['місце', 'місця', 'місць'])} з майстер-класами`], [String(s.cities), pluralUk(s.cities, ['місто чи село', 'міста й села', 'міст і сіл'])], [String(s.withPrices), `${pluralUk(s.withPrices, ['профіль', 'профілі', 'профілів'])} з цінами з прайсу`]].map(([n, l]) => (
