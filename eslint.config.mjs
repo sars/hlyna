@@ -1,16 +1,34 @@
-import { dirname } from 'path'
-import { fileURLToPath } from 'url'
-import { FlatCompat } from '@eslint/eslintrc'
+import nextCoreWebVitals from 'eslint-config-next/core-web-vitals'
+import nextTypescript from 'eslint-config-next/typescript'
 
-const __filename = fileURLToPath(import.meta.url)
-const __dirname = dirname(__filename)
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-})
+// Next 16 ships native flat configs; FlatCompat on top of them crashes with
+// "Converting circular structure to JSON".
+// The react-hooks plugin object as registered by eslint-config-next (not hoisted by pnpm).
+const reactHooks = nextCoreWebVitals.find((c) => c.plugins?.['react-hooks'])?.plugins['react-hooks']
 
 const eslintConfig = [
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
+  {
+    ignores: [
+      '.next/',
+      'node_modules/',
+      'public/',
+      'src/payload-types.ts',
+      'src/payload-generated-schema.ts',
+      'src/migrations/',
+      'src/app/(payload)/admin/importMap.js',
+      'next-env.d.ts',
+    ],
+  },
+  ...nextCoreWebVitals,
+  ...nextTypescript,
+  {
+    plugins: { 'react-hooks': reactHooks },
+    rules: {
+      // React Compiler advisories (eslint-plugin-react-hooks 7): hints, not bugs, for now.
+      'react-hooks/set-state-in-effect': 'warn',
+      'react-hooks/refs': 'warn',
+    },
+  },
   {
     rules: {
       '@typescript-eslint/ban-ts-comment': 'warn',
@@ -29,9 +47,6 @@ const eslintConfig = [
         },
       ],
     },
-  },
-  {
-    ignores: ['.next/', 'src/payload-types.ts', 'src/payload-generated-schema.ts'],
   },
 ]
 
