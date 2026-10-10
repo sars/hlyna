@@ -41,7 +41,7 @@ export function flags(s: StudioCard): MapFilter[] {
 }
 
 export async function mapStudios() {
-  const all = (await getAllStudios()).filter((s) => s.type !== 'supplier')
+  const all = (await getAllStudios()).filter((s) => s.type !== 'supplier' && s.status !== 'closed')
   const placed = all.filter((s) => typeof s.geo?.lat === 'number' && typeof s.geo?.lng === 'number')
   return { all, placed }
 }
