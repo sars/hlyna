@@ -3,12 +3,13 @@ import { getServerSideSitemap } from 'next-sitemap'
 import { site } from '@/content/site'
 import { topicList } from '@/content/topics'
 import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses } from '@/lib/catalog'
+import { makerCities } from '@/lib/makers'
 import { certificateCities } from '@/lib/topics'
 
-// Every public catalogue page: hubs, topic pages, master-class and certificate cities, studio profiles.
+// Every public catalogue page: hubs, topic and product pages, master-class, certificate and maker cities, studio profiles.
 export const revalidate = 3600
 
-const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/dlya-biznesu', '/dlya-biznesu/posud-dlya-restoraniv', '/llms.txt']
+const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/vyrobnyky/misto', '/vyrobnyky/vyrib', '/dlya-biznesu', '/tsiny-2026', '/llms.txt']
 
 export async function GET() {
   const studios = await getAllStudios()
@@ -19,6 +20,7 @@ export async function GET() {
     ...topicList.map((t) => ({ loc: site.url + t.path, lastmod: now })),
     ...(await certificateCities()).map((c) => ({ loc: `${site.url}/sertyfikaty/${c.slug}`, lastmod: now })),
     ...cities.map((g) => ({ loc: `${site.url}/maister-klasy/${g.city.slug}`, lastmod: now })),
+    ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: now })),
     ...studios.map((s) => ({ loc: `${site.url}/vyrobnyky/${s.slug}`, lastmod: s.updatedAt || now })),
   ])
 }

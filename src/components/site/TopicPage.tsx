@@ -93,7 +93,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: title, numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, item: listItem(s) })) }} />
 
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]">
+      <div className={`grid grid-cols-1 items-start gap-8 ${topic.photo ? 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]' : ''}`}>
         <div className="grid grid-cols-1 gap-4">
           <Breadcrumbs items={[...topic.parents, ...extraParents, { label: crumb ?? topic.crumb }]} />
           <span className="kicker">{topic.kicker}</span>
@@ -101,12 +101,12 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
           <p className="m-0 max-w-[70ch] text-lg">{topic.lead(ctx)}</p>
           <Updated />
         </div>
-        <DocPhoto photo={topic.photo} priority />
+        {topic.photo && <DocPhoto photo={topic.photo} priority />}
       </div>
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
         <div className="grid grid-cols-1 gap-10">
-          <Epigraph lines={topic.verse} />
+          {topic.verse.length > 0 && <Epigraph lines={topic.verse} />}
 
           {topic.sections.map((sec, k) => (
             <section key={sec.title} aria-labelledby={`sec${k}`}>
@@ -193,6 +193,14 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [] }: { topic
         <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24">
           {topic.form ? (
             <RequestForm sourcePage={topic.path} defaultWhat={topic.form} defaultCity={ctx.place} />
+          ) : topic.section === 'makers' ? (
+            <div className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]">
+              <p className="font-display m-0 text-sm tracking-wide uppercase">Купити або замовити</p>
+              <p className="m-0 text-[15px]">Більшість майстрів продають через Instagram, власний сайт чи Etsy — посилання в профілях. Для партії під заклад чи компанію надішліть один запит кільком студіям.</p>
+              <Link href="/vyrobnyky/vyrib" className="font-bold">Усі вироби →</Link>
+              <Link href="/vyrobnyky/misto" className="font-bold">Виробники за містами →</Link>
+              <Link href={REQUEST_HREF} className="font-bold">Надіслати запит →</Link>
+            </div>
           ) : (
             <div className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]">
               <p className="font-display m-0 text-sm tracking-wide uppercase">Подарувати або піти командою</p>

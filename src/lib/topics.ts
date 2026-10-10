@@ -16,9 +16,9 @@ const rank = (s: StudioCard) => (s.prices?.length ? 2 : 0) + (s.instagram ? 1 : 
 // and certificate pages a real place to take a class (offersMasterClasses), not an artist who paints.
 const eligible = (topic: Topic, l: Topic['lists'][number], s: StudioCard) =>
   (!l.types || l.types.includes(s.type ?? '')) &&
-  l.formats.some((f) => hasFormat(s, f)) &&
+  (l.match ? l.match(s) : l.formats.some((f) => hasFormat(s, f))) &&
   (!l.filter || l.filter(s)) &&
-  (topic.section === 'biz' || offersMasterClasses(s))
+  (topic.section === 'mk' || topic.section === 'cert' ? offersMasterClasses(s) : true)
 
 export async function topicData(topic: Topic, citySlug?: string): Promise<TopicData> {
   const studios = (await getAllStudios()).filter((s) => !citySlug || s.cityDoc?.slug === citySlug)
@@ -78,7 +78,7 @@ export function topicMetadata(topic: Topic, data: TopicData, over: { title?: str
         title: over.h1 ?? topic.h1,
         kicker: topic.kicker,
         sub: ctx.min && ctx.max ? `${ctx.n} ${pluralUk(ctx.n, ['місце', 'місця', 'місць'])} · від ${fmt(ctx.min)} грн` : undefined,
-        ...(over.coa ? { coa: over.coa, pattern: over.coa } : { img: topic.ogImg, credit: `Фото: ${topic.photo.author}, ${topic.photo.license}` }),
+        ...(over.coa ? { coa: over.coa, pattern: over.coa } : topic.photo ? { img: topic.ogImg, credit: `Фото: ${topic.photo.author}, ${topic.photo.license}` } : { pattern: topic.ogImg }),
       }),
     },
   }

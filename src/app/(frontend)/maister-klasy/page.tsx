@@ -36,7 +36,7 @@ export default async function MasterClassesIndex() {
         <SectionHead title="Формати" id="formats" />
         <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
           {topicList
-            .filter((t) => t.section !== 'biz')
+            .filter((t) => t.section === 'mk' || t.section === 'cert')
             .map((t) => (
               <li key={t.path}>
                 <Link href={t.path} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">

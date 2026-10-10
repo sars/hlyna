@@ -16,6 +16,9 @@ export const docPhotos = {
   // Temporary CC0 stock (Unsplash via Wikimedia Commons, public/images/stock) where no documentary photo fits.
   tealMug: { src: '/images/stock/teal-mug.jpg', width: 960, height: 653, alt: 'Керамічна чашка ручної роботи з бірюзовою поливою', author: 'Unsplash', license: 'CC0', href: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'Wikimedia Commons' },
   wheelTop: { src: '/images/stock/wheel-top.jpg', width: 960, height: 640, alt: 'Руки формують миску на гончарному колі, вигляд згори', author: 'Unsplash', license: 'CC0', href: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'Wikimedia Commons' },
+  restaurantTable: { src: '/images/stock/restaurant-table.jpg', width: 960, height: 640, alt: 'Керамічні тарілки і піала на сервірованому столі', author: 'Unsplash', license: 'CC0', href: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'Wikimedia Commons' },
+  glazedBottles: { src: '/images/stock/glazed-bottles.jpg', width: 960, height: 640, alt: 'Керамічні пляшки й вази з матовою поливою', author: 'Unsplash', license: 'CC0', href: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'Wikimedia Commons' },
+  terracotta: { src: '/images/stock/terracotta.jpg', width: 960, height: 640, alt: 'Теракотові горщики, глечики й миски на полицях майстерні', author: 'Unsplash', license: 'CC0', href: 'https://creativecommons.org/publicdomain/zero/1.0/', source: 'Wikimedia Commons' },
 } satisfies Record<string, DocPhoto>
 
 export type DocPhotoKey = keyof typeof docPhotos

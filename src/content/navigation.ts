@@ -19,9 +19,7 @@ export const REQUEST_HREF = '/zapyt'
 export const STUDIO_JOIN_HREF = '/zapyt?vid=studiya'
 
 const PLANNED = [
-  '/tsiny-2026', '/hayidy', '/keisy', '/mapa', '/dlya-studiy', '/yak-tse-pratsyuye', '/pro-nas',
-  '/vyrobnyky/vyrib', '/vyrobnyky/misto', '/dobirky',
-  '/dlya-biznesu/posud-dlya-kavyaren', '/dlya-biznesu/posud-dlya-hoteliv', '/dlya-biznesu/korporatyvni-podarunky',
+  '/hayidy', '/keisy', '/mapa', '/dlya-studiy', '/yak-tse-pratsyuye', '/pro-nas', '/dobirky',
 ]
 export const isBuilt = (href: string) => !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?'))
 const liveLinks = (links: NavLink[]) => links.filter((l) => isBuilt(l.href))
@@ -54,7 +52,7 @@ const mainNavPlan: NavSection[] = [
       {
         title: 'Корисне',
         links: [
-          { label: 'Ціни на партії', href: '/tsiny-2026/partiyi', note: 'Як ціна залежить від кількості' },
+          { label: 'Ціни 2026', href: '/tsiny-2026', note: 'Майстер-класи, корпоративи, посуд — медіани за прайсами студій' },
           { label: 'Як замовити партію кераміки', href: '/hayidy/yak-zamovyty-partiyu', note: 'Терміни, зразки, оплата, доставка' },
           { label: 'Харчова безпечність і посудомийка', href: '/hayidy/kharchova-bezpechnist', note: 'Що питати в студії' },
           { label: 'Кейси', href: '/keisy', note: 'Хто для кого робив посуд' },
@@ -165,24 +163,24 @@ const mainNavPlan: NavSection[] = [
       {
         title: 'Для бізнесу',
         links: [
-          { label: 'Партії посуду', href: '/tsiny-2026/partiyi' },
-          { label: 'Чашки з логотипом', href: '/tsiny-2026/chashky-z-lohotypom' },
-          { label: 'Корпоративи', href: '/tsiny-2026/korporatyvy' },
+          { label: 'Корпоративи з особи', href: '/tsiny-2026#corporate' },
+          { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom#prices' },
+          { label: 'Посуд для ресторанів', href: '/dlya-biznesu/posud-dlya-restoraniv#prices' },
         ],
       },
       {
         title: 'Для себе',
         links: [
-          { label: 'Майстер-класи за містами', href: '/tsiny-2026/maister-klasy' },
-          { label: 'Сертифікати', href: '/tsiny-2026/sertyfikaty' },
-          { label: 'Кераміка ручної роботи в роздріб', href: '/tsiny-2026/rozdrib' },
+          { label: 'Майстер-класи за містами', href: '/tsiny-2026#maister-klasy' },
+          { label: 'Сертифікати', href: '/tsiny-2026#cert' },
+          { label: 'Чашки й посуд у роздріб', href: '/tsiny-2026#cup' },
         ],
       },
     ],
     promo: {
       title: 'Як ми рахуємо',
-      text: 'Ціни беремо з сайтів, прайсів і сторіс студій та оновлюємо щосезону. Дата вказана на кожній сторінці.',
-      cta: { label: 'Методологія', href: '/pro-nas/metodolohiya' },
+      text: 'Ціни беремо з опублікованих прайсів студій, рахуємо медіану й типовий діапазон і оновлюємо щосезону.',
+      cta: { label: 'Методологія', href: '/tsiny-2026#metodolohiya' },
     },
   },
 ]
@@ -216,7 +214,10 @@ export const footerColumns: NavColumn[] = [
     title: 'Для бізнесу',
     links: [
       { label: 'Посуд для ресторанів', href: '/dlya-biznesu/posud-dlya-restoraniv' },
+      { label: 'Посуд для кав’ярень', href: '/dlya-biznesu/posud-dlya-kavyaren' },
+      { label: 'Посуд для готелів', href: '/dlya-biznesu/posud-dlya-hoteliv' },
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
+      { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
       { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Надіслати запит', href: REQUEST_HREF },
@@ -250,6 +251,9 @@ export const footerColumns: NavColumn[] = [
     title: 'Каталог',
     links: [
       { label: 'Усі студії й майстри', href: '/vyrobnyky' },
+      { label: 'За містами', href: '/vyrobnyky/misto' },
+      { label: 'За виробами', href: '/vyrobnyky/vyrib' },
+      { label: 'Ціни 2026', href: '/tsiny-2026' },
       { label: 'Для бізнесу', href: '/dlya-biznesu' },
       { label: 'Майстер-класи', href: '/maister-klasy' },
       { label: 'Для LLM: llms.txt', href: '/llms.txt' },
