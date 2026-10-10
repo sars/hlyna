@@ -13,6 +13,8 @@
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
     "import:studios": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/import-studios.ts",
+    "import:studios:prune": "cross-env NODE_OPTIONS=--no-deprecation PRUNE=1 payload run scripts/import-studios.ts",
+    "find:duplicates": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/find-duplicates.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",

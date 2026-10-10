@@ -32,7 +32,7 @@ Next.js 16 (App Router) + Payload 3 (admin at `/admin`, Postgres) + Tailwind 4 w
 ## Commands
 - `pnpm dev` — site on http://localhost:3000, admin on /admin (local Postgres `hlyna`).
 - `pnpm shots /path` — screenshots to `.shots/` (dev server must run). Look once per finished screen.
-- `pnpm import:studios` — import/refresh studios from `../UkraineCeramics/_master/all_entries.jsonl`.
+- `pnpm import:studios` — import/refresh studios from `../UkraineCeramics/_master/all_entries.jsonl` (unchanged ones are skipped). `pnpm import:studios:prune` also deletes studios gone from the data that nobody enriched. `pnpm find:duplicates` lists likely duplicates; record them in `../UkraineCeramics/_ops/name_aliases.tsv`, run `python3 _ops/merge.py` there, then prune.
 - `pnpm generate:types` after collection changes; `pnpm exec tsc --noEmit` before finishing (the Stop hook runs it).
 - `pnpm build` — production build (needs the database reachable).
 
