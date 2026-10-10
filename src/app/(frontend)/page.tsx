@@ -7,6 +7,8 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
+import { verses } from '@/content/verses'
+import { Epigraph } from '@/components/site/Bits'
 import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses, pluralUk } from '@/lib/catalog'
 
 export const revalidate = 86400
@@ -86,6 +88,7 @@ export default async function HomePage() {
             <Link href={REQUEST_HREF} className="rounded-full bg-terra px-[22px] py-[13px] font-bold text-cream no-underline hover:bg-terra-dark hover:text-cream">Отримати пропозиції</Link>
             <Link href="/maister-klasy" className="rounded-full border-2 border-ink px-[22px] py-[11px] font-bold text-ink no-underline hover:bg-ink hover:text-cream">Знайти майстер-клас</Link>
           </div>
+          <Epigraph lines={verses.home} />
           <dl className="m-0 flex flex-wrap gap-x-6 gap-y-2 text-sm text-umber">
             <div><dt className="font-display text-xl text-cobalt">{nf(s.makers)}</dt><dd className="m-0">{pluralUk(s.makers, ['студія, майстер чи бренд', 'студії, майстри й бренди', 'студій, майстрів і брендів'])}</dd></div>
             <div><dt className="font-display text-xl text-cobalt">{s.cities}</dt><dd className="m-0">{pluralUk(s.cities, ['місто чи село', 'міста й села', 'міст і сіл'])}</dd></div>

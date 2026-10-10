@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, Updated } from '@/components/site/Bits'
+import { Breadcrumbs, container, Epigraph, Updated } from '@/components/site/Bits'
+import { verses } from '@/content/verses'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { mainNav } from '@/content/navigation'
 import { site } from '@/content/site'
@@ -25,6 +26,7 @@ export default function BusinessIndex() {
             Українські студії роблять посуд для ресторанів, кав’ярень і готелів, чашки з логотипом і подарунки для команд, а також проводять корпоративи з ліплення з глини. Партію зазвичай виготовляють {site.prices.batchLeadTime}; корпоратив коштує {site.prices.corporate}. {site.model}
           </p>
           <Updated />
+          <Epigraph lines={verses.business} />
         </div>
         {biz.columns.map((c) => (
           <section key={c.title} className="grid gap-3">

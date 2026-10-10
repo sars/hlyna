@@ -12,8 +12,9 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 - **LLM-ready:** first 2–3 sentences are plain facts with numbers and a date; then a table; then details; then FAQ. schema.org JSON-LD (`src/components/site/JsonLd.tsx`), clean headings, «Оновлено» date. No thin pages: list pages need ≥3 real entries.
 - **Honest:** only collected data; never invent studios, prices, cases, reviews. Say the model openly but briefly (`site.model` in `src/content/site.ts`). Don't publish the legal entity.
 - **Flexible wording:** no site-wide «від 30 штук»; minimum order lives in profiles. «Корпоратив з ліплення з глини».
-- **Voice:** see `docs/voice/README.md` (warm master + potters' vocabulary + Kotsiubynsky-style imagery after the factual lead).
+- **Voice:** `docs/voice/README.md` — factual lead, then at most one short verse epigraph (`Epigraph`, `src/content/verses.ts`), then warm, clear potters' prose. Never explain the verse.
 - **Language:** Ukrainian only; English later via Payload localization and `/en` routes; never Russian.
+- **Scope:** studio-scale ceramics made in Ukraine. Makers who now work abroad, suppliers, factories, media, course platforms and gift-certificate aggregators stay as drafts.
 - **Photos:** only with the maker's consent; stock photos (`public/images/stock`, CC0) only for site chrome.
 - **Mobile first and fast:** server components by default, client components only for interaction, `next/image`, fonts self-hosted by `next/font`.
 - **No paid services** without the owner's explicit approval.

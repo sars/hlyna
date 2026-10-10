@@ -3,11 +3,12 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, LyricNote, SectionHead, Updated } from '@/components/site/Bits'
+import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
+import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, igHandle, pluralUk, TYPE_LABEL, worksWithVenues } from '@/lib/catalog'
 
 export const revalidate = 86400
@@ -60,10 +61,7 @@ export default async function HorecaTablewarePage() {
 
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
         <div className="grid gap-10">
-          <LyricNote
-            image="У поливі, як у глибокій воді, ховається світло вашої лампи, а теплий край тарілки ще пам’ятає руки майстра."
-            prose="такий посуд робить подачу вашою, а студії нижче вже працюють із закладами."
-          />
+          <Epigraph lines={verses.horeca} />
 
           <section aria-labelledby="check">
             <SectionHead kicker="Перед замовленням" title="Що перевірити у студії" id="check" />

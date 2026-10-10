@@ -36,16 +36,21 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
   )
 }
 
-// The site's signature device: one Kotsiubynsky-style image, then a wink and the plain point.
-// Max one or two per page, never in the factual lead, tables, prices or FAQ (docs/voice).
-export function LyricNote({ image, prose }: { image: string; prose: string }) {
+// The site's signature device: a short verse epigraph in the spirit of Kotsiubynsky, set apart from the prose.
+// One per page at most, never in the factual lead, tables, prices or FAQ, and never explained (docs/voice).
+export function Epigraph({ lines }: { lines: string[] }) {
   return (
-    <aside className="relative rounded-2xl border border-line bg-cream py-3.5 pr-4 pl-6 before:absolute before:top-3 before:bottom-3 before:left-0 before:w-1.5 before:rounded-md before:bg-[repeating-linear-gradient(180deg,var(--color-terra)_0_10px,var(--color-cobalt)_10px_20px,var(--color-ochre)_20px_30px)]">
-      <span className="font-display text-[10.5px] tracking-[.14em] text-terra uppercase">ліричний відступ</span>
-      <p className="mt-1.5 mb-0 text-[16.5px]">
-        <i className="text-[#4a3628]">{image}</i> <b className="text-cobalt">Прозою:</b> {prose}
+    <figure className="m-0 border-l-[3px] border-ochre py-1.5 pl-[22px]">
+      <p className="m-0 text-[19px] leading-[1.55] text-[#5a3f2c] italic">
+        {lines.map((l, i) => (
+          <React.Fragment key={i}>
+            {i > 0 && <br />}
+            {l}
+          </React.Fragment>
+        ))}
       </p>
-    </aside>
+      <span aria-hidden className="mt-3 block h-2 w-14 bg-[repeating-linear-gradient(90deg,var(--color-terra)_0_12px,transparent_12px_16px,var(--color-cobalt)_16px_28px,transparent_28px_32px,var(--color-ochre)_32px_44px)]" />
+    </figure>
   )
 }
 

@@ -3,11 +3,12 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { Breadcrumbs, container, LyricNote, SectionHead, Updated } from '@/components/site/Bits'
+import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
+import { pickVerse } from '@/content/verses'
 import { fmt, getAllStudios, groupByCity, hryvniaAmounts, igHandle, MIN_LIST, offersMasterClasses, pluralUk, range, TYPE_LABEL } from '@/lib/catalog'
 
 export const revalidate = 86400
@@ -86,10 +87,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
 
       <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
         <div className="grid gap-10">
-          <LyricNote
-            image="Коло крутиться, і грудка глини то тікає з-під долонь, то слухняно тягнеться вгору, тепла, як хліб."
-            prose="за дві години у вас буде перша миска, а через 2–4 тижні, після двох випалів, ви заберете її додому."
-          />
+          <Epigraph lines={pickVerse(city.slug as string)} />
 
           <section aria-labelledby="list">
             <SectionHead title={`Студії: ${city.name}`} id="list" />
