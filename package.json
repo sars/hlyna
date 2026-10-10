@@ -12,6 +12,7 @@
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
+    "import:studios": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/import-studios.ts",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
@@ -19,10 +20,12 @@
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "shots": "node scripts/shots.mjs"
   },
   "dependencies": {
     "@payloadcms/admin-bar": "3.90.2",
+    "@payloadcms/db-postgres": "3.90.2",
     "@payloadcms/live-preview-react": "3.90.2",
     "@payloadcms/next": "3.90.2",
     "@payloadcms/plugin-form-builder": "3.90.2",
@@ -31,6 +34,7 @@
     "@payloadcms/plugin-search": "3.90.2",
     "@payloadcms/plugin-seo": "3.90.2",
     "@payloadcms/richtext-lexical": "3.90.2",
+    "@payloadcms/translations": "3.90.2",
     "@payloadcms/ui": "3.90.2",
     "@radix-ui/react-checkbox": "^1.0.4",
     "@radix-ui/react-label": "^2.0.2",
@@ -51,8 +55,7 @@
     "react-dom": "19.2.6",
     "react-hook-form": "7.71.1",
     "sharp": "0.35.4",
-    "tailwind-merge": "^3.4.0",
-    "@payloadcms/db-postgres": "3.90.2"
+    "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.2.0",

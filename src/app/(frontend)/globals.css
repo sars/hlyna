@@ -43,8 +43,22 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
-  --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-geist-sans);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: var(--font-raleway), 'Helvetica Neue', Arial, sans-serif;
+  --font-display: var(--font-unbounded), 'Arial Black', system-ui, sans-serif;
+  /* Brand palette 1A */
+  --color-clay: #f3e7da;
+  --color-sand: #efdcc8;
+  --color-cream: #fffaf4;
+  --color-ink: #2a2018;
+  --color-umber: #6c5243;
+  --color-line: #e1c7ae;
+  --color-terra: #b4683f;
+  --color-terra-dark: #97542f;
+  --color-cobalt: #2a4fa8;
+  --color-cobalt-dark: #203d85;
+  --color-ochre: #d9a441;
+  --color-sage: #5f7e6a;
 }
 
 @layer utilities {
@@ -87,81 +101,46 @@
 }
 
 :root {
-  --background: oklch(100% 0 0deg);
-  --foreground: oklch(14.5% 0 0deg);
-  --card: oklch(96.5% 0.005 265deg);
-  --card-foreground: oklch(14.5% 0 0deg);
-  --popover: oklch(100% 0 0deg);
-  --popover-foreground: oklch(14.5% 0 0deg);
-  --primary: oklch(20.5% 0 0deg);
-  --primary-foreground: oklch(98.5% 0 0deg);
-  --secondary: oklch(97% 0 0deg);
-  --secondary-foreground: oklch(20.5% 0 0deg);
-  --muted: oklch(97% 0 0deg);
-  --muted-foreground: oklch(55.6% 0 0deg);
-  --accent: oklch(97% 0 0deg);
-  --accent-foreground: oklch(20.5% 0 0deg);
-  --destructive: oklch(57.7% 0.245 27.325deg);
-  --destructive-foreground: oklch(57.7% 0.245 27.325deg);
-  --border: oklch(92.2% 0 0deg);
-  --input: oklch(92.2% 0 0deg);
-  --ring: oklch(70.8% 0 0deg);
-  --chart-1: oklch(64.6% 0.222 41.116deg);
-  --chart-2: oklch(60% 0.118 184.704deg);
-  --chart-3: oklch(39.8% 0.07 227.392deg);
-  --chart-4: oklch(82.8% 0.189 84.429deg);
-  --chart-5: oklch(76.9% 0.188 70.08deg);
-  --radius: 0.625rem;
-  --sidebar: oklch(98.5% 0 0deg);
-  --sidebar-foreground: oklch(14.5% 0 0deg);
-  --sidebar-primary: oklch(20.5% 0 0deg);
-  --sidebar-primary-foreground: oklch(98.5% 0 0deg);
-  --sidebar-accent: oklch(97% 0 0deg);
-  --sidebar-accent-foreground: oklch(20.5% 0 0deg);
-  --sidebar-border: oklch(92.2% 0 0deg);
-  --sidebar-ring: oklch(70.8% 0 0deg);
-  --success: oklch(78% 0.08 200deg);
-  --warning: oklch(89% 0.1 75deg);
-  --error: oklch(75% 0.15 25deg);
+  /* Design 1A «Глина і кобальт». Single light look by choice (see AGENTS.md). */
+  --background: #f3e7da;
+  --foreground: #2a2018;
+  --card: #fbf3ea;
+  --card-foreground: #2a2018;
+  --popover: #fbf3ea;
+  --popover-foreground: #2a2018;
+  --primary: #b4683f;
+  --primary-foreground: #fffaf4;
+  --secondary: #efdcc8;
+  --secondary-foreground: #2a2018;
+  --muted: #efdcc8;
+  --muted-foreground: #6c5243;
+  --accent: #efdcc8;
+  --accent-foreground: #2a2018;
+  --destructive: #a63a2a;
+  --destructive-foreground: #fffaf4;
+  --border: #e1c7ae;
+  --input: #e1c7ae;
+  --ring: #2a4fa8;
+  --chart-1: #b4683f;
+  --chart-2: #2a4fa8;
+  --chart-3: #d9a441;
+  --chart-4: #5f7e6a;
+  --chart-5: #6c5243;
+  --radius: 1.25rem;
+  --sidebar: #fbf3ea;
+  --sidebar-foreground: #2a2018;
+  --sidebar-primary: #b4683f;
+  --sidebar-primary-foreground: #fffaf4;
+  --sidebar-accent: #efdcc8;
+  --sidebar-accent-foreground: #2a2018;
+  --sidebar-border: #e1c7ae;
+  --sidebar-ring: #2a4fa8;
+  --success: #5f7e6a;
+  --warning: #d9a441;
+  --error: #a63a2a;
+  color-scheme: light;
 }
 
-[data-theme='dark'] {
-  --background: oklch(14.5% 0 0deg);
-  --foreground: oklch(98.5% 0 0deg);
-  --card: oklch(17% 0 0deg);
-  --card-foreground: oklch(98.5% 0 0deg);
-  --popover: oklch(14.5% 0 0deg);
-  --popover-foreground: oklch(98.5% 0 0deg);
-  --primary: oklch(98.5% 0 0deg);
-  --primary-foreground: oklch(20.5% 0 0deg);
-  --secondary: oklch(26.9% 0 0deg);
-  --secondary-foreground: oklch(98.5% 0 0deg);
-  --muted: oklch(26.9% 0 0deg);
-  --muted-foreground: oklch(70.8% 0 0deg);
-  --accent: oklch(26.9% 0 0deg);
-  --accent-foreground: oklch(98.5% 0 0deg);
-  --destructive: oklch(39.6% 0.141 25.723deg);
-  --destructive-foreground: oklch(63.7% 0.237 25.331deg);
-  --border: oklch(26.9% 0 0deg);
-  --input: oklch(26.9% 0 0deg);
-  --ring: oklch(43.9% 0 0deg);
-  --chart-1: oklch(48.8% 0.243 264.376deg);
-  --chart-2: oklch(69.6% 0.17 162.48deg);
-  --chart-3: oklch(76.9% 0.188 70.08deg);
-  --chart-4: oklch(62.7% 0.265 303.9deg);
-  --chart-5: oklch(64.5% 0.246 16.439deg);
-  --sidebar: oklch(20.5% 0 0deg);
-  --sidebar-foreground: oklch(98.5% 0 0deg);
-  --sidebar-primary: oklch(48.8% 0.243 264.376deg);
-  --sidebar-primary-foreground: oklch(98.5% 0 0deg);
-  --sidebar-accent: oklch(26.9% 0 0deg);
-  --sidebar-accent-foreground: oklch(98.5% 0 0deg);
-  --sidebar-border: oklch(26.9% 0 0deg);
-  --sidebar-ring: oklch(43.9% 0 0deg);
-  --success: oklch(28% 0.1 200deg);
-  --warning: oklch(35% 0.08 70deg);
-  --error: oklch(45% 0.1 25deg);
-}
 
 @theme inline {
   --color-background: var(--background);
@@ -221,4 +200,32 @@ html {
 html[data-theme='dark'],
 html[data-theme='light'] {
   opacity: initial;
+}
+
+@layer base {
+  html { font-variant-numeric: lining-nums; -webkit-text-size-adjust: 100%; }
+  body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); line-height: 1.6; }
+  a { color: var(--color-cobalt); }
+  a:hover { color: var(--color-cobalt-dark); }
+  :focus-visible { outline: 2.5px solid var(--color-cobalt); outline-offset: 2px; border-radius: 6px; }
+}
+
+@utility band {
+  height: 12px;
+  background: repeating-linear-gradient(90deg, var(--color-terra) 0 16px, var(--color-clay) 16px 20px, var(--color-cobalt) 20px 36px, var(--color-clay) 36px 40px, var(--color-ochre) 40px 56px, var(--color-clay) 56px 60px);
+}
+@utility kicker {
+  font-family: var(--font-display);
+  font-size: 11.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--color-terra);
+}
+@utility h-display {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: -.01em;
+  text-wrap: balance;
+  font-weight: 700;
 }

@@ -1,0 +1,10 @@
+[Unit]
+Description=Hlyna nightly backup (Postgres + media)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/hlyna
+Environment=BACKUP_DIR=/var/backups/hlyna
+ExecStart=/opt/hlyna/deploy/backup.sh

@@ -15,7 +15,16 @@ import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
 
+// Pages are rendered on demand when the database is unreachable at build time (Docker build).
 export async function generateStaticParams() {
+  try {
+    return await paramsFromDb()
+  } catch {
+    return []
+  }
+}
+
+async function paramsFromDb() {
   const payload = await getPayload({ config: configPromise })
   const posts = await payload.find({
     collection: 'posts',

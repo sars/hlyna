@@ -67,6 +67,9 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    studios: Studio;
+    cities: City;
+    requests: Request;
     pages: Page;
     posts: Post;
     media: Media;
@@ -89,6 +92,9 @@ export interface Config {
     };
   };
   collectionsSelect: {
+    studios: StudiosSelect<false> | StudiosSelect<true>;
+    cities: CitiesSelect<false> | CitiesSelect<true>;
+    requests: RequestsSelect<false> | RequestsSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -108,7 +114,7 @@ export interface Config {
   db: {
     defaultIDType: number;
   };
-  fallbackLocale: null;
+  fallbackLocale: ('false' | 'none' | 'null') | false | null | 'uk' | 'uk'[];
   globals: {
     header: Header;
     footer: Footer;
@@ -117,7 +123,7 @@ export interface Config {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
   };
-  locale: null;
+  locale: 'uk';
   widgets: {
     collections: CollectionsWidget;
   };
@@ -152,123 +158,124 @@ export interface UserAuthOperations {
   };
 }
 /**
+ * Студії, бренди й майстри. Фільтри списку: місто, тип, згода на запити (consent.requests), робота з HoReCa (b2b.worksWithHoreca).
+ *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
+ * via the `definition` "studios".
  */
-export interface Page {
+export interface Studio {
   id: number;
-  title: string;
-  hero: {
-    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
-    richText?: {
-      root: {
-        type: string;
-        children: {
-          type: any;
-          version: number;
-          [k: string]: unknown;
-        }[];
-        direction: ('ltr' | 'rtl') | null;
-        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-        indent: number;
-        version: number;
-      };
-      [k: string]: unknown;
-    } | null;
-    links?:
+  name: string;
+  type?: ('studio' | 'brand' | 'maker' | 'school' | 'shop' | 'supplier' | 'heritage' | 'other') | null;
+  city?: (number | null) | City;
+  oblast?: string | null;
+  address?: string | null;
+  description?: string | null;
+  services?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  products?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  prices?:
+    | {
+        text: string;
+        source?: string | null;
+        /**
+         * Напр. «жовтень 2026»
+         */
+        date?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  photos?: (number | Media)[] | null;
+  instagram?: string | null;
+  website?: string | null;
+  facebook?: string | null;
+  phone?: string | null;
+  email?: string | null;
+  otherLinks?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  salesChannels?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  b2b?: {
+    minOrder?: string | null;
+    leadTime?: string | null;
+    logoMethods?:
       | {
-          link: {
-            type?: ('reference' | 'custom') | null;
-            newTab?: boolean | null;
-            reference?:
-              | ({
-                  relationTo: 'pages';
-                  value: number | Page;
-                } | null)
-              | ({
-                  relationTo: 'posts';
-                  value: number | Post;
-                } | null);
-            url?: string | null;
-            label: string;
-            /**
-             * Choose how the link should be rendered.
-             */
-            appearance?: ('default' | 'outline') | null;
-          };
+          text: string;
           id?: string | null;
         }[]
       | null;
-    media?: (number | null) | Media;
+    foodSafe?: boolean | null;
+    dishwasherSafe?: boolean | null;
+    worksWithHoreca?: boolean | null;
+    worksWithCorporate?: boolean | null;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
+  activity?: {
+    lastPostDate?: string | null;
+    posts90d?: number | null;
+    followers?: number | null;
+    websiteAlive?: boolean | null;
+    etsySales?: number | null;
+    checkedAt?: string | null;
   };
-  publishedAt?: string | null;
+  consent?: {
+    photos?: boolean | null;
+    requests?: boolean | null;
+    contactedAt?: string | null;
+    notes?: string | null;
+  };
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * Генерується з назви, якщо порожній
    */
-  generateSlug?: boolean | null;
-  slug: string;
+  slug?: string | null;
+  status?: ('active' | 'unclear' | 'closed' | 'relocated') | null;
+  confidence?: ('high' | 'medium' | 'low') | null;
+  sources?:
+    | {
+        url: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Стабільний хеш назви та міста для повторних імпортів
+   */
+  sourceId?: string | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "posts".
+ * via the `definition` "cities".
  */
-export interface Post {
+export interface City {
   id: number;
-  title: string;
-  heroImage?: (number | null) | Media;
-  content: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  };
-  relatedPosts?: (number | Post)[] | null;
-  categories?: (number | Category)[] | null;
-  meta?: {
-    title?: string | null;
-    /**
-     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
-     */
-    image?: (number | null) | Media;
-    description?: string | null;
-  };
-  publishedAt?: string | null;
-  authors?: (number | User)[] | null;
-  populatedAuthors?:
-    | {
-        id?: string | null;
-        name?: string | null;
-      }[]
-    | null;
+  name: string;
   /**
-   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   * Генерується з назви, якщо порожній (транслітерація за правилами 2010 р.)
    */
-  generateSlug?: boolean | null;
-  slug: string;
+  slug?: string | null;
+  oblast?: string | null;
+  population?: number | null;
+  isOver100k?: boolean | null;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -388,6 +395,154 @@ export interface FolderInterface {
   folderType?: 'media'[] | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "requests".
+ */
+export interface Request {
+  id: number;
+  what: 'tableware' | 'logo-mugs' | 'corporate-gifts' | 'corporate-workshop' | 'master-class' | 'other';
+  details?: string | null;
+  quantity?: string | null;
+  deadline?: string | null;
+  budgetPerItem?: string | null;
+  city?: string | null;
+  logo?: boolean | null;
+  contactName?: string | null;
+  contactPhoneOrTelegram?: string | null;
+  contactEmail?: string | null;
+  sourcePage?: string | null;
+  website2?: string | null;
+  status: 'new' | 'forwarded' | 'replied' | 'deal' | 'lost';
+  studiosSent?: (number | Studio)[] | null;
+  dealAmount?: number | null;
+  /**
+   * Рахується автоматично: 5% від суми угоди
+   */
+  commission5?: number | null;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  hero: {
+    type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
+    richText?: {
+      root: {
+        type: string;
+        children: {
+          type: any;
+          version: number;
+          [k: string]: unknown;
+        }[];
+        direction: ('ltr' | 'rtl') | null;
+        format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+        indent: number;
+        version: number;
+      };
+      [k: string]: unknown;
+    } | null;
+    links?:
+      | {
+          link: {
+            type?: ('reference' | 'custom') | null;
+            newTab?: boolean | null;
+            reference?:
+              | ({
+                  relationTo: 'pages';
+                  value: number | Page;
+                } | null)
+              | ({
+                  relationTo: 'posts';
+                  value: number | Post;
+                } | null);
+            url?: string | null;
+            label: string;
+            /**
+             * Choose how the link should be rendered.
+             */
+            appearance?: ('default' | 'outline') | null;
+          };
+          id?: string | null;
+        }[]
+      | null;
+    media?: (number | null) | Media;
+  };
+  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "posts".
+ */
+export interface Post {
+  id: number;
+  title: string;
+  heroImage?: (number | null) | Media;
+  content: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  publishedAt?: string | null;
+  authors?: (number | User)[] | null;
+  populatedAuthors?:
+    | {
+        id?: string | null;
+        name?: string | null;
+      }[]
+    | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -964,6 +1119,18 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
+        relationTo: 'studios';
+        value: number | Studio;
+      } | null)
+    | ({
+        relationTo: 'cities';
+        value: number | City;
+      } | null)
+    | ({
+        relationTo: 'requests';
+        value: number | Request;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1044,6 +1211,141 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "studios_select".
+ */
+export interface StudiosSelect<T extends boolean = true> {
+  name?: T;
+  type?: T;
+  city?: T;
+  oblast?: T;
+  address?: T;
+  description?: T;
+  services?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  products?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  prices?:
+    | T
+    | {
+        text?: T;
+        source?: T;
+        date?: T;
+        id?: T;
+      };
+  photos?: T;
+  instagram?: T;
+  website?: T;
+  facebook?: T;
+  phone?: T;
+  email?: T;
+  otherLinks?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  salesChannels?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  b2b?:
+    | T
+    | {
+        minOrder?: T;
+        leadTime?: T;
+        logoMethods?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        foodSafe?: T;
+        dishwasherSafe?: T;
+        worksWithHoreca?: T;
+        worksWithCorporate?: T;
+      };
+  activity?:
+    | T
+    | {
+        lastPostDate?: T;
+        posts90d?: T;
+        followers?: T;
+        websiteAlive?: T;
+        etsySales?: T;
+        checkedAt?: T;
+      };
+  consent?:
+    | T
+    | {
+        photos?: T;
+        requests?: T;
+        contactedAt?: T;
+        notes?: T;
+      };
+  slug?: T;
+  status?: T;
+  confidence?: T;
+  sources?:
+    | T
+    | {
+        url?: T;
+        id?: T;
+      };
+  sourceId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "cities_select".
+ */
+export interface CitiesSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  oblast?: T;
+  population?: T;
+  isOver100k?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "requests_select".
+ */
+export interface RequestsSelect<T extends boolean = true> {
+  what?: T;
+  details?: T;
+  quantity?: T;
+  deadline?: T;
+  budgetPerItem?: T;
+  city?: T;
+  logo?: T;
+  contactName?: T;
+  contactPhoneOrTelegram?: T;
+  contactEmail?: T;
+  sourcePage?: T;
+  website2?: T;
+  status?: T;
+  studiosSent?: T;
+  dealAmount?: T;
+  commission5?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

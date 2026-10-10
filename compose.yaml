@@ -1,0 +1,89 @@
+# Production: app + Postgres + Caddy (HTTPS) on one VPS.
+#   docker compose up -d --build
+# Secrets live in .env next to this file (see .env.example and deploy/README.md).
+
+name: hlyna
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://hlyna.com.ua}
+    image: hlyna-app:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      NODE_ENV: production
+      # The app reaches the db over the private compose network; this wins over
+      # any DATABASE_URL in .env (that one is for local dev).
+      DATABASE_URL: postgres://hlyna:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD missing in .env}@db:5432/hlyna
+    volumes:
+      - media:/app/public/media
+    depends_on:
+      db:
+        condition: service_healthy
+    # node fetch, not wget/curl: nothing extra in the image. Switch to
+    # /api/health once that route exists.
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:3000/health').then((r) => process.exit(r.status < 500 ? 0 : 1)).catch(() => process.exit(1))"
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 1536M
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: hlyna
+      POSTGRES_DB: hlyna
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD missing in .env}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    # No `ports:` on purpose: Docker-published ports bypass ufw. Reach the db
+    # with `docker compose exec db psql -U hlyna` or an SSH tunnel.
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U hlyna -d hlyna']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    logging: *logging
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+      - '443:443/udp'
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates. Losing this means re-issuing from Let's Encrypt (rate-limited).
+      - caddy_data:/data
+      - caddy_config:/config
+    # service_started: Caddy keeps answering while the app restarts.
+    depends_on:
+      app:
+        condition: service_started
+    logging: *logging
+
+volumes:
+  pgdata: # the database; backed up by deploy/backup.sh
+  media: # Payload uploads; backed up by deploy/backup.sh
+  caddy_data:
+  caddy_config:

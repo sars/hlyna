@@ -4,10 +4,16 @@ import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
+import { en } from '@payloadcms/translations/languages/en'
+import { uk } from '@payloadcms/translations/languages/uk'
+
 import { Categories } from './collections/Categories'
+import { Cities } from './collections/Cities'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
+import { Requests } from './collections/Requests'
+import { Studios } from './collections/Studios'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
@@ -62,7 +68,17 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URL || '',
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users],
+  collections: [Studios, Cities, Requests, Pages, Posts, Media, Categories, Users],
+  i18n: {
+    fallbackLanguage: 'uk',
+    supportedLanguages: { uk, en },
+  },
+  // Ukrainian only for now; add { code: 'en', label: 'English' } later to enable English content.
+  localization: {
+    locales: [{ code: 'uk', label: 'Українська' }],
+    defaultLocale: 'uk',
+    fallback: true,
+  },
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer],
   plugins,

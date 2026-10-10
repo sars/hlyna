@@ -1,7 +1,6 @@
-# Claude Code
+@AGENTS.md
 
-This project uses the Payload CMS skill at `.claude/skills/payload/`.
-Start with `.claude/skills/payload/SKILL.md` for a quick reference, then see `.claude/skills/payload/reference/` for detailed docs.
+Payload CMS reference: `.claude/skills/payload/SKILL.md` (details in `.claude/skills/payload/reference/`).
 
 <!-- BEGIN:nextjs-agent-rules -->
 
