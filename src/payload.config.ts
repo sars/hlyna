@@ -20,6 +20,7 @@ import { Header } from './Header/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -67,6 +68,10 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
+    // Dev: schema is pushed automatically (push defaults to true outside production).
+    // Production: pending migrations from src/migrations run on server start.
+    // After changing collections: `pnpm payload migrate:create <name>` and commit the files.
+    prodMigrations: migrations,
   }),
   collections: [Studios, Cities, Requests, Pages, Posts, Media, Categories, Users],
   i18n: {

@@ -75,6 +75,13 @@ cd /opt/hlyna && deploy/release.sh    # git pull + build + up -d + health check
 ```
 Same thing by hand: `git pull && docker compose up -d --build`.
 
+## Database migrations
+- **Production runs them automatically.** `prodMigrations` in `src/payload.config.ts` applies every pending migration from `src/migrations/` when the app starts (`NODE_ENV=production`). Applied ones are tracked in the `payload_migrations` table, so a restart is a no-op. A fresh database is built entirely by `20261010_140549_initial`.
+- **Dev uses push.** `pnpm dev` syncs the local schema straight from the collections; no migration is needed to try a change.
+- **After changing collections or fields:** run `pnpm payload migrate:create <short_name>` (e.g. `add_studio_tags`), review the generated `src/migrations/<stamp>_<name>.ts`, run `pnpm generate:types`, and commit the `.ts`, `.json` and updated `index.ts` together with the collection change. The next `deploy/release.sh` applies it.
+- **Check a migration before deploying:** `createdb hlyna_migtest && DATABASE_URL=postgresql://localhost:5432/hlyna_migtest pnpm payload migrate && dropdb hlyna_migtest`.
+- Status on the server: `docker compose exec app npx payload migrate:status` (or read `payload_migrations` in psql). Never edit a migration that production has already applied; add a new one.
+
 ## Everyday commands
 ```bash
 docker compose ps
