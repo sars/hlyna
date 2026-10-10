@@ -170,6 +170,11 @@ export interface Studio {
   city?: (number | null) | City;
   oblast?: string | null;
   address?: string | null;
+  summary?: string | null;
+  /**
+   * Показується на сайті. Якщо порожньо — показуємо «Опис (з досліджень)».
+   */
+  publicDescription?: string | null;
   description?: string | null;
   services?:
     | {
@@ -1222,6 +1227,8 @@ export interface StudiosSelect<T extends boolean = true> {
   city?: T;
   oblast?: T;
   address?: T;
+  summary?: T;
+  publicDescription?: T;
   description?: T;
   services?:
     | T

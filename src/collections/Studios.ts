@@ -3,6 +3,7 @@ import type { CollectionConfig } from 'payload'
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
 import { ensureUniqueSlug } from '../hooks/ensureUniqueSlug'
+import { revalidateCatalogAfterChange, revalidateCatalogAfterDelete } from '../hooks/revalidateCatalog'
 
 export const STUDIO_TYPES = [
   { label: 'Студія', value: 'studio' },
@@ -49,6 +50,8 @@ export const Studios: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [ensureUniqueSlug({ collection: 'studios', from: 'name' })],
+    afterChange: [revalidateCatalogAfterChange],
+    afterDelete: [revalidateCatalogAfterDelete],
   },
   fields: [
     {
@@ -83,8 +86,22 @@ export const Studios: CollectionConfig = {
             },
             { name: 'address', label: 'Адреса', type: 'text' },
             {
+              name: 'summary',
+              label: 'Короткий опис для карток і пошуку (до 160 символів)',
+              type: 'text',
+              localized: true,
+              maxLength: 200,
+            },
+            {
+              name: 'publicDescription',
+              label: 'Опис для сайту (голос сайту, лише факти)',
+              type: 'textarea',
+              localized: true,
+              admin: { description: 'Показується на сайті. Якщо порожньо — показуємо «Опис (з досліджень)».' },
+            },
+            {
               name: 'description',
-              label: 'Опис',
+              label: 'Опис (з досліджень, внутрішній)',
               type: 'textarea',
               localized: true,
             },

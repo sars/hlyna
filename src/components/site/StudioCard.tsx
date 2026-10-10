@@ -5,7 +5,7 @@ import { TYPE_LABEL, type StudioCard as Card } from '@/lib/catalog'
 
 // Text-first card: no photo until the studio gives consent (AGENTS.md → photos).
 export function StudioCard({ s, showCity = true }: { s: Card; showCity?: boolean }) {
-  const first = (s.description ?? '').split(/(?<=[.!?])\s/)[0]
+  const first = s.summary || (s.publicDescription ?? s.description ?? '').split(/(?<=[.!?])\s/)[0]
   return (
     <Link href={`/vyrobnyky/${s.slug}`} className="grid content-start gap-2 rounded-[20px] border border-transparent bg-card p-4 text-ink no-underline hover:border-line hover:text-ink">
       <span className="flex flex-wrap gap-1.5 text-[11.5px] font-bold">

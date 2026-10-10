@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const what = TYPE_LABEL[s.type ?? 'other']?.toLowerCase() ?? 'майстерня'
   return {
     title: `${s.name}${city ? ` — ${what}, ${city}` : ''}`,
-    description: (s.description ?? '').slice(0, 155),
+    description: (s.summary || s.publicDescription || s.description || '').slice(0, 160),
     alternates: { canonical: `/vyrobnyky/${s.slug}` },
   }
 }
@@ -71,7 +71,7 @@ export default async function StudioPage({ params }: Args) {
           '@context': 'https://schema.org',
           '@type': s.type === 'maker' ? 'Person' : 'LocalBusiness',
           name: s.name,
-          description: s.description,
+          description: s.summary || s.publicDescription || s.description,
           url: `${site.url}/vyrobnyky/${s.slug}`,
           ...(city ? { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(s.address ? { streetAddress: s.address } : {}) } } : {}),
           sameAs: [s.instagram, s.website, s.facebook, ...(s.otherLinks ?? []).map((l) => l.url)].filter(Boolean),
@@ -81,7 +81,11 @@ export default async function StudioPage({ params }: Args) {
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city ? [{ label: city.name, href: `/maister-klasy/${city.slug}` }] : []), { label: s.name }]} />
         <span className="kicker">{typeLabel}{city ? ` · ${city.name}` : ''}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{s.name}</h1>
-        <p className="m-0 max-w-[70ch] text-lg">{s.description}</p>
+        <div className="grid max-w-[70ch] gap-3 text-lg">
+          {(s.publicDescription || s.description || '').split(/\n{2,}/).map((para, i) => (
+            <p key={i} className="m-0">{para}</p>
+          ))}
+        </div>
         <div className="flex flex-wrap gap-2 text-[13px] font-bold">
           {mk && <span className="rounded-full bg-sand px-3 py-1 text-umber">майстер-класи</span>}
           {venues && <span className="rounded-full bg-sand px-3 py-1 text-umber">працює із закладами</span>}
