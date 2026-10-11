@@ -5,7 +5,7 @@ import { expect, test } from '@playwright/test'
 const BASE = process.env.BASE_URL || 'http://localhost:3000'
 
 const pages = [
-  { path: '/', h1: /кераміка/iu },
+  { path: '/', h1: /ручної роботи/iu },
   { path: '/dlya-biznesu/chashky-z-lohotypom', h1: /логотип/iu },
   { path: '/maister-klasy/kyiv', h1: /Київ/u },
   { path: '/tsiny-2026', h1: /Ціни/u },
