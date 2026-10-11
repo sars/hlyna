@@ -11,13 +11,14 @@ import Image from 'next/image'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { InstagramPosts } from '@/components/site/InstagramPosts.client'
+import { ProfileMap } from '@/components/site/ProfileMap.client'
 import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
-import { amountsIn, cleanAddress, cleanName, cleanPublic, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
+import { amountsIn, cleanAddress, inCity, cleanName, cleanPublic, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -175,6 +176,13 @@ export default async function StudioPage({ params }: Args) {
     ...(channels.length && !exhibiting ? [['Де продає', channels.join(' · ')] as [string, React.ReactNode]] : []),
   ]
   const street = firstAddress(s.address)
+  const geo = s.geo
+  const precise = geo?.lat != null && geo?.lng != null && (geo.precision === 'address' || geo.precision === 'street')
+  const placeText = [cleanAddress(s.address) || street, city && !(cleanAddress(s.address) || street || '').includes(city.name) ? city.name : '']
+    .filter(Boolean)
+    .join(', ')
+  const routeQuery = encodeURIComponent(placeText.replace(/\s*\([^)]*\)/g, ''))
+  const receivesVisitors = ['studio', 'school', 'shop', 'heritage'].includes(s.type ?? '')
   const photos = await getStudioPhotos(s.id)
 
   return (
@@ -191,6 +199,7 @@ export default async function StudioPage({ params }: Args) {
               ? { homeLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA' } } }
               : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(street ? { streetAddress: street } : {}) } }
             : {}),
+          ...(precise && !isPersonMaker(s) && !dormant ? { geo: { '@type': 'GeoCoordinates', latitude: geo!.lat, longitude: geo!.lng } } : {}),
           ...(altNames.length ? { alternateName: altNames } : {}),
           ...(profileUrls(s).length ? { sameAs: profileUrls(s) } : {}),
           ...(priceRange && s.type !== 'maker' && !dormant ? { priceRange } : {}),
@@ -262,6 +271,26 @@ export default async function StudioPage({ params }: Args) {
               ))}
             </dl>
           </section>
+
+          {precise && !dormant && (
+            <section aria-labelledby="where">
+              <SectionHead title="Де знайти" id="where">
+                <p className="m-0 break-words">{placeText}</p>
+              </SectionHead>
+              <ProfileMap lat={geo!.lat!} lng={geo!.lng!} address={placeText} />
+              <p className="mt-3 mb-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+                <span className="text-umber">Прокласти маршрут:</span>
+                <a href={`https://www.google.com/maps/dir/?api=1&destination=${routeQuery}`} target="_blank" rel="noopener nofollow">Google Maps</a>
+                <a href={`https://maps.apple.com/?daddr=${routeQuery}`} target="_blank" rel="noopener nofollow">Apple Maps</a>
+                {city?.slug && <Link href={`/mapa?misto=${city.slug}&studio=${s.slug}`}>Показати на мапі студій</Link>}
+              </p>
+            </section>
+          )}
+          {!precise && !dormant && receivesVisitors && city && (
+            <p className="m-0 rounded-2xl bg-card px-4 py-3 text-[15px]">
+              Працює {inCity(city.name)} — точну адресу уточнюйте у студії.
+            </p>
+          )}
 
           {(products.length > 0 || services.length > 0) && (
             <section aria-labelledby="offer">

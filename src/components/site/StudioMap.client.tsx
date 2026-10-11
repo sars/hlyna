@@ -118,11 +118,13 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
           const zoom = await (m.getSource('studios') as GeoJSONSource).getClusterExpansionZoom(f.properties.cluster_id as number)
           m.easeTo({ center: (f.geometry as unknown as { coordinates: [number, number] }).coordinates, zoom })
         })
+        const pointHtml = (p: MapProps & { f: unknown }) => {
+          const fs = (typeof p.f === 'string' ? JSON.parse(p.f) : p.f) as MapFilter[]
+          const chips = fs.map((k) => filters.find((x) => x.key === k)?.label).filter(Boolean)
+          return `<div class="map-pop"><b><a href="/vyrobnyky/${esc(p.slug)}">${esc(p.name)}</a></b><div>${esc(p.type)} · ${esc(p.city)}</div>${p.address ? `<div>${esc(p.address)}</div>` : ''}${chips.length ? `<div class="map-chips">${chips.map((c) => `<span>${esc(c!)}</span>`).join('')}</div>` : ''}</div>`
+        }
         m.on('click', 'points', (e) => {
-          const p = e.features![0].properties as unknown as MapProps & { f: string }
-          const chips = (JSON.parse(String(p.f)) as MapFilter[]).map((k) => filters.find((x) => x.key === k)?.label).filter(Boolean)
-          popup((e.features![0].geometry as unknown as { coordinates: [number, number] }).coordinates,
-            `<div class="map-pop"><b><a href="/vyrobnyky/${esc(p.slug)}">${esc(p.name)}</a></b><div>${esc(p.type)} · ${esc(p.city)}</div>${p.address ? `<div>${esc(p.address)}</div>` : ''}${chips.length ? `<div class="map-chips">${chips.map((c) => `<span>${esc(c!)}</span>`).join('')}</div>` : ''}</div>`)
+          popup((e.features![0].geometry as unknown as { coordinates: [number, number] }).coordinates, pointHtml(e.features![0].properties as unknown as MapProps & { f: string }))
         })
         m.on('click', 'towns', (e) => {
           const p = e.features![0].properties as unknown as { name: string; n: number; list: string; citySlug: string }
@@ -143,6 +145,13 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
           const b = new maplibregl.LngLatBounds()
           for (const f of inCity) b.extend(f.geometry.coordinates)
           m.fitBounds(b, { padding: 60, maxZoom: 12, duration: 0 })
+        }
+        // /mapa?studio=<slug> (from a profile's «Показати на мапі студій»): centre on that studio and open its popup.
+        const studio = new URLSearchParams(window.location.search).get('studio')
+        const target = studio ? data.features.find((f) => f.properties.slug === studio && f.properties.precise) : undefined
+        if (target) {
+          m.jumpTo({ center: target.geometry.coordinates, zoom: 15 })
+          popup(target.geometry.coordinates, pointHtml(target.properties as MapProps & { f: unknown }))
         }
       })
     })()
