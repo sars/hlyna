@@ -33,7 +33,8 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], channel: 'chromium' },
     },
   ],
-  webServer: {
+  // With BASE_URL set (an already running server or production) no dev server is started.
+  webServer: process.env.BASE_URL ? undefined : {
     command: 'pnpm dev',
     reuseExistingServer: true,
     url: 'http://localhost:3000',
