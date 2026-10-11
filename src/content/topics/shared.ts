@@ -5,7 +5,7 @@ import { pluralUk, texts } from '@/lib/catalog'
 import { inCity } from '@/lib/present'
 import { PRODUCT_RE } from '@/lib/products'
 import { fmt } from '@/lib/money'
-import type { DocPhoto } from '../photos'
+import type { HeroPhoto } from '../photos'
 
 // min/max: «здебільшого» range. For whole-Ukraine pages whose price has an `index` category it is the price
 // index's range (same numbers as /tsiny-2026); otherwise the range of this page's own price lines.
@@ -34,7 +34,7 @@ export type Topic = {
   metaDescription: (c: TopicCtx) => string
   lead: (c: TopicCtx) => string
   verse: string[]
-  photo?: DocPhoto
+  photo?: HeroPhoto
   ogImg: string
   lists: TopicList[]
   evidence: RegExp

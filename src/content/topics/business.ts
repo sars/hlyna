@@ -2,7 +2,7 @@
 import { productText } from '@/lib/products'
 import { site } from '../site'
 import { verses } from '../verses'
-import { docPhotos } from '../photos'
+import { docPhotos, sitePhotos } from '../photos'
 import { BIZ, CLASS_PRICE, CLASS_PRICE_SETS, CUPS, DECOR, MAKERS, makesTableware, priceRange, studios, type Topic, where, WORKSHOP } from './shared'
 
 export const businessTopics: Record<string, Topic> = {
@@ -17,7 +17,7 @@ export const businessTopics: Record<string, Topic> = {
     metaDescription: (c) => `Керамічні чашки з логотипом компанії чи закладу: ${studios(c.n)}, які роблять персоналізовані вироби й партії на замовлення. Штамп, деколь, розпис, терміни ${site.lead.batch}. Один запит — пропозиції від кількох студій.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять персоналізовані вироби, корпоративні подарунки або посуд партіями на замовлення. Логотип наносять штампом, деколлю чи розписом; партію зазвичай виготовляють ${site.lead.logoDetail}.`,
     verse: verses.logo,
-    photo: docPhotos.tealMug,
+    photo: sitePhotos.bizLogo,
     ogImg: 'teal-mug',
     lists: [
       { title: 'Прямо пишуть про логотип чи персоналізацію', note: 'Ці студії згадують нанесення логотипа, написів або персоналізовані вироби на своїх сайтах чи в Instagram.', formats: ['logo'], types: MAKERS },
@@ -76,7 +76,7 @@ export const businessTopics: Record<string, Topic> = {
     metaDescription: (c) => `Тімбілдинг у гончарній студії або у вашому офісі: ${studios(c.n)} ${where(c)}, ${c.price('corporate')}. Формати, тривалість, що буде з виробами. Один запит — пропозиції від кількох студій.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які проводять корпоративи й закриті майстер-класи з кераміки. У прайсах студій — ${c.price('corporate')}; заняття триває 1,5–3 години в студії або у вашому офісі, а вироби після випалу забирають через 2–4 тижні.`,
     verse: verses.corporate,
-    photo: docPhotos.workshopTable,
+    photo: sitePhotos.bizWorkshop,
     ogImg: 'doc-workshop-table',
     lists: [{ title: 'Студії, які проводять корпоративи', formats: ['corporate-workshop'], types: WORKSHOP, byCity: true }],
     evidence: /корпоратив|тімбілд|тимбілд|для компан|для команд|закрит|колектив|виїзн/iu,
@@ -132,7 +132,7 @@ export const businessTopics: Record<string, Topic> = {
     metaDescription: (c) => `Що подарувати команді й клієнтам на Новий рік 2026: чашки, ялинкові прикраси, посуд з логотипом і сертифікати на майстер-клас від ${studios(c.n)}. Коли замовляти, щоб встигнути до свят.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять корпоративні подарунки або святкові колекції: ялинкові прикраси, чашки, свічники, різдвяні тарілки. Партію на замовлення виготовляють ${site.lead.batch}, тож для подарунків з логотипом запит варто надіслати до початку листопада; після середини листопада реальніше вироби з наявності або сертифікати на майстер-клас.`,
     verse: verses.newYear,
-    photo: docPhotos.festiveWare,
+    photo: sitePhotos.bizNewYear,
     ogImg: 'doc-festive-ware',
     lists: [
       { title: 'Роблять корпоративні подарунки', formats: ['corporate-gifts', 'logo'], types: MAKERS },

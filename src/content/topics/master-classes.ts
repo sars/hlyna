@@ -1,7 +1,7 @@
 // Master-class format and certificate topic pages (/maister-klasy/<format>, /sertyfikaty).
 import { fmt } from '@/lib/money'
 import { verses } from '../verses'
-import { docPhotos } from '../photos'
+import { docPhotos, sitePhotos } from '../photos'
 import { MK, mkCards, places, priceRange, type Topic, where, WORKSHOP } from './shared'
 
 export const masterClassTopics: Record<string, Topic> = {
@@ -16,7 +16,7 @@ export const masterClassTopics: Record<string, Topic> = {
     metaDescription: (c) => `Де провести гончарне побачення: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни в прайсах ${priceRange(c)}` : ''}. Як проходить заняття, що входить у ціну, сертифікати.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, де проводять майстер-класи для двох або гончарні побачення.${priceRange(c) ? ` У прайсах студій такі заняття коштують здебільшого ${priceRange(c)}.` : ''} Зазвичай це 1,5–2 години на гончарному колі чи з ліпленням; готові вироби забирають через 2–4 тижні.`,
     verse: verses.couples,
-    photo: docPhotos.wheelCloseup,
+    photo: sitePhotos.mkCouples,
     ogImg: 'doc-wheel-closeup',
     lists: [{ title: 'Де провести гончарне побачення', formats: ['couples'], types: WORKSHOP, byCity: true }],
     evidence: /для двох|удвох|побачен|для пар|парн|романтичн/iu,
@@ -100,7 +100,7 @@ export const masterClassTopics: Record<string, Topic> = {
     metaDescription: (c) => `Де спробувати гончарне коло: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни в прайсах ${priceRange(c)}` : ''}. Як проходить перше заняття, що встигнете зробити, коли забрати виріб.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, де можна сісти за гончарне коло.${priceRange(c) ? ` У прайсах студій заняття коштують здебільшого ${priceRange(c)}.` : ''} На першому занятті зазвичай встигають зробити 1–3 чашки чи миски; випалені й политі вироби забирають через 2–4 тижні.`,
     verse: verses.wheel,
-    photo: docPhotos.wheelHands,
+    photo: sitePhotos.mkWheel,
     ogImg: 'doc-wheel-hands',
     lists: [{ title: 'Де спробувати гончарне коло', formats: ['wheel'], types: WORKSHOP, byCity: true }],
     evidence: /гончарн\p{L}* (?:кол|круг)|на колі|на крузі|гончарств/iu,
@@ -142,7 +142,7 @@ export const masterClassTopics: Record<string, Topic> = {
     metaDescription: (c) => `Ручне ліплення з глини без гончарного кола: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни в прайсах ${priceRange(c)}` : ''}. Що можна зробити, скільки триває, коли забрати виріб.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, де проводять майстер-класи з ручного ліплення.${priceRange(c) ? ` У прайсах студій заняття коштують здебільшого ${priceRange(c)}.` : ''} Це найпростіший спосіб почати: без кола, у спокійному темпі, а з глини виходять тарілки, чашки, вази чи фігурки.`,
     verse: verses.handbuilding,
-    photo: docPhotos.handbuilding,
+    photo: sitePhotos.mkHandbuilding,
     ogImg: 'doc-handbuilding',
     lists: [{ title: 'Де ліплять з глини', formats: ['handbuilding'], types: WORKSHOP, byCity: true }],
     evidence: /ліпл|ліпк|ручн\p{L}* формув/iu,
@@ -184,7 +184,7 @@ export const masterClassTopics: Record<string, Topic> = {
     metaDescription: (c) => `Де розписати чашку чи тарілку: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни в прайсах ${priceRange(c)}` : ''}. Ангоби, поливи, петриківка й косівський розпис, коли забрати виріб.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, де можна розписати кераміку: власний виріб після ліплення чи кола або вже готову чашку чи тарілку.${priceRange(c) ? ` У прайсах студій розпис коштує здебільшого ${priceRange(c)}.` : ''} Розписують ангобами або поливами, а справжній колір з’являється тільки після випалу.`,
     verse: verses.painting,
-    photo: docPhotos.paintingBowl,
+    photo: sitePhotos.mkPainting,
     ogImg: 'doc-painting-bowl',
     lists: [{ title: 'Де розписують кераміку', formats: ['painting'], types: WORKSHOP, byCity: true }],
     evidence: /розпис/iu,
@@ -225,7 +225,7 @@ export const masterClassTopics: Record<string, Topic> = {
     metaDescription: (c) => `Регулярні заняття з кераміки: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни в прайсах ${priceRange(c)}` : ''}. Курси гончарства на колі, ліплення, абонементи, коворкінг для тих, хто вже вміє.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, де є курси кераміки, абонементи або регулярні заняття.${priceRange(c) ? ` У прайсах студій курси й абонементи коштують здебільшого ${priceRange(c)}.` : ''} Курс зазвичай складається з 4–10 занять: від центрування на колі до власної поливи; після нього частина студій пускає працювати самостійно.`,
     verse: verses.courses,
-    photo: docPhotos.potterOutdoors,
+    photo: sitePhotos.mkCourses,
     ogImg: 'doc-potter-outdoors',
     lists: [{ title: 'Де навчитися кераміки', formats: ['courses'], types: WORKSHOP, byCity: true }],
     evidence: /(?<!\p{L})курс|абонемент|регулярн|занять/iu,
@@ -265,7 +265,7 @@ export const masterClassTopics: Record<string, Topic> = {
     metaDescription: (c) => `Подарунковий сертифікат на майстер-клас з кераміки: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни ${priceRange(c)}` : ''}. Формати, термін дії, електронні сертифікати.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, які продають подарункові сертифікати на майстер-класи з кераміки.${priceRange(c) ? ` У прайсах студій сертифікати коштують здебільшого ${priceRange(c)}.` : ''} Сертифікат можна взяти на заняття на колі, ліплення, розпис чи побачення для двох; найчастіше він діє 3–6 місяців.`,
     verse: verses.certificates,
-    photo: docPhotos.wheelTop,
+    photo: sitePhotos.giftCertificates,
     ogImg: 'wheel-top',
     lists: [{ title: 'Де купити сертифікат', formats: ['certificates'], types: [...WORKSHOP, 'brand'], byCity: true }],
     evidence: /сертифікат/iu,

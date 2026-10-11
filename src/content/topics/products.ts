@@ -3,7 +3,7 @@ import { isExhibitingOnly } from '@/lib/present'
 import { PRODUCT_RE, productText } from '@/lib/products'
 import { site } from '../site'
 import { verses } from '../verses'
-import { docPhotos, type DocPhoto } from '../photos'
+import { docPhotos, type HeroPhoto } from '../photos'
 import { CLASS_PRICE_SETS, CUPS, MAKERS, n, priceRange, type Topic, where } from './shared'
 
 const MAKERS_ROOT = [{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'Вироби', href: '/vyrobnyky/vyrib' }]
@@ -18,7 +18,7 @@ type ProductCfg = {
   re: RegExp
   priceRe?: RegExp
   verse?: string[]
-  photo?: DocPhoto
+  photo?: HeroPhoto
   ogImg: string
   items: [string, string][]
   faq: { q: string; a: string }[]

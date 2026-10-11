@@ -51,6 +51,19 @@ export const sitePhotos = {
   vesselJug: { src: '/images/site/home-format-jug-1.jpg', width: 600, height: 800, alt: 'Руки майстрині формують миску з глини на турнетці' }, // 297
   vesselBowl: { src: '/images/site/home-format-bowl-1.jpg', width: 600, height: 600, alt: 'Руки формують миску на гончарному колі, крупний план' }, // 384
   vesselPlate: { src: '/images/site/home-format-plate-1.jpg', width: 600, height: 600, alt: 'Миска з блакитними хмаринками і пензель, вигляд згори' }, // 478
+  // Inner pages (16:11, 1200×825), frame numbers per docs/design/photo-plan.md §4.
+  bizLogo: { src: '/images/site/biz-logo-1.jpg', width: 1200, height: 825, alt: 'Відтиск штампа на сирій тарілці — так наносять знак на кераміку' }, // 542
+  bizWorkshop: { src: '/images/site/biz-workshop-1.jpg', width: 1200, height: 825, alt: 'Чотири руки формують виріб з пласта глини за спільним столом' }, // 162
+  bizNewYear: { src: '/images/site/biz-newyear-1.jpg', width: 1200, height: 825, alt: 'Чашка ручної роботи з червоними сердечками на полиці' }, // 82
+  mkHandbuilding: { src: '/images/site/mk-lipennya-1.jpg', width: 1200, height: 825, alt: 'Стек вирізає листок із розкачаного пласта глини' }, // 139
+  mkWheel: { src: '/images/site/mk-wheel-1.jpg', width: 1200, height: 825, alt: 'Руки формують чашку на гончарному колі' }, // 337
+  mkPainting: { src: '/images/site/mk-paint-1.jpg', width: 1200, height: 825, alt: 'Пензель кладе блакитний ангоб на сиру миску' }, // 452
+  mkCouples: { src: '/images/site/mk-couples-1.jpg', width: 1200, height: 825, alt: 'Дві пари рук на гончарному колі, вигляд згори' }, // 342
+  mkCourses: { src: '/images/site/mk-courses-1.jpg', width: 1200, height: 825, alt: 'Руки витягують стінку посудини на гончарному колі' }, // 64
+  giftCertificates: { src: '/images/site/gift-cert-1.jpg', width: 1200, height: 825, alt: 'Дві руки передають свіжу глиняну чашку в сутінках' }, // 425
 } satisfies Record<string, SitePhoto>
+
+// A photo at the top of an inner page: a Wikimedia/stock photo with its credit, or an archive photo without one.
+export type HeroPhoto = DocPhoto | SitePhoto
 
 export type SitePhotoKey = keyof typeof sitePhotos
