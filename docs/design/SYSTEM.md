@@ -222,7 +222,7 @@
 | `overflow-x-auto rounded-2xl bg-card` + `<table>` | | `<DataTable>` | |
 | `details … rounded-2xl bg-card` (FAQ, «Показати ще») | | `<Faq>`, `<MoreLink as="summary">` | |
 | `.map-pop`, `.maplibregl-popup-content` (1A хекси) | | кольори з токенів, радіус 2px | |
-| `themeColor: '#2a4fa8'` (`layout.tsx`), кольори `manifest.ts` | | `#efe9de` (papier) і `#1d3ec6` | див. §7 |
+| `themeColor: '#2a4fa8'` (`layout.tsx`), кольори `manifest.ts` | | `themeColor #efe9de`; manifest `#efe9de` / `#1d3ec6` | див. §7.6 |
 | `src/app/(frontend)/og/route.tsx` `C = {…1A}` | | нові токени після 2-го раунду OG (§7) | |
 
 Перевірка наприкінці (крок 9 §9): `grep -rnE 'bg-clay|bg-cream|bg-sand|bg-card|text-umber|text-cream|border-line|bg-terra|text-terra\b|terra-dark|ochre|sage|\bkicker\b|h-display|\bband\b|rounded-(full|xl|2xl|\[)|shadow-|font-sans|cobalt-dark' src` має повернути нуль рядків.
@@ -415,7 +415,7 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 | `/maister-klasy/dlya-ditey` | нема | заглушка Kadir Celep (Unsplash) |
 | Гайд про випал, `chornodymlena-i-molochena` | Wikimedia (`docPhotos`) з підписом CC | лишається з підписом |
 | Добірки `/dobirky/*` | без фото | без фото, поки майстри не дадуть свої |
-| Профілі без фото | — | без фото; OG — куманець/герб |
+| Профілі без фото | — | без фото; OG — чорне поле з назвою студії (§7.2) |
 
 ### 6.2 Розміри `next/image` по компонентах
 
@@ -451,15 +451,68 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 
 ---
 
-## 7. OG-картка — вибір у процесі
+## 7. OG-картка — C2 «Етикетка»
 
-Триває 2-й раунд (`experiments/design-options/og-a|b|c.html`, `og.css`, `og-data.js`). Поки власник не вибрав:
-- `src/app/(frontend)/og/route.tsx` лишається як є і мігрує на нові токени **останнім кроком перед прибиранням 1A** (§9, крок 8), щоб не робити двічі.
-- Обмеження Satori: flex і абсолютне позиціювання, без grid, `background-clip`, blend, clip-path; шрифти — TTF з `src/assets/fonts` (потрібні Unbounded 800, Golos Text 400/500, JetBrains Mono 500; для варіанта B ще Playfair Display Italic 400).
-- Фото в OG — ті самі кадри, що на сторінці (`ogImage({img})`), для міст — герби `public/images/coa`, за замовчуванням — кадр 331 або 414; профілі без фото — куманець на папері/кобальті.
-- Разом з OG оновити `manifest.ts` (`background_color: #efe9de`, `theme_color: #1d3ec6`) і `viewport.themeColor` у `layout.tsx` (пропозиція — `#efe9de`, колір шапки; питання власнику §10).
+Обрано власником 11.10.2026 (`experiments/design-options/og-c2.html`, знімки `shots/og-c2-*.png`; відхилені варіанти прибрано з дошки). Маршрут `src/app/(frontend)/og/route.tsx` переписати за цим розділом на кроці 8 (§9).
 
-Сюди вписати обраний варіант і специфікацію після рішення.
+### 7.1 Композиція (1200×630, `ImageResponse`)
+
+Сюжет на всю картку, паперова етикетка внизу ліворуч, паперовий ярлик із логотипом угорі ліворуч. Усе — flex і `position:absolute`.
+
+| Елемент | Геометрія | Стиль |
+|---|---|---|
+| Тло | `position:absolute; inset:0` | `<img>` фото `object-fit:cover`; для широких кропів `object-position: 0 50%` (сюжет праворуч від етикетки); без фото — поле `ink #15130f` |
+| Ярлик (бренд) | `absolute; left:48; top:0; padding:12px 18px 14px` | тло `paper`, куманець 30px `clay`, «ГЛИНА» Unbounded 800 22px капітеллю, `letter-spacing:.02em` |
+| Етикетка | `absolute; left:48; bottom:48; width:760; padding:32px 40px 28px` | тло `paper`, `border-left:12px solid cobalt`, flex column |
+| Кікер | mono 17px, `letter-spacing:.08em`, капітель, `clay-text #a84a27` | |
+| Заголовок | Unbounded 800 капітеллю, `line-height:1.04`, `margin-top:12px` | 48px до 28 символів, 42px до 44, далі 36px (`ogSize`) |
+| Підпис | Golos 21px, `line-height:1.3`, `ink-2`, `margin-top:14px` | лише стабільний текст (7.4) |
+| Низ етикетки | mono 15px, `letter-spacing:.06em`, `ink-2`; `margin-top:18px; padding-top:12px; border-top:1px rgba(21,19,15,.2)`; flex space-between | ліворуч `hlyna.com.ua`, праворуч «Каталог студій і майстрів» |
+
+Перевірено у прев'ю ~600 і ~300px: заголовок ≥ 36px лишається читабельним; кікер і підпис на 300px декоративні — норма для OG.
+
+### 7.2 Варіанти за типом сторінки
+
+| Тип | Тло | Ярлик | Етикетка |
+|---|---|---|---|
+| Тематична (`TopicPage`), гайд, формат × місто, сертифікати | фото сторінки з `photo-plan.md` (той самий кадр, що в геро; кроп 1.91:1, для широких — `object-position: 0 50%`); сторінки без власного кадру — 331 | так | кікер = `topic.kicker` (без року), заголовок = `h1`, підпис = `topic.ogSub` — стабільне речення без чисел |
+| **Місто** (`/maister-klasy/[city]`) | кадр **318** (руки центрують глину на колі); **без гербів** — `public/images/coa` в OG більше не вживаються | так | кікер «Майстер-класи», підпис «Гончарне коло, ліплення і розпис: студії, адреси, формати й сертифікати» |
+| **Бізнес-тема «Посуд для ресторанів»** | кадр **508** (полита миска на білому столі, широкий кроп) | так | кікер «Для ресторанів», підпис із `metaDescription` без чисел («Тарілки, миски й посуд для подачі на замовлення: зразки, харчова полива, дозамовлення») |
+| **Профіль студії** (без фото — згода) | поле `ink`; назва студії як сюжет: `absolute; left:56; top:56; right:56`, Unbounded 800 капітеллю 120px (92px до 44 символів, 64px довше), `line-height:.96`, колір `paper`; над нею кікер «Тип · Місто» mono 17px `peach`, `margin-bottom:16px` | **ні** (бренд один раз) | `width:840`; без кікера й заголовка: підпис = перше речення `summary` (+ адреса шоуруму, якщо є) Golos 21px; рядок «що роблять» = до 4 `productChips` mono 14px капітеллю через `border-right:1px rgba(21,19,15,.25)`; низ: ліворуч куманець 22px + «ГЛИНА» 16px + `hlyna.com.ua` mono 14px, праворуч «Профіль у каталозі студій» |
+| **Головна** | **статичний PNG** `public/og-home.png`, не маршрут (`page.tsx` → `openGraph.images`) | | три підходи на дошці — **вибір власника**: **Г1б** (фото 331 широким кропом, великий ярлик: куманець 56px + «ГЛИНА» 44px, етикетка 42px) — рекомендую; Г1а (логотип рядком у етикетці, без ярлика); Г3б (чорне поле, вордмарк-вікно «ГЛИНА» 230px із кадру 331 зверху, куманець 350px `clay` праворуч унизу, етикетка 640px) |
+
+Статичний PNG головної: відкрити обраний підхід в `og-c2.html`, зняти кадр 1200×630 Playwright-скриптом (`page.locator('.og-frame').first().screenshot()` при масштабі 1 — як у `shots.mjs`), зберегти як `public/og-home.png` (q80, ≤ 200 KB); перезнімати лише при зміні бренду. Г1а/Г1б можна зробити і в Satori, Г3б — ні (`background-clip:text`).
+
+### 7.3 Параметри маршруту `/og`
+
+`title`, `kicker`, `sub`, `img` (ім'я файлу з `public/images/site` або `doc-<name>` для Wikimedia), `credit` (лише Wikimedia), `studio=1` (профільна композиція) + `makes` (до 4 через `|`). Параметри `coa` і `pattern` та `ShieldMosaic` вилучити. Довжини: title ≤ 90, kicker ≤ 60, sub ≤ 140, makes ≤ 4 × 24. `ogImage()` в `src/utilities/ogImage.ts` оновити відповідно.
+
+### 7.4 Правила вмісту (маршрут застосовує сам, сторінки — теж)
+
+- **Років на картках не буває.** У маршруті перед рендером до `title`, `kicker`, `sub`, `makes`:
+  ```ts
+  const noYears = (s: string) =>
+    s.replace(/\s*[·—–-]?\s*\b(?:19|20)\d{2}(?:\/\d{2})?\b/g, '').replace(/\s{2,}/g, ' ').replace(/\s*[:,·—–-]\s*$/, '').trim()
+  // «Майстер-класи · 2026» → «Майстер-класи»; «Новорічні подарунки 2026/27» → «Новорічні подарунки»; «Ціни 2026» → «Ціни»
+  ```
+  Сторінки, що формують `title`/`kicker` з роком (`maister-klasy/[city]`, `tsiny-2026`, новорічні), передають в OG версію без року; регулярка — страховка.
+- **Без змінних чисел**: ні лічильників студій/місць, ні цін, ні «оновлено …» — картки кешуються (`Cache-Control: public, max-age=86400, s-maxage=604800`) і не перегенеруються. `sub` — стабільне речення з конфігу теми (`topic.ogSub`) або `metaDescription` без числових фрагментів; сторінка передає `ogSub` явно, маршрут не рахує нічого.
+- Фото в OG — лише з `sitePhotos`/`docPhotos` (згода і кредити за §6); без логотипів студій і штампів-знаків; профілі — без фото.
+- Українська, без емодзі; бренд на картці один раз (ярлик або рядок у етикетці, не обидва).
+
+### 7.5 Токени, шрифти, обмеження Satori
+
+- Кольори: `paper #efe9de`, `ink #15130f`, `ink-2 #4e483f`, `cobalt #1d3ec6`, `clay #b4532e` (знак), `clay-text #a84a27` (кікер), `peach #ffd9a8` (кікер на чорному), лінійка `rgba(21,19,15,.2)`.
+- Шрифти (TTF у `src/assets/fonts`, усі OFL, статичні накреслення з Google Fonts): **Unbounded 800** (наявний Bold 700 замінити), **Golos Text 400** і **500**, **JetBrains Mono 400**. Raleway TTF прибрати. Playfair у OG не потрібен.
+- Satori: лише `display:flex` (кожен `div` з кількома дітьми — flex), `position:absolute`, `object-fit`/`object-position`, рамки, `letter-spacing`, `textTransform`; без grid, `background-clip`, blend, clip-path. Фото — `<img src="data:image/jpeg;base64,…">` з `readFile`, як зараз; SVG куманця — інлайн (той самий path, що у `public/favicon.svg`).
+- Розмір відповіді ≤ 200 KB: джерельні JPEG для OG ≤ 1600px по довгій стороні, q70–75.
+
+### 7.6 Разом з OG
+
+- `layout.tsx`: `viewport.themeColor = '#efe9de'` (папір, як шапка — **вирішено**).
+- `manifest.ts`: `background_color: '#efe9de'`, `theme_color: '#1d3ec6'`.
+- `page.tsx` головної: `openGraph.images = [{ url: '/og-home.png', width: 1200, height: 630 }]`.
+- Перевірка (крок 8 §9): відкрити `/og?…` для тематичної, міської, бізнес-теми і `/og?studio=1&…`, порівняти зі знімками `experiments/design-options/shots/og-c2-desktop.png`; жоден параметр не містить року; `pnpm exec tsc --noEmit`.
 
 ---
 
@@ -486,7 +539,7 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 | 5 | **TopicPage.** `TopicPage`, `PlaceContent`, `StudioRow`, `SmallCities`, `CityHead`, `FactStrip`, `CtaBand`, `QuoteBlock`, `RequestForm` повна; потім `WavePage`, `GuidePage`, `WaveB/CRoute` | `src/components/site/` | `pnpm shots` 3 тематичних (бізнес, МК-формат, гайд) + одна хвиля; форма липка на 1280, бар ховається над формою на 390; FAQ JSON-LD |
 | 6 | **Профіль і списки.** `vyrobnyky/[slug]`, `StudioCell`, `MakerRow`, `Facts`, `ListBlock/PriceList`, `MapFrame` + стилі попапів, `InstagramPosts`; `/vyrobnyky`, `/vyrobnyky/misto[/city]`, `/vyrobnyky/vyrib[/product]`, `/maister-klasy`, `/maister-klasy/[city][/format]`, `/dobirky*`, `/keysy*`, `/tsiny-2026`, `/mapa` | `src/app/(frontend)/…`, `profile/blocks.tsx` | `pnpm shots` профіль SaGa Pottery, `/maister-klasy/kyiv`, `/vyrobnyky/misto`, `/tsiny-2026`, `/mapa`; таблиця цін scroll без обрізання на 390 |
 | 7 | **Решта.** `/zapyt`, `/kabinet/*` + `KabinetForms`/`StudioEditForm`, 404/`error.tsx`, `/pro-nas`, `/dlya-studiy`, `/podiyi`, `/muzei-keramiky`, `/de-kupyty-keramiku`, `/sertyfikaty*`, `/podarunky-z-keramiky`, `/novyi-rik-i-rizdvo` | | `pnpm shots` кожної; `tests/int` проходять; форма кабінету надсилається |
-| 8 | **OG + manifest + themeColor** після 2-го раунду (§7); TTF у `src/assets/fonts`, прибрати Raleway TTF | `og/route.tsx`, `manifest.ts`, `layout.tsx` | відкрити `/og?…` для 4 типів сторінок, ≤ 200 KB, шрифти рендеряться |
+| 8 | **OG + manifest + themeColor** за §7 (C2 «Етикетка», статичний PNG головної); TTF у `src/assets/fonts`, прибрати Raleway TTF | `og/route.tsx`, `manifest.ts`, `layout.tsx` | відкрити `/og?…` для 4 типів сторінок, ≤ 200 KB, шрифти рендеряться |
 | 9 | **Прибирання 1A.** Видалити старі токени й утиліти з `globals.css`, `Bits.container`, `StudioCard.tsx`, `SelectionFaq.tsx`; grep-перевірка з §2.7 = 0; запис у `docs/decisions.md` і `docs/STATUS.md`; `AGENTS.md` (власник) | | `pnpm build`; `pnpm shots` головна + 2 внутрішні; grep порожній |
 
 ---
@@ -495,6 +548,6 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 
 1. **Стайлгайд у проді** — лишити відкритим (`noindex`, без посилань) чи ховати за `notFound()` у production?
 2. **Стани форм без зеленого/червоного** — помилка `terracotta-text`/`peach`, успіх звичайним текстом із лінійкою. Прийнятно для кабінету студій?
-3. **`theme-color` браузера** — папір `#efe9de` (як шапка) чи кобальт `#1d3ec6`?
+3. ~~**`theme-color` браузера**~~ — вирішено: папір `#efe9de` (§7.6).
 4. **Словник (`Term`)** — лише вручну у вибраних місцях (головна «випали», гайди) чи автоматично для першої появи кожного слова з `glossary.md` на сторінці?
 5. **Телефон: дві кнопки запиту** (шапка «Запит →» + нижній бар) — лишити обидві, як у макеті, чи прибрати з шапки, коли є бар?
