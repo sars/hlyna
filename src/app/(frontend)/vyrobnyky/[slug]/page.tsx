@@ -286,8 +286,8 @@ export default async function StudioPage({ params }: Args) {
               <ul className="m-0 grid grid-cols-1 list-none gap-2 p-0">
                 {cases.map((c) => (
                   <li key={c.slug}>
-                    <Link href={casePath(c.slug)} className="block rounded-2xl bg-card p-4 text-ink no-underline hover:bg-sand hover:text-ink">
-                      <span className="block text-[13px] text-umber">Кейс · {c.client.type}</span>
+                    <Link href={casePath(c)} className="block rounded-2xl bg-card p-4 text-ink no-underline hover:bg-sand hover:text-ink">
+                      <span className="block text-[13px] text-umber">Кейс · {c.client.name}</span>
                       <b>{c.title}</b>
                     </Link>
                   </li>

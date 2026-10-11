@@ -103,7 +103,6 @@ const mainNavPlan: NavSection[] = [
           { label: 'Ціни 2026', href: '/tsiny-2026', note: 'Майстер-класи, корпоративи, посуд — медіани за прайсами студій' },
           { label: 'Як замовити партію кераміки', href: '/hayidy/yak-zamovyty-partiyu', note: 'Терміни, зразки, оплата, доставка' },
           { label: 'Харчова безпечність і посудомийка', href: '/hayidy/kharchova-bezpechnist', note: 'Що питати в студії' },
-          { label: 'Кейси', href: '/keysy', note: 'Як студії робили посуд і подарунки для бізнесу' },
         ],
       },
     ],
@@ -239,7 +238,6 @@ const mainNavPlan: NavSection[] = [
 ]
 
 const simpleNavPlan: NavLink[] = [
-  { label: 'Кейси', href: '/keysy' },
   { label: 'Гайди', href: '/hayidy' },
   { label: 'Мапа', href: '/mapa' },
 ]
@@ -276,7 +274,6 @@ export const footerColumns: NavColumn[] = ([
       { label: 'Річниця компанії: формати', href: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi' },
       { label: 'Подарунки співробітникам', href: '/dlya-biznesu/podarunky-spivrobitnykam' },
       { label: 'Новий рік і Різдво з керамікою', href: '/novyi-rik-i-rizdvo' },
-      { label: 'Кейси', href: '/keysy' },
       { label: 'Надіслати запит', href: REQUEST_HREF },
     ],
   },

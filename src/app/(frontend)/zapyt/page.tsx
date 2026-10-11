@@ -10,6 +10,8 @@ type Search = Promise<{ vid?: string; what?: string; misto?: string }>
 
 export async function generateMetadata({ searchParams }: { searchParams: Search }): Promise<Metadata> {
   const { vid } = await searchParams
+  if (vid === 'keys')
+    return { title: 'Виправити або зняти кейс', description: 'Повідомте про неточність у кейсі студії або попросіть його зняти.', alternates: { canonical: '/zapyt' }, robots: { index: false } }
   if (vid === 'studiya')
     return {
       title: 'Додати або оновити студію в каталозі',
@@ -34,7 +36,13 @@ export default async function RequestPage({ searchParams }: { searchParams: Sear
   return (
     <main className="mx-auto grid grid-cols-1 max-w-[1200px] gap-8 px-4 pt-11 pb-16 sm:px-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       <div className="grid grid-cols-1 content-start gap-4">
-        {studio ? (
+        {vid === 'keys' ? (
+          <>
+            <span className="kicker">Кейси студій</span>
+            <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Виправити або зняти кейс</h1>
+            <p className="m-0 text-lg text-umber">Кейси ми пишемо за відкритими джерелами й позначаємо дату перевірки. Якщо ви зі студії чи від замовника й бачите неточність або не хочете, щоб кейс був на сайті, напишіть нам — ми перевіримо й виправимо або знімемо його.</p>
+          </>
+        ) : studio ? (
           <>
             <span className="kicker">Для студій і майстрів</span>
             <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Додати або оновити студію</h1>

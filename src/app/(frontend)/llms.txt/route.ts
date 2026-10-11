@@ -44,7 +44,7 @@ export async function GET() {
   const wave = written.filter((w) => w.section !== 'keysy')
   const cases = written.filter((w) => w.section === 'keysy')
   if (wave.length) lines.push('## Детальні добірки', ...wave.map((w) => `- [${w.title}](${site.url}${w.path}): ${w.summary}`), '')
-  if (cases.length) lines.push('## Кейси (за відкритими джерелами, з датою перевірки)', ...cases.map((w) => `- [${w.title}](${site.url}${w.path}): ${w.summary}`), '')
+  if (cases.length) lines.push('## Кейси студій (за відкритими джерелами, з датою перевірки)', ...cases.map((w) => `- [${w.title}](${site.url}${w.path}): ${w.summary}`), '')
   lines.push('## Гайди', ...guides.map((g) => `- [${g.h1}](${site.url}${g.path}): ${g.short}`), '')
   lines.push('## Добірки', `- [Сучасні українські керамісти](${site.url}/dobirky/suchasni-keramisty): бренди, авторки й автори, студії за відкритими даними (не рейтинг)`, `- [Косів і Опішне сьогодні](${site.url}/dobirky/kosiv-i-opishne): хто працює з глиною в двох гончарних осередках`, '')
   lines.push('## Для студій', `- [${studioPage.h1}](${site.url}${studioPage.path}): ${studioPage.short}`, '')

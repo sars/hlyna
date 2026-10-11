@@ -1,4 +1,4 @@
-// Case pages («Кейси»): how a studio did a corporate or HoReCa order, told from public sources with the date we
+// Studio case pages («Кейси студії»): how a studio did a corporate or HoReCa order, told from public sources with the date we
 // checked them. A case says only what its sources say; what the studio hasn't published goes to «Що спитати в
 // студії». Labels: open-sources (за відкритими джерелами) → studio-confirmed → studio-and-client-confirmed.
 import { caseCopies } from '@/content/cases'
@@ -12,7 +12,8 @@ export type CaseCopy = {
   metaDescription: string
   status: CaseStatus | string
   checked: string
-  studio: { name: string; slug: string | null }
+  studio: { name: string; slug: string | null; note?: string }
+  published?: string
   client: { name: string; type: string }
   facts: { label: string; value: string; source: string }[]
   lead: string
@@ -23,10 +24,26 @@ export type CaseCopy = {
   related: { topics?: string[] }
 }
 
-export const CASES = caseCopies as CaseCopy[]
+// A case belongs to its studio: it lives at /vyrobnyky/<studio>/keisy/<short>, where <short> is the client/project
+// part of the case id. Cases without a studio in the catalogue are not published.
+const SHORT: Record<string, string> = {
+  'art-hall-metinvest-yuvileina-taril': 'metinvest-yuvileina-taril',
+  'keramika-lviv-fest-superhumans-inklyuzyvna-tarilka': 'fest-superhumans-inklyuzyvna-tarilka',
+  'quiet-form-tc-pizza-tarilky-z-heroyamy': 'tc-pizza-tarilky-z-heroyamy',
+  'zola-alternatyva-posud-dlya-kavyaren-odesa': 'alternatyva-posud-dlya-kavyaren',
+  'sholomitska-alex-cooper-tatar-bunar-london': 'alex-cooper-tatar-bunar',
+}
+export const caseShort = (c: Pick<CaseCopy, 'slug'>) => SHORT[c.slug] ?? c.slug
+
+export const CASES = (caseCopies as CaseCopy[]).filter((c) => c.studio.slug)
 export const caseBySlug = (slug: string) => CASES.find((c) => c.slug === slug) ?? null
+export const caseFor = (studioSlug: string, short: string) =>
+  CASES.find((c) => c.studio.slug === studioSlug && caseShort(c) === short) ?? null
+export const caseByShort = (short: string) => CASES.find((c) => caseShort(c) === short) ?? null
 export const casesForStudio = (studioSlug?: string | null) => CASES.filter((c) => c.studio.slug === studioSlug)
-export const casePath = (slug: string) => `/keysy/${slug}`
+// First publication of the current cases; a case added later sets its own `published`.
+export const FIRST_PUBLISHED = '2026-10-11'
+export const casePath = (c: Pick<CaseCopy, 'slug' | 'studio'>) => `/vyrobnyky/${c.studio.slug}/keisy/${caseShort(c)}`
 
 export const CASE_LABEL: Record<string, string> = {
   'open-sources': 'За відкритими джерелами',
@@ -47,6 +64,8 @@ const FORM_BY_TOPIC: [RegExp, string][] = [
   [/posud-dlya-/, 'tableware'],
 ]
 export function caseFormWhat(c: CaseCopy): string {
+  // A case for a restaurant, café or hotel reads as a tableware case, even if it also links the logo-mugs page.
+  if (/ресторан|кав.ярн|готел|заклад|холдинг/i.test(c.client.type)) return 'tableware'
   const topics = c.related.topics ?? []
   for (const [re, what] of FORM_BY_TOPIC) if (topics.some((t) => re.test(t))) return what
   return 'tableware'
@@ -71,18 +90,10 @@ export const RELATED_LABEL: Record<string, string> = {
   '/vyrobnyky/vyrib/tarilky-i-mysky': 'Тарілки й миски',
 }
 
-export const KEYSY_INDEX = {
-  path: '/keysy',
-  title: 'Кейси: як українські студії кераміки виконали замовлення для бізнесу',
-  description:
-    'Як студії робили посуд для ресторанів і кав’ярень та подарунки для компаній: задача, терміни, що відомо з відкритих джерел і що спитати в студії для схожого замовлення.',
-}
-
 // For the sitemap and llms.txt (via the editorial registry).
 export function liveCasePages() {
   return [
-    { id: 'keysy', path: KEYSY_INDEX.path, section: 'keysy', title: KEYSY_INDEX.title, summary: KEYSY_INDEX.description },
-    ...CASES.map((c) => ({ id: c.slug, path: casePath(c.slug), section: 'keysy', title: c.title, summary: c.metaDescription })),
+    ...CASES.map((c) => ({ id: c.slug, path: casePath(c), section: 'keysy', title: c.title, summary: c.metaDescription })),
   ]
 }
 

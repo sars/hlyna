@@ -54,6 +54,8 @@ export function RequestForm({
   const [city, setCity] = useState(defaultCity)
   const [details, setDetails] = useState('')
   const [studio, setStudio] = useState(forStudio)
+  // /zapyt?vid=keys: a neutral «correct or remove this case» note, not a buyer request.
+  const [caseFix, setCaseFix] = useState(false)
   const kind = KIND[what] ?? KIND.other
   // New-studio form: warn when the studio is already in the catalogue and point to the claim instead.
   const [sName, setSName] = useState('')
@@ -75,10 +77,11 @@ export function RequestForm({
     const q = new URLSearchParams(window.location.search)
     /* eslint-disable react-hooks/set-state-in-effect -- one-time sync from the URL after hydration */
     if (q.get('vid') === 'studiya') setStudio(true)
-    const caseSlug = q.get('vid') === 'keys' ? (q.get('slug') ?? '').replace(/[^a-z0-9-]/g, '').slice(0, 120) : ''
+    const caseSlug = q.get('vid') === 'keys' ? (q.get('slug') ?? '').replace(/[^a-z0-9/-]/g, '').slice(0, 160) : ''
     if (caseSlug) {
       setWhat('other')
-      setDetails(`Прошу зняти або виправити кейс /keysy/${caseSlug}. Що саме: `)
+      setCaseFix(true)
+      setDetails(`Прошу зняти або виправити кейс /vyrobnyky/${caseSlug}. Що саме: `)
     }
     const w = q.get('what')
     if (w && KIND[w]) setWhat(w)
@@ -96,7 +99,7 @@ export function RequestForm({
     body.sourcePage = sourcePage
     if (studio) body.what = 'studio'
     if (!body.contactPhoneOrTelegram && !body.contactEmail) {
-      setError('Вкажіть телефон, Telegram або email, щоб студії могли відповісти.')
+      setError(caseFix ? 'Вкажіть телефон, Telegram або email, щоб ми могли відповісти.' : 'Вкажіть телефон, Telegram або email, щоб студії могли відповісти.')
       setState('error')
       return
     }
@@ -116,8 +119,10 @@ export function RequestForm({
   if (state === 'done')
     return (
       <div className="grid gap-2 rounded-[20px] border border-line bg-card p-5" role="status">
-        <p className="font-display m-0 text-sm uppercase">{studio ? 'Дані студії отримали' : 'Запит надіслано'}{requestId ? ` · № ${requestId}` : ''}</p>
-        {studio ? (
+        <p className="font-display m-0 text-sm uppercase">{studio ? 'Дані студії отримали' : caseFix ? 'Повідомлення отримали' : 'Запит надіслано'}{requestId ? ` · № ${requestId}` : ''}</p>
+        {caseFix ? (
+          <p className="m-0">Ми перевіримо кейс за вашим повідомленням і виправимо або знімемо його, а потім напишемо вам.</p>
+        ) : studio ? (
           <p className="m-0">Ми перевіримо профіль і напишемо вам, щоб уточнити деталі. Нічого не публікуємо без перевірки, а фото — лише з вашої згоди.</p>
         ) : (
           <>
@@ -126,6 +131,33 @@ export function RequestForm({
           </>
         )}
       </div>
+    )
+
+  if (caseFix && !studio)
+    return (
+      <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
+        <p className="font-display m-0 text-sm tracking-wide uppercase">Виправити або зняти кейс</p>
+        <input type="hidden" name="what" value="other" />
+        <label className={label}>
+          Що виправити або чому зняти
+          <textarea name="details" rows={5} value={details} onChange={(e) => setDetails(e.target.value)} className={field} />
+        </label>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+          <label className={label}>
+            Ваше ім’я і хто ви (студія, замовник)
+            <input name="contactName" className={field} />
+          </label>
+          <label className={label}>
+            Телефон, Telegram або email
+            <input name="contactPhoneOrTelegram" placeholder="+380… або @нік" className={field} />
+          </label>
+        </div>
+        <input type="text" name="website2" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+        <button type="submit" disabled={state === 'sending'} className="justify-self-start rounded-full bg-terra px-5 py-3 font-bold text-cream hover:bg-terra-dark disabled:opacity-60">
+          {state === 'sending' ? 'Надсилаємо…' : 'Надіслати'}
+        </button>
+        {state === 'error' && <p className="m-0 text-sm text-[var(--error)]">{error}</p>}
+      </form>
     )
 
   if (studio)
