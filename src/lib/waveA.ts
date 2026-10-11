@@ -38,6 +38,8 @@ export const fill = (text: string, vars: WaveVars) =>
     })
     .replace(/\s+([,.;:])/g, '$1')
     .replace(/[ \t]{2,}/g, ' ')
+    // A text that opens with a placeholder («{inCity} кераміку…» → «у Києві…») starts with a capital.
+    .replace(/^(\s*)(\p{Ll})/u, (_m, a: string, b: string) => a + b.toUpperCase())
 
 export function fillCopy(c: WaveCopy, vars: WaveVars): WaveCopy {
   const f = (t: string) => fill(t, vars)

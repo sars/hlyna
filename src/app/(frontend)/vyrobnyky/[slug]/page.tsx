@@ -13,6 +13,7 @@ import { StudioCard } from '@/components/site/StudioCard'
 import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
+import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { getAllStudios, getCatalog, getStudioBySlug, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
 import { amountsIn, cleanAddress, cleanName, cleanPublic, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
@@ -179,12 +180,12 @@ export default async function StudioPage({ params }: Args) {
       <JsonLd
         data={{
           '@context': 'https://schema.org',
-          '@type': s.type === 'maker' ? 'Person' : dormant ? 'Organization' : 'LocalBusiness',
+          '@type': isPersonMaker(s) ? 'Person' : dormant ? 'Organization' : 'LocalBusiness',
           name,
           description: stripPersonal(s.summary || description),
           url: `${site.url}/vyrobnyky/${s.slug}`,
           ...(city
-            ? s.type === 'maker'
+            ? isPersonMaker(s)
               ? { homeLocation: { '@type': 'Place', address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA' } } }
               : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(street ? { streetAddress: street } : {}) } }
             : {}),

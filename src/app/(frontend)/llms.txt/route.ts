@@ -19,7 +19,8 @@ export async function GET() {
     '',
     `> ${site.description}`,
     '',
-    `Мова: українська. Дані оновлено: ${site.dataUpdated}.`,
+    `Мова: українська. Дані оновлено: ${site.dataUpdated} (${site.contentUpdated}).`,
+    'Одна студія може бути на кількох сторінках форматів (гончарне коло, ліплення, для дітей…), тож суми за форматами більші за кількість студій у місті.',
     '',
     '## Як працює сервіс',
     site.model,
@@ -27,7 +28,7 @@ export async function GET() {
     '',
   ]
   const { stats, studios: priced } = await priceIndex()
-  lines.push(`## Ціни 2026 (за прайсами ${priced} студій; «здебільшого» = 10–90-й перцентиль)`)
+  lines.push(`## Ціни 2026 (за прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])}; «здебільшого» = 10–90-й перцентиль)`)
   for (const x of stats) lines.push(`- ${x.cat.label}, ${x.cat.unit}: здебільшого ${x.p10}–${x.p90} грн, медіана ${x.median} грн (${x.n} ${pluralUk(x.n, ['студія', 'студії', 'студій'])})`)
   lines.push(`- Партія посуду на замовлення: зазвичай ${site.lead.batch}; з логотипом — ${site.lead.logo} (${site.lead.logoDetail}); окрема річ на замовлення — ${site.lead.customItem}; забрати виріб після майстер-класу — через ${site.lead.pickup}.`, `- Докладно: ${site.url}/tsiny-2026`, '')
   const section = async (title: string, kinds: string[], extra: string[] = []) => {

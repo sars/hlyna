@@ -44,6 +44,7 @@ const NOTE_SENTENCE = /[^.!?\n]*(?:актуальн\p{L}* [^.!?\n]{0,60}не п�
 export function cleanPublic(text?: string | null): string {
   if (!text) return ''
   return text
+    .replace(/коворкинг/giu, 'коворкінг')
     .replace(NOTE_SENTENCE, '')
     .replace(/\(([^()]*)\)/g, (_m, inner: string) => {
       const kept = inner.split(/\s*;\s*/).filter((seg) => seg.trim() && !NOTE_WORDS.test(seg))
@@ -76,7 +77,7 @@ export function splitSource(raw: string): PriceLine {
   const body = m ? raw.slice(0, m.index).trim() : raw.trim()
   const src = m?.[1]?.trim()
   const year = Number((src ?? raw).match(/(?:19|20)(\d\d)(?!\d)/)?.[0]) || undefined
-  return { text: body.replace(/[,;]\s*$/, ''), source: src, year }
+  return { text: body.replace(/[,;]\s*$/, '').replace(/коворкинг/giu, 'коворкінг'), source: src, year }
 }
 
 export function publicPrices(s: Studio): PriceLine[] {
