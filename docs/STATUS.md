@@ -3,6 +3,7 @@
 Updated 2026-10-10.
 
 ## Now
+- **Дизайн головної (2026-10-11):** затверджений шаблон і бриф для впровадження — `docs/design/` (README.md → що робити, history.md → чому так, template/ → еталон). Фавіконка вже замінена в `public/`.
 - Payload 3.90 "website" template on Next.js 16, Postgres adapter, runs locally (`pnpm dev`).
 - Production setup written, not deployed yet: `Dockerfile`, `compose.yaml` (app + db + caddy), `Caddyfile` (hlyna.com.ua primary, www + hlyna.com → 301), `deploy/` (README, release, backup, restore, systemd timer).
 - Claude Code: `.claude/settings.json` (permissions, guard hook, tsc-on-stop hook), agents `explorer` / `implementer` / `reviewer`, skill `payload`.

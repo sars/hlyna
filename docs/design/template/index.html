@@ -1,0 +1,437 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Глина</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 16 16%27%3E%3Cg fill=%27%23b4532e%27%3E%3Cpath fill-rule=%27evenodd%27 d=%27M8 4 A5.5 5.5 0 1 1 7.99 4 Z M8 6.5 A3 3 0 1 0 8.01 6.5 Z%27/%3E%3Cpath d=%27M5.5 1 H10.5 L9 5 H7 Z%27/%3E%3Crect x=%275.5%27 y=%2715%27 width=%275%27 height=%271%27/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Golos+Text:wght@400;500;600&family=Playfair+Display:ital,wght@1,400;1,500&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Variant 2 + 4 merged: the wordmark is a window cut into a photograph of the wheel, the rest is the
+   poster register of variant 2 (bone paper, cobalt panels, numbered photo cards). Content follows the
+   live home page block by block. Fonts are all SIL OFL: Unbounded, Golos Text, Playfair Display, JetBrains Mono. */
+:root{
+  --paper:#efe9de;
+  --paper-2:#e4dccd;
+  --ink:#15130f;
+  --ink-2:#4e483f;
+  --cobalt:#1d3ec6;
+  --cobalt-deep:#132b8f;
+  --peach:#ffd9a8;
+  --clay:#c9542c;
+  --rule:rgba(21,19,15,.2);
+  --display:'Unbounded', 'Arial Black', system-ui, sans-serif;
+  --body:'Golos Text', 'Helvetica Neue', Arial, sans-serif;
+  --serif:'Playfair Display', Georgia, serif;
+  --mono:'JetBrains Mono', Menlo, monospace;
+  --gutter:clamp(16px,3vw,40px);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+main{overflow-x:clip}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible,summary:focus-visible,.gl:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+p{margin:0}
+.wrap{padding-inline:var(--gutter);max-width:1600px;margin-inline:auto}
+.k{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.it{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:0;text-transform:none}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;padding:0 1.4em;height:52px;background:var(--ink);color:var(--paper);font-family:var(--display);font-weight:600;font-size:13.5px;letter-spacing:.03em;text-transform:uppercase;line-height:1;transition:background .2s,transform .2s;border:0;border-radius:2px;cursor:pointer}
+.btn:hover{background:var(--cobalt);transform:translateY(-2px)}
+.btn.ghost{background:transparent;color:inherit;box-shadow:inset 0 0 0 2px currentColor}
+.btn.ghost:hover{background:var(--ink);color:var(--paper);box-shadow:inset 0 0 0 2px var(--ink)}
+.btn.blue{background:var(--cobalt)}.btn.blue:hover{background:var(--cobalt-deep)}
+.arrow{display:inline-block;transition:transform .25s}.btn:hover .arrow,a:hover>.arrow{transform:translateX(4px)}
+.gl{position:relative;text-decoration:underline dotted var(--clay);text-underline-offset:4px;text-decoration-thickness:1.5px;cursor:help;border:0;font:inherit}
+.gl::after{content:attr(data-def);display:none;position:absolute;left:0;bottom:calc(100% + 8px);z-index:5;background:var(--ink);color:var(--paper);font-family:var(--body);font-size:14px;line-height:1.4;padding:8px 11px;width:max-content;max-width:min(300px,70vw);border-radius:2px;pointer-events:none;text-decoration:none;text-transform:none;letter-spacing:0}
+.gl:hover::after,.gl:focus::after{display:block}
+
+/* ---------- top ---------- */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:20px;padding-block:12px;border-bottom:2px solid var(--ink)}
+.top .logo{font-family:var(--display);font-weight:800;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing:.02em;display:inline-flex;align-items:center;gap:10px}
+.mark{width:28px;height:28px;fill:var(--clay);flex:none}
+.top .logo .mark{width:26px;height:26px}
+.top nav{display:flex;gap:clamp(12px,2vw,28px);justify-content:center;flex-wrap:wrap}
+.top nav a{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:4px 0;border-bottom:2px solid transparent}
+.top nav a:hover{border-color:var(--cobalt)}
+.top .btn{height:44px;font-size:12px}
+.top .short{display:none}
+@media(max-width:860px){.top{grid-template-columns:auto auto;justify-content:space-between}.top nav{display:none}.top .full{display:none}.top .short{display:inline}}
+
+/* ---------- hero: wordmark window + statement + request ---------- */
+.hero{padding-block:clamp(14px,2.5vw,32px) 0}
+.kicker{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;padding-bottom:6px}
+@media(max-width:600px){.kicker span+span{display:none}}
+.word{font-family:var(--display);font-weight:800;font-size:min(345px,calc((100vw - 2*var(--gutter)) / 4.4));line-height:.9;letter-spacing:-.02em;text-transform:uppercase;margin:0 0 0 -.02em;background:url(img/os-wheel-gold.jpg) center 48%/cover no-repeat;-webkit-background-clip:text;background-clip:text;color:transparent;display:block;width:fit-content;max-width:100%}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(24px,4vw,56px);padding-block:clamp(22px,3vw,40px) clamp(28px,4vw,56px);border-top:2px solid var(--ink);margin-top:clamp(12px,2vw,24px)}
+@media(min-width:960px){.hero-grid{grid-template-columns:minmax(0,7fr) minmax(0,5fr);align-items:start}}
+.hero h1{font-family:var(--display);font-weight:600;font-size:clamp(26px,3.1vw,44px);line-height:1.1;letter-spacing:-.01em;max-width:18ch}
+.hero .sub{margin-top:16px;max-width:52ch;font-size:18px;color:var(--ink-2)}
+.hero .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.epi{margin-top:26px;font-family:var(--serif);font-style:italic;font-size:clamp(19px,1.7vw,24px);line-height:1.3;color:var(--cobalt-deep);max-width:30ch;padding-left:16px;border-left:2px solid var(--cobalt)}
+.epi span{display:block}
+.stats{display:flex;flex-wrap:wrap;gap:8px 28px;margin-top:26px;font-size:14px;color:var(--ink-2)}
+.stats b{font-family:var(--display);font-weight:600;font-size:22px;color:var(--cobalt);margin-right:6px;font-variant-numeric:tabular-nums}
+/* compact request form in the hero, like the live site */
+.rq{background:var(--cobalt);color:var(--paper);padding:clamp(18px,2.4vw,28px);display:grid;gap:4px}
+.rq .k{color:#cfd7ff}
+.rq h2{font-family:var(--display);font-weight:600;font-size:20px;line-height:1.15;margin:6px 0 10px}
+.field{display:grid;gap:3px;padding-block:7px}
+.field label{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;opacity:.85}
+.field input,.field textarea{font:inherit;font-size:16px;border:0;border-bottom:2px solid rgba(239,233,222,.6);background:transparent;padding:6px 0;color:var(--paper);border-radius:0;width:100%}
+.field input::placeholder,.field textarea::placeholder{color:rgba(239,233,222,.55)}
+.field textarea{min-height:58px;resize:vertical}
+.two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.rq .sub{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-top:14px}
+.rq .sub small{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:#cfd7ff}
+.rq .btn{background:var(--paper);color:var(--cobalt-deep)}.rq .btn:hover{background:var(--ink);color:var(--paper)}
+.rq .ok{display:none;font-family:var(--serif);font-style:italic;font-size:20px;margin-top:10px}
+.rq.sent .ok{display:block}.rq.sent .sub,.rq.sent .fields{display:none}
+
+/* ---------- section head ---------- */
+.sec{padding-block:clamp(56px,8vw,110px) 0}
+.head{display:grid;gap:8px;align-items:end;padding-bottom:18px;border-bottom:2px solid var(--ink)}
+@media(min-width:800px){.head{grid-template-columns:minmax(0,1fr) auto}}
+.head h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(30px,5.2vw,76px);line-height:.95;letter-spacing:-.01em}
+.head h2 .it{font-size:.9em;color:var(--cobalt);text-transform:none}
+.head .k{display:block;margin-bottom:12px}
+.head .lead{margin-top:10px;max-width:60ch;color:var(--ink-2);font-size:16.5px}
+.head .more{font-family:var(--display);font-weight:600;text-transform:uppercase;font-size:13px;letter-spacing:.04em;white-space:nowrap}
+
+/* ---------- numbered photo cards ---------- */
+.film-wrap{padding-top:clamp(16px,2.6vw,30px)}
+.film{display:grid;grid-template-columns:minmax(0,1fr);gap:10px;padding-inline:var(--gutter);max-width:1600px;margin-inline:auto}
+@media(min-width:640px) and (max-width:999px){.film{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(min-width:1000px){.film{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}}
+.card{display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--ink);color:var(--paper);position:relative;overflow:hidden}
+.card img{width:100%;aspect-ratio:1/1;object-fit:cover;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.card:hover img{transform:scale(1.04)}
+.card .n{position:absolute;top:12px;left:14px;font-family:var(--display);font-weight:800;font-size:56px;line-height:.8;color:var(--paper);mix-blend-mode:difference}
+.card .t{padding:18px 16px 20px;display:grid;gap:8px;align-content:start}
+.card h3{font-family:var(--display);font-weight:600;font-size:21px;line-height:1.12}
+.card p{margin:0;font-size:14.5px;color:#d6cfc2;max-width:36ch}
+.card .go{font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;margin-top:6px;color:var(--peach)}
+.card.blue{background:var(--cobalt)}.card.blue p{color:#cfd7ff}
+.film-hint{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);padding-top:4px}
+
+/* ---------- blue steps ---------- */
+.blue-block{background:var(--cobalt);color:var(--paper);margin-top:clamp(56px,8vw,110px);padding-block:clamp(44px,7vw,96px)}
+.blue-block .k{color:#cfd7ff;display:block;margin-bottom:12px}
+.blue-block h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(32px,5.6vw,84px);line-height:.95;max-width:22ch}
+.blue-block h2 .it{font-size:.9em;color:var(--peach);text-transform:none}
+.steps{display:grid;grid-template-columns:minmax(0,1fr);margin-top:clamp(28px,4vw,52px);border-top:1px solid rgba(239,233,222,.45)}
+@media(min-width:800px){.steps{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.step{padding:24px 0 28px;border-bottom:1px solid rgba(239,233,222,.45);display:grid;grid-template-columns:auto minmax(0,1fr);gap:18px;align-items:start}
+@media(min-width:800px){.step{border-bottom:0;border-right:1px solid rgba(239,233,222,.45);padding-right:28px}.step+.step{padding-left:28px}.step:last-child{border-right:0}}
+.step b{font-family:var(--display);font-weight:800;font-size:clamp(48px,6vw,88px);line-height:.8;letter-spacing:-.02em;color:var(--peach)}
+.step h3{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.15;margin-bottom:8px}
+.step p{color:#dfe4ff;font-size:15.5px;max-width:30ch}
+.blue-block .btn{margin-top:28px;background:var(--paper);color:var(--cobalt-deep)}.blue-block .btn:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- market ---------- */
+.market{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(24px,4vw,56px);padding-top:clamp(22px,3vw,40px)}
+@media(min-width:960px){.market{grid-template-columns:minmax(0,4fr) minmax(0,8fr);align-items:stretch}.market figure{display:flex;flex-direction:column}.market figure img{flex:1;aspect-ratio:auto;min-height:420px}}
+.market figure{margin:0}
+.market figure img{width:100%;aspect-ratio:4/5;object-fit:cover}
+.market figcaption{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2);padding-top:8px}
+.market .text{display:grid;gap:18px}
+.market .quote{background:#fff;border-left:6px solid var(--cobalt);padding:18px 22px;display:grid;gap:10px;font-size:17px}
+.market .quote .src{font-family:var(--mono);font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-2)}
+.nums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(min-width:600px){.nums{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.nums div{background:var(--paper-2);padding:14px 16px}
+.nums b{display:block;font-family:var(--display);font-weight:800;font-size:clamp(26px,2.6vw,36px);line-height:1;color:var(--cobalt);font-variant-numeric:tabular-nums}
+.nums span{display:block;margin-top:6px;font-size:13px;color:var(--ink-2)}
+table.price{width:100%;border-collapse:collapse;font-size:15px;border-top:2px solid var(--ink)}
+table.price caption{text-align:left;font-family:var(--mono);font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding-bottom:10px}
+table.price th{text-align:left;font-family:var(--mono);font-weight:500;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding:10px 0;border-bottom:1px solid var(--rule)}
+table.price td{padding:12px 0;border-bottom:1px solid var(--rule);vertical-align:top}
+table.price td+td,table.price th+th{padding-left:14px}
+table.price td.p{white-space:nowrap;font-variant-numeric:tabular-nums}
+table.price a{text-decoration:underline;text-underline-offset:3px;color:var(--cobalt)}
+.tbl{overflow-x:auto}
+@media(max-width:700px){table.price,table.price tbody,table.price tr,table.price td{display:block}table.price thead{display:none}table.price caption{display:block;width:100%}table.price tr{padding:12px 0;border-bottom:1px solid var(--rule)}table.price td{padding:3px 0;border:0}table.price td+td{padding-left:0}table.price td.p{white-space:normal}table.price td[data-label]::before{content:attr(data-label) ' · ';font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}table.price td:first-child{font-weight:600;font-size:16px}table.price td:first-child::before{content:none}}
+
+/* ---------- master classes: formats in vessel windows + cities ---------- */
+.formats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(10px,2vw,24px);padding-top:clamp(22px,3vw,40px);align-items:end}
+
+.fmt{display:grid;gap:10px;text-align:center}
+@media(max-width:700px){.formats{grid-template-columns:minmax(0,1fr);gap:14px}.fmt{grid-template-columns:120px minmax(0,1fr);align-items:center;text-align:left;gap:4px 18px}.fmt .win{grid-row:1/3;aspect-ratio:3/4}.fmt.bowl .win,.fmt.plate .win{aspect-ratio:1/1}.fmt h3{align-self:end}.fmt small{align-self:start}}
+.fmt .win{width:100%;aspect-ratio:3/4}
+.fmt .win img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.fmt:hover .win img{transform:scale(1.03)}
+.fmt.jug .win img{clip-path:url(#jug)}.fmt.bowl .win{aspect-ratio:1/1}.fmt.bowl .win img{clip-path:url(#bowl)}.fmt.plate .win{aspect-ratio:1/1}.fmt.plate .win img{clip-path:url(#plate)}
+.fmt h3{font-family:var(--display);font-weight:600;font-size:clamp(14px,1.6vw,19px);line-height:1.15}
+.fmt small{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.cities{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 24px;margin-top:clamp(28px,4vw,48px);border-top:2px solid var(--ink)}
+@media(min-width:700px){.cities{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.city{display:flex;justify-content:space-between;align-items:baseline;gap:10px;padding:12px 0;border-bottom:1px solid var(--rule);font-weight:600;font-size:17px}
+.city:hover{color:var(--cobalt)}
+.city b{font-family:var(--display);font-weight:600;font-size:14px;color:var(--clay)}
+.tags{display:flex;flex-wrap:wrap;gap:8px;padding-top:22px}
+.tags a{font-family:var(--mono);font-size:12px;letter-spacing:.04em;text-transform:uppercase;padding:9px 14px;box-shadow:inset 0 0 0 1.5px var(--ink)}
+.tags a:hover{background:var(--ink);color:var(--paper)}
+
+/* ---------- guides + faq ---------- */
+.guides{display:grid;grid-template-columns:minmax(0,1fr);margin-top:clamp(20px,3vw,36px)}
+@media(min-width:800px){.guides{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.guide{display:grid;gap:8px;align-content:start;padding:22px 0 26px;border-bottom:1px solid var(--rule)}
+@media(min-width:800px){.guide{border-bottom:0;border-right:1px solid var(--rule);padding-right:24px}.guide+.guide{padding-left:24px}.guide:last-child{border-right:0}}
+.guide .k{color:var(--clay)}
+.guide h3{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.15}
+.guide:hover h3{color:var(--cobalt)}
+.guide p{color:var(--ink-2);font-size:15px;max-width:38ch}
+.faq{max-width:900px;margin-top:clamp(16px,3vw,30px)}
+.faq details{border-bottom:1px solid var(--rule)}
+.faq summary{list-style:none;cursor:pointer;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:baseline;padding:16px 0;font-family:var(--display);font-weight:600;font-size:16px;line-height:1.25}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary .pm{font-family:var(--mono);font-size:18px;color:var(--cobalt)}
+.faq details[open] .pm::before{content:"–"}.faq details:not([open]) .pm::before{content:"+"}
+.faq details p{margin:0 0 20px;max-width:62ch;color:var(--ink-2)}
+
+/* ---------- studios ---------- */
+.studios{margin-top:clamp(56px,8vw,110px);background:var(--ink);color:var(--paper);padding-block:clamp(44px,7vw,96px)}
+.studios .grid{display:grid;grid-template-columns:minmax(0,1fr);gap:clamp(24px,4vw,56px)}
+@media(min-width:960px){.studios .grid{grid-template-columns:minmax(0,4fr) minmax(0,8fr);align-items:center}}
+.studios figure{margin:0}
+.studios figure img{width:100%;aspect-ratio:3/4;object-fit:cover}
+@media(max-width:959px){.studios figure img{aspect-ratio:4/3;object-position:center 30%}}
+.studios .k{color:#d6cfc2;display:block;margin-bottom:12px}
+.studios h2{font-family:var(--display);font-weight:800;text-transform:uppercase;font-size:clamp(28px,4.6vw,68px);line-height:.95;max-width:14ch}
+.studios h2 .it{font-size:.9em;color:var(--peach);text-transform:none}
+.studios ul{list-style:none;padding:0;margin:22px 0 0;max-width:48ch;font-size:16px}
+.studios li{padding:10px 0;border-top:1px solid rgba(239,233,222,.3)}
+.studios .acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;align-items:center}
+.studios .btn{background:var(--peach);color:var(--ink)}.studios .btn:hover{background:var(--paper)}
+.studios .note{margin-top:14px;font-size:14px;color:#d6cfc2;max-width:52ch}
+.studios .note a{color:var(--peach);text-decoration:underline;text-underline-offset:3px}
+
+footer{padding-block:26px 44px;display:grid;gap:18px;font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;line-height:1.7;color:var(--ink-2);border-top:2px solid var(--ink)}
+@media(min-width:800px){footer{grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto}}
+footer b{color:var(--ink);font-weight:500;display:block;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px}
+.mbar{display:none}
+@media(max-width:860px){.mbar{display:block;position:fixed;left:0;right:0;bottom:0;z-index:30;padding:10px var(--gutter) calc(10px + env(safe-area-inset-bottom,0px));background:var(--paper);border-top:2px solid var(--ink)}.mbar .btn{width:100%}body{padding-bottom:76px}}
+@media(prefers-reduced-motion:reduce){.card img,.btn,.arrow,.fmt .win img{transition:none}html{scroll-behavior:auto}}
+/* ---------- paths below 1000px: compact rows, all six visible, no horizontal scroll ---------- */
+.film-hint{display:none}
+@media(max-width:999px){
+  .film .card{grid-template-columns:108px minmax(0,1fr);grid-template-areas:"img n" "img t";grid-template-rows:auto minmax(0,1fr);min-height:108px}
+  .film .card img{grid-area:img;height:100%;aspect-ratio:auto;min-height:108px}
+  .film .card .n{grid-area:n;position:static;font-size:12px;letter-spacing:.1em;color:var(--peach);mix-blend-mode:normal;margin:12px 14px 0;line-height:1}
+  .film .card .t{grid-area:t;padding:4px 14px 12px;gap:4px;align-content:start}
+  .film .card h3{font-size:16px;line-height:1.15}
+  .film .card p{font-size:13px;max-width:none;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+  .film .card .go{margin-top:2px;font-size:11px}
+}
+@media(min-width:960px){.mk{padding-top:clamp(8px,1.5vw,20px)}
+.formats{padding-top:0;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-bottom:1px solid var(--rule);align-items:stretch}
+.fmt{grid-template-columns:170px minmax(0,1fr);align-items:center;text-align:left;gap:6px 24px;padding:24px 24px 24px 0;border-right:1px solid var(--rule)}
+.fmt+.fmt{padding-left:24px}.fmt:last-child{border-right:0;padding-right:0}
+.fmt .win,.fmt.bowl .win,.fmt.plate .win{grid-row:1/3;width:170px;height:170px;aspect-ratio:auto;display:grid;justify-items:start;align-items:end}
+.fmt .win img{height:170px;width:128px;aspect-ratio:auto}.fmt.bowl .win img,.fmt.plate .win img{width:170px}
+.fmt h3{align-self:end;font-size:20px}.fmt small{align-self:start}
+.cities{margin-top:clamp(28px,4vw,48px);grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <clipPath id="jug" clipPathUnits="objectBoundingBox"><path d="M.36 0 H.64 C.66 0 .67 .02 .66 .04 L.61 .09 C.6 .13 .6 .17 .62 .2 C.78 .28 .9 .42 .92 .6 C.94 .8 .84 .96 .66 1 H.34 C.16 .96 .06 .8 .08 .6 C.1 .42 .22 .28 .38 .2 C.4 .17 .4 .13 .39 .09 L.34 .04 C.33 .02 .34 0 .36 0 Z"/></clipPath>
+    <clipPath id="bowl" clipPathUnits="objectBoundingBox"><path d="M.03 .3 C.03 .22 .25 .18 .5 .18 C.75 .18 .97 .22 .97 .3 C.97 .6 .82 .9 .62 .98 L.38 .98 C.18 .9 .03 .6 .03 .3 Z"/></clipPath>
+    <clipPath id="plate" clipPathUnits="objectBoundingBox"><circle cx=".5" cy=".5" r=".5"/></clipPath>
+  </defs>
+</svg>
+
+<header class="wrap top">
+  <a class="logo" href="#top"><svg class="mark" viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" d="M32 17 A21 21 0 1 1 31.99 17 Z M32 27.2 A10.8 10.8 0 1 0 32.01 27.2 Z"/><path d="M23.3 4 H40.7 L35.7 18 H28.3 Z"/><rect x="23.5" y="59" width="17" height="3.6"/></svg><span>Глина</span></a>
+  <nav aria-label="Розділи">
+    <a href="#business">Для бізнесу</a><a href="#how">Як це працює</a><a href="#market">Ціни 2026</a><a href="#cities">Майстер-класи</a><a href="#guides">Гайди</a><a href="#studios">Для студій</a>
+  </nav>
+  <a class="btn" href="#request"><span class="full">Отримати пропозиції</span><span class="short">Запит</span> <span class="arrow">→</span></a>
+</header>
+
+<main id="top">
+  <section class="wrap hero" aria-labelledby="h1">
+    <div class="kicker"><span>Українська кераміка ручної роботи</span><span>Каталог студій і майстрів · оновлено жовтень 2026</span></div>
+    <div class="word" aria-hidden="true">Глина</div>
+    <div class="hero-grid">
+      <div>
+        <h1 id="h1">Посуд і подарунки ручної роботи від українських студій</h1>
+        <p class="sub">Для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови, терміни й ціни та надішліть один запит одразу кільком студіям.</p>
+        <div class="acts"><a class="btn blue" href="#request">Отримати пропозиції</a><a class="btn ghost" href="#cities">Знайти майстер-клас</a></div>
+        <p class="epi" aria-label="Епіграф"><span>Глина пам’ятає руки,</span><span>вогонь — терпіння,</span><span>а чашка — ранок,</span><span>коли її вперше взяли до рук.</span></p>
+        <div class="stats" aria-label="Цифри каталогу"><span><b>507</b>студій, майстрів і брендів</span><span><b>110</b>міст і сіл</span><span><b>196</b>місць з майстер-класами</span></div>
+      </div>
+      <form class="rq" id="request" aria-labelledby="rq-h">
+        <span class="k">Запит · безкоштовно</span>
+        <h2 id="rq-h">Опишіть, що потрібно — відповідять 3–5 студій</h2>
+        <div class="fields">
+          <div class="field"><label for="f-what">Що потрібно і скільки</label><textarea id="f-what" name="what" placeholder="60 тарілок 27 см і 60 мисок, матова полива, під посудомийку"></textarea></div>
+          <div class="two">
+            <div class="field"><label for="f-city">Місто</label><input id="f-city" name="city" placeholder="Львів"></div>
+            <div class="field"><label for="f-when">До якої дати</label><input id="f-when" name="when" placeholder="до 15 грудня"></div>
+          </div>
+          <div class="field"><label for="f-contact">Як з вами зв’язатися</label><input id="f-contact" name="contact" placeholder="пошта або телефон"></div>
+        </div>
+        <div class="sub"><button class="btn" type="submit">Надіслати запит</button><small>Відповідь напряму від студій</small></div>
+        <p class="ok">Дякуємо. Передамо запит студіям і повернемося з пропозиціями.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- Paths -->
+  <section class="sec" id="business" aria-labelledby="paths-h">
+    <div class="wrap head">
+      <div><span class="k">Для бізнесу</span><h2 id="paths-h">Що ви <span class="it">шукаєте?</span></h2></div>
+      <a class="more" href="#request">Усі напрями <span class="arrow">→</span></a>
+    </div>
+    <div class="film-wrap">
+      <div class="film" tabindex="0" aria-label="Напрями">
+        <a class="card" href="#request"><img src="img/rest-plating.jpg" alt="Кухар викладає страву на керамічну миску"><span class="n">01</span><div class="t"><h3>Посуд для ресторанів і кав’ярень</h3><p>Тарілки, миски, чашки під стиль закладу. Посудомийка, зразки, дозамовлення.</p><span class="go">Студії та ціни →</span></div></a>
+        <a class="card" href="#request"><img src="img/os-stamp.jpg" alt="Штамп з логотипом притискають до сирої глини"><span class="n">02</span><div class="t"><h3>Чашки та посуд з логотипом</h3><p>Штамп, деколь або полива у фірмових кольорах. Ціни залежно від кількості.</p><span class="go">Як це роблять →</span></div></a>
+        <a class="card" href="#request"><img src="img/os-mug-hearts.jpg" alt="Чашка ручної роботи з сердечками на полиці майстерні"><span class="n">03</span><div class="t"><h3>Новорічні подарунки 2026/27</h3><p>Для команди і клієнтів: що встигнуть зробити до свят і коли замовляти.</p><span class="go">Ідеї та терміни →</span></div></a>
+        <a class="card" href="#request"><img src="img/os-four-hands.jpg" alt="Дві пари рук тримають миску на гончарному колі"><span class="n">04</span><div class="t"><h3>Корпоратив з ліплення з глини</h3><p>У студії чи у вашому офісі, для невеликої команди чи великого відділу. Ціни з особи — у таблиці нижче.</p><span class="go">Формати →</span></div></a>
+        <a class="card blue" href="#cities"><img src="img/os-wheel-yard.jpg" alt="Дівчина працює за гончарним колом у саду"><span class="n">05</span><div class="t"><h3>Майстер-клас для себе</h3><p>Гончарство, ліплення, побачення, заняття для дітей — по всій Україні.</p><span class="go">За містами →</span></div></a>
+        <a class="card blue" href="#cities"><img src="img/os-hands-bowl.jpg" alt="Одні руки передають іншим щойно зліплену миску"><span class="n">06</span><div class="t"><h3>Подарунковий сертифікат</h3><p>Сертифікати на гончарство: ціни, термін дії й формати за містами.</p><span class="go">Сертифікати →</span></div></a>
+      </div>
+      <div class="wrap film-hint"><span>Гортайте вбік</span><span>06 напрямів</span></div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="blue-block" id="how" aria-labelledby="how-h">
+    <div class="wrap">
+      <span class="k">Як це працює</span>
+      <h2 id="how-h">Один запит <span class="it">замість</span> десяти листувань</h2>
+      <ol class="steps" style="list-style:none;padding:0;margin-bottom:0">
+        <li class="step"><b>1</b><div><h3>Опишіть замовлення</h3><p>Що потрібно, скільки штук, до якої дати, місто й бюджет за одиницю.</p></div></li>
+        <li class="step"><b>2</b><div><h3>Ми підберемо студії</h3><p>Передамо запит 3–5 студіям, які роблять такі вироби й працюють з такими обсягами.</p></div></li>
+        <li class="step"><b>3</b><div><h3>Порівняйте пропозиції</h3><p>Студії відповідають напряму. Ви обираєте за ціною, терміном і стилем.</p></div></li>
+      </ol>
+      <a class="btn" href="#request">Надіслати запит <span class="arrow">→</span></a>
+    </div>
+  </section>
+
+  <!-- Market -->
+  <section class="wrap sec" id="market" aria-labelledby="market-h">
+    <div class="head">
+      <div><span class="k">Коротко про ринок · оновлено жовтень 2026</span><h2 id="market-h">Скільки коштує <span class="it">і скільки часу займає</span></h2></div>
+      <a class="more" href="#market">Ціни 2026 <span class="arrow">→</span></a>
+    </div>
+    <div class="market">
+      <figure><img src="img/class-drying-bowls.jpg" alt="Висушені миски-сирець на полиці перед випалом"><figcaption>Сирець сохне перед першим випалом</figcaption></figure>
+      <div class="text">
+        <div class="quote">
+          <p><b>Посуд ручної роботи</b> від українських студій можна замовити і невеликою, і великою партією: мінімальна кількість залежить від студії та виробу. Виготовлення зазвичай займає 3–8 тижнів, бо кожна партія проходить сушіння і два <abbr class="gl" tabindex="0" data-def="Обробка вогнем у печі: перший випал — без поливи, другий — з поливою.">випали</abbr>.</p>
+          <p><b>Разовий майстер-клас</b> коштує здебільшого 600–1 500 грн з особи, індивідуальний — 1 100–2 100 грн за заняття. Корпоратив — здебільшого 600–1 500 грн з особи.</p>
+          <span class="src">Джерело: прайси, сайти і сторіс українських студій, зібрані «Глиною» у 2026 році. Ціни для кожної студії — у її профілі.</span>
+        </div>
+        <div class="nums" aria-label="Цифри каталогу">
+          <div><b>507</b><span>студій, майстрів і брендів у каталозі</span></div>
+          <div><b>196</b><span>місць з майстер-класами</span></div>
+          <div><b>110</b><span>міст і сіл</span></div>
+          <div><b>137</b><span>профілів з цінами з прайсу</span></div>
+        </div>
+        <div class="tbl">
+          <table class="price">
+            <caption>Типові формати і ціни, 2026</caption>
+            <thead><tr><th>Що</th><th>Типова ціна</th><th>Термін</th><th>Детальніше</th></tr></thead>
+            <tbody>
+              <tr><td>Партія посуду для закладу</td><td data-label="Типова ціна" class="p">за запитом, залежить від кількості</td><td data-label="Термін">3–8 тижнів</td><td data-label="Детальніше"><a href="#request">Посуд для ресторанів</a></td></tr>
+              <tr><td>Чашки з логотипом</td><td data-label="Типова ціна" class="p">за запитом</td><td data-label="Термін">4–10 тижнів</td><td data-label="Детальніше"><a href="#request">Чашки з логотипом</a></td></tr>
+              <tr><td>Корпоратив з ліплення з глини</td><td data-label="Типова ціна" class="p">600–1 500 грн з особи</td><td data-label="Термін">бронювання за 1–3 тижні</td><td data-label="Детальніше"><a href="#request">Корпоративи</a></td></tr>
+              <tr><td>Разовий майстер-клас</td><td data-label="Типова ціна" class="p">600–1 500 грн з особи</td><td data-label="Термін">запис на тиждень уперед</td><td data-label="Детальніше"><a href="#cities">За містами</a></td></tr>
+              <tr><td>Індивідуальний майстер-клас</td><td data-label="Типова ціна" class="p">1 100–2 100 грн за заняття</td><td data-label="Термін">за домовленістю</td><td data-label="Детальніше"><a href="#cities">За містами</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Master classes -->
+  <section class="wrap sec" id="cities" aria-labelledby="cities-h">
+    <div class="head">
+      <div><span class="k">Для себе і в подарунок</span><h2 id="cities-h">Майстер-класи <span class="it">з кераміки за містами</span></h2><p class="lead">Усі студії міста на одній сторінці: формати, ціни, сертифікати й контакти.</p></div>
+      <a class="more" href="#cities">Усі міста <span class="arrow">→</span></a>
+    </div>
+    <div class="mk"><div class="formats" aria-label="Формати майстер-класів">
+      <a class="fmt jug" href="#cities"><div class="win"><img src="img/os-if-blue.jpg" alt="Руки формують миску з джгутів глини"></div><h3>Ліплення з глини</h3><small>без кола, з джгутів і пласта</small></a>
+      <a class="fmt bowl" href="#cities"><div class="win"><img src="img/os-wheel-top.jpg" alt="Руки центрують глину на гончарному колі, вид згори"></div><h3>Гончарне коло</h3><small>центрування, витягування</small></a>
+      <a class="fmt plate" href="#cities"><div class="win"><img src="img/os-paint-mug.jpg" alt="Пензель наносить зелений візерунок на чашку"></div><h3>Розпис</h3><small>ангоби й полива по сирцю</small></a>
+    </div>
+    <div class="cities">
+      <a class="city" href="#request">Київ<b>54</b></a><a class="city" href="#request">Львів<b>34</b></a><a class="city" href="#request">Одеса<b>26</b></a><a class="city" href="#request">Луцьк<b>23</b></a>
+      <a class="city" href="#request">Харків<b>19</b></a><a class="city" href="#request">Ужгород<b>16</b></a><a class="city" href="#request">Дніпро<b>15</b></a><a class="city" href="#request">Тернопіль<b>13</b></a>
+      <a class="city" href="#request">Франківськ<b>11</b></a><a class="city" href="#request">Вінниця<b>10</b></a><a class="city" href="#request">Суми<b>10</b></a><a class="city" href="#cities">Усі міста<b>→</b></a>
+    </div></div>
+    <div class="tags" aria-label="Формати"><a href="#cities">Гончарство для двох</a><a href="#cities">Для дітей</a><a href="#cities">Гончарне коло</a><a href="#cities">Ліплення з глини</a><a href="#cities">Розпис</a><a href="#cities">Курси</a><a href="#cities">Сертифікати</a></div>
+  </section>
+
+  <!-- Guides -->
+  <section class="wrap sec" id="guides" aria-labelledby="guides-h">
+    <div class="head">
+      <div><span class="k">Корисне</span><h2 id="guides-h">Як замовити кераміку <span class="it">без сюрпризів</span></h2></div>
+      <a class="more" href="#guides">Усі гайди <span class="arrow">→</span></a>
+    </div>
+    <div class="guides">
+      <a class="guide" href="#request"><span class="k">Для закладів</span><h3>Що перевірити у студії перед замовленням посуду</h3><p>Зразки, харчова полива, посудомийка, дозамовлення через пів року.</p></a>
+      <a class="guide" href="#request"><span class="k">Для компаній</span><h3>Новорічні подарунки з кераміки: коли замовляти</h3><p>Календар: до якої дати надіслати запит і погодити зразок, щоб партія встигла до свят.</p></a>
+      <a class="guide" href="#request"><span class="k">Логотип</span><h3>Штамп, деколь чи полива</h3><p>П’ять способів нанести логотип на кераміку і що узгодити зі студією.</p></a>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="wrap sec" aria-labelledby="faq-h">
+    <div class="head"><div><span class="k">Питання і відповіді</span><h2 id="faq-h">Часті <span class="it">питання</span></h2></div><span></span></div>
+    <div class="faq">
+      <details open><summary>Чи можна замовити посуд ручної роботи невеликою партією?<span class="pm" aria-hidden="true"></span></summary><p>Так. Українські студії беруть і невеликі, і великі замовлення. Мінімальна партія залежить від студії та виробу; умови, терміни й ціни кожної студії вказані в її профілі.</p></details>
+      <details><summary>Скільки часу займає виготовлення партії кераміки?<span class="pm" aria-hidden="true"></span></summary><p>Зазвичай 3–8 тижнів: формування, сушіння, перший випал, полива (глазур) і другий випал. Перед Новим роком і відкриттям закладу замовляйте заздалегідь.</p></details>
+      <details><summary>Чи безпечний такий посуд і чи можна мити його в посудомийці?<span class="pm" aria-hidden="true"></span></summary><p>Це залежить від маси (глини), поливи й температури випалу. Перед партією попросіть у студії зразок і спитайте, чи полива харчова, без свинцю, і чи витримує посудомийку. Докладно — у гайді «Харчова безпечність і посудомийка».</p></details>
+      <details><summary>Як нанести логотип на кераміку?<span class="pm" aria-hidden="true"></span></summary><p>Найчастіше штампом на сирій глині, деколлю (перекладною картинкою, яку випалюють) або поливою у фірмових кольорах. Спосіб впливає на ціну і термін.</p></details>
+      <details><summary>Скільки коштує майстер-клас з гончарства?<span class="pm" aria-hidden="true"></span></summary><p>За прайсами студій 2026 року разовий майстер-клас коштує здебільшого 600–1 500 грн з особи, індивідуальний — 1 100–2 100 грн за заняття, корпоратив — здебільшого 600–1 500 грн з особи. Докладно — на сторінці «Ціни 2026».</p></details>
+      <details><summary>Скільки коштує сервіс для замовника?<span class="pm" aria-hidden="true"></span></summary><p>Для замовника безкоштовно. Ціни встановлюють студії. Якщо замовлення відбулося, студія платить нам 5% від його суми; за розміщення чи запити ми грошей не беремо.</p></details>
+    </div>
+  </section>
+
+  <!-- For studios -->
+  <section class="studios" id="studios">
+    <div class="wrap grid">
+      <figure><img src="img/os-portrait.jpg" alt="Майстриня усміхається за робочим столом у своїй майстерні"></figure>
+      <div>
+        <span class="k">Для студій і майстрів</span>
+        <h2>Отримуйте замовлення <span class="it">від ресторанів і компаній</span></h2>
+        <ul>
+          <li>Безкоштовний профіль з вашими фото, цінами й умовами</li>
+          <li>Запити від ресторанів, кав’ярень, готелів і компаній</li>
+          <li>Без оплати за розміщення чи за запити</li>
+        </ul>
+        <div class="acts"><a class="btn" href="#studios">Додати студію</a></div>
+        <p class="note">Ваша студія вже є на сайті? Знайдіть її профіль і натисніть «Керувати профілем». <a href="#studios">Вхід для студій</a></p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="wrap">
+    <div><b style="display:flex;align-items:center;gap:8px"><svg class="mark" style="width:22px;height:22px" viewBox="0 0 64 64" aria-hidden="true"><path fill-rule="evenodd" d="M32 17 A21 21 0 1 1 31.99 17 Z M32 27.2 A10.8 10.8 0 1 0 32.01 27.2 Z"/><path d="M23.3 4 H40.7 L35.7 18 H28.3 Z"/><rect x="23.5" y="59" width="17" height="3.6"/></svg>Глина</b>Каталог українських керамічних студій і майстрів. Посуд і подарунки ручної роботи для бізнесу, майстер-класи та сертифікати.<br>Оновлено 11.10.2026</div>
+    <div><b>Розділи</b><a href="#business">Для бізнесу</a> · <a href="#how">Як це працює</a> · <a href="#market">Ціни 2026</a> · <a href="#cities">Майстер-класи</a> · <a href="#guides">Гайди</a> · <a href="#studios">Для студій</a></div>
+    <div><b>Модель</b>Для замовника безкоштовно.<br>Студія платить 5% лише з замовлення, що відбулося.</div>
+  </footer>
+</main>
+<div class="mbar"><a class="btn blue" href="#request">Отримати пропозиції <span class="arrow">→</span></a></div>
+<script>
+  (function(){
+    var f=document.getElementById('request');
+    if(f) f.addEventListener('submit',function(e){e.preventDefault();f.classList.add('sent');});
+  })();
+</script>
+
+</body>
+</html>

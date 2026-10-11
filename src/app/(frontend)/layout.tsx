@@ -19,8 +19,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html className={`${unbounded.variable} ${raleway.variable}`} lang="uk" data-theme="light">
       <head>
-        <link href="/favicon.ico" rel="icon" sizes="32x32" />
-        <link href="/favicon.svg" rel="icon" type="image/svg+xml" />
+        <link href="/favicon.ico" rel="icon" sizes="48x48" />
+        <link href="/favicon-16.png" rel="icon" type="image/png" sizes="16x16" />
+        <link href="/favicon-32.png" rel="icon" type="image/png" sizes="32x32" />
+        <link href="/favicon.svg" rel="icon" type="image/svg+xml" sizes="any" />
         <link href="/apple-touch-icon.png" rel="apple-touch-icon" />
         <JsonLd
           data={{

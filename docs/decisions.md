@@ -10,3 +10,5 @@ Newest at the bottom. One line each; the reason after the dash.
 - **2026-10-10. No paid services without the owner's approval.** Free or self-hosted first.
 - **2026-10-10. Brand «Глина».** Domains: **hlyna.com.ua** primary; **hlyna.com** (and both www) 301-redirect to it.
 - **2026-10-10. Writing voice: see `docs/voice/`.** «Теплий майстер», potters' vocabulary; first 2–3 sentences of a page stay plain and factual for LLMs.
+- **2026-10-11. Головна: новий дизайн «реєстр» — шаблон у `docs/design/template/`, бриф у `docs/design/README.md`, історія в `docs/design/history.md`.** Кістяний папір + чорнило + кобальт, вордмарк-вікно у фото, нумеровані фотокартки, контент без змін. Шрифти лише SIL OFL: Unbounded, Golos Text, Playfair Display italic, JetBrains Mono.
+- **2026-10-11. Фавіконка: куманець «чаша зверху», теракота;** окремі малюнки для 16/32/48, SVG з темною темою, maskable 512. Файли в `public/`, теги в `layout.tsx`, `manifest.ts`.
