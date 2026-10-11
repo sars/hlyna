@@ -1,35 +1,38 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { Mark } from '@/components/ui/Mark'
+import { wrap } from '@/components/ui/layout'
 import { utilityNav } from '@/content/navigation'
 import { MainNav } from './MainNav.client'
 
+// Header «Реєстр» (docs/design/SYSTEM.md §4.2): a mono utility strip (lg+), then the sticky row under a 2px ink rule:
+// mark + ГЛИНА, the menu with its mega panels, the request button. The same on every page.
 export function SiteHeader() {
   return (
     <>
-      <div className="border-b border-line text-[13px]">
-        <div className="mx-auto flex max-w-[1200px] flex-wrap justify-between gap-2.5 px-4 py-1.5 sm:px-5">
-          <nav aria-label="Швидкі посилання" className="flex flex-wrap gap-4">
+      <div className="hidden border-b border-rule lg:block">
+        <div className={wrap}>
+          <nav aria-label="Швидкі посилання" className="flex gap-[22px] py-[7px] font-mono text-[11px] tracking-[.06em] text-ink-2 uppercase">
             {utilityNav.map((l) => (
-              <Link key={l.href} href={l.href} className="text-umber no-underline hover:text-cobalt">
+              <Link key={l.href} href={l.href} className="text-ink-2 no-underline hover:text-cobalt">
                 {l.label}
               </Link>
             ))}
+            <span className="ml-auto font-medium text-ink" aria-label="Мова сайту">
+              UA
+            </span>
           </nav>
-          <span className="font-bold text-ink" aria-label="Мова сайту">
-            UA
-          </span>
         </div>
       </div>
-      <header className="sticky top-[env(safe-area-inset-top,0px)] z-30 border-b border-line bg-clay">
-        <div className="band" aria-hidden />
-        <nav aria-label="Головне меню" className="mx-auto flex max-w-[1200px] items-center gap-4 px-4 py-3 sm:px-5">
-          <Link href="/" className="grid grid-cols-1 leading-none whitespace-nowrap no-underline" aria-label="Глина, hlyna.com.ua — на головну">
-            <span className="font-display text-xl font-bold text-cobalt">глина</span>
-            <span className="mt-1 text-[11px] font-semibold tracking-wide text-umber">hlyna.com.ua</span>
+      <header className="nav-head sticky top-[env(safe-area-inset-top,0px)] z-20 border-b-2 border-ink bg-paper">
+        <div className={`${wrap} nav-top`}>
+          <Link href="/" className="inline-flex items-center gap-2.5 font-display text-[22px] leading-none font-extrabold tracking-[.02em] whitespace-nowrap text-ink uppercase no-underline hover:text-ink" aria-label="Глина — на головну">
+            <Mark size={26} />
+            Глина
           </Link>
           <MainNav />
-        </nav>
+        </div>
       </header>
     </>
   )

@@ -115,6 +115,10 @@
   main {
     overflow-x: clip;
   }
+  /* Anchors land below the sticky header. */
+  [id] {
+    scroll-margin-top: 6rem;
+  }
   h1,
   h2,
   h3 {
@@ -345,7 +349,59 @@
     .ui-pcard-go { margin-top: 6px; font-size: 12px; }
   }
 
-  @media (prefers-reduced-motion: reduce) { .ui-arrow, .ui-pcard img { transition: none; } }
+
+  /* Header, mega menu and phone drawer (§4.2). Presentation only; the menu data is src/content/navigation.ts. */
+  .nav-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; padding-block: 12px; }
+  .nav-actions { grid-column: 3; display: flex; align-items: center; justify-self: end; gap: 8px; }
+  /* Phones: «Меню» and «Запит →» sit beside the logo down to 360px wide. */
+  .nav-actions .ui-btn { padding-inline: 12px; }
+  .nav-main { display: none; }
+  .nav-list { display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(10px, 1.8vw, 26px); margin: 0; padding: 0; list-style: none; }
+  .nav-sec { display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; border: 0; border-bottom: 2px solid transparent; background: none; color: var(--color-ink); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; text-decoration: none; cursor: pointer; }
+  .nav-sec[data-emphasis] { color: var(--color-cobalt); }
+  .nav-sec:hover, .nav-sec[aria-expanded='true'] { border-bottom-color: var(--color-cobalt); }
+  .nav-caret { width: 6px; height: 6px; margin-top: -3px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; opacity: 0.7; transform: rotate(45deg); transition: transform 0.2s; }
+  .nav-sec[aria-expanded='true'] .nav-caret { margin-top: 3px; transform: rotate(225deg); }
+  .nav-mega { display: none; }
+  .nav-mega-in { max-width: 1600px; margin-inline: auto; padding: 28px var(--spacing-gutter) 32px; }
+  .nav-mega-cols { display: grid; }
+  .nav-col { padding-inline: 24px; border-left: 1px solid var(--color-rule); }
+  .nav-col:first-child { padding-left: 0; border-left: 0; }
+  .nav-col ul { margin: 0; padding: 0; list-style: none; }
+  .nav-col-title { margin: 0 0 6px; padding-bottom: 10px; border-bottom: 1px solid var(--color-rule); font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink-2); }
+  .nav-col a { display: block; padding: 7px 0; color: var(--color-ink); font-size: 15.5px; font-weight: 600; line-height: 1.25; text-decoration: none; }
+  .nav-col a:hover { color: var(--color-cobalt); }
+  .nav-col small { display: block; margin-top: 2px; color: var(--color-ink-2); font-size: 13px; font-weight: 400; }
+  .nav-promo { display: grid; gap: 10px; align-content: start; margin-left: 24px; padding: 22px; background: var(--color-cobalt); color: var(--color-paper); }
+  .nav-promo b { font-family: var(--font-display); font-size: 17px; font-weight: 600; line-height: 1.2; }
+  .nav-promo p { margin: 0; font-size: 14.5px; color: var(--color-on-cobalt-2); }
+  @media (max-width: 22.49rem) {
+    .nav-top > a > svg { display: none; }
+    .nav-actions .ui-btn { padding-inline: 10px; }
+  }
+  @media (min-width: 60rem) {
+    .nav-top { gap: 20px; }
+    .nav-actions { gap: 10px; }
+    .nav-actions .ui-btn { padding-inline: 1.4em; }
+    .nav-main { display: block; grid-column: 2; }
+    .nav-mega { display: block; position: absolute; left: 0; right: 0; top: 100%; background: var(--color-paper); border-bottom: 2px solid var(--color-ink); }
+  }
+  .nav-drawer { position: fixed; inset: 0; z-index: 50; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: calc(14px + env(safe-area-inset-top, 0px)) var(--spacing-gutter) 40px; overflow-y: auto; border: 0; background: var(--color-paper); color: var(--color-ink); }
+  .nav-drawer::backdrop { background: transparent; }
+  @media (min-width: 60rem) { .nav-drawer { display: none !important; } }
+  .nav-drawer-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 2px solid var(--color-ink); }
+  .nav-drawer details { border-bottom: 1px solid var(--color-rule); }
+  .nav-drawer summary { display: flex; align-items: center; gap: 10px; padding: 16px 0; list-style: none; cursor: pointer; font-family: var(--font-display); font-size: 15px; font-weight: 600; text-transform: uppercase; }
+  .nav-drawer summary::-webkit-details-marker { display: none; }
+  .nav-pm { margin-left: auto; font-family: var(--font-mono); font-size: 20px; font-weight: 400; color: var(--color-cobalt); }
+  .nav-drawer details[open] .nav-pm::before { content: '–'; }
+  .nav-drawer details:not([open]) .nav-pm::before { content: '+'; }
+  .nav-drawer details ul { margin: 0; padding: 0 0 12px; list-style: none; }
+  .nav-drawer details li a { display: block; padding: 7px 0; color: var(--color-ink); font-size: 16px; font-weight: 600; text-decoration: none; }
+  .nav-drawer-util { display: flex; flex-wrap: wrap; gap: 8px 18px; padding-top: 18px; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .nav-drawer-util a { color: var(--color-ink-2); text-decoration: none; }
+
+  @media (prefers-reduced-motion: reduce) { .ui-arrow, .ui-pcard img, .nav-caret { transition: none; } }
 }
 
 /* 1A container: removed in step 9 with Bits.container. */

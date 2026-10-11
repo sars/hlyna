@@ -4,15 +4,24 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
-import { mainNav, requestHrefFor, simpleNav, STUDIO_JOIN_HREF } from '@/content/navigation'
+import { Button } from '@/components/ui/Button'
+import { Mark } from '@/components/ui/Mark'
+import { mainNav, requestHrefFor, simpleNav, STUDIO_JOIN_HREF, utilityNav } from '@/content/navigation'
 
-// Desktop: mega menus opened by click (and closed by Escape, outside click or navigation).
-// Mobile: a full-screen drawer with collapsible sections. Plain markup, no animation library.
+// The menu data comes from src/content/navigation.ts (planned pages already filtered out); this file is only presentation.
+// Desktop (lg+): mono menu, mega panels opened by click, Enter/Space or hover intent; Escape, outside click and navigation
+// close them, Escape returns focus to the section button. Phone: «Меню» opens a native <dialog> drawer (Escape, focus return
+// and inert page behind come from the browser; body scroll is locked while it is open).
+// Every mega panel is in the server HTML (links stay crawlable); styles are the `nav-*` classes in globals.css.
 export function MainNav() {
-  const [open, setOpen] = useState<string | null>(null)
-  const [drawer, setDrawer] = useState(false)
   const pathname = usePathname()
-  const rootRef = useRef<HTMLDivElement>(null)
+  // The open section is remembered with the path it was opened on, so navigating closes it without an effect.
+  const [opened, setOpened] = useState<{ id: string | null; path: string | null }>({ id: null, path: null })
+  const open = opened.path === pathname ? opened.id : null
+  const setOpen = (id: string | null) => setOpened({ id, path: pathname })
+  const [drawer, setDrawer] = useState(false)
+  const navRef = useRef<HTMLElement>(null)
+  const dialogRef = useRef<HTMLDialogElement>(null)
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Hover intent on desktop (mouse): open after a short pause, close after leaving the menu area.
   const canHover = () => typeof window !== 'undefined' && window.matchMedia('(hover: hover) and (pointer: fine)').matches
@@ -22,164 +31,180 @@ export function MainNav() {
   }
 
   useEffect(() => {
-    setOpen(null)
-    setDrawer(false)
-  }, [pathname])
-
-  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        setOpen(null)
-        setDrawer(false)
-      }
+      if (e.key !== 'Escape') return
+      const expanded = navRef.current?.querySelector<HTMLButtonElement>('button[aria-expanded="true"]')
+      if (!expanded) return
+      if (navRef.current?.contains(document.activeElement)) expanded.focus() // focus goes back to the section button
+      setOpened((o) => ({ id: null, path: o.path }))
     }
     const onClick = (e: MouseEvent) => {
-      if (rootRef.current && !rootRef.current.contains(e.target as Node)) setOpen(null)
+      if (navRef.current && !navRef.current.contains(e.target as Node)) setOpened((o) => (o.id ? { id: null, path: o.path } : o))
     }
+    // Leaving the phone layout with the drawer open would leave the page locked behind an invisible dialog.
+    const mq = window.matchMedia('(min-width: 60rem)')
+    const onMq = () => mq.matches && dialogRef.current?.open && dialogRef.current.close()
     document.addEventListener('keydown', onKey)
     document.addEventListener('click', onClick)
+    mq.addEventListener('change', onMq)
     return () => {
       document.removeEventListener('keydown', onKey)
       document.removeEventListener('click', onClick)
+      mq.removeEventListener('change', onMq)
     }
   }, [])
 
+  // A navigation closes the drawer (the dialog element lives in the layout and survives route changes).
   useEffect(() => {
-    document.body.style.overflow = drawer ? 'hidden' : ''
-  }, [drawer])
+    if (dialogRef.current?.open) dialogRef.current.close()
+  }, [pathname])
+
+  const openDrawer = () => {
+    dialogRef.current?.showModal()
+    document.body.style.overflow = 'hidden'
+    setDrawer(true)
+  }
+  const onDrawerClose = () => {
+    document.body.style.overflow = ''
+    setDrawer(false)
+  }
+  const request = requestHrefFor(pathname)
 
   return (
-    <div
-      ref={rootRef}
-      className="flex min-w-0 flex-1 items-center gap-4"
-      onMouseLeave={() => canHover() && later(() => setOpen(null), 220)}
-      onMouseEnter={() => timer.current && clearTimeout(timer.current)}
-    >
-      <ul className="hidden min-w-0 flex-1 items-center gap-0.5 lg:flex">
-        {mainNav.map((s) => (
-          <li key={s.id}>
-            <button
-              type="button"
-              aria-expanded={open === s.id}
-              aria-controls={`mega-${s.id}`}
-              onClick={() => setOpen(open === s.id && !canHover() ? null : s.id)}
-              onMouseEnter={() => canHover() && later(() => setOpen(s.id), open ? 0 : 120)}
-              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-2.5 text-[15px] font-semibold hover:bg-card aria-expanded:bg-card ${s.emphasis ? 'text-cobalt' : 'text-ink'}`}
-            >
-              {s.label}
-              <span aria-hidden className="mt-[-3px] inline-block size-2 rotate-45 border-r-2 border-b-2 border-current" />
-            </button>
-          </li>
-        ))}
-        {simpleNav.map((l) => (
-          <li key={l.href}>
-            <Link href={l.href} onMouseEnter={() => canHover() && later(() => setOpen(null), 120)} className="rounded-full px-3 py-2.5 text-[15px] font-semibold text-ink no-underline hover:bg-card">
-              {l.label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-
-      <Link
-        href={requestHrefFor(pathname)}
-        className="ml-auto hidden rounded-full bg-terra px-5 py-3 text-[15px] font-bold whitespace-nowrap text-cream no-underline hover:bg-terra-dark hover:text-cream lg:inline-flex"
+    <>
+      <nav
+        ref={navRef}
+        aria-label="Головне меню"
+        className="nav-main"
+        onMouseLeave={() => canHover() && later(() => setOpen(null), 220)}
+        onMouseEnter={() => timer.current && clearTimeout(timer.current)}
       >
-        Отримати пропозиції
-      </Link>
-
-      <button
-        type="button"
-        onClick={() => setDrawer(true)}
-        aria-expanded={drawer}
-        aria-controls="mobile-menu"
-        className="ml-auto inline-flex rounded-full border border-line bg-card px-4 py-2 font-bold text-ink lg:hidden"
-      >
-        Меню
-      </button>
-
-      {/* All panels are rendered on the server (links stay crawlable); only the open one is visible. */}
-      {mainNav.map((section) => (
-        <div
-          key={section.id}
-          id={`mega-${section.id}`}
-          hidden={open !== section.id}
-          className="absolute inset-x-0 top-full hidden border-b border-line bg-card shadow-[0_18px_30px_rgba(42,32,24,.12)] lg:block"
-        >
-          <div className="mx-auto grid max-w-[1200px] grid-cols-[repeat(3,minmax(0,1fr))_minmax(0,1.1fr)] gap-7 px-5 py-7">
-            {section.columns.map((c) => (
-              <div key={c.title}>
-                <p className="kicker mb-2.5">{c.title}</p>
-                <ul className="grid grid-cols-1 gap-2">
-                  {c.links.map((l) => (
-                    <li key={l.href + l.label}>
-                      <Link href={l.href} className="font-semibold text-ink no-underline hover:text-cobalt">
-                        {l.label}
-                        {l.note && <small className="block text-[13px] leading-snug font-normal text-umber">{l.note}</small>}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-            {section.promo && (
-              <div className="grid grid-cols-1 content-start gap-2.5 rounded-2xl bg-cobalt p-4 text-clay">
-                <b className="font-display text-[15px] leading-tight uppercase">{section.promo.title}</b>
-                <p className="m-0 text-sm">{section.promo.text}</p>
-                <Link href={section.promo.cta.href} className="justify-self-start rounded-full bg-ochre px-4 py-2.5 text-sm font-bold text-ink no-underline hover:text-ink">
-                  {section.promo.cta.label}
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      ))}
-
-      {drawer && (
-        <div id="mobile-menu" role="dialog" aria-modal="true" aria-label="Меню" className="fixed inset-0 z-50 overflow-y-auto bg-clay px-4 pt-[calc(env(safe-area-inset-top,0px)+14px)] pb-10">
-          <div className="mb-3 flex items-center justify-between">
-            <Link href="/" className="font-display text-xl font-bold text-cobalt no-underline">
-              глина
-            </Link>
-            <button type="button" onClick={() => setDrawer(false)} className="rounded-full border border-line bg-card px-4 py-2 font-bold text-ink">
-              Закрити
-            </button>
-          </div>
-          {mainNav.map((s, i) => (
-            <details key={s.id} open={i === 0} className="group border-b border-line">
-              <summary className="font-display flex cursor-pointer list-none justify-between py-4 text-base font-semibold uppercase">
+        <ul className="nav-list">
+          {mainNav.map((s) => (
+            <li key={s.id}>
+              <button
+                type="button"
+                aria-expanded={open === s.id}
+                aria-controls={`mega-${s.id}`}
+                data-emphasis={s.emphasis ? '' : undefined}
+                className="nav-sec"
+                onClick={() => setOpen(open === s.id && !canHover() ? null : s.id)}
+                onMouseEnter={() => canHover() && later(() => setOpen(s.id), open ? 0 : 120)}
+              >
                 {s.label}
-                <span aria-hidden className="text-terra"><span className="group-open:hidden">+</span><span className="hidden group-open:inline">−</span></span>
-              </summary>
-              <ul className="mb-3.5 grid grid-cols-1 gap-1">
-                {s.columns.flatMap((c) => c.links).map((l) => (
-                  <li key={l.href + l.label}>
-                    <Link href={l.href} className="block py-1.5 font-semibold text-ink no-underline">
-                      {l.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </details>
+                <span className="nav-caret" aria-hidden />
+              </button>
+              <div id={`mega-${s.id}`} hidden={open !== s.id} className="nav-mega" onClick={(e) => (e.target as HTMLElement).closest('a') && setOpen(null)}>
+                <div className="nav-mega-in">
+                  <div
+                    className="nav-mega-cols"
+                    style={{ gridTemplateColumns: `repeat(${s.columns.length}, minmax(0, 1fr))${s.promo ? ' minmax(0, 1.1fr)' : ''}` }}
+                  >
+                    {s.columns.map((c) => (
+                      <div key={c.title} className="nav-col">
+                        <p className="nav-col-title">{c.title}</p>
+                        <ul>
+                          {c.links.map((l) => (
+                            <li key={l.href + l.label}>
+                              <Link href={l.href}>
+                                {l.label}
+                                {l.note && <small>{l.note}</small>}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                    {s.promo && (
+                      <div className="nav-promo" data-tone="cobalt">
+                        <b>{s.promo.title}</b>
+                        <p>{s.promo.text}</p>
+                        <Button href={s.promo.cta.href} variant="peach" size="sm" className="justify-self-start">
+                          {s.promo.cta.label}
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </li>
           ))}
-          <details className="group border-b border-line">
-            <summary className="font-display flex cursor-pointer list-none justify-between py-4 text-base font-semibold uppercase">
-              Ще <span aria-hidden className="text-terra"><span className="group-open:hidden">+</span><span className="hidden group-open:inline">−</span></span>
+          {simpleNav.map((l) => (
+            <li key={l.href}>
+              <Link href={l.href} className="nav-sec" onMouseEnter={() => canHover() && later(() => setOpen(null), 120)}>
+                {l.label}
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <div className="nav-actions">
+        <button type="button" className="ui-btn lg:hidden" data-variant="ghost" data-size="sm" aria-expanded={drawer} aria-controls="mobile-menu" onClick={openDrawer}>
+          Меню
+        </button>
+        <Button href={request} size="sm" arrow>
+          <span className="hidden lg:inline">Отримати пропозиції</span>
+          <span className="lg:hidden">Запит</span>
+        </Button>
+      </div>
+
+      <dialog
+        ref={dialogRef}
+        id="mobile-menu"
+        aria-label="Меню"
+        className="nav-drawer"
+        onClose={onDrawerClose}
+        onClick={(e) => (e.target as HTMLElement).closest('a') && dialogRef.current?.close()}
+      >
+        <div className="nav-drawer-top">
+          <Link href="/" className="inline-flex items-center gap-2.5 font-display text-xl leading-none font-extrabold tracking-[.02em] text-ink uppercase no-underline hover:text-ink">
+            <Mark size={26} />
+            Глина
+          </Link>
+          <button type="button" className="ui-btn" data-variant="ghost" data-size="sm" onClick={() => dialogRef.current?.close()}>
+            Закрити
+          </button>
+        </div>
+        {mainNav.map((s, i) => (
+          <details key={s.id} open={i === 0}>
+            <summary>
+              {s.label}
+              <span className="nav-pm" aria-hidden />
             </summary>
-            <ul className="mb-3.5 grid grid-cols-1 gap-1">
-              {[...simpleNav, { label: 'Для студій', href: STUDIO_JOIN_HREF }].map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className="block py-1.5 font-semibold text-ink no-underline">
-                    {l.label}
-                  </Link>
+            <ul>
+              {s.columns.flatMap((c) => c.links).map((l) => (
+                <li key={l.href + l.label}>
+                  <Link href={l.href}>{l.label}</Link>
                 </li>
               ))}
             </ul>
           </details>
-          <Link href={requestHrefFor(pathname)} className="mt-5 flex w-full justify-center rounded-full bg-terra px-5 py-3.5 font-bold text-cream no-underline">
-            Отримати пропозиції
-          </Link>
-        </div>
-      )}
-    </div>
+        ))}
+        <details>
+          <summary>
+            Ще
+            <span className="nav-pm" aria-hidden />
+          </summary>
+          <ul>
+            {[...simpleNav, { label: 'Для студій', href: STUDIO_JOIN_HREF }].map((l) => (
+              <li key={l.href}>
+                <Link href={l.href}>{l.label}</Link>
+              </li>
+            ))}
+          </ul>
+        </details>
+        <nav aria-label="Швидкі посилання" className="nav-drawer-util">
+          {utilityNav.map((l) => (
+            <Link key={l.href} href={l.href}>
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+        <Button href={request} variant="cobalt" full arrow className="mt-[22px]">
+          Отримати пропозиції
+        </Button>
+      </dialog>
+    </>
   )
 }
