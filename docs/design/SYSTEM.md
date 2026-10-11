@@ -181,7 +181,16 @@
 }
 ```
 
-Вилучити: `@import 'tw-animate-css'`, `@config tailwind.config.mjs` (і сам файл), `@plugin "@tailwindcss/typography"` і залежності `@tailwindcss/typography`, `tw-animate-css` (перевірено 11.10.2026: `prose` і `animate-*` у `src` не вживаються), `@custom-variant dark`, усі `@source inline(...)`, блок `:root` із shadcn-змінними (`--background`, `--card`, `--primary`, `--radius`, `--sidebar-*`, `--chart-*`, `--success/--warning/--error`), `@theme inline`, `html{opacity:0}` і `data-theme`, утиліти `band`/`kicker`/`h-display`, `.container`.
+Вилучено на кроці 1 (перевірено grep по `src` без `/panel`): `@import 'tw-animate-css'` у публічному CSS, `@config tailwind.config.mjs` (і сам файл), `@plugin "@tailwindcss/typography"` разом із залежністю (`prose` у `src` не вживається), `@custom-variant dark`, усі `@source inline(...)`, shadcn-змінні `:root` і `@theme inline`, `html{opacity:0}` і `data-theme`.
+
+**Лишається до кроку 9 (ще вживається публічним кодом):**
+- `--color-card` (`bg-card`, ≈105 місць, у т. ч. `MainNav`, `Wave*`) і `:root { --error }` (`text-[var(--error)]` у формах) — зникають разом із заміною `bg-card`/`--error` за картою §2.7;
+- базове правило `* { border-color: var(--color-line) }` (≈85 «голих» `border` покладаються на колір `--border`) — зникає, коли сторінки отримають явні `border-rule`/`border-ink`;
+- `body { min-height: 100vh; display: flex; flex-direction: column }` — на ньому тримаються `mx-auto` mains із `w-full`; переглянути на кроці 3 разом із футером;
+- `.container` (з медіа-запитами замість `@variant`, без `2xl`) — до вилучення `Bits.container` на кроці 9;
+- **`tw-animate-css` лишається в `package.json`**: його імпортує власний `panel.css`, і панель користується `animate-in`/`zoom-in`. З публічного CSS він прибраний.
+
+Нові брейкпоінти (§2.4) змістили `md` 48 → 50rem і `lg` 64 → 60rem, `2xl` (86rem) вилучено; старі сторінки до кроку 9 перелаштовуються на цих значеннях (контейнер: md 800px, lg 960px). Базові `h1, h2, h3 { font-weight: 600 }` змінюють заголовки без явної ваги; `font-bold` (700) на Unbounded тимчасово береться з 800 (вантажаться лише 600/800).
 
 ### 2.7 Карта міграції 1A → нова
 
@@ -292,6 +301,9 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 - Панелі задають тон атрибутом `data-tone="cobalt|ink"`; дочірні примітиви читають його через `group-data-[tone=cobalt]:…` або селектори в `@layer components` (кікер, лінійки, кнопка за замовчуванням, фокус).
 - Усі списки студій, FAQ, таблиці рендеряться на сервері повністю (нічого не ховати за JS — ЛЛМ і пошук читають HTML).
 - Кожен примітив показаний у `/dev/styleguide` (§8); новий примітив без запису там і тут не приймається.
+- **Як реалізовано (крок 2):** кнопка, таблиця, FAQ, терм, поля, смуга цифр, комірки/рядки студій, фотокартка і вордмарк мають власні `ui-*` класи в `@layer components` (складні стани, `data-*` атрибути); решта — утиліти Tailwind. Тон панелі читають кікер і `Italic` через `group-data-[tone=…]/tone:`, кнопка без `variant` і поля — через `[data-tone] …` у CSS. Списки-обгортки експортуються разом з елементами: `StudioCells`/`StudioCell`/`IndexCell` (`StudioCell.tsx`), `StudioRows`/`StudioRow`, `MakerRows`/`MakerRow`; `CityList.tsx` містить і `SmallCities` (`groups: {name, studios: {name, href}[]}[]`); `Fields.tsx` — `Field`, `FieldRow`, `Input`, `Textarea`, `Select`, `Checkbox`; `Faq.tsx` — `Faq` і `FaqItem`. `PhotoCard` позначає тон атрибутом `data-pcard`, щоб не збігатися з `data-tone` панелей. `MoreLink` — `inline-flex`, а не `inline-block` (inline-block посилання як елемент grid/flex отримувало колонку вужчу за свій `nowrap`-текст).
+- **`Term` на телефоні** (< 40rem): тултип — не над словом, а фіксована плашка між гаттерами над нижнім краєм (`bottom: 92px`), щоб не виходити за екран при будь-якій позиції слова; від `sm` — над словом, `side="end"` для слів біля правого краю.
+- **Ще не зроблені (кроки 3–6):** `VesselWindow` (крок 4), `MapFrame` (крок 6), `RequestForm`/`MobileRequestBar` (крок 3/5).
 
 ### 4.1 Примітиви (`src/components/ui/`)
 
@@ -399,7 +411,7 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 - Архів власника — без окремої згоди; **виключені** кадри зі штампом-знаком 496–497; портрети «в камеру» не для ілюстрацій; людина в сцені — можна.
 - Підписів і кредитів під архівними фото нема → `DocPhoto` отримує варіант без `figcaption` (для `sitePhotos`); підпис лишається тільки для Wikimedia (`docPhotos`, CC BY-SA).
 - Зовнішні фото — лише для сюжетів, яких в архіві нема (посуд у закладі, стос тарілок, діти, піч); перевага Unsplash/CC0; запис у `CREDITS.md`.
-- Профілі й кейси — тільки фото студії з Payload.
+- Профілі й кейси — тільки фото студії (завантажені власниками, `getStudioPhotos`).
 - Alt-тексти — з таблиць `photo-plan.md` (без назви студії й міста).
 - Реєстр `sitePhotos` у `src/content/photos.ts`: `{ src, width, height, alt }`, у коментарі № кадру; файли `public/images/site/<розділ>-<слот>-<n>.jpg` (JPEG q80, sRGB, без EXIF).
 
@@ -428,7 +440,7 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 | `VesselWindow` | 3:4 / 1:1 | 600×800 / 600×600 | `(min-width:960px) 170px, 120px` |
 | «Для студій» | 3:4 (< lg 4:3, `object-position: center 30%`) | 1200×1600 | `(min-width:960px) 33vw, 100vw` |
 | `DocPhoto` у геро внутрішніх | 16:11 | 1200×825 | `(min-width:960px) 40vw, 100vw` |
-| Профіль: головне / мініатюри | 3:2 / 1:1 | з Payload | `(min-width:960px) 760px, 100vw` / `(min-width:640px) 150px, 33vw` |
+| Профіль: головне / мініатюри | 3:2 / 1:1 | `getStudioPhotos` | `(min-width:960px) 760px, 100vw` / `(min-width:640px) 150px, 33vw` |
 | OG | 1.91:1 | 1200×630, q70, ≤ 200 KB | — |
 
 Усі фото `object-fit: cover`, `rounded-none`, `priority` лише для першого фото геро; решта lazy.
@@ -519,7 +531,7 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 ## 8. Стайлгайд `/dev/styleguide`
 
 - Файл `src/app/(frontend)/dev/styleguide/page.tsx`, серверний, `export const metadata = { title: 'Стайлгайд', robots: { index: false, follow: false } }`. У sitemap не потрапляє (`next-sitemap` виключає все, крім `catalog-sitemap.xml`; `/dev` у `catalog-sitemap` не додавати). У `robots.txt` **не** забороняти (інакше `noindex` не прочитають). На `/llms.txt` не згадувати. Посилань на нього із сайту нема.
-- **Видимий у проді** (рішення: так — статичний, дешевий, дає власникові подивитися на телефоні; якщо власник проти — обгорнути в `notFound()` при `NODE_ENV === 'production'`).
+- **Лише локально** (рішення власника, крок 2): сторінка серверна й `dynamic = 'force-dynamic'`, у production викликає `notFound()` (першим рядком після перевірки `process.env.NODE_ENV`); посилань на неї нема ніде.
 - Рендерить **справжні компоненти з `src/components/ui` і `site`**, не копії розмітки, у такому порядку (кожен блок — `SectionHead` з назвою компонента і `id`): 1 кольори (свотчі зі значенням, роллю і парами з §2.1, читаються з CSS-змінних) · 2 типографіка (усі рядки §3.1 живим текстом) · 3 лінійки/радіус/фокус · 4 `Button` усі варіанти × розміри × стани (hover показати як окремий статичний приклад не треба; `disabled`) на папері, у `Panel cobalt` і `Panel ink` · 5 `Kicker`, `SectionHead rule/poster`, `CityHead`, `MoreLink`, `Breadcrumbs`, `Updated` · 6 `Panel` обидва тони з кікером, текстом і кнопкою · 7 `FactStrip` (цифри з `stats()`), `Stat inline/tile` · 8 `PhotoCard` ×2 (ink, cobalt) з фото з `sitePhotos`, `VesselWindow` ×3 · 9 `DataTable` stack і scroll (рядки з `facts()`/таблиці головної) · 10 `Chip` усі варіанти, `ChipGroup` · 11 `Faq` (3 питання з `faqFor`) · 12 `Term` · 13 `Epigraph` (`verses.home`) · 14 `Field`/`Input`/`Select`/`Textarea`/`Checkbox` на папері й на кобальті, стан помилки · 15 `NumberedList` 1 і 2 колонки, `QuoteBlock`, `CtaBand` обидва тони, `Note`, `SideBox` · 16 `StudioCell`, `StudioRow`, `MakerRow`, `CityList`, `SmallCities`, `Facts`, `ListBlock`, `PriceList`, `IndexCell` — з **реальними** студіями (`getCatalog`, перші 2–4 з Києва; якщо база недоступна під час білда — порожній стан «немає даних», без вигаданих) · 17 `MapFrame` (порожній, fallback-текст) · 18 `RequestForm` compact і повна, `MobileRequestBar` показати як статичний блок (`position: static` через проп `inline`) · 19 `Mark` 22/26/28 · 20 вордмарк (`WordmarkWindow`).
 - Перевірка: `pnpm shots /dev/styleguide` на 390/1280 — порівняти з попереднім знімком у `.shots/`; скрипт `shots.mjs` доповнити перевіркою `document.documentElement.scrollWidth <= window.innerWidth` (друкує попередження про горизонтальний скрол).
 - Доки й код не розходяться: новий примітив → рядок у §4.1 + блок у стайлгайді в одному коміті.
@@ -532,7 +544,7 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 
 | # | Крок | Файли | Перевірка |
 |---|---|---|---|
-| 1 | **Токени + шрифти.** Новий `@theme` (§2.6) поруч зі старими 1A-токенами (старі лишаються до кроку 9, але `--color-ink` і `--color-cobalt` одразу отримують нові значення); базові стилі; видалити shadcn-змінні, `html{opacity:0}`, `dark`, typography, `tw-animate-css`, `tailwind.config.mjs`; `next/font` за §3.2; `font-sans` → `font-body` у коді | `globals.css`, `layout.tsx`, `package.json` | `pnpm build`; `pnpm shots /` — шрифти Golos/Unbounded, сторінка не «біла»; Lighthouse: ≤ 10 preload шрифтів |
+| 1 | **Токени + шрифти.** Новий `@theme` (§2.6) поруч зі старими 1A-токенами (старі лишаються до кроку 9, але `--color-ink` і `--color-cobalt` одразу отримують нові значення); базові стилі; видалити shadcn-змінні (крім `--card`/`--error`, див. §2.6), `html{opacity:0}`, `dark`, typography, імпорт `tw-animate-css` з публічного CSS (пакет лишається для `/panel`), `tailwind.config.mjs`; `next/font` за §3.2; `font-sans` → `font-body` у коді | `globals.css`, `layout.tsx`, `manifest.ts`, `package.json` | `pnpm build`; `pnpm shots /` — шрифти Golos/Unbounded, сторінка не «біла»; Lighthouse: ≤ 10 preload шрифтів (фактично 4: Google віддає варіативні файли, один на підмножину) |
 | 2 | **Примітиви + стайлгайд.** `src/components/ui/*` з §4.1, `layout.ts` (`wrap`), `@layer components` (`ui-table`, `ui-faq`, `ui-term`, `ui-wordmark`), `src/content/glossary.ts`, `sitePhotos` у `photos.ts` (поки з наявними файлами), `/dev/styleguide` | `src/components/ui/`, `src/app/(frontend)/dev/styleguide/` | `pnpm shots /dev/styleguide`; стек таблиці на 390; тултип не виходить за край; `tsc` |
 | 3 | **Шапка, футер, бар.** `SiteHeader`, `MainNav.client` (`dialog`-шухляда, `nav-*`), `SiteFooter`, `MobileRequestBar` | `src/components/site/` | `pnpm shots / /dlya-biznesu/posud-dlya-restoraniv`; e2e smoke (`tests/e2e`) меню відкривається/закривається, Escape; на 390 «Запит →» в один рядок, шухляда прокручується |
 | 4 | **Головна.** `page.tsx` за §5: `WordmarkWindow`, `PhotoCard`, `Panel`, `Stat`, `DataTable`, `VesselWindow`, `CityList`, `Faq`; `RequestForm compact` на кобальті; фото за `photo-plan.md` §2 (експорт у `public/images/site/`) | `page.tsx`, `photos.ts`, `public/images/site/` | `pnpm shots /`: «ГЛИНА» по ширині; картки 3×2 на 1280, списком на 390; e2e H1 без змін; JSON-LD на місці (`view-source`) |
@@ -546,7 +558,7 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 
 ## 10. Відкриті питання для власника
 
-1. **Стайлгайд у проді** — лишити відкритим (`noindex`, без посилань) чи ховати за `notFound()` у production?
+1. ~~**Стайлгайд у проді**~~ — вирішено: лише локально, у production `notFound()` (§8).
 2. **Стани форм без зеленого/червоного** — помилка `terracotta-text`/`peach`, успіх звичайним текстом із лінійкою. Прийнятно для кабінету студій?
 3. ~~**`theme-color` браузера**~~ — вирішено: папір `#efe9de` (§7.6).
 4. **Словник (`Term`)** — лише вручну у вибраних місцях (головна «випали», гайди) чи автоматично для першої появи кожного слова з `glossary.md` на сторінці?
