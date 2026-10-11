@@ -10,7 +10,7 @@ import { fmt, getAllStudios, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
 import { evidenceLine } from '@/lib/topics'
 import { fillCopy } from '@/lib/waveA'
-import { EVENT_KIND, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/lib/waveB'
+import { EVENT_KIND, eventEnd, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/lib/waveB'
 import { ogImage } from '@/utilities/ogImage'
 
 // Wave B page: reviewed copy (src/content/waveB) around a live block that differs per page.
@@ -84,7 +84,15 @@ function EventRow({ e }: { e: EventItem }) {
     <li className="grid grid-cols-1 gap-0.5 rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
       <span className="text-[12.5px] font-semibold tracking-wide text-terra uppercase">{EVENT_KIND[e.kind] ?? 'Подія'}{e.city ? ` · ${e.city}` : ''}</span>
       {e.link ? <a href={e.link} target="_blank" rel="noopener nofollow" className="font-bold">{e.name}</a> : <b>{e.name}</b>}
-      {(e.nextDate || e.months) && <span className="text-umber">{e.nextDate ? `Найближче: ${e.nextDate.split('-').reverse().join('.')}` : e.months}</span>}
+      {(e.nextDate || e.months) && (
+        <span className="text-umber">
+          {e.nextDate
+            ? e.nextDate <= new Date().toISOString().slice(0, 10)
+              ? `Триває до ${eventEnd(e).split('-').reverse().join('.')}`
+              : `${e.approx ? 'Орієнтовно' : 'Дата'}: ${e.nextDate.split('-').reverse().join('.')}`
+            : e.months}
+        </span>
+      )}
       {e.venue && <span className="text-umber">{e.venue}</span>}
       {e.entry && <span className="text-umber">Вхід: {e.entry}</span>}
     </li>
@@ -223,7 +231,7 @@ const RELATED: Record<WaveBId, { label: string; href: string }[]> = {
   etsy: [{ label: 'Де купити кераміку', href: '/de-kupyty-keramiku' }, { label: 'Бренди посуду', href: '/dobirky/brendy-posudu' }, { label: 'Ціни 2026', href: '/tsiny-2026' }],
   podiyi: [{ label: 'Музеї й галереї', href: '/muzei-keramiky' }, { label: 'Де купити кераміку', href: '/de-kupyty-keramiku' }, { label: 'Мапа студій', href: '/mapa' }],
   'muzei-keramiky': [{ label: 'Ярмарки й події', href: '/podiyi' }, { label: 'Косів і Опішне сьогодні', href: '/dobirky/kosiv-i-opishne' }, { label: 'Мапа студій', href: '/mapa' }],
-  'yalynkovi-prykrasy': [{ label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Ярмарки й події', href: '/podiyi' }],
+  'yalynkovi-prykrasy': [{ label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Ярмарки й події', href: '/podiyi' }],
   'vydy-keramiky': [{ label: 'Харчова безпечність', href: '/hayidy/kharchova-bezpechnist' }, { label: 'Догляд за керамікою', href: '/hayidy/dohliad-za-keramikoyu' }, { label: 'Чорнодимлена й молочена', href: '/hayidy/chornodymlena-i-molochena' }],
   'dohliad-za-keramikoyu': [{ label: 'Харчова безпечність', href: '/hayidy/kharchova-bezpechnist' }, { label: 'Види кераміки', href: '/hayidy/vydy-keramiky' }, { label: 'Тарілки й миски', href: '/vyrobnyky/vyrib/tarilky-i-mysky' }],
   'chornodymlena-i-molochena': [{ label: 'Косів і Опішне сьогодні', href: '/dobirky/kosiv-i-opishne' }, { label: 'Види кераміки', href: '/hayidy/vydy-keramiky' }, { label: 'Музеї й галереї', href: '/muzei-keramiky' }],

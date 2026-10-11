@@ -70,7 +70,7 @@ export default async function Page() {
       related={[
         { label: 'Сертифікати на майстер-клас', href: '/sertyfikaty' },
         { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' },
-        { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+        { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
         { label: 'Чашки', href: '/vyrobnyky/vyrib/chashky' },
       ]}
     >

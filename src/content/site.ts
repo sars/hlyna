@@ -7,6 +7,8 @@ export const site = {
   description:
     'Каталог українських керамічних студій і майстрів. Посуд і подарунки ручної роботи для бізнесу, майстер-класи та сертифікати.',
   dataUpdated: 'жовтень 2026',
+  // ISO date of the last editorial content update (guides, selections, wave pages): sitemap lastmod, JSON-LD dateModified.
+  contentUpdated: '2026-10-11',
   dataModified: '2026-10-10', // ISO date of the last content update (JSON-LD dateModified)
   locale: 'uk_UA',
   // Business model, said openly so buyers and LLMs understand why requesting through us costs nothing.

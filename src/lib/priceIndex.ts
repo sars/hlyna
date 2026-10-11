@@ -4,7 +4,7 @@
 import { cache } from 'react'
 
 import { getAllStudios, type StudioCard } from './catalog'
-import { publicPrices, roundNice } from './present'
+import { publicPrices, roundNice, spanOf, type Span } from './present'
 import { PRODUCT_RE } from './products'
 
 export type Category = {
@@ -37,7 +37,7 @@ const priceIn = (t: string) => {
 }
 // The price that belongs to the category's own words: «чашки 250–2200 грн, тарілки 545–4000 грн» → cups 250,
 // plates 545. Falls back to the first price in the line.
-const near = (kw: RegExp) => (t: string) => {
+export const near = (kw: RegExp) => (t: string) => {
   const m = t.match(kw)
   if (m?.index !== undefined) {
     const v = priceIn(t.slice(m.index, m.index + m[0].length + 70))
@@ -102,13 +102,23 @@ export function studioValues(studios: StudioCard[]) {
   return { values, years, sources }
 }
 
+/** A studio's own price for one category (median of its matching lines), or null. */
+export function studioPrice(s: StudioCard, key = 'group'): number | null {
+  return studioValues([s]).values.get(key)?.[0]?.value ?? null
+}
+
+/** Price of one category across a set of studios (a city, a format in a city), worded by spanOf. */
+export function scopeSpan(studios: StudioCard[], key = 'group'): Span | null {
+  return spanOf((studioValues(studios).values.get(key) ?? []).map((x) => x.value))
+}
+
 // Prices among one group of studios (a city page): from–to across studios, median once there are 3.
 export function localPrices(studios: StudioCard[]) {
   const { values } = studioValues(studios)
   return CATEGORIES.flatMap((cat) => {
-    const vals = (values.get(cat.key) ?? []).map((x) => x.value).sort((a, b) => a - b)
-    if (vals.length < 2) return []
-    return [{ cat, n: vals.length, min: roundNice(vals[0]), max: roundNice(vals[vals.length - 1]), median: vals.length >= 3 ? roundNice(median(vals)) : null }]
+    const sp = spanOf((values.get(cat.key) ?? []).map((x) => x.value))
+    if (!sp) return []
+    return [{ cat, n: sp.n, min: sp.min, max: sp.max, text: sp.text, median: sp.n >= 3 ? sp.median : null }]
   })
 }
 
@@ -140,7 +150,10 @@ export const priceIndex = cache(async function priceIndex() {
   }
   const cities = [...byCity.values()]
     .filter((c) => c.vals.length >= 3)
-    .map((c) => ({ name: c.name, slug: c.slug, n: c.vals.length, median: roundNice(median(c.vals)), min: roundNice(Math.min(...c.vals)), max: roundNice(Math.max(...c.vals)) }))
+    .map((c) => {
+      const sp = spanOf(c.vals)!
+      return { name: c.name, slug: c.slug, n: c.vals.length, median: roundNice(median(c.vals)), min: sp.min, max: sp.max }
+    })
     .sort((a, b) => b.n - a.n)
   return { stats, cities, studios: sources.size, years: years.length ? { from: years[0], to: years[years.length - 1] } : null }
 })

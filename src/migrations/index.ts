@@ -4,6 +4,7 @@ import * as migration_20261010_164905_add_formats from './20261010_164905_add_fo
 import * as migration_20261010_181452_add_instagram_posts from './20261010_181452_add_instagram_posts';
 import * as migration_20261010_190427_add_alternate_names from './20261010_190427_add_alternate_names';
 import * as migration_20261010_194941_add_geo from './20261010_194941_add_geo';
+import * as migration_20261011_052428_request_studio_type from './20261011_052428_request_studio_type';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20261010_194941_add_geo.up,
     down: migration_20261010_194941_add_geo.down,
-    name: '20261010_194941_add_geo'
+    name: '20261010_194941_add_geo',
+  },
+  {
+    up: migration_20261011_052428_request_studio_type.up,
+    down: migration_20261011_052428_request_studio_type.down,
+    name: '20261011_052428_request_studio_type'
   },
 ];

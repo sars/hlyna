@@ -7,7 +7,9 @@ import { JsonLd } from './JsonLd'
 
 export const container = 'mx-auto max-w-[1200px] px-4 sm:px-5'
 
-export function Breadcrumbs({ items }: { items: { label: string; href?: string }[] }) {
+// Breadcrumbs also emit the page's WebPage JSON-LD with dateModified: the newest data behind the page when the
+// caller knows it (studio updatedAt), else the editorial content date.
+export function Breadcrumbs({ items, modified }: { items: { label: string; href?: string }[]; modified?: string | null }) {
   return (
     <>
       <nav aria-label="Навігація" className="text-[13px] text-umber">
@@ -33,6 +35,7 @@ export function Breadcrumbs({ items }: { items: { label: string; href?: string }
           itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.label, ...(it.href ? { item: site.url + it.href } : {}) })),
         }}
       />
+      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'WebPage', name: items[items.length - 1]?.label, inLanguage: 'uk', dateModified: (modified || site.contentUpdated).slice(0, 10), isPartOf: { '@type': 'WebSite', url: site.url } }} />
     </>
   )
 }

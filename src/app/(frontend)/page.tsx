@@ -28,7 +28,7 @@ const nf = (n: number) => n.toLocaleString('uk-UA')
 const paths = [
   { img: '/images/stock/restaurant-table.jpg', alt: 'Керамічні тарілки і піала на столі ресторану', title: 'Посуд для ресторанів і кав’ярень', text: 'Тарілки, миски, чашки під стиль закладу. Посудомийка, зразки, дозамовлення.', cta: 'Студії та ціни', href: '/dlya-biznesu/posud-dlya-restoraniv' },
   { img: '/images/stock/teal-mug.jpg', alt: 'Керамічна чашка ручної роботи з бірюзовою поливою', title: 'Чашки та посуд з логотипом', text: 'Штамп, деколь або полива у фірмових кольорах. Ціни залежно від кількості.', cta: 'Як це роблять', href: '/dlya-biznesu/chashky-z-lohotypom' },
-  { img: '/images/doc/festive-ware.jpg', alt: 'Святковий розписний посуд бубнівської кераміки', title: 'Новорічні подарунки 2026', text: 'Для команди і клієнтів: що встигнуть зробити до свят і коли замовляти.', cta: 'Ідеї та терміни', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+  { img: '/images/doc/festive-ware.jpg', alt: 'Святковий розписний посуд бубнівської кераміки', title: 'Новорічні подарунки 2026/27', text: 'Для команди і клієнтів: що встигнуть зробити до свят і коли замовляти.', cta: 'Ідеї та терміни', href: '/dlya-biznesu/novorichni-podarunky-2026' },
   { img: '/images/doc/workshop-table.jpg', alt: 'Стіл майстерні з розписаними виробами і людьми за роботою', title: 'Корпоратив з ліплення з глини', text: 'У студії чи у вашому офісі, для невеликої команди чи великого відділу. Ціни з особи — у таблиці нижче.', cta: 'Формати', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
 ]
 

@@ -38,7 +38,7 @@ export function dedupeTexts(items: string[]): string[] {
 // Research annotations that must not reach visitors: «(уточнюється)», «дані зі сніпета пошуку»,
 // «сторінка зараз 404», «717 використань», «~2024». Inside a parenthesis only the note part is removed,
 // so a source hint like «(tvoeshop, 2026; сертифікат наразі «недоступний»)» keeps «tvoeshop, 2026».
-const NOTE_WORDS = /уточн|можливо|ймовірно|не підтвердж|сніпет|снипет|(?<!\d)404(?!\d)|станом на|не вказано|орієнтир|стара картка|недоступн|перевірит|на сайті —/iu
+const NOTE_WORDS = /уточн|можливо|ймовірно|не підтвердж|сніпет|снипет|(?<!\d)404(?!\d)|станом на|не вказано|орієнтир|стара картка|недоступн|перевірит|на сайті —|з публікації|назва бренду|в іншому місці|у лістингу|точка збору|^\s*сайт\s*$/iu
 const NOTE_SENTENCE = /[^.!?\n]*(?:актуальн\p{L}* [^.!?\n]{0,60}не підтвердж|сторінк\p{L}* зараз 404|дані зі сніпет)[^.!?\n]*[.!?]?/giu
 
 export function cleanPublic(text?: string | null): string {
@@ -65,7 +65,9 @@ export function cleanPublic(text?: string | null): string {
 
 // "… — 1750 грн (сайт, 2026)" → body + source hint. Old (≤2022) and internal lines are dropped.
 const SOURCE = /\s*\(([^()]*?(?:19|20)\d\d[^()]*?|[^()]*?(?:сайт|instagram|bodo|kava|tvoeshop|prom|etsy|olx|facebook|магазин|\.ua|\.com|\.net)[^()]*?)\)\s*$/iu
-const INTERNAL = /медіан|переглянуто|вітрин|застаріл|ціна за запитом|ціни не опубліковано|за квед/iu
+const INTERNAL = /медіан|переглянуто|вітрин|застаріл|ціна за запитом|ціни не опубліковано|за квед|ймовірно|уточнити/iu
+// Donations and charity prices are not a price of a class or a product (and never go into priceRange).
+const DONATION = /донат|благодійн|(?<!\p{L})зсу(?!\p{L})|на військо|на збір/iu
 
 export type PriceLine = { text: string; source?: string; year?: number }
 
@@ -80,13 +82,19 @@ export function splitSource(raw: string): PriceLine {
 export function publicPrices(s: Studio): PriceLine[] {
   const out: PriceLine[] = []
   const seen = new Set<string>()
-  for (const p of s.prices ?? []) {
-    if (INTERNAL.test(p.text)) continue
-    const line = splitSource(p.text)
+  // Newest first, so when the same price appears from several sources (Bodo, bodo.ua, Instagram) the freshest stays.
+  const raw = [...(s.prices ?? [])].map((p) => p.text).sort((a, b) => (splitSource(b).year ?? 0) - (splitSource(a).year ?? 0))
+  for (const text of raw) {
+    if (INTERNAL.test(text) || DONATION.test(text)) continue
+    const line = splitSource(text)
     if (line.year && line.year < 2023) continue
     if (!/\d/.test(line.text)) continue
     const key = norm(line.text)
     if (seen.has(key)) continue
+    // Near duplicate: same amounts and one wording contained in the other («МК кераміки, 1,5 год — 1200 грн» twice).
+    const am = amountsIn(line.text).join(',')
+    const w = words(line.text)
+    if (am && out.some((o) => amountsIn(o.text).join(',') === am && (() => { const ow = words(o.text); return [...w].every((x) => ow.has(x)) || [...ow].every((x) => w.has(x)) })())) continue
     seen.add(key)
     // Prices in dollars or euros come from shops abroad (Etsy, own site for export); say so instead of leaving a bare «43 USD».
     if (/(?<!\p{L})(?:usd|eur)(?!\p{L})|\$|€/iu.test(line.text) && !/грн|₴/.test(line.text))
@@ -119,6 +127,26 @@ export function typicalRange(amounts: number[]): { min: number; max: number } | 
   const pick = (q: number) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]
   const r = sorted.length >= 5 ? { min: pick(0.1), max: pick(0.9) } : { min: sorted[0], max: sorted[sorted.length - 1] }
   return { min: roundNice(r.min), max: roundNice(r.max) }
+}
+
+/**
+ * One wording for a set of prices (one value per studio), used by every page so the same studios never
+ * produce two different numbers: 1 price → «900 грн», 2 → «900 і 1 300 грн», 3–4 → «від 900 до 1 700 грн»,
+ * 5+ → the typical span (10th–90th percentile). Never «від X до X».
+ */
+export type Span = { n: number; min: number; max: number; median: number; text: string }
+export function spanOf(values: number[]): Span | null {
+  const v = values.filter((x) => x > 0).sort((a, b) => a - b)
+  if (!v.length) return null
+  const med = roundNice(v[Math.floor(v.length / 2)])
+  const nice = (x: number) => roundNice(x).toLocaleString('uk-UA')
+  if (v.length === 1) return { n: 1, min: roundNice(v[0]), max: roundNice(v[0]), median: med, text: `${nice(v[0])} грн` }
+  if (v.length === 2) {
+    const [a, b] = [roundNice(v[0]), roundNice(v[1])]
+    return { n: 2, min: a, max: b, median: med, text: a === b ? `${nice(a)} грн` : `${nice(a)} і ${nice(b)} грн` }
+  }
+  const r = typicalRange(v)!
+  return { n: v.length, min: r.min, max: r.max, median: med, text: r.min === r.max ? `${r.min.toLocaleString('uk-UA')} грн` : `від ${r.min.toLocaleString('uk-UA')} до ${r.max.toLocaleString('uk-UA')} грн` }
 }
 
 // ---------- people and places ----------
@@ -195,6 +223,7 @@ const STALE_ADDRESS = /^\s*(?:історично|раніше|колишн)|ак
 export function firstAddress(addr?: string | null): string {
   if (!addr || STALE_ADDRESS.test(addr)) return ''
   return addr
+    .replace(/\([^)]*\)/g, '')
     .split(/;|\s+та\s+|\s+і\s+(?=вул)/)[0]
     .replace(/\([^)]*\)/g, '')
     .replace(/,?\s*(?:ст\.\s*)?м\.\s*[«"]?[А-ЯІЇЄҐ][^,;]*$/u, '')
@@ -242,6 +271,7 @@ export function cleanName(name: string): string {
   let n = name
     .replace(/\s*\((?=[^)]*(?:тел\.?|\+?\d[\d\s-]{6,}|партнер))[^)]*\)/giu, '')
     .replace(/\s+[—–-]\s+(?:мк|майстер-клас\p{L}*)\s+на\s+.+$/iu, '')
+    .replace(/,?\s*(?:тел\.?\s*)?\+?\d[\d\s()-]{8,}\d/gu, '')
   n = n.replace(/\s*\(([^()]*)\)/g, (m, inner: string) => {
     const outer = n.replace(m, '')
     if (ADDRESS.test(inner)) return ''

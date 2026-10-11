@@ -141,6 +141,9 @@ export function groupByCity(studios: StudioCard[]): CityGroup[] {
   return [...map.values()].sort((a, b) => b.studios.length - a.studios.length)
 }
 
+/** Newest updatedAt among studios (page dateModified / sitemap lastmod). */
+export const latestUpdate = (xs: { updatedAt?: string | null }[]) => xs.reduce<string | null>((m, x) => (x.updatedAt && (!m || x.updatedAt > m) ? x.updatedAt : m), null)
+
 export const MIN_LIST = 3 // no thin pages: a list needs at least 3 real entries (AGENTS.md)
 
 export const fmt = (n: number) => n.toLocaleString('uk-UA')

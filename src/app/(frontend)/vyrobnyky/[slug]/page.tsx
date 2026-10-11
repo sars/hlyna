@@ -11,8 +11,9 @@ import { StudioCard } from '@/components/site/StudioCard'
 import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
+import { makerCities } from '@/lib/makers'
 import { getAllStudios, getCatalog, getStudioBySlug, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
-import { amountsIn, cleanAddress, cleanName, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
+import { amountsIn, cleanAddress, cleanName, cleanPublic, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -63,17 +64,24 @@ const GROUPS: [string, RegExp][] = [
   ['Майстер-класи', /(?<!\p{L})мк(?!\p{L})|майстер-клас|заняття|урок|побачен|для двох|гончарств|ліплен|ліпк|розпис|гончарн\p{L}* (?:кол|круг)/iu],
   ['Курси й абонементи', /курс|абонемент|\d+\s*занять|місяц/iu],
   ['Для компаній', /корпоратив|тімбілд|тимбілд|для компан|для команд|груп[аиу]?\s+до|оптов|гурт/iu],
-  ['Коворкінг і послуги', /коворк|оренд|випал|полиц|глина\s+\d|сертифікат/iu],
+  ['Коворкінг і послуги', /коворк|оренд|полиц|глина\s+\d|^\s*(?:випал|сертифікат)/iu],
 ]
+// Prices from before 2025 move to «Старші ціни» when the studio has newer ones (they stay visible, but last).
+const OLD_GROUP = 'Старші ціни (до 2025 року)'
 function groupPrices(lines: PriceLine[]) {
   const out = new Map<string, PriceLine[]>()
+  const hasNew = lines.some((l) => (l.year ?? 0) >= 2025)
   for (const l of lines) {
+    if (hasNew && l.year && l.year < 2025) {
+      out.set(OLD_GROUP, [...(out.get(OLD_GROUP) ?? []), l])
+      continue
+    }
     // Courses and company prices first: «МК» appears in many course lines too.
     const order = [GROUPS[1], GROUPS[2], GROUPS[3], GROUPS[0]]
     const g = order.find(([, re]) => re.test(l.text))?.[0] ?? 'Вироби'
     out.set(g, [...(out.get(g) ?? []), l])
   }
-  return [...GROUPS.map(([g]) => g), 'Вироби'].filter((g) => out.has(g)).map((g) => [g, out.get(g)!] as const)
+  return [...GROUPS.map(([g]) => g), 'Вироби', OLD_GROUP].filter((g) => out.has(g)).map((g) => [g, out.get(g)!] as const)
 }
 
 const SHOW = 12
@@ -117,7 +125,9 @@ export default async function StudioPage({ params }: Args) {
   if (!s) notFound()
 
   const name = cleanName(s.name)
-  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name)
+  // A bare Instagram handle already shown in «Коротко» is not an alternative name.
+  const handle = igHandle(s.instagram).toLowerCase()
+  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name && t.replace(/^@/, '').toLowerCase() !== handle)
   // On the page, skip variants already visible in the heading («Ґроно (Grono)» → only grono.shop is new).
   const shownAlt = altNames.filter((t) => !name.toLowerCase().includes(t.toLowerCase()))
   const city = s.cityDoc
@@ -132,28 +142,30 @@ export default async function StudioPage({ params }: Args) {
   const related = city ? everyone.filter((x) => x.cityDoc?.slug === city.slug && x.slug !== s.slug).slice(0, 6) : []
   // Link the city only when it has its own master-class page (MIN_LIST places).
   const cityPage = city ? (groupByCity(everyone.filter(offersMasterClasses)).find((g) => g.city.slug === city.slug)?.studios.length ?? 0) >= MIN_LIST : false
+  // Breadcrumb and «Місто» go to the city's makers page (/vyrobnyky/misto/<city>), else to its master-class page.
+  const makersPage = city ? (await makerCities()).some((g) => g.city.slug === city.slug) : false
+  const cityHref = city ? (makersPage ? `/vyrobnyky/misto/${city.slug}` : cityPage ? `/maister-klasy/${city.slug}` : '') : ''
   const b2b = s.b2b ?? {}
   const hasB2bData = Boolean(b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length)
   const channels = dedupeTexts((s.salesChannels ?? []).map((x) => x.text)).slice(0, 6)
-  const products = dedupeTexts((s.products ?? []).map((x) => x.text))
-  const services = dedupeTexts((s.services ?? []).map((x) => x.text))
+  const products = dedupeTexts((s.products ?? []).map((x) => cleanPublic(x.text)))
+  const services = dedupeTexts((s.services ?? []).map((x) => cleanPublic(x.text)))
   const prices = publicPrices(s)
   // schema.org priceRange from the studio's own hryvnia prices (typical span, not extremes).
-  const span = typicalRange(prices.flatMap((p) => amountsIn(p.text)))
+  const span = typicalRange(prices.filter((p) => !p.year || p.year >= 2025 || !prices.some((x) => (x.year ?? 0) >= 2025)).flatMap((p) => amountsIn(p.text)))
   const priceRange = span ? (span.min === span.max ? `${span.min} UAH` : `${span.min}–${span.max} UAH`) : ''
   const priceGroups = groupPrices(prices)
   const description = stripPersonal(s.publicDescription || s.description || '')
   const recentNote = stripPersonal(s.recentNote || '')
   const monthYear = (d?: string | null) => (d ? new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(d)).filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ') : '')
   const lastPost = monthYear(s.activity?.lastPostDate)
-  const followers = s.activity?.followers ? new Intl.NumberFormat('uk-UA').format(s.activity.followers) : ''
   const igPosts = (s.activity?.instagramPosts ?? []).map((x) => x.url)
   const facts: [string, React.ReactNode][] = [
     ['Тип', typeLabel],
-    ...(city ? [['Місто', cityPage ? <Link key="c" href={`/maister-klasy/${city.slug}`}>{city.name}</Link> : city.name] as [string, React.ReactNode]] : []),
+    ...(city ? [['Місто', cityHref ? <Link key="c" href={cityHref}>{city.name}</Link> : city.name] as [string, React.ReactNode]] : []),
     ...(cleanAddress(s.address) ? [['Адреса', cleanAddress(s.address)] as [string, React.ReactNode]] : []),
     ...(s.instagram ? [['Instagram', link(s.instagram, '@' + igHandle(s.instagram))] as [string, React.ReactNode]] : []),
-    ...(lastPost ? [['Останній пост', `${lastPost}${followers ? ` · ${followers} підписників` : ''}`] as [string, React.ReactNode]] : []),
+    ...(lastPost ? [['Останній пост', lastPost] as [string, React.ReactNode]] : []),
     ...(s.website ? [['Сайт', link(s.website, s.website.replace(/^https?:\/\//, '').replace(/\/$/, ''))] as [string, React.ReactNode]] : []),
     ...(s.facebook ? [['Facebook', link(s.facebook, 'сторінка')] as [string, React.ReactNode]] : []),
     ...(channels.length && !exhibiting ? [['Де продає', channels.join(' · ')] as [string, React.ReactNode]] : []),
@@ -180,7 +192,7 @@ export default async function StudioPage({ params }: Args) {
         }}
       />
       <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityPage ? [{ label: city.name, href: `/maister-klasy/${city.slug}` }] : []), { label: name }]} />
+        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityHref ? [{ label: city.name, href: cityHref }] : []), { label: name }]} modified={s.updatedAt} />
         <span className="kicker">{typeLabel}{city ? ` · ${city.name}` : ''}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06] break-words">{name}</h1>
         {shownAlt.length > 0 && <p className="m-0 -mt-2 text-sm break-words text-umber">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}

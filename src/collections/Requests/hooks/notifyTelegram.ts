@@ -26,7 +26,10 @@ export const notifyTelegram: CollectionAfterChangeHook = async ({ doc, operation
     const serverUrl = (process.env.NEXT_PUBLIC_SERVER_URL || '').replace(/\/$/, '')
 
     const text = [
-      `Новий запит #${doc.id}: ${what}`,
+      doc.what === 'studio' ? `Студія #${doc.id}: додати / оновити профіль` : `Новий запит #${doc.id}: ${what}`,
+      line('Студія', doc.studioName),
+      line('Instagram / сайт', doc.studioLinks),
+      line('Згода на фото', doc.what === 'studio' ? (doc.photoConsent ? 'так' : 'ні') : null),
       line('Деталі', doc.details),
       line('Кількість', doc.quantity),
       line('Термін', doc.deadline),

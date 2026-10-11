@@ -17,18 +17,22 @@ const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/vyrobnyky/misto',
 
 export async function GET() {
   const studios = await getAllStudios()
-  const now = new Date().toISOString()
+  // lastmod = when the data behind the page last changed, not the build time: the newest studio update for
+  // catalogue pages, the content date for editorial pages (guides, selections, wave pages).
+  const latest = (xs: { updatedAt?: string | null }[]) => xs.reduce((m, x) => (x.updatedAt && x.updatedAt > m ? x.updatedAt : m), site.contentUpdated)
+  const now = latest(studios)
+  const content = site.contentUpdated
   const cities = groupByCity(studios.filter(offersMasterClasses)).filter((g) => g.studios.length >= MIN_LIST)
   return getServerSideSitemap([
     ...HUBS.map((p) => ({ loc: site.url + p, lastmod: now })),
     ...topicList.map((t) => ({ loc: site.url + t.path, lastmod: now })),
-    ...guides.map((g) => ({ loc: site.url + g.path, lastmod: now })),
-    ...(await liveWavePages()).map((p) => ({ loc: site.url + p.path, lastmod: now })),
-    ...(await liveWaveBPages()).map((p) => ({ loc: site.url + p.path, lastmod: now })),
-    ...(await liveWaveCPages()).map((p) => ({ loc: site.url + p.path, lastmod: now })),
-    ...(await certificateCities()).map((c) => ({ loc: `${site.url}/sertyfikaty/${c.slug}`, lastmod: now })),
-    ...cities.map((g) => ({ loc: `${site.url}/maister-klasy/${g.city.slug}`, lastmod: now })),
-    ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: now })),
-    ...(await getCatalog()).map((s) => ({ loc: `${site.url}/vyrobnyky/${s.slug}`, lastmod: s.updatedAt || now })),
+    ...guides.map((g) => ({ loc: site.url + g.path, lastmod: content })),
+    ...(await liveWavePages()).map((p) => ({ loc: site.url + p.path, lastmod: content })),
+    ...(await liveWaveBPages()).map((p) => ({ loc: site.url + p.path, lastmod: content })),
+    ...(await liveWaveCPages()).map((p) => ({ loc: site.url + p.path, lastmod: content })),
+    ...(await certificateCities()).map((c) => ({ loc: `${site.url}/sertyfikaty/${c.slug}`, lastmod: latest(studios.filter((s) => s.cityDoc?.slug === c.slug)) })),
+    ...cities.map((g) => ({ loc: `${site.url}/maister-klasy/${g.city.slug}`, lastmod: latest(g.studios) })),
+    ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: latest(g.studios) })),
+    ...(await getCatalog()).map((s) => ({ loc: `${site.url}/vyrobnyky/${s.slug}`, lastmod: s.updatedAt || content })),
   ])
 }

@@ -95,8 +95,10 @@ export async function etsyData() {
 
 export type EventItem = {
   name: string; kind: string; recurrence: string; dates: string; nextDate: string; city: string; venue: string
-  status: string; entry: string; participation: string; link: string; months: string
+  status: string; entry: string; participation: string; link: string; months: string; approx?: boolean
 }
+// Last day of the event's current edition: «2026-10-10..2026-10-11» → 2026-10-11; otherwise nextDate.
+export const eventEnd = (e: EventItem) => e.dates.match(new RegExp(`${e.nextDate}\\.\\.(\\d{4}-\\d{2}-\\d{2})`))?.[1] ?? e.nextDate
 const today = () => new Date().toISOString().slice(0, 10)
 export const EVENT_KIND: Record<string, string> = {
   fair: 'Ярмарок', market: 'Маркет', festival: 'Фестиваль', exhibition: 'Виставка', symposium: 'Симпозіум', plein_air: 'Пленер',
@@ -107,7 +109,8 @@ export const EVENT_KIND: Record<string, string> = {
 export async function eventsPageData() {
   const items = eventsData as EventItem[]
   const t = today()
-  const upcoming = items.filter((e) => e.nextDate && e.nextDate >= t && e.status !== 'ended').sort((a, b) => a.nextDate.localeCompare(b.nextDate))
+  // Upcoming or still running today (multi-day events count until their last day), computed at render time.
+  const upcoming = items.filter((e) => /^\d{4}-\d{2}-\d{2}$/.test(e.nextDate) && eventEnd(e) >= t && e.status !== 'ended').sort((a, b) => a.nextDate.localeCompare(b.nextDate))
   const recurring = items.filter((e) => !upcoming.includes(e) && ['annual', 'seasonal', 'monthly'].includes(e.recurrence) && !['ended', 'paused'].includes(e.status))
   const paused = items.filter((e) => ['ended', 'paused'].includes(e.status))
   const cities = new Set(items.map((e) => e.city).filter(Boolean))

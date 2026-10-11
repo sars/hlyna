@@ -52,11 +52,11 @@ export function fillCopy(c: WaveCopy, vars: WaveVars): WaveCopy {
   }
 }
 
-const priceVars = (r: { min?: number; max?: number; median?: number } | null | undefined): WaveVars => ({
+const priceVars = (r: { min?: number; max?: number; median?: number; priceText?: string } | null | undefined): WaveVars => ({
   min: r?.min,
   max: r?.max,
   median: r?.median ? `${fmt(r.median)} грн` : undefined,
-  priceRange: r?.min && r?.max ? `від ${fmt(r.min)} до ${fmt(r.max)} грн` : undefined,
+  priceRange: r?.priceText ?? (r?.min && r?.max ? (r.min === r.max ? `${fmt(r.min)} грн` : `від ${fmt(r.min)} до ${fmt(r.max)} грн`) : undefined),
 })
 
 // ---------- 1. format × city ----------

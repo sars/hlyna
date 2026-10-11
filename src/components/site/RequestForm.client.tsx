@@ -29,26 +29,49 @@ const label = 'grid gap-1 text-[13px] font-semibold text-umber'
 // Posts to Payload's REST API (collection `requests`, public create). `website2` is a honeypot.
 // defaultWhat / defaultCity come from the page (a master-class city page asks about a master class in that city).
 // /zapyt?vid=studiya (or forStudio, on /dlya-studiy) opens the form for studios that want to add or update their profile.
-export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tableware', defaultCity = '', forStudio = false }: { sourcePage: string; compact?: boolean; defaultWhat?: string; defaultCity?: string; forStudio?: boolean }) {
+// /zapyt?what=<kind>&misto=<city slug> (set by the header button from the page the visitor came from) pre-fills the form.
+export function RequestForm({
+  sourcePage,
+  compact = false,
+  defaultWhat = 'tableware',
+  defaultCity = '',
+  forStudio = false,
+  cityNames,
+}: {
+  sourcePage: string
+  compact?: boolean
+  defaultWhat?: string
+  defaultCity?: string
+  forStudio?: boolean
+  cityNames?: Record<string, string>
+}) {
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
-  const [what, setWhat] = useState(forStudio ? 'other' : defaultWhat)
+  const [requestId, setRequestId] = useState<number | null>(null)
+  const [what, setWhat] = useState(defaultWhat)
+  const [city, setCity] = useState(defaultCity)
   const [studio, setStudio] = useState(forStudio)
   const kind = KIND[what] ?? KIND.other
 
   useEffect(() => {
-    if (new URLSearchParams(window.location.search).get('vid') === 'studiya') {
-      setStudio(true)
-      setWhat('other')
-    }
-  }, [])
+    const q = new URLSearchParams(window.location.search)
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time sync from the URL after hydration */
+    if (q.get('vid') === 'studiya') setStudio(true)
+    const w = q.get('what')
+    if (w && KIND[w]) setWhat(w)
+    const m = q.get('misto')
+    if (m && cityNames?.[m]) setCity(cityNames[m])
+    /* eslint-enable react-hooks/set-state-in-effect */
+  }, [cityNames])
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = new FormData(e.currentTarget)
     const body = Object.fromEntries(form.entries()) as Record<string, string | boolean>
     body.logo = form.get('logo') === 'on'
+    body.photoConsent = form.get('photoConsent') === 'on'
     body.sourcePage = sourcePage
+    if (studio) body.what = 'studio'
     if (!body.contactPhoneOrTelegram && !body.contactEmail) {
       setError('Вкажіть телефон, Telegram або email, щоб студії могли відповісти.')
       setState('error')
@@ -58,6 +81,8 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
     try {
       const res = await fetch('/api/requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       if (!res.ok) throw new Error(String(res.status))
+      const json = (await res.json().catch(() => null)) as { doc?: { id?: number } } | null
+      setRequestId(json?.doc?.id ?? null)
       setState('done')
     } catch {
       setError('Не вдалося надіслати. Спробуйте ще раз за хвилину.')
@@ -67,15 +92,64 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
 
   if (state === 'done')
     return (
-      <div className="rounded-[20px] border border-line bg-card p-5">
-        <p className="font-display m-0 text-sm uppercase">Запит надіслано</p>
-        <p className="mt-2 mb-0">Ми передамо його студіям, які роблять такі вироби, і напишемо вам, коли вони відповідатимуть. Зазвичай це 1–3 робочі дні.</p>
+      <div className="grid gap-2 rounded-[20px] border border-line bg-card p-5" role="status">
+        <p className="font-display m-0 text-sm uppercase">{studio ? 'Дані студії отримали' : 'Запит надіслано'}{requestId ? ` · № ${requestId}` : ''}</p>
+        {studio ? (
+          <p className="m-0">Ми перевіримо профіль і напишемо вам, щоб уточнити деталі. Нічого не публікуємо без перевірки, а фото — лише з вашої згоди.</p>
+        ) : (
+          <>
+            <p className="m-0">Що далі: ми передамо запит студіям, які роблять саме таке, і напишемо вам. Студії відповідатимуть напряму — з цінами й термінами.</p>
+            <p className="m-0 text-sm text-umber">Якщо щось змінилося, відповідайте на наше повідомлення й вкажіть номер запиту.</p>
+          </>
+        )}
       </div>
+    )
+
+  if (studio)
+    return (
+      <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
+        <p className="font-display m-0 text-sm tracking-wide uppercase">Додати / оновити студію</p>
+        <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+          <label className={label}>
+            Назва студії чи ім’я майстра
+            <input name="studioName" required className={field} />
+          </label>
+          <label className={label}>
+            Місто
+            <input name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ваше місто" autoComplete="address-level2" className={field} />
+          </label>
+          <label className={`${label} sm:col-span-2`}>
+            Instagram або сайт
+            <input name="studioLinks" placeholder="@студія або https://…" className={field} />
+          </label>
+          <label className={`${label} sm:col-span-2`}>
+            Що додати чи змінити
+            <textarea name="details" rows={3} placeholder="Нова студія, адреса, ціни, формати, умови для бізнесу, що виправити…" className={field} />
+          </label>
+          <label className={label}>
+            Телефон або Telegram
+            <input name="contactPhoneOrTelegram" inputMode="tel" placeholder="+380… або @нік" className={field} />
+          </label>
+          <label className={label}>
+            Email
+            <input name="contactEmail" type="email" placeholder="ви@студія.ua" className={field} />
+          </label>
+        </div>
+        <label className="flex items-start gap-2 text-sm text-umber">
+          <input type="checkbox" name="photoConsent" className="mt-0.5 size-4 accent-[var(--color-terra)]" /> Дозволяємо показувати фото наших робіт із підписом студії
+        </label>
+        <input type="text" name="website2" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+        <button type="submit" disabled={state === 'sending'} className="justify-self-start rounded-full bg-terra px-5 py-3 font-bold text-cream hover:bg-terra-dark disabled:opacity-60">
+          {state === 'sending' ? 'Надсилаємо…' : 'Надіслати дані студії'}
+        </button>
+        {state === 'error' && <p className="m-0 text-sm text-[var(--error)]">{error}</p>}
+        <p className="m-0 text-[12.5px] text-umber">Профіль безкоштовний. Студія платить 5% лише з замовлень, укладених через наш запит.</p>
+      </form>
     )
 
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
-      <p className="font-display m-0 text-sm tracking-wide uppercase">{studio ? 'Додати студію' : 'Швидкий запит'}</p>
+      <p className="font-display m-0 text-sm tracking-wide uppercase">Швидкий запит</p>
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <label className={label}>
           Що потрібно
@@ -99,31 +173,24 @@ export function RequestForm({ sourcePage, compact = false, defaultWhat = 'tablew
         </label>
         <label className={label}>
           Місто
-          <input name="city" defaultValue={defaultCity} placeholder="Ваше місто" autoComplete="address-level2" className={field} />
+          <input name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ваше місто" autoComplete="address-level2" className={field} />
         </label>
         {!compact && (
           <label className={`${label} sm:col-span-2`}>
             Деталі
-            <textarea
-              key={studio ? 'studio' : 'buyer'}
-              name="details"
-              rows={3}
-              defaultValue={studio ? 'Я студія / майстер. Хочу додати або оновити профіль: назва, Instagram чи сайт, місто, що робимо.' : undefined}
-              placeholder={kind.details}
-              className={field}
-            />
+            <textarea name="details" rows={3} placeholder={kind.details} className={field} />
           </label>
         )}
         <label className={label}>
           Телефон або Telegram
-          <input name="contactPhoneOrTelegram" placeholder="+380… або @нік" className={field} />
+          <input name="contactPhoneOrTelegram" inputMode="tel" placeholder="+380… або @нік" className={field} />
         </label>
         <label className={label}>
           Email
           <input name="contactEmail" type="email" placeholder="ви@компанія.ua" className={field} />
         </label>
       </div>
-      {kind.logo && !studio && (
+      {kind.logo && (
         <label className="flex items-center gap-2 text-sm text-umber">
           <input type="checkbox" name="logo" className="size-4 accent-[var(--color-terra)]" /> Потрібен логотип
         </label>

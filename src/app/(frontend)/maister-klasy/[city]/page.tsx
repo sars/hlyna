@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { latestUpdate } from '@/lib/catalog'
+
 import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
@@ -11,7 +13,8 @@ import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
 import { fmt, getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, inCity, oblastLabel, singleClassAmounts, typicalRange, staleNote } from '@/lib/present'
+import { cleanName, firstAddress, inCity, oblastLabel, staleNote, type Span } from '@/lib/present'
+import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { cityContent } from '@/lib/places'
 import { certificateCities } from '@/lib/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/lib/waveA'
@@ -37,7 +40,7 @@ export async function generateStaticParams() {
 type Args = { params: Promise<{ city: string }> }
 
 const places = (n: number) => `${fmt(n)} ${pluralUk(n, ['місце', 'місця', 'місць'])}`
-const priceText = (r: { min: number; max: number } | null) => (r ? (r.min === r.max ? `${fmt(r.min)} грн` : `від ${fmt(r.min)} до ${fmt(r.max)} грн`) : '')
+const priceText = (r: Span | null) => r?.text ?? ''
 
 // Format chips per studio (from tags), in the order people choose by.
 const CHIPS: [Format, string][] = [
@@ -61,21 +64,19 @@ const FORMAT_PAGES: [Format, string, string][] = [
   ['courses', 'Курси й абонементи', '/maister-klasy/kursy'],
 ]
 
-const minClass = (s: StudioCard) => {
-  const a = singleClassAmounts(s)
-  return a.length ? Math.min(...a) : null
-}
+// The studio's own single-class price (adults, per person): the same number /tsiny-2026 counts for it.
+const minClass = (s: StudioCard) => studioPrice(s, 'group')
 
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const g = await cityData((await params).city)
   if (!g) return {}
-  const r = typicalRange(g.studios.flatMap(singleClassAmounts))
+  const r = scopeSpan(g.studios, 'group')
   const n = g.studios.length
   return {
     title: `Майстер-класи з кераміки ${inCity(g.city.name)}: ${places(n)} і ціни 2026`,
-    description: `${places(n)} ${inCity(g.city.name)}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття найчастіше коштує ${priceText(r)}` : ''}. Формати, адреси, сертифікати.`,
+    description: `${places(n)} ${inCity(g.city.name)}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття коштує ${priceText(r)}` : ''}. Формати, адреси, сертифікати.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
-    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${places(n)}, найчастіше ${priceText(r)}` : places(n), pattern: g.city.slug as string, coa: g.city.slug as string }) },
+    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${places(n)}, ${priceText(r)}` : places(n), pattern: g.city.slug as string, coa: g.city.slug as string }) },
   }
 }
 
@@ -85,8 +86,8 @@ export default async function CityMasterClassesPage({ params }: Args) {
   const { city, studios } = g
   const where = inCity(city.name)
   const region = oblastLabel(city)
-  const r = typicalRange(studios.flatMap(singleClassAmounts))
-  const priced = studios.filter((s) => singleClassAmounts(s).length).length
+  const r = scopeSpan(studios, 'group')
+  const priced = r?.n ?? 0
   // Studios with a known class price first, then those with Instagram, then by name.
   const sorted = [...studios].sort((a, b) => Number(minClass(b) !== null) - Number(minClass(a) !== null) || Number(!!b.instagram) - Number(!!a.instagram) || a.name.localeCompare(b.name, 'uk'))
   const hasCertPage = (await certificateCities()).some((c) => c.slug === city.slug)
@@ -105,7 +106,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
     {
       q: `Скільки коштує майстер-клас з кераміки ${where}?`,
       a: r
-        ? `За прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])} міста разовий майстер-клас найчастіше коштує ${priceText(r)}. Групове заняття дешевше за індивідуальне; випал і полива іноді оплачуються окремо. Курси й абонементи рахуються окремо.`
+        ? `За прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])} міста разовий майстер-клас коштує ${priceText(r)}. Групове заняття дешевше за індивідуальне; випал і полива іноді оплачуються окремо. Курси й абонементи рахуються окремо.`
         : `Студії міста здебільшого не публікують ціни. По Україні разовий майстер-клас коштує ${f.range('group')}, індивідуальний — ${f.range('private')}.`,
     },
     { q: 'Коли можна забрати свій виріб?', a: `Зазвичай через ${site.lead.pickup}: виріб має висохнути і пройти два випали (до і після поливи). Деякі студії надсилають готові вироби Новою поштою.` },
@@ -135,13 +136,13 @@ export default async function CityMasterClassesPage({ params }: Args) {
         }}
       />
       <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи', href: '/maister-klasy' }, { label: city.name }]} />
+        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи', href: '/maister-klasy' }, { label: city.name }]} modified={latestUpdate(studios)} />
         <span className="kicker">Майстер-класи{region ? ` · ${region}` : ''}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки: {city.name}</h1>
         <p className="m-0 max-w-[70ch] text-lg">
           У каталозі «Глина» — {places(studios.length)} {where}, де проводять заняття з гончарства, ліплення чи розпису кераміки
           {breakdown.length ? `: ${breakdown.join(', ')}` : ''}.
-          {r ? ` Разовий майстер-клас найчастіше коштує ${priceText(r)} (за прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])}, ${site.dataUpdated}).` : ''} Нижче — кожна студія з форматами й цінами; один запит можна надіслати одразу кільком.
+          {r ? ` Разовий майстер-клас коштує ${priceText(r)} (за прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])}, ${site.dataUpdated}).` : ''} Нижче — кожна студія з форматами й цінами; один запит можна надіслати одразу кільком.
         </p>
         {cityContent(city.slug as string)?.lead && (
           <p className="m-0 max-w-[70ch] text-[15.5px] text-umber">

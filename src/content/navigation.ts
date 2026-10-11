@@ -19,6 +19,28 @@ export type NavSection = {
 }
 
 export const REQUEST_HREF = '/zapyt'
+
+// The header button keeps the page's context: /zapyt?what=<kind>&misto=<city slug>, read by the request form.
+const NOT_CITY = new Set(['honcharne-kolo', 'lipennya', 'dlya-ditey', 'dlya-dvokh', 'rozpys', 'kursy', 'den-narodzhennya'])
+export function requestHrefFor(pathname: string | null): string {
+  if (!pathname) return REQUEST_HREF
+  const p = pathname.split('/').filter(Boolean)
+  let what = ''
+  if (p[0] === 'maister-klasy' || p[0] === 'sertyfikaty') what = 'master-class'
+  else if (pathname.includes('korporatyv') || pathname.includes('richnytsyu')) what = 'corporate-workshop'
+  else if (pathname.includes('chashky-z-lohotypom')) what = 'logo-mugs'
+  else if (pathname.includes('podarunky-spivrobitnykam') || pathname.includes('korporatyvni-podarunky') || p[0] === 'novyi-rik-i-rizdvo') what = 'corporate-gifts'
+  else if (pathname.includes('posud-dlya') || p[0] === 'dlya-biznesu' || (p[0] === 'vyrobnyky' && p[1] === 'vyrib')) what = 'tableware'
+  else if (p[0] === 'podarunky-z-keramiky') what = 'other'
+  let city = ''
+  if ((p[0] === 'maister-klasy' || p[0] === 'sertyfikaty') && p[1] && !NOT_CITY.has(p[1])) city = p[1]
+  if (p[0] === 'vyrobnyky' && p[1] === 'misto' && p[2]) city = p[2]
+  const q = new URLSearchParams()
+  if (what) q.set('what', what)
+  if (city) q.set('misto', city)
+  const qs = q.toString()
+  return qs ? `${REQUEST_HREF}?${qs}` : REQUEST_HREF
+}
 // Studios and makers use the same request form («Інше») until there is a page for them.
 export const STUDIO_JOIN_HREF = '/zapyt?vid=studiya'
 
@@ -72,7 +94,7 @@ const mainNavPlan: NavSection[] = [
         links: [
           { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom', note: 'Штамп, деколь, полива у фірмових кольорах' },
           { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky', note: 'Для команди і клієнтів' },
-          { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026', note: 'Що встигнуть зробити до свят' },
+          { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026', note: 'Що встигнуть зробити до свят' },
           { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny', note: 'У студії або у вашому офісі' },
           { label: 'Як відсвяткувати річницю компанії', href: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi', note: '14 форматів поруч: ціни, групи, терміни' },
           { label: 'Подарунки співробітникам', href: '/dlya-biznesu/podarunky-spivrobitnykam', note: 'Кераміка, сертифікати, ліміт без податку' },
@@ -253,7 +275,7 @@ export const footerColumns: NavColumn[] = ([
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
       { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
-      { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Річниця компанії: формати', href: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi' },
       { label: 'Подарунки співробітникам', href: '/dlya-biznesu/podarunky-spivrobitnykam' },
       { label: 'Новий рік і Різдво з керамікою', href: '/novyi-rik-i-rizdvo' },

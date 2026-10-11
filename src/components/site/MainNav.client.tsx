@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useRef, useState } from 'react'
 
-import { mainNav, REQUEST_HREF, simpleNav, STUDIO_JOIN_HREF } from '@/content/navigation'
+import { mainNav, requestHrefFor, simpleNav, STUDIO_JOIN_HREF } from '@/content/navigation'
 
 // Desktop: mega menus opened by click (and closed by Escape, outside click or navigation).
 // Mobile: a full-screen drawer with collapsible sections. Plain markup, no animation library.
@@ -81,7 +81,7 @@ export function MainNav() {
       </ul>
 
       <Link
-        href={REQUEST_HREF}
+        href={requestHrefFor(pathname)}
         className="ml-auto hidden rounded-full bg-terra px-5 py-3 text-[15px] font-bold whitespace-nowrap text-cream no-underline hover:bg-terra-dark hover:text-cream lg:inline-flex"
       >
         Отримати пропозиції
@@ -175,7 +175,7 @@ export function MainNav() {
               ))}
             </ul>
           </details>
-          <Link href={REQUEST_HREF} className="mt-5 flex w-full justify-center rounded-full bg-terra px-5 py-3.5 font-bold text-cream no-underline">
+          <Link href={requestHrefFor(pathname)} className="mt-5 flex w-full justify-center rounded-full bg-terra px-5 py-3.5 font-bold text-cream no-underline">
             Отримати пропозиції
           </Link>
         </div>

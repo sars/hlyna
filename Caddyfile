@@ -33,8 +33,15 @@ hlyna.com.ua {
 	}
 
 	# lb_try_duration holds requests for a few seconds while the app restarts.
+	# While the app restarts after a deploy, answer with a short branded page instead of a blank 502.
+	handle_errors 502 503 504 {
+		header Content-Type "text/html; charset=utf-8"
+		header Retry-After "10"
+		respond `<!doctype html><html lang="uk"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="refresh" content="10"><title>Глина — оновлюємо сайт</title><body style="margin:0;background:#f3e7da;color:#2a2018;font-family:system-ui,sans-serif"><main style="max-width:640px;margin:0 auto;padding:64px 16px"><p style="color:#b4683f;font-weight:700;letter-spacing:2px;text-transform:uppercase;font-size:13px">глина</p><h1>Оновлюємо сайт</h1><p style="font-size:18px;color:#6c5243">Сторінка відкриється за кілька секунд — вона оновиться сама.</p></main></body></html>` 503
+	}
+
 	reverse_proxy app:3000 {
-		lb_try_duration 5s
+		lb_try_duration 30s
 		lb_try_interval 250ms
 	}
 }

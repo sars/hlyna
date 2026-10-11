@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { latestUpdate } from '@/lib/catalog'
+
 import { Breadcrumbs, container, DocPhoto, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { fixPriceRef, mergeFaq, type PlaceContent } from '@/lib/places'
@@ -128,7 +130,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
 
       <div className={`grid grid-cols-1 items-start gap-8 ${topic.photo ? 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]' : ''}`}>
         <div className="grid grid-cols-1 gap-4">
-          <Breadcrumbs items={[...topic.parents, ...extraParents, { label: crumb ?? topic.crumb }]} />
+          <Breadcrumbs items={[...topic.parents, ...extraParents, { label: crumb ?? topic.crumb }]} modified={latestUpdate(all)} />
           <span className="kicker">{topic.kicker}</span>
           <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{title}</h1>
           {place?.lead && <p className="m-0 max-w-[70ch] text-lg">{place.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
@@ -165,9 +167,9 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
             </SectionHead>
             {examples.length ? (
               <div className="grid grid-cols-1 gap-3">
-                {ctx.min && ctx.max && (
+                {ctx.priceText && (
                   <p className="m-0 text-lg">
-                    Найчастіше в прайсах — <b>від {ctx.min.toLocaleString('uk-UA')} до {ctx.max.toLocaleString('uk-UA')} грн{topic.price.unitLabel ? ` ${topic.price.unitLabel}` : ''}</b>.
+                    {ctx.min === ctx.max ? 'У прайсах' : 'Найчастіше в прайсах'} — <b>{ctx.priceText}{topic.price.unitLabel ? ` ${topic.price.unitLabel}` : ''}</b>.
                   </p>
                 )}
                 <ul className="m-0 grid grid-cols-1 list-none gap-2 p-0">

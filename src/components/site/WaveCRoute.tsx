@@ -215,8 +215,8 @@ function Block({ d }: { d: WaveCData }) {
 
 const RELATED: Record<WaveCId, { label: string; href: string }[]> = {
   'richnytsya-kompaniyi': [{ label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' }, { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Ціни 2026', href: '/tsiny-2026' }],
-  'podarunky-spivrobitnykam': [{ label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' }],
-  'novyi-rik-i-rizdvo': [{ label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Ярмарки й події', href: '/podiyi' }],
+  'podarunky-spivrobitnykam': [{ label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' }],
+  'novyi-rik-i-rizdvo': [{ label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Ярмарки й події', href: '/podiyi' }],
 }
 
 export async function WaveCRoute({ id }: { id: WaveCId }) {

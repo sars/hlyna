@@ -1,4 +1,4 @@
-import type { CollectionConfig, FieldAccess } from 'payload'
+import type { CollectionAfterOperationHook, CollectionConfig, FieldAccess } from 'payload'
 
 import { anyone } from '../../access/anyone'
 import { authenticated } from '../../access/authenticated'
@@ -13,6 +13,15 @@ export { REQUEST_STATUS_OPTIONS, REQUEST_WHAT_OPTIONS }
 const adminOnly: { create: FieldAccess; update: FieldAccess } = {
   create: ({ req }) => Boolean(req.user),
   update: ({ req }) => Boolean(req.user),
+}
+
+/**
+ * The public form only needs to know the request was saved: a create without a logged-in user
+ * answers with the id alone, so internal fields (status, studiosSent, commission5, notes…) never leave the server.
+ */
+const publicCreateResponse: CollectionAfterOperationHook = ({ operation, req, result }) => {
+  if (operation !== 'create' || req.user || !result || typeof result !== 'object') return result
+  return { id: (result as { id: number }).id } as typeof result
 }
 
 export const Requests: CollectionConfig = {
@@ -38,6 +47,7 @@ export const Requests: CollectionConfig = {
     beforeValidate: [validateRequest],
     beforeChange: [computeCommission],
     afterChange: [notifyTelegram],
+    afterOperation: [publicCreateResponse],
   },
   fields: [
     {
@@ -48,6 +58,15 @@ export const Requests: CollectionConfig = {
       options: [...REQUEST_WHAT_OPTIONS],
     },
     { name: 'details', label: 'Деталі', type: 'textarea' },
+    {
+      type: 'row',
+      admin: { condition: (data) => data?.what === 'studio' },
+      fields: [
+        { name: 'studioName', label: 'Назва студії', type: 'text', admin: { width: '33%' } },
+        { name: 'studioLinks', label: 'Instagram / сайт', type: 'text', admin: { width: '33%' } },
+        { name: 'photoConsent', label: 'Згода на фото', type: 'checkbox', defaultValue: false, admin: { width: '33%' } },
+      ],
+    },
     {
       type: 'row',
       fields: [

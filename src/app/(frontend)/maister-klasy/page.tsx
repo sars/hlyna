@@ -6,7 +6,7 @@ import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/
 import { facts } from '@/lib/facts'
 import { topicList } from '@/content/topics'
 import { fmt, getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
-import { singleClassAmounts, typicalRange } from '@/lib/present'
+import { scopeSpan } from '@/lib/priceIndex'
 
 export const revalidate = 86400
 
@@ -51,7 +51,7 @@ export default async function MasterClassesIndex() {
         <SectionHead title="Міста" id="cities" />
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2.5 p-0">
           {big.map((g) => {
-            const r = typicalRange(g.studios.flatMap(singleClassAmounts))
+            const r = scopeSpan(g.studios, 'group')
             return (
               <li key={g.city.slug}>
                 <Link href={`/maister-klasy/${g.city.slug}`} className="grid grid-cols-1 gap-0.5 rounded-[14px] bg-card px-3.5 py-3 text-ink no-underline hover:bg-sand hover:text-ink">

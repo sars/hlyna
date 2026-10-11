@@ -84,7 +84,10 @@ export default async function Page({ params }: Args) {
           </SectionHead>
           {p.vars.priceRange && (
             <p className="m-0 mb-3 text-lg">
-              Найчастіше в прайсах {p.vars.inCity} — <b>{p.vars.priceRange}</b>.
+              Найчастіше в прайсах {p.vars.inCity} — <b>{p.vars.priceRange}</b>.{' '}
+              <span className="text-base text-umber">
+                Це ціни лише місць із цієї сторінки, по одній на студію; загальну ціну разового майстер-класу в місті дивіться на <Link href={`/maister-klasy/${city}`}>сторінці міста</Link> і в «<Link href="/tsiny-2026">Цінах 2026</Link>».
+              </span>
             </p>
           )}
           <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0">

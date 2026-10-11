@@ -4,7 +4,8 @@ import { topics, type Topic, type TopicCtx } from '@/content/topics'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt, getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
 import { facts } from './facts'
-import { amountsIn, isExhibitingOnly, publicPrices, splitSource, typicalRange } from './present'
+import { near } from './priceIndex'
+import { amountsIn, isExhibitingOnly, publicPrices, spanOf, splitSource } from './present'
 
 // A museum or museum shop is listed on class pages only if its own services name a class it runs.
 const museumOnly = (s: StudioCard) =>
@@ -12,6 +13,8 @@ const museumOnly = (s: StudioCard) =>
 
 const GROUP_TOTAL = /до\s+\d+\s*(?:ос|учасн|люд|чол)|\d+\s*(?:учасник\p{L}*|осіб)\s*[—–-]|за\s+груп|для\s+(?:своєї\s+)?груп|для\s+(?:своєї\s+)?компані|компані\p{L}*\s+до|наступн/iu
 const COUPLE_TOTAL = /для двох|удвох|вдвох|на двох|для пари|\(2\)/iu
+const KIDS_LINE = /(?<!\p{L})(?:дит|діт)|школяр|\d+\s*[–-]\s*\d+\s*(?:рок|років)|від\s+\d+\s+рок/iu
+const DONATION = /донат|благодійн|зсу|на військо/iu
 
 export type TopicListData = { title: string; note?: string; byCity?: boolean; studios: StudioCard[] }
 export type PriceExample = { studio: StudioCard; text: string; source?: string }
@@ -43,15 +46,28 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
   const all = lists.flatMap((l) => l.studios)
   const examples: PriceExample[] = []
   const couplePage = /двох/.test(topic.price.re.source)
+  const kidsPage = /дит/.test(topic.price.re.source)
   const amounts: number[] = []
+  const perStudio: number[] = []
   for (const s of all) {
     const lines = publicPrices(s).filter((p) => topic.price.re.test(p.text) && !topic.price.exclude?.test(p.text) && amountsIn(p.text).length)
     // The range uses only lines in the page's unit (e.g. per person for corporate events).
-    lines
+    let usable = lines
       .filter((p) => !topic.price.unit || (topic.price.unit.test(p.text) && !topic.price.unitNot?.test(p.text)))
       // Totals for a group or a couple are not a per-person price: they stay as examples, out of the range.
       .filter((p) => !GROUP_TOTAL.test(p.text) && (couplePage || !COUPLE_TOTAL.test(p.text)))
-      .forEach((p) => amounts.push(...amountsIn(p.text)))
+      // Children's prices are not an adult class price (and the other way round on the kids page).
+      .filter((p) => kidsPage || !KIDS_LINE.test(p.text))
+      // A private lesson is not the usual price of a class (it has its own line on /tsiny-2026).
+      .filter((p) => couplePage || topic.price.index === 'private' || !/індивідуал/iu.test(p.text))
+      .filter((p) => !DONATION.test(p.text))
+    // A newer line replaces older ones: prices from before 2025 count only when the studio has nothing newer.
+    if (usable.some((p) => (p.year ?? 0) >= 2025)) usable = usable.filter((p) => !p.year || p.year >= 2025)
+    // The price next to the page's own words, lower end of a range («1 750–3 400 грн» → 1 750).
+    const pick = near(topic.price.re)
+    const own = usable.map((p) => pick(p.text)).filter((v): v is number => v !== null && v >= 150 && v <= 20000)
+    amounts.push(...own)
+    if (own.length) perStudio.push([...own].sort((a, b) => a - b)[Math.floor(own.length / 2)])
     // Prefer an example in the page's unit; recent lines first.
     const best = [...lines].sort((a, b) => Number(!!topic.price.unit?.test(b.text)) - Number(!!topic.price.unit?.test(a.text)) || (b.year ?? 0) - (a.year ?? 0))[0]
     if (best) examples.push({ studio: s, text: best.text, source: best.source })
@@ -60,13 +76,15 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
   // Whole-Ukraine pages quote the price index for their category, so the number matches /tsiny-2026 and
   // every other page; city pages keep the range of their own studios.
   const idx = topic.price.index && !citySlug ? f.get(topic.price.index) : null
-  const r = idx ? { min: idx.min, max: idx.max } : typicalRange(amounts)
+  // One value per studio (its own median), worded by spanOf — the same rule as /tsiny-2026 and city pages.
+  const span = spanOf(perStudio)
+  const r = idx ? { min: idx.min, max: idx.max, text: idx.min === idx.max ? `${fmt(idx.min)} грн` : `від ${fmt(idx.min)} до ${fmt(idx.max)} грн`, median: idx.median } : span
   return {
     lists,
     all,
     examples: examples.slice(0, 8),
     amounts,
-    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, median: medianOf(amounts), place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
+    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
   }
 }
 

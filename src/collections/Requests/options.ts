@@ -5,6 +5,7 @@ export const REQUEST_WHAT_OPTIONS = [
   { label: 'Корпоратив з ліплення з глини', value: 'corporate-workshop' },
   { label: 'Майстер-клас', value: 'master-class' },
   { label: 'Інше', value: 'other' },
+  { label: 'Студія: додати / оновити профіль', value: 'studio' },
 ] as const
 
 export const REQUEST_STATUS_OPTIONS = [

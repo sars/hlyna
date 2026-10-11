@@ -12,7 +12,7 @@ import { verses } from './verses'
 // min/max: «здебільшого» range. For whole-Ukraine pages whose price has an `index` category it is the price
 // index's range (same numbers as /tsiny-2026); otherwise the range of this page's own price lines.
 // price(key): the price index range for any category, e.g. c.price('corporate').
-export type TopicCtx = { n: number; cities: number; min?: number; max?: number; median?: number; place?: string; price: (key: string) => string }
+export type TopicCtx = { n: number; cities: number; min?: number; max?: number; median?: number; priceText?: string; place?: string; price: (key: string) => string }
 
 export type TopicList = {
   title: string
@@ -53,7 +53,7 @@ const studios = (k: number) => n(k, ['студія чи майстер', 'сту
 const places = (k: number) => n(k, ['місце', 'місця', 'місць'])
 const inCities = (k: number) => `у ${fmt(k)} ${pluralUk(k, ['місті', 'містах', 'містах'])}`
 const where = (c: TopicCtx) => (c.place ? inCity(c.place) : inCities(c.cities))
-const priceRange = (c: TopicCtx) => (c.min && c.max ? `від ${fmt(c.min)} до ${fmt(c.max)} грн` : '')
+const priceRange = (c: TopicCtx) => c.priceText ?? ''
 
 const WORKSHOP = ['studio', 'school', 'maker', 'heritage', 'other']
 // Makers of tableware (the logo page's second list): no cafés, no jewellery-only brands.
@@ -127,7 +127,7 @@ export const topics: Record<string, Topic> = {
       { q: 'Скільки коштує ваш сервіс?', a: site.model },
     ],
     related: [
-      { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
       { label: 'Посуд для ресторанів і кав’ярень', href: '/dlya-biznesu/posud-dlya-restoraniv' },
       { label: 'Подарункові сертифікати', href: '/sertyfikaty' },
@@ -184,7 +184,7 @@ export const topics: Record<string, Topic> = {
     ],
     related: [
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
-      { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Подарункові сертифікати', href: '/sertyfikaty' },
       { label: 'Майстер-класи за містами', href: '/maister-klasy' },
     ],
@@ -195,9 +195,9 @@ export const topics: Record<string, Topic> = {
     path: '/dlya-biznesu/novorichni-podarunky-2026',
     section: 'biz',
     parents: BIZ,
-    crumb: 'Новорічні подарунки 2026',
+    crumb: 'Новорічні подарунки 2026/27',
     kicker: 'Подарунки для команди й клієнтів',
-    h1: 'Новорічні подарунки 2026 з української кераміки',
+    h1: 'Новорічні корпоративні подарунки з кераміки: сезон 2026/27',
     metaTitle: () => 'Новорічні корпоративні подарунки 2026: українська кераміка ручної роботи і терміни',
     metaDescription: (c) => `Що подарувати команді й клієнтам на Новий рік 2026: чашки, ялинкові прикраси, посуд з логотипом і сертифікати на майстер-клас від ${studios(c.n)}. Коли замовляти, щоб встигнути до свят.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять корпоративні подарунки або святкові колекції: ялинкові прикраси, чашки, свічники, різдвяні тарілки. Партію на замовлення виготовляють ${site.lead.batch}, тож для подарунків з логотипом запит варто надіслати до початку листопада; після середини листопада реальніше вироби з наявності або сертифікати на майстер-клас.`,
@@ -540,7 +540,7 @@ export const topics: Record<string, Topic> = {
     related: [
       { label: 'Для двох', href: '/maister-klasy/dlya-dvokh' },
       { label: 'Гончарне коло', href: '/maister-klasy/honcharne-kolo' },
-      { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Майстер-класи за містами', href: '/maister-klasy' },
     ],
   },
@@ -739,7 +739,7 @@ export const topics: Record<string, Topic> = {
     ],
     related: [
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
-      { label: 'Новорічні подарунки 2026', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Подарункові сертифікати', href: '/sertyfikaty' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
     ],

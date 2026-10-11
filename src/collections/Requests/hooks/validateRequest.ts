@@ -10,6 +10,8 @@ const TEXT_LIMITS: Record<string, number> = {
   contactPhoneOrTelegram: 200,
   contactEmail: 254,
   sourcePage: 500,
+  studioName: 200,
+  studioLinks: 500,
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/

@@ -458,8 +458,11 @@ export interface FolderInterface {
  */
 export interface Request {
   id: number;
-  what: 'tableware' | 'logo-mugs' | 'corporate-gifts' | 'corporate-workshop' | 'master-class' | 'other';
+  what: 'tableware' | 'logo-mugs' | 'corporate-gifts' | 'corporate-workshop' | 'master-class' | 'other' | 'studio';
   details?: string | null;
+  studioName?: string | null;
+  studioLinks?: string | null;
+  photoConsent?: boolean | null;
   quantity?: string | null;
   deadline?: string | null;
   budgetPerItem?: string | null;
@@ -1410,6 +1413,9 @@ export interface CitiesSelect<T extends boolean = true> {
 export interface RequestsSelect<T extends boolean = true> {
   what?: T;
   details?: T;
+  studioName?: T;
+  studioLinks?: T;
+  photoConsent?: T;
   quantity?: T;
   deadline?: T;
   budgetPerItem?: T;

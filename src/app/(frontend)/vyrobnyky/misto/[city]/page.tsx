@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { latestUpdate } from '@/lib/catalog'
+
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { MakerRow } from '@/components/site/MakerRow'
@@ -91,7 +93,7 @@ export default async function CityMakersPage({ params }: Args) {
         }}
       />
       <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, { label: city.name }]} />
+        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, { label: city.name }]} modified={latestUpdate(studios)} />
         <span className="kicker">Виробники{region ? ` · ${region}` : ''}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Кераміка ручної роботи: {city.name}</h1>
         {content?.lead && <p className="m-0 max-w-[70ch] text-lg">{content.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
@@ -126,7 +128,7 @@ export default async function CityMakersPage({ params }: Args) {
                   <thead>
                     <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
                       <th className="border-b border-line px-3.5 py-3">Що</th>
-                      <th className="border-b border-line px-3.5 py-3 whitespace-nowrap">Від–до, грн</th>
+                      <th className="border-b border-line px-3.5 py-3 whitespace-nowrap">Ціни</th>
                       <th className="border-b border-line px-3.5 py-3">Медіана</th>
                       <th className="hidden border-b border-line px-3.5 py-3 sm:table-cell">Студій</th>
                     </tr>
@@ -135,8 +137,8 @@ export default async function CityMakersPage({ params }: Args) {
                     {prices.map((p) => (
                       <tr key={p.cat.key}>
                         <td className="border-b border-line px-3.5 py-2.5">{p.cat.label} <span className="text-[12.5px] text-umber">{p.cat.unit}<span className="sm:hidden"> · {p.n} {pluralUk(p.n, ['студія', 'студії', 'студій'])}</span></span></td>
-                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.min === p.max ? fmt(p.min) : `${fmt(p.min)}–${fmt(p.max)}`}</td>
-                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.median ? fmt(p.median) : '—'}</td>
+                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.text}</td>
+                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.median ? `${fmt(p.median)} грн` : '—'}</td>
                         <td className="hidden border-b border-line px-3.5 py-2.5 sm:table-cell">{p.n}</td>
                       </tr>
                     ))}
