@@ -18,10 +18,11 @@ export const facts = cache(async () => {
     return x ? { min: x.p10, max: x.p90, median: x.median, n: x.n, unit: x.cat.unit } : null
   }
   /** «здебільшого 300–1 900 грн з особи» (or the fallback when too few studios publish a price). */
-  const range = (key: string, opts: { unit?: boolean; fallback?: string } = {}) => {
+  const range = (key: string, opts: { unit?: boolean; fallback?: string; bare?: boolean } = {}) => {
     const f = get(key)
     if (!f) return opts.fallback ?? 'за прайсом студії'
-    return `здебільшого ${fmt(f.min)}–${fmt(f.max)} грн${opts.unit === false ? '' : ` ${f.unit}`}`
+    // bare: the range without the word «здебільшого», for table cells whose column header already says it
+    return `${opts.bare ? '' : 'здебільшого '}${fmt(f.min)}–${fmt(f.max)} грн${opts.unit === false ? '' : ` ${f.unit}`}`
   }
   /** «1 000 грн» median, or '' */
   const median = (key: string) => {

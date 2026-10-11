@@ -37,8 +37,8 @@ export const sitePhotos = {
   // Wordmark window (8:3 strip, decorative: the text on top carries the meaning). Frame 331; the phone file is the same crop at 1200 px.
   wordmarkDesktop: { src: '/images/site/home-wordmark-1.jpg', width: 2400, height: 900, alt: '' },
   wordmarkMobile: { src: '/images/site/home-wordmark-mobile-1.jpg', width: 1200, height: 450, alt: '' },
-  // Home «Що ви шукаєте?», cards 01–06 (1:1). 01: stock CC0 placeholder (pepe nero, Unsplash; no archive frame of a dish in a restaurant).
-  cardVenues: slot(docPhotos.restaurantTable),
+  // Home «Що ви шукаєте?», cards 01–06 (1:1). 01 is an external Unsplash photo (Big Dodzy; no archive frame of a dish in a restaurant), see public/images/site/CREDITS.md.
+  cardVenues: { src: '/images/site/home-path-01-1.jpg', width: 1200, height: 1200, alt: 'Страва в керамічній мисці ручної роботи, яку тримають у руках' },
   cardLogo: { src: '/images/site/home-path-02-1.jpg', width: 1200, height: 1200, alt: 'Відтиск штампа-квітки на сирій тарілці з рожевим краєм' }, // 542
   cardGifts: { src: '/images/site/home-path-03-1.jpg', width: 1200, height: 1200, alt: 'Чашка ручної роботи з червоними сердечками на дерев’яній полиці' }, // 82
   cardPair: { src: '/images/site/home-path-04-1.jpg', width: 1200, height: 1200, alt: 'Дві пари рук тримають свіжу миску на гончарному колі, вигляд згори' }, // 346

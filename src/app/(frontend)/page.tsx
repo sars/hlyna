@@ -142,7 +142,6 @@ export default async function HomePage() {
             <PhotoCard key={c.href} n={String(i + 1).padStart(2, '0')} title={c.title} text={c.text} cta={c.cta} href={c.href} tone={c.tone} photo={c.photo} />
           ))}
         </div>
-        <p className="m-0 mt-3 font-mono text-[11px] tracking-[.05em] text-ink-2 uppercase">Фото до напряму 01: pepe nero, Unsplash (CC0).</p>
       </section>
 
       {/* How it works */}
@@ -176,7 +175,7 @@ export default async function HomePage() {
         <SectionHead variant="poster" id="market" kicker={`Коротко про ринок · оновлено ${site.dataUpdated}`} title={<>Скільки коштує <Italic>і скільки часу займає</Italic></>} more={{ label: 'Ціни 2026', href: '/tsiny-2026' }} />
         <div className="grid gap-[clamp(24px,4vw,56px)] pt-[clamp(22px,3vw,40px)] lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
           <figure className="m-0 flex flex-col">
-            <Image src={sitePhotos.market.src} alt={sitePhotos.market.alt} width={sitePhotos.market.width} height={sitePhotos.market.height} sizes="(min-width:960px) 33vw, 100vw" className="aspect-[4/5] w-full flex-1 object-cover lg:aspect-auto lg:min-h-[420px]" />
+            <Image src={sitePhotos.market.src} alt={sitePhotos.market.alt} width={sitePhotos.market.width} height={sitePhotos.market.height} sizes="(min-width:960px) 33vw, 100vw" className="aspect-[4/3] w-full flex-1 object-cover lg:aspect-auto lg:min-h-[420px]" />
           </figure>
           <div className="grid content-start gap-[18px]">
             <QuoteBlock
@@ -201,13 +200,13 @@ export default async function HomePage() {
             </div>
             <DataTable
               caption="Типові формати і ціни, 2026"
-              columns={[{ key: 'what', label: 'Що' }, { key: 'price', label: 'Типова ціна' }, { key: 'term', label: 'Термін' }, { key: 'more', label: 'Детальніше' }]}
+              columns={[{ key: 'what', label: 'Що' }, { key: 'price', label: 'Типова ціна, здебільшого' }, { key: 'term', label: 'Термін' }, { key: 'more', label: 'Детальніше' }]}
               rows={[
                 ['Партія посуду для закладу', 'за запитом, залежить від кількості', site.lead.batch, 'Посуд для ресторанів', '/dlya-biznesu/posud-dlya-restoraniv'],
                 ['Чашки з логотипом', 'за запитом', site.lead.logo, 'Чашки з логотипом', '/dlya-biznesu/chashky-z-lohotypom'],
-                ['Корпоратив з ліплення з глини', f.range('corporate'), 'бронювання за 1–3 тижні', 'Корпоративи', '/dlya-biznesu/korporatyv-lipennya-z-hlyny'],
-                ['Разовий майстер-клас', f.range('group'), 'запис на тиждень уперед', 'За містами', '/maister-klasy'],
-                ['Індивідуальний майстер-клас', f.range('private'), 'за домовленістю', 'За містами', '/maister-klasy'],
+                ['Корпоратив з ліплення з глини', f.range('corporate', { bare: true }), 'бронювання за 1–3 тижні', 'Корпоративи', '/dlya-biznesu/korporatyv-lipennya-z-hlyny'],
+                ['Разовий майстер-клас', f.range('group', { bare: true }), 'запис на тиждень уперед', 'За містами', '/maister-klasy'],
+                ['Індивідуальний майстер-клас', f.range('private', { bare: true }), 'за домовленістю', 'За містами', '/maister-klasy'],
               ].map((r) => ({ what: r[0], price: nobreak(r[1]), term: nobreak(r[2]), more: <Link href={r[4]}>{r[3]}</Link> }))}
             />
           </div>
@@ -277,7 +276,7 @@ export default async function HomePage() {
       </div>
 
       {/* For studios */}
-      <Panel as="section" tone="ink" bleed className={section} id="studios" aria-label="Для студій і майстрів">
+      <Panel as="section" tone="ink" bleed className={section} id="studios" aria-label="Для студій і майстрів" data-flush-footer="">
         <div className="grid items-center gap-[clamp(24px,4vw,56px)] lg:grid-cols-[minmax(0,4fr)_minmax(0,8fr)]">
           <figure className="m-0">
             <Image src={sitePhotos.forStudios.src} alt={sitePhotos.forStudios.alt} width={sitePhotos.forStudios.width} height={sitePhotos.forStudios.height} sizes="(min-width:960px) 33vw, 100vw" className="aspect-[4/3] w-full object-cover object-[center_30%] lg:aspect-[3/4]" />

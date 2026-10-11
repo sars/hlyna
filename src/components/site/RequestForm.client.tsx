@@ -231,8 +231,59 @@ export function RequestForm({
       </form>
     )
 
+  // Compact (home hero): the same fields, paired in rows so the panel is no taller than the hero text; a short «Відповідь напряму від студій»
+  // sits by the button (the 5% model is stated in the FAQ and the footer).
+  if (compact) {
+    const pair = 'grid grid-cols-2 gap-x-4 [&>*:last-child:nth-child(odd)]:col-span-2'
+    return (
+      <form id="zapyt-forma" data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={`${panel} p-[clamp(16px,2vw,24px)]`} noValidate>
+        <Kicker>Запит · безкоштовно</Kicker>
+        <h2 id={`${uid}-h`} className="m-0 mt-1 mb-1.5 font-display text-[18px] leading-[1.15] font-semibold sm:text-[19px]">
+          Опишіть, що потрібно — відповідять 3–5 студій
+        </h2>
+        <div className={pair}>
+          <Field label="Що потрібно" htmlFor={`${uid}-what`}>
+            <Select id={`${uid}-what`} name="what" value={what} onChange={(e) => setWhat(e.target.value)}>
+              {WHAT.map((w) => (
+                <option key={w.value} value={w.value}>
+                  {w.label}
+                </option>
+              ))}
+            </Select>
+          </Field>
+          {kind.qty && (
+            <Field label={kind.qty} htmlFor={`${uid}-qty`}>
+              <Input id={`${uid}-qty`} name="quantity" inputMode="numeric" placeholder={kind.qtyPh} />
+            </Field>
+          )}
+          <Field label={kind.date} htmlFor={`${uid}-date`}>
+            <Input id={`${uid}-date`} name="deadline" placeholder={kind.datePh} />
+          </Field>
+          <Field label="Місто" htmlFor={`${uid}-city`}>
+            <Input id={`${uid}-city`} name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ваше місто" autoComplete="address-level2" />
+          </Field>
+          <Field label="Телефон або Telegram" htmlFor={`${uid}-tel`}>
+            <Input id={`${uid}-tel`} name="contactPhoneOrTelegram" inputMode="tel" placeholder="+380… або @нік" />
+          </Field>
+          <Field label="Email" htmlFor={`${uid}-mail`}>
+            <Input id={`${uid}-mail`} name="contactEmail" type="email" placeholder="ви@компанія.ua" />
+          </Field>
+        </div>
+        {kind.logo && <Checkbox name="logo" label="Потрібен логотип" className="!py-1.5" />}
+        {honeypot}
+        <div className="mt-2 flex flex-wrap items-center gap-x-3.5 gap-y-2">
+          <Button type="submit" disabled={state === 'sending'}>
+            {state === 'sending' ? 'Надсилаємо…' : 'Надіслати запит'}
+          </Button>
+          <small className="font-mono text-[11px] tracking-[.03em] text-on-cobalt-2">Відповідь напряму від студій</small>
+        </div>
+        {errorLine}
+      </form>
+    )
+  }
+
   return (
-    <form id={compact ? 'zapyt-forma' : undefined} data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={panel} noValidate>
+    <form data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={panel} noValidate>
       <Kicker>Запит · безкоштовно</Kicker>
       <h2 id={`${uid}-h`} className="m-0 mt-1.5 mb-2 font-display text-[19px] leading-[1.15] font-semibold sm:text-xl">
         Опишіть, що потрібно — відповідять 3–5 студій
@@ -261,11 +312,9 @@ export function RequestForm({
       <Field label="Місто" htmlFor={`${uid}-city`}>
         <Input id={`${uid}-city`} name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ваше місто" autoComplete="address-level2" />
       </Field>
-      {!compact && (
-        <Field label="Деталі" htmlFor={`${uid}-details`}>
-          <Textarea id={`${uid}-details`} name="details" rows={3} placeholder={kind.details} value={details} onChange={(e) => setDetails(e.target.value)} />
-        </Field>
-      )}
+      <Field label="Деталі" htmlFor={`${uid}-details`}>
+        <Textarea id={`${uid}-details`} name="details" rows={3} placeholder={kind.details} value={details} onChange={(e) => setDetails(e.target.value)} />
+      </Field>
       <FieldRow>
         <Field label="Телефон або Telegram" htmlFor={`${uid}-tel`}>
           <Input id={`${uid}-tel`} name="contactPhoneOrTelegram" inputMode="tel" placeholder="+380… або @нік" />

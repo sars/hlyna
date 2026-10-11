@@ -249,7 +249,7 @@
 
   /* FAQ: native details with a +/– sign. */
   .ui-faq details { border-bottom: 1px solid var(--color-rule); }
-  .ui-faq summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: baseline; padding: 15px 0; font-family: var(--font-display); font-weight: 600; font-size: 15.5px; line-height: 1.25; }
+  .ui-faq summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: baseline; padding: 15px 0; font-family: var(--font-display); font-weight: 600; font-size: 16px; line-height: 1.25; }
   .ui-faq summary::-webkit-details-marker { display: none; }
   .ui-faq summary:hover { color: var(--color-cobalt); }
   .ui-faq-pm { font-family: var(--font-mono); font-size: 18px; color: var(--color-cobalt); }
@@ -435,6 +435,13 @@
   }
 
   @media (prefers-reduced-motion: reduce) { .ui-arrow, .ui-pcard img, .ui-vessel img, .nav-caret { transition: none; } }
+}
+
+/* A page that ends with a full-bleed dark panel (home) lets the footer rule butt against it. */
+@layer utilities {
+  main:has([data-flush-footer]) ~ footer {
+    margin-top: 0;
+  }
 }
 
 /* 1A container: removed in step 9 with Bits.container. */

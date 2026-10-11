@@ -11,8 +11,8 @@ import { site } from '@/content/site'
 export function SiteFooter() {
   return (
     <footer className={`${wrap} mt-[clamp(56px,8vw,96px)] border-t-2 border-ink pt-[26px] pb-11`}>
-      <div className="grid grid-cols-1 gap-[18px] font-mono text-[11.5px] leading-[1.7] tracking-[.03em] text-ink-2 sm:grid-cols-2 lg:grid-cols-[minmax(0,1.3fr)_repeat(4,minmax(0,1fr))]">
-        <div className="grid content-start gap-2 sm:col-span-2 lg:col-span-1">
+      <div className="grid grid-cols-2 gap-[18px] font-mono text-[11.5px] leading-[1.7] tracking-[.03em] text-ink-2 lg:grid-cols-[minmax(0,1.3fr)_repeat(4,minmax(0,1fr))]">
+        <div className="col-span-2 grid content-start gap-2 lg:col-span-1">
           <Link href="/" className="inline-flex items-center gap-2 font-display text-base leading-none font-extrabold tracking-[.02em] text-ink uppercase no-underline hover:text-ink">
             <Mark size={22} />
             Глина
