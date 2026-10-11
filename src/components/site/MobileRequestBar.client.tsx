@@ -3,11 +3,12 @@
 import { usePathname } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
+import { Button } from '@/components/ui/Button'
 import { requestHrefFor } from '@/content/navigation'
 
 // Phone-only bar with the request button. Jumps to the page's own form (#zapyt-forma) when there is one and
 // hides while that form is on screen, so it never covers the form's fields; otherwise opens /zapyt with the
-// page's context (kind of request, city).
+// page's context (kind of request, city). Pages that show it keep a bottom padding of at least 76px on <main>.
 export function MobileRequestBar() {
   const pathname = usePathname()
   const [hasForm, setHasForm] = useState(false)
@@ -26,12 +27,13 @@ export function MobileRequestBar() {
   if (pathname?.startsWith('/zapyt')) return null
   return (
     <div
-      className={`fixed inset-x-0 bottom-0 z-20 border-t border-line bg-clay/95 px-4 py-2.5 pb-[max(10px,env(safe-area-inset-bottom))] backdrop-blur transition-transform duration-200 lg:hidden ${formVisible ? 'translate-y-full' : ''}`}
+      inert={formVisible}
       aria-hidden={formVisible}
+      className={`fixed inset-x-0 bottom-0 z-30 border-t-2 border-ink bg-paper px-gutter pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom,0px))] transition-transform duration-200 lg:hidden ${formVisible ? 'translate-y-full' : ''}`}
     >
-      <a href={hasForm ? '#zapyt-forma' : requestHrefFor(pathname)} tabIndex={formVisible ? -1 : 0} className="flex w-full justify-center rounded-full bg-terra px-5 py-3 font-bold text-cream no-underline hover:text-cream">
+      <Button href={hasForm ? '#zapyt-forma' : requestHrefFor(pathname)} variant="cobalt" full arrow>
         Отримати пропозиції
-      </a>
+      </Button>
     </div>
   )
 }
