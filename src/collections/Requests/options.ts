@@ -14,4 +14,5 @@ export const REQUEST_STATUS_OPTIONS = [
   { label: 'Студія відповіла', value: 'replied' },
   { label: 'Угода', value: 'deal' },
   { label: 'Втрачено', value: 'lost' },
+  { label: 'Оброблено / перенесено', value: 'closed' },
 ] as const

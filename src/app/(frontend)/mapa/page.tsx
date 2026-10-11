@@ -72,7 +72,7 @@ export default async function MapPage() {
           {faq.map((f, i) => (
             <details key={f.q} open={i === 0} className="rounded-2xl bg-card px-[18px] py-1">
               <summary className="cursor-pointer list-none py-3.5 font-bold">{f.q}</summary>
-              <p className="mt-0 mb-3.5">{f.q.startsWith('Моєї') ? <>Заповніть коротку форму на сторінці <Link href="/dlya-studiy">«Додати студію»</Link> — профіль і позначка на мапі безкоштовні.</> : f.a}</p>
+              <p className="mt-0 mb-3.5">{f.q.startsWith('Моєї') ? <>Заповніть коротку форму на сторінці <Link href="/dlya-studiy">«Додати студію»</Link> — профіль і позначка на мапі безкоштовні. Ваша студія вже є на сайті, але без адреси? Знайдіть її профіль і натисніть «Керувати профілем».</> : f.a}</p>
             </details>
           ))}
         </div>

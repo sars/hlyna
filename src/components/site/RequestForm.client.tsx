@@ -53,6 +53,21 @@ export function RequestForm({
   const [city, setCity] = useState(defaultCity)
   const [studio, setStudio] = useState(forStudio)
   const kind = KIND[what] ?? KIND.other
+  // New-studio form: warn when the studio is already in the catalogue and point to the claim instead.
+  const [sName, setSName] = useState('')
+  const [sLinks, setSLinks] = useState('')
+  const [existing, setExisting] = useState<{ slug: string; name: string; city: string }[]>([])
+  useEffect(() => {
+    if (!studio) return
+    if (sName.trim().length < 3 && sLinks.trim().length < 3) return
+    const t = setTimeout(() => {
+      fetch(`/kabinet/api/studios?name=${encodeURIComponent(sName)}&ig=${encodeURIComponent(sLinks)}`)
+        .then((r) => r.json())
+        .then((r: typeof existing) => setExisting(Array.isArray(r) ? r : []))
+        .catch(() => setExisting([]))
+    }, 400)
+    return () => clearTimeout(t)
+  }, [studio, sName, sLinks])
 
   useEffect(() => {
     const q = new URLSearchParams(window.location.search)
@@ -111,12 +126,12 @@ export function RequestForm({
       <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
         <p className="font-display m-0 text-sm tracking-wide uppercase">Додати нову студію</p>
         <p className="m-0 text-sm text-umber">
-          Ваша студія вже є в каталозі? Відкрийте її профіль у <Link href="/vyrobnyky">списку виробників</Link> чи на <Link href="/mapa">мапі</Link> й натисніть «Подати заявку» в блоці «Це ваша студія?» — так ви отримаєте доступ до кабінету.
+          Ваша студія вже є в каталозі? Відкрийте її профіль у <Link href="/vyrobnyky">списку виробників</Link> чи на <Link href="/mapa">мапі</Link> й натисніть «Керувати профілем» — так ви отримаєте доступ до кабінету. Вже маєте кабінет? <Link href="/kabinet/vhid">Увійти</Link>.
         </p>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           <label className={label}>
             Назва студії чи ім’я майстра
-            <input name="studioName" required className={field} />
+            <input name="studioName" required value={sName} onChange={(e) => { setSName(e.target.value); if (e.target.value.trim().length < 3 && sLinks.trim().length < 3) setExisting([]) }} className={field} />
           </label>
           <label className={label}>
             Місто
@@ -124,13 +139,23 @@ export function RequestForm({
           </label>
           <label className={label}>
             Instagram або сайт
-            <input name="studioLinks" placeholder="@студія або https://…" className={field} />
+            <input name="studioLinks" placeholder="@студія або https://…" value={sLinks} onChange={(e) => { setSLinks(e.target.value); if (e.target.value.trim().length < 3 && sName.trim().length < 3) setExisting([]) }} className={field} />
           </label>
           <label className={label}>
             Телефон, Telegram або email
             <input name="contactPhoneOrTelegram" placeholder="+380… або @нік" className={field} />
           </label>
         </div>
+        {existing.length > 0 && (
+          <div className="grid gap-1.5 rounded-2xl border border-terra/40 bg-sand p-3.5 text-[14.5px]" role="status">
+            {existing.map((x) => (
+              <p key={x.slug} className="m-0">
+                Ця студія вже є в каталозі: <b>{x.name}</b>
+                {x.city ? ` (${x.city})` : ''} — <Link href={`/kabinet/zayavka?studio=${x.slug}`}>подайте заявку на керування профілем</Link>.
+              </p>
+            ))}
+          </div>
+        )}
         <input type="text" name="website2" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
         <button type="submit" disabled={state === 'sending'} className="justify-self-start rounded-full bg-terra px-5 py-3 font-bold text-cream hover:bg-terra-dark disabled:opacity-60">
           {state === 'sending' ? 'Надсилаємо…' : 'Додати студію'}

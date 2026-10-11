@@ -159,7 +159,7 @@ const mainNavPlan: NavSection[] = [
     ],
     promo: {
       title: 'Ви студія або майстер?',
-      text: 'Додайте профіль безкоштовно й отримуйте запити від ресторанів і компаній.',
+      text: 'Додайте профіль безкоштовно й отримуйте запити від ресторанів і компаній. Ваша студія вже є на сайті? Знайдіть її профіль і натисніть «Керувати профілем».',
       cta: { label: 'Додати студію', href: STUDIO_JOIN_HREF },
     },
   },
@@ -323,6 +323,7 @@ export const footerColumns: NavColumn[] = ([
       { label: 'Добірки', href: '/dobirky' },
       { label: 'Гайди', href: '/hayidy' },
       { label: 'Для студій і майстрів', href: '/dlya-studiy' },
+      { label: 'Вхід для студій', href: '/kabinet/vhid' },
       { label: 'Про «Глину»', href: '/pro-nas' },
       { label: 'llms.txt — для ШІ-асистентів', href: '/llms.txt' },
     ],

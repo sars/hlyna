@@ -252,7 +252,10 @@ export default async function HomePage() {
               <li>Без оплати за розміщення чи за запити</li>
             </ul>
           </div>
-          <Link href={STUDIO_JOIN_HREF} className="justify-self-start rounded-full bg-ochre px-[22px] py-[13px] font-bold text-ink no-underline hover:text-ink">Додати студію</Link>
+          <div className="grid gap-2">
+            <Link href={STUDIO_JOIN_HREF} className="justify-self-start rounded-full bg-ochre px-[22px] py-[13px] font-bold text-ink no-underline hover:text-ink">Додати студію</Link>
+            <p className="m-0 text-sm text-clay/85">Ваша студія вже є на сайті? Знайдіть її профіль і натисніть «Керувати профілем». <Link href="/kabinet/vhid" className="text-ochre hover:text-cream">Вхід для студій</Link></p>
+          </div>
         </div>
       </section>
       <MobileRequestBar />

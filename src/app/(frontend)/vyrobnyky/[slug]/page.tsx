@@ -393,7 +393,7 @@ export default async function StudioPage({ params }: Args) {
               </>
             ) : (
               <>
-                <b>Це ваша студія?</b> Керуйте профілем: фото, ціни, умови для бізнесу — безкоштовно. <Link href={`/kabinet/zayavka?studio=${s.slug}`}>Подати заявку →</Link>
+                <b>Це ваша студія?</b> Керуйте профілем: фото, ціни, умови для бізнесу — безкоштовно. <Link href={`/kabinet/zayavka?studio=${s.slug}`}>Керувати профілем →</Link>
               </>
             )}
           </div>
