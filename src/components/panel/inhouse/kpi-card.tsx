@@ -45,13 +45,13 @@ export function KpiCard({
       {note && <p className="mt-1 text-xs text-muted-foreground">{note}</p>}
     </CardContent>
   );
-  if (!href) return <Card className="gap-0 py-0 shadow-xs">{body}</Card>;
+  if (!href) return <Card className="h-full gap-0 py-0 shadow-xs">{body}</Card>;
   return (
     <Link
       href={href}
-      className="block rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
+      className="block h-full rounded-xl outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
     >
-      <Card className="gap-0 py-0 shadow-xs transition-colors hover:bg-muted/40">{body}</Card>
+      <Card className="h-full gap-0 py-0 shadow-xs transition-colors hover:bg-muted/40">{body}</Card>
     </Link>
   );
 }

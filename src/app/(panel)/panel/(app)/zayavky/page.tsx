@@ -10,7 +10,7 @@ import { listClaims } from '@/server/services/claims'
 export const metadata = { title: 'Заявки на профіль' }
 
 const TONE = { pending: 'warn', approved: 'good', rejected: 'bad' } as const
-const LABEL = { pending: 'claims.pending', approved: 'claims.approved', rejected: 'claims.rejected' } as const
+const LABEL = { pending: 'claims.statusPending', approved: 'claims.approved', rejected: 'claims.rejected' } as const
 
 export default async function ClaimsPage() {
   const rows = await listClaims(db)

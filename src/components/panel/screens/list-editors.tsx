@@ -132,10 +132,21 @@ export function PriceList({ value, onChange }: { value: PriceRow[]; onChange: (v
         items={value}
         onChange={onChange}
         render={(p, i, set) => (
-          <div className="grid gap-1.5 sm:grid-cols-[1fr_9rem_7rem]">
-            <Input aria-label={t('editor.priceText')} placeholder={t('editor.priceText')} value={p.text} onChange={(e) => set({ ...p, text: e.target.value })} className="h-9" id={`price-${i}`} />
-            <Input aria-label={t('editor.priceSource')} placeholder={t('editor.priceSource')} value={p.source ?? ''} onChange={(e) => set({ ...p, source: e.target.value || null })} className="h-9" />
-            <Input aria-label={t('editor.priceDate')} placeholder="10.2026" value={p.dateText ?? ''} onChange={(e) => set({ ...p, dateText: e.target.value || null })} className="h-9" />
+          <div className="grid gap-1.5 rounded-md border bg-muted/20 p-2 sm:grid-cols-[1fr_9rem_7rem] sm:border-0 sm:bg-transparent sm:p-0">
+            <label className="grid gap-0.5">
+              <span className="text-xs text-muted-foreground sm:sr-only">{t('editor.priceText')}</span>
+              <Input placeholder={t('editor.priceText')} value={p.text} onChange={(e) => set({ ...p, text: e.target.value })} className="h-9" id={`price-${i}`} />
+            </label>
+            <div className="grid grid-cols-2 gap-1.5 sm:contents">
+              <label className="grid gap-0.5">
+                <span className="text-xs text-muted-foreground sm:sr-only">{t('editor.priceSource')}</span>
+                <Input placeholder={t('editor.priceSource')} value={p.source ?? ''} onChange={(e) => set({ ...p, source: e.target.value || null })} className="h-9" />
+              </label>
+              <label className="grid gap-0.5">
+                <span className="text-xs text-muted-foreground sm:sr-only">{t('editor.priceDate')}</span>
+                <Input placeholder="10.2026" value={p.dateText ?? ''} onChange={(e) => set({ ...p, dateText: e.target.value || null })} className="h-9" />
+              </label>
+            </div>
           </div>
         )}
       />

@@ -4,6 +4,7 @@ import type { Db } from '../db'
 import { user } from '../db/schema/auth'
 import { cities, media, studioPhotos, studioPrices, studios } from '../db/schema/catalog'
 import { changeSets } from '../db/schema/history'
+import { revalidateStudios } from '../revalidate'
 import { audit, same, type Actor } from './audit'
 import { NotFound } from './requests'
 import { recordRevision } from './studios'
@@ -88,7 +89,7 @@ async function load(ex: Db | Parameters<Parameters<Db['transaction']>[0]>[0], st
 }
 
 export async function listChangeSets(db: Db, status: 'pending' | 'done' = 'pending') {
-  return db
+  const rows = await db
     .select({
       id: changeSets.id,
       status: changeSets.status,
@@ -108,6 +109,9 @@ export async function listChangeSets(db: Db, status: 'pending' | 'done' = 'pendi
     .where(status === 'pending' ? eq(changeSets.status, 'pending') : sql`${changeSets.status} <> 'pending'`)
     .orderBy(status === 'pending' ? asc(changeSets.createdAt) : desc(changeSets.decidedAt))
     .limit(200)
+  if (status !== 'pending') return rows
+  // «полів: N» counts what really differs from the live profile, not every key the owner's form sent.
+  return Promise.all(rows.map(async (r) => ({ ...r, fields: (await getChangeSet(db, r.id))?.fields.filter((f) => f.changed).length ?? r.fields })))
 }
 
 export async function getChangeSet(db: Db, id: number) {
@@ -140,7 +144,7 @@ export async function getChangeSet(db: Db, id: number) {
  * Applies the accepted fields and closes the change set (accepted ones applied, the rest dropped). Idempotent:
  * a closed change set is left as it is. Optionally saves our rewrite of the public description in the same step.
  */
-export async function applyChangeSet(
+async function applyChangeSetTx(
   db: Db,
   id: number,
   accept: FieldKey[] | 'all' | 'all-but-text',
@@ -204,6 +208,13 @@ export async function applyChangeSet(
     await audit(tx, actor, 'change_set', id, status, { fields: { from: offered, to: keys } })
     return { status, applied: keys, already: false, studioId: cs.studioId, slug: row!.slug }
   })
+}
+
+/** Applies the accepted fields of an owner's change set and refreshes the studio's public pages. */
+export async function applyChangeSet(...args: Parameters<typeof applyChangeSetTx>) {
+  const res = await applyChangeSetTx(...args)
+  if (!res.already && 'studioId' in res && res.studioId && res.status !== 'rejected') await revalidateStudios(args[0], [res.studioId])
+  return res
 }
 
 export async function rejectChangeSet(db: Db, id: number, note: string, actor: Actor) {

@@ -5,20 +5,21 @@ import { notFound } from 'next/navigation'
 import { PageHeader, StatusBadge } from '@/components/panel/inhouse'
 import { formatDateTime } from '@/components/panel/lib/format'
 import { t } from '@/components/panel/lib/i18n'
-import { ClaimActions } from '@/components/panel/screens/claim-actions'
+import { ClaimActions, ClaimInviteCard } from '@/components/panel/screens/claim-actions'
 import { EntityHistory } from '@/components/panel/screens/history'
 import { Card, CardContent } from '@/components/panel/ui/card'
 import { db } from '@/server/db'
-import { getClaim } from '@/server/services/claims'
+import { claimInvite, getClaim } from '@/server/services/claims'
 
 export const metadata = { title: 'Заявка' }
 
 const TONE = { pending: 'warn', approved: 'good', rejected: 'bad' } as const
-const LABEL = { pending: 'claims.pending', approved: 'claims.approved', rejected: 'claims.rejected' } as const
+const LABEL = { pending: 'claims.statusPending', approved: 'claims.approved', rejected: 'claims.rejected' } as const
 
 export default async function ClaimPage({ params }: { params: Promise<{ id: string }> }) {
   const c = await getClaim(db, Number((await params).id))
   if (!c) notFound()
+  const invite = c.status === 'approved' ? await claimInvite(db, c.id) : null
   return (
     <div className="space-y-5">
       <Link href="/panel/zayavky" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
@@ -82,7 +83,14 @@ export default async function ClaimPage({ params }: { params: Promise<{ id: stri
           </ul>
         </CardContent>
       </Card>
-      {c.status === 'pending' && <ClaimActions id={c.id} existingOwners={c.existingOwners} />}
+      {c.status === 'pending' && <ClaimActions id={c.id} existingOwners={c.existingOwners} studioNames={c.studios.map((s) => s.name).join('», «')} claimant={c.name} />}
+      {invite && (
+        <ClaimInviteCard
+          id={c.id}
+          invite={{ link: invite.link, message: invite.message, hasPassword: invite.hasPassword, issuedAt: invite.issuedAt?.toISOString() ?? null, expiresAt: invite.expiresAt?.toISOString() ?? null, usedAt: invite.usedAt?.toISOString() ?? null }}
+          formatted={{ issuedAt: invite.issuedAt ? formatDateTime(invite.issuedAt) : undefined, expiresAt: invite.expiresAt ? formatDateTime(invite.expiresAt) : undefined, usedAt: invite.usedAt ? formatDateTime(invite.usedAt) : undefined }}
+        />
+      )}
       <Card className="gap-0 py-0 shadow-xs">
         <CardContent className="space-y-3 p-4 sm:p-6">
           <h2 className="text-sm font-medium">{t('requests.history')}</h2>

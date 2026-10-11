@@ -38,6 +38,7 @@ export default async function StudiosPage({ searchParams }: { searchParams: Prom
     <div className="space-y-5">
       <PageHeader title={t('studios.title')} description={t('studios.description')} actions={<RefreshButton />} />
       <UrlFilters
+        compactOnPhone
         filters={[
           { kind: 'search', name: 'q', label: t('studios.search') },
           { kind: 'choice', name: 'city', label: t('studios.city'), allLabel: t('studios.all'), options: cities.filter((c) => c.count > 0).map((c) => ({ value: String(c.id), label: `${c.name} (${c.count})` })) },

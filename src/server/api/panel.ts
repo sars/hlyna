@@ -11,7 +11,7 @@ import { InviteError } from '../auth/invites'
 import { requireRole } from '../auth/guards'
 import { db } from '../db'
 import type { Actor } from '../services/audit'
-import { approveClaim, rejectClaim } from '../services/claims'
+import { approveClaim, reissueClaimInvite, rejectClaim } from '../services/claims'
 import { applyChangeSet, FIELD_ORDER, rejectChangeSet, type FieldKey } from '../services/changeSets'
 import { NotFound, setRequestStatus, setRequestStudios, updateRequest } from '../services/requests'
 import { searchStudios } from '../services/studios'
@@ -87,6 +87,8 @@ app.put('/requests/:id/studios', zValidator('param', id), zValidator('json', z.o
 app.post('/claims/:id/approve', zValidator('param', id), zValidator('json', z.object({ linkToOwnerId: z.string().max(100).nullish() })), async (c) =>
   c.json(await approveClaim(db, c.req.valid('param').id, c.get('actor'), { linkToOwnerId: c.req.valid('json').linkToOwnerId })),
 )
+
+app.post('/claims/:id/invite', zValidator('param', id), async (c) => c.json(await reissueClaimInvite(db, c.req.valid('param').id, c.get('actor'))))
 
 app.post('/claims/:id/reject', zValidator('param', id), zValidator('json', z.object({ reason: z.string().max(1000).default('') })), async (c) =>
   c.json(await rejectClaim(db, c.req.valid('param').id, c.req.valid('json').reason, c.get('actor'))),

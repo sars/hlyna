@@ -221,9 +221,18 @@ export function UserActions({
 
       <section className="flex flex-wrap gap-2">
         {role !== 'owner' && !isSelf && (
-          <Button type="button" variant="outline" disabled={busy} onClick={() => run(() => api(`/users/${id}`, { method: 'PATCH', body: { role: role === 'admin' ? 'editor' : 'admin' } }), t('editor.saved'))}>
-            {role === 'admin' ? t('users.makeEditor') : t('users.makeAdmin')}
-          </Button>
+          <ConfirmDialog
+            trigger={
+              <Button type="button" variant="outline" disabled={busy}>
+                {role === 'admin' ? t('users.makeEditor') : t('users.makeAdmin')}
+              </Button>
+            }
+            title={role === 'admin' ? t('users.makeEditorTitle') : t('users.makeAdminTitle')}
+            body={role === 'admin' ? t('users.makeEditorBody') : t('users.makeAdminBody')}
+            confirmLabel={role === 'admin' ? t('users.makeEditor') : t('users.makeAdmin')}
+            destructive={false}
+            onConfirm={() => run(() => api(`/users/${id}`, { method: 'PATCH', body: { role: role === 'admin' ? 'editor' : 'admin' } }), t('editor.saved'))}
+          />
         )}
         {!isSelf &&
           (active ? (

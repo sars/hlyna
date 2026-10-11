@@ -148,8 +148,8 @@ export function RequestStudios({ id, initial }: { id: number; initial: Pick[] })
           onClick={async () => {
             setBusy(true)
             try {
-              await api(`/requests/${id}/studios`, { method: 'PUT', body: { studioIds: chosen.map((c) => c.id) } })
-              toast.success(t('requests.saved'))
+              const res = await api<{ status?: string }>(`/requests/${id}/studios`, { method: 'PUT', body: { studioIds: chosen.map((c) => c.id) } })
+              toast.success(res.status === 'forwarded' ? `${t('requests.saved')}. ${t('requests.forwardedAuto')}` : t('requests.saved'))
               router.refresh()
             } catch (e) {
               toast.error((e as Error).message)

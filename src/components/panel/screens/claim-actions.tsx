@@ -38,7 +38,7 @@ export function CopyBlock({ label, text }: { label: string; text: string }) {
 }
 
 /** Approve (create or extend the owner, link shown once) or reject — the same service the Telegram buttons call. */
-export function ClaimActions({ id, existingOwners }: { id: number; existingOwners: Owner[] }) {
+export function ClaimActions({ id, existingOwners, studioNames, claimant }: { id: number; existingOwners: Owner[]; studioNames: string; claimant: string }) {
   const router = useRouter()
   const [attachTo, setAttachTo] = useState<string>(existingOwners[0]?.id ?? '')
   const [busy, setBusy] = useState(false)
@@ -83,14 +83,19 @@ export function ClaimActions({ id, existingOwners }: { id: number; existingOwner
           </fieldset>
         )}
         <div className="flex flex-wrap gap-2">
-          <Button
-            disabled={busy}
-            onClick={async () => {
+          <ConfirmDialog
+            trigger={<Button disabled={busy}>{busy ? t('claims.approving') : t('claims.approve')}</Button>}
+            title={t('claims.approveConfirm', { name: studioNames })}
+            destructive={false}
+            body={attachTo ? t('claims.approveConfirmAttach', { name: existingOwners.find((o) => o.id === attachTo)?.name ?? '' }) : t('claims.approveConfirmNew', { name: claimant })}
+            confirmLabel={t('claims.approve')}
+            onConfirm={async () => {
               setBusy(true)
               try {
                 const res = await api<Approved>(`/claims/${id}/approve`, { body: { linkToOwnerId: attachTo || null } })
                 setResult(res)
                 toast.success(t('claims.approved'))
+                // The page re-renders as «approved» and shows the link from the server (it stays visible after refresh).
                 router.refresh()
               } catch (e) {
                 toast.error((e as Error).message)
@@ -98,9 +103,7 @@ export function ClaimActions({ id, existingOwners }: { id: number; existingOwner
                 setBusy(false)
               }
             }}
-          >
-            {busy ? t('claims.approving') : t('claims.approve')}
-          </Button>
+          />
           <ConfirmDialog
             trigger={<Button variant="outline" disabled={busy}>{t('claims.reject')}</Button>}
             title={t('claims.rejectConfirm')}
@@ -120,6 +123,55 @@ export function ClaimActions({ id, existingOwners }: { id: number; existingOwner
             </FormField>
           </ConfirmDialog>
         </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+type Invite = { link: string | null; message: string | null; issuedAt: string | null; expiresAt: string | null; usedAt: string | null; hasPassword: boolean }
+
+/** After approval: the owner's password link stays visible until it's used or expires; a new one can be issued. */
+export function ClaimInviteCard({ id, invite, formatted }: { id: number; invite: Invite; formatted: { issuedAt?: string; expiresAt?: string; usedAt?: string } }) {
+  const [fresh, setFresh] = useState<{ link: string; message: string } | null>(null)
+  const [busy, setBusy] = useState(false)
+  const link = fresh?.link ?? invite.link
+  const message = fresh?.message ?? invite.message
+  return (
+    <Card className="gap-0 py-0 shadow-xs">
+      <CardContent className="space-y-4 p-4 sm:p-6">
+        <h2 className="text-sm font-medium">{t('claims.inviteTitle')}</h2>
+        {link ? (
+          <>
+            <p className="text-xs text-muted-foreground">
+              {fresh ? t('claims.inviteNew') : t('claims.inviteIssued', { date: formatted.issuedAt ?? '' })} {formatted.expiresAt && !fresh ? t('claims.inviteValid', { date: formatted.expiresAt }) : t('claims.inviteValid7')}
+            </p>
+            <CopyBlock label={t('claims.linkTitle')} text={link} />
+            {message && <CopyBlock label={t('claims.message')} text={message} />}
+          </>
+        ) : invite.hasPassword ? (
+          <p className="text-sm text-muted-foreground">{invite.usedAt ? t('claims.inviteUsed', { date: formatted.usedAt ?? '' }) : t('claims.noLink')}</p>
+        ) : (
+          <p className="text-sm text-muted-foreground">{t('claims.inviteExpired')}</p>
+        )}
+        <ConfirmDialog
+          trigger={<Button variant="outline" disabled={busy}>{t('claims.inviteCreate')}</Button>}
+          title={t('claims.inviteCreateConfirm')}
+          destructive={false}
+          body={t('claims.inviteCreateHint')}
+          confirmLabel={t('claims.inviteCreate')}
+          onConfirm={async () => {
+            setBusy(true)
+            try {
+              const res = await api<{ link: string; message: string }>(`/claims/${id}/invite`, { body: {} })
+              setFresh(res)
+              toast.success(t('claims.inviteNew'))
+            } catch (e) {
+              toast.error((e as Error).message)
+            } finally {
+              setBusy(false)
+            }
+          }}
+        />
       </CardContent>
     </Card>
   )

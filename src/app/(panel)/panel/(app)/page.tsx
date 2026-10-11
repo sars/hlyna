@@ -34,7 +34,7 @@ export default async function OverviewPage() {
             <ul className="space-y-1 text-sm">
               {todo.map((x) => (
                 <li key={x.href}>
-                  <Link href={x.href} className="text-primary hover:underline">
+                  <Link href={x.href} className="inline-flex min-h-11 items-center text-primary hover:underline sm:min-h-0">
                     {x.text}
                   </Link>
                 </li>

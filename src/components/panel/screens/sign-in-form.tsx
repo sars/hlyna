@@ -81,10 +81,10 @@ export function SetPasswordForm({ token, email }: { token: string; email: string
     >
       <fieldset disabled={busy} className="space-y-4">
         <FormField id="login" label={t('auth.login')}>
-          <Input id="login" name="login" type="email" defaultValue={email.endsWith('.invalid') ? '' : email} autoComplete="username" required />
+          <Input id="login" name="login" type="email" defaultValue={email.endsWith('.invalid') ? '' : email} autoComplete="username" required onInvalid={(e) => e.currentTarget.setCustomValidity(t('auth.loginInvalid'))} onInput={(e) => e.currentTarget.setCustomValidity('')} />
         </FormField>
         <FormField id="password" label={t('auth.newPassword')} error={error}>
-          <Input id="password" name="password" type="password" minLength={10} autoComplete="new-password" required aria-invalid={Boolean(error)} />
+          <Input id="password" name="password" type="password" minLength={10} autoComplete="new-password" required aria-invalid={Boolean(error)} onInvalid={(e) => e.currentTarget.setCustomValidity(t('auth.passwordShort'))} onInput={(e) => e.currentTarget.setCustomValidity('')} />
         </FormField>
         <Button type="submit" className="w-full">
           {busy ? t('action.saving') : t('auth.setSubmit')}

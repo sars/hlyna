@@ -70,7 +70,14 @@ export async function listStudios(db: Db, f: StudioListFilters) {
   if (f.verified !== undefined) where.push(f.verified ? eq(studios.ownerVerified, true) : sql`coalesce(${studios.ownerVerified}, false) = false`)
   if (f.hasPrices !== undefined) where.push(f.hasPrices ? hasPricesSql : sql`not ${hasPricesSql}`)
   if (f.hasAddress !== undefined) where.push(f.hasAddress ? hasAddressSql : sql`not coalesce(${hasAddressSql}, false)`)
-  if (f.after) where.push(or(gt(studios.name, f.after.name), and(eq(studios.name, f.after.name), gt(studios.id, f.after.id))))
+  // Keyset paging in the same Ukrainian collation as the ORDER BY below.
+  if (f.after)
+    where.push(
+      or(
+        sql`${studios.name} collate "uk-UA-x-icu" > ${f.after.name} collate "uk-UA-x-icu"`,
+        and(sql`${studios.name} collate "uk-UA-x-icu" = ${f.after.name} collate "uk-UA-x-icu"`, gt(studios.id, f.after.id)),
+      ),
+    )
 
   const rows = await db
     .select({
@@ -90,7 +97,7 @@ export async function listStudios(db: Db, f: StudioListFilters) {
     .from(studios)
     .leftJoin(cities, eq(cities.id, studios.cityId))
     .where(and(...where))
-    .orderBy(asc(studios.name), asc(studios.id))
+    .orderBy(sql`${studios.name} collate "uk-UA-x-icu"`, asc(studios.id))
     .limit(limit + 1)
   const hasMore = rows.length > limit
   const page = rows.slice(0, limit)
@@ -102,7 +109,7 @@ export async function cityOptions(db: Db) {
   return db
     .select({ id: cities.id, name: cities.name, count: sql<number>`(select count(*)::int from ${studios} s where s.city_id = "app"."cities"."id")` })
     .from(cities)
-    .orderBy(asc(cities.name))
+    .orderBy(sql`${cities.name} collate "uk-UA-x-icu"`)
 }
 
 // ---------------------------------------------------------------- read for the editor

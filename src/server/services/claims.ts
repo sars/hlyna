@@ -1,11 +1,12 @@
 import { and, asc, desc, eq, inArray, sql } from 'drizzle-orm'
 
 import type { Db } from '../db'
-import { account, studioOwner, user } from '../db/schema/auth'
+import { account, inviteLinks, studioOwner, user } from '../db/schema/auth'
 import { cities, studios } from '../db/schema/catalog'
 import { claims, claimStudios } from '../db/schema/requests'
 import { createInvite } from '../auth/invites'
 import { createUser, grantStudios } from '../auth/users'
+import { revalidateStudios } from '../revalidate'
 import { audit, type Actor } from './audit'
 import { NotFound } from './requests'
 import { patchStudio } from './studios'
@@ -115,8 +116,10 @@ export async function approveClaim(db: Db, id: number, actor: Actor, opts: { lin
     const [cred] = await tx.select({ id: account.id }).from(account).where(and(eq(account.userId, ownerId), eq(account.providerId, 'credential'))).limit(1)
     let link: string | null = null
     if (!cred) link = (await createInvite(exec, { userId: ownerId, createdBy: actor.id, baseUrl: SITE() })).link
-    return { status: 'approved' as const, ownerId, link, message: link ? studioWelcomeMessage(link) : null, already: false }
+    return { status: 'approved' as const, ownerId, link, message: link ? studioWelcomeMessage(link) : null, already: false, studioIds }
   })
+  // «Профіль підтверджено студією» appears on the public profile.
+  if (result.status === 'approved' && !result.already && result.studioIds) await revalidateStudios(db, result.studioIds)
   return result
 }
 
@@ -132,4 +135,37 @@ export async function rejectClaim(db: Db, id: number, reason: string, actor: Act
     await audit(tx, actor, 'claim', id, 'reject', { status: { from: 'pending', to: 'rejected' }, ...(r ? { reason: { from: null, to: r } } : {}) })
     return { status: 'rejected' as const, already: false }
   })
+}
+
+/** The last password link issued to the claim's owner, if any (the full link is kept so the approver can see it again). */
+export async function claimInvite(db: Db, claimId: number) {
+  const [c] = await db.select({ ownerId: claims.ownerId, status: claims.status }).from(claims).where(eq(claims.id, claimId)).limit(1)
+  if (!c?.ownerId || c.status !== 'approved') return null
+  const [cred] = await db.select({ id: account.id }).from(account).where(and(eq(account.userId, c.ownerId), eq(account.providerId, 'credential'))).limit(1)
+  const [inv] = await db
+    .select({ link: inviteLinks.link, createdAt: inviteLinks.createdAt, expiresAt: inviteLinks.expiresAt, usedAt: inviteLinks.usedAt })
+    .from(inviteLinks)
+    .where(eq(inviteLinks.userId, c.ownerId))
+    .orderBy(desc(inviteLinks.createdAt))
+    .limit(1)
+  const usable = inv && inv.link && !inv.usedAt && inv.expiresAt > new Date()
+  return {
+    ownerId: c.ownerId,
+    hasPassword: Boolean(cred),
+    link: usable ? inv.link : null,
+    message: usable && inv.link ? studioWelcomeMessage(inv.link) : null,
+    issuedAt: inv?.createdAt ?? null,
+    expiresAt: inv?.expiresAt ?? null,
+    usedAt: inv?.usedAt ?? null,
+  }
+}
+
+/** A fresh link for the claim's owner (replaces any unused one). Editors may do this from the claim page. */
+export async function reissueClaimInvite(db: Db, claimId: number, actor: Actor) {
+  const [c] = await db.select({ ownerId: claims.ownerId, status: claims.status }).from(claims).where(eq(claims.id, claimId)).limit(1)
+  if (!c) throw new NotFound(`Заявку #${claimId} не знайдено`)
+  if (c.status !== 'approved' || !c.ownerId) throw new Error('Посилання можна створити лише для схваленої заявки.')
+  const { link, expiresAt } = await createInvite(db, { userId: c.ownerId, createdBy: actor.id, baseUrl: SITE() })
+  await audit(db, actor, 'claim', claimId, 'invite', { invite: { from: null, to: expiresAt.toISOString() } })
+  return { link, expiresAt, message: studioWelcomeMessage(link) }
 }

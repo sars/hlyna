@@ -103,7 +103,7 @@ export async function updateRequest(db: Db, id: number, patch: { notes?: string 
 export async function setRequestStudios(db: Db, id: number, studioIds: number[], actor: Actor) {
   const ids = [...new Set(studioIds)].slice(0, 20)
   return db.transaction(async (tx) => {
-    const [r] = await tx.select({ id: requests.id }).from(requests).where(eq(requests.id, id)).for('update').limit(1)
+    const [r] = await tx.select({ id: requests.id, status: requests.status }).from(requests).where(eq(requests.id, id)).for('update').limit(1)
     if (!r) throw new NotFound(`Запит #${id} не знайдено`)
     const before = await tx.select({ studioId: requestStudios.studioId, sentAt: requestStudios.sentAt }).from(requestStudios).where(eq(requestStudios.requestId, id))
     const had = new Map(before.map((b) => [b.studioId, b.sentAt]))
@@ -113,6 +113,13 @@ export async function setRequestStudios(db: Db, id: number, studioIds: number[],
     const from = before.map((b) => b.studioId).sort((a, b) => a - b)
     const to = [...ids].sort((a, b) => a - b)
     if (JSON.stringify(from) !== JSON.stringify(to)) await audit(tx, actor, 'request', id, 'studios', { studios: { from, to } })
-    return { count: ids.length }
+    // Same meaning as the Telegram «Передано студіям» button: choosing studios for a fresh request forwards it.
+    let status = r.status
+    if (ids.length && (r.status === 'new' || r.status === 'in_progress')) {
+      await tx.update(requests).set({ status: 'forwarded', updatedAt: sql`now()`, updatedBy: actor.id }).where(eq(requests.id, id))
+      await audit(tx, actor, 'request', id, 'status', { status: { from: r.status, to: 'forwarded' } })
+      status = 'forwarded'
+    }
+    return { count: ids.length, status }
   })
 }

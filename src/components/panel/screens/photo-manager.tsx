@@ -23,6 +23,7 @@ export function PhotoManager({ value, onChange, studioSlug }: { value: PhotoItem
   const [alt, setAlt] = useState('')
   const [busy, setBusy] = useState(false)
   const file = useRef<HTMLInputElement>(null)
+  const [pickKey, setPickKey] = useState(0)
 
   async function upload() {
     const f = file.current?.files?.[0]
@@ -46,6 +47,8 @@ export function PhotoManager({ value, onChange, studioSlug }: { value: PhotoItem
       }
       setAlt('')
       if (file.current) file.current.value = ''
+      setPickKey((k) => k + 1) // the picker forgets the uploaded file's name
+      toast.success(t('editor.photoAdded'))
     } catch (e) {
       toast.error((e as Error).message)
     } finally {
@@ -94,7 +97,7 @@ export function PhotoManager({ value, onChange, studioSlug }: { value: PhotoItem
         )}
       />
       <div className="grid gap-2 rounded-lg border border-dashed p-3 sm:grid-cols-[1fr_1fr_auto] sm:items-center">
-        <FilePick ref={file} accept="image/jpeg,image/png,image/webp" />
+        <FilePick key={pickKey} ref={file} accept="image/jpeg,image/png,image/webp" />
         <Input value={alt} onChange={(e) => setAlt(e.target.value)} placeholder={t('editor.alt')} aria-label={t('editor.alt')} className="h-9" />
         <Button type="button" variant="outline" onClick={upload} disabled={busy}>
           <Upload />

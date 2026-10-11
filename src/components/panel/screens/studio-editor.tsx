@@ -180,7 +180,7 @@ export function StudioEditor({
       const json = (await res.json()) as { lat?: number; lng?: number; kind?: 'address' | 'street' | 'settlement'; displayName?: string; error?: string }
       if (!res.ok || json.lat === undefined) throw new Error(json.error ?? t('error.save'))
       setForm((f) => ({ ...f, geoLat: json.lat!, geoLng: json.lng!, geoPrecision: json.kind! }))
-      toast.success(t('editor.geoFound', { name: json.displayName ?? '' }))
+      toast.success(t('editor.geoFound', { name: (json.displayName ?? '').split(',').map((x) => x.trim()).filter((x) => !/^\d{5}$/.test(x) && x !== 'Україна').slice(0, 3).join(', ') }))
     } catch (e) {
       toast.error((e as Error).message)
     } finally {

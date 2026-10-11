@@ -62,7 +62,7 @@ export default async function InstagramPage() {
             <ul className="space-y-1 font-mono text-[11px] text-muted-foreground">
               {s.recentLog.map((l) => (
                 <li key={l} className="break-words">
-                  {l}
+                  {l.replace(/^(\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})(\.\d+)?Z/, (iso) => formatDateTime(iso))}
                 </li>
               ))}
             </ul>

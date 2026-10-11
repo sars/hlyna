@@ -82,7 +82,9 @@ export async function geocode(address: string | null, city: string, oblast?: str
       for (const h of await ask(query)) {
         const p = { lat: Number(h.lat), lng: Number(h.lon) }
         if (c && km(c, p) > 30) continue
-        const exact = kind === 'address' && (h.addresstype === 'building' || h.class === 'building' || h.type === 'house' || /\d/.test(h.display_name.split(',')[0] ?? ''))
+        const parts = h.display_name.split(',').map((x) => x.trim())
+        // A house number is often the second part («Міська галерея, 27, Соборна вулиця, …»).
+        const exact = kind === 'address' && (h.addresstype === 'building' || h.class === 'building' || h.type === 'house' || parts.slice(0, 2).some((x) => /^\d+[\p{L}/-]*\d*$/u.test(x)) || /\d/.test(parts[0] ?? ''))
         return { ...p, displayName: h.display_name, kind: exact ? 'address' : 'street' }
       }
     }

@@ -24,18 +24,21 @@ export function HistoryList({
   fieldLabel = (field: string) => field,
   /** How a stored value is written for a person. */
   valueLabel = (_field: string, value: unknown) => describe(value),
+  /** How an action without field changes is written ("approve" → "схвалено"); default: "created". */
+  actionLabel,
   className,
 }: {
   events: AuditEvent[];
   fieldLabel?: (field: string) => string;
   valueLabel?: (field: string, value: unknown) => string;
+  actionLabel?: (action: string) => string;
   className?: string;
 }) {
   return (
     <ul className={cn('space-y-3', className)}>
       {events.map((event) => (
         <li key={event.id} className="flex flex-wrap items-baseline gap-x-2 text-sm">
-          <span className="text-foreground">{sentence(event, fieldLabel, valueLabel)}</span>
+          <span className="text-foreground">{sentence(event, fieldLabel, valueLabel, actionLabel)}</span>
           <span className="text-xs text-muted-foreground">·</span>
           <time
             dateTime={event.at}
@@ -61,13 +64,14 @@ function sentence(
   event: AuditEvent,
   fieldLabel: (field: string) => string,
   valueLabel: (field: string, value: unknown) => string,
+  actionLabel?: (action: string) => string,
 ): string {
   const actor = event.actorName ?? t('history.someone');
   if (event.action === 'created') return t('history.created', { actor });
   if (event.action === 'deleted') return t('history.deleted', { actor });
   if (event.action === 'restored') return t('history.restored', { actor });
   const changes = Object.entries(event.changes);
-  if (!changes.length) return t('history.created', { actor });
+  if (!changes.length) return actionLabel && event.action !== 'create' ? `${actor}: ${actionLabel(event.action)}` : t('history.created', { actor });
   // One line per event, not per field: an edit that touched three fields is
   // one thing the person did, and three lines make it look like three.
   return changes

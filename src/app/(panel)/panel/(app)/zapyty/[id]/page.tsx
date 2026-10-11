@@ -53,8 +53,8 @@ export default async function RequestPage({ params }: { params: Promise<{ id: st
               {[r.contactName, r.contactPhoneOrTelegram, r.contactEmail].filter(Boolean).join(' · ')}
               {(href || r.contactEmail) && (
                 <span className="mt-1 flex gap-3">
-                  {href && <a className="text-primary hover:underline" href={href}>{t('requests.contact')}</a>}
-                  {r.contactEmail && <a className="text-primary hover:underline" href={`mailto:${r.contactEmail}`}>Email</a>}
+                  {href && <a className="inline-flex min-h-11 items-center text-primary hover:underline sm:min-h-0" href={href}>{href.startsWith('tel:') ? t('requests.call') : t('requests.contact')}</a>}
+                  {r.contactEmail && <a className="inline-flex min-h-11 items-center text-primary hover:underline sm:min-h-0" href={`mailto:${r.contactEmail}`}>Email</a>}
                 </span>
               )}
             </Row>
@@ -67,7 +67,13 @@ export default async function RequestPage({ params }: { params: Promise<{ id: st
             <Row label={t('requests.city')}>{r.city}</Row>
             <Row label={t('requests.logo')}>{r.logo ? t('history.yes') : null}</Row>
             <Row label={t('requests.photoConsent')}>{r.what === 'studio' ? (r.photoConsent ? t('history.yes') : t('history.no')) : null}</Row>
-            <Row label={t('requests.source')}>{r.sourcePage}</Row>
+            <Row label={t('requests.source')}>
+              {r.sourcePage ? (
+                <a className="text-primary hover:underline" href={r.sourcePage} target="_blank" rel="noopener">
+                  {r.sourcePage.startsWith('/vyrobnyky/') ? t('requests.sourceProfile') : r.sourcePage}
+                </a>
+              ) : null}
+            </Row>
             <Row label={t('requests.created')}>{formatDateTime(r.createdAt)}</Row>
           </dl>
         </CardContent>

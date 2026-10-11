@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { EmptyState, PageHeader, RefreshButton } from '@/components/panel/inhouse'
 import { formatDateTime } from '@/components/panel/lib/format'
 import { t } from '@/components/panel/lib/i18n'
-import { fieldLabel } from '@/components/panel/lib/labels'
+import { actionLabel, fieldLabel, sourceLabel } from '@/components/panel/lib/labels'
 import { UrlFilters } from '@/components/panel/screens/url-filters'
 import { Card } from '@/components/panel/ui/card'
 import { db } from '@/server/db'
@@ -42,11 +42,11 @@ export default async function JournalPage({ searchParams }: { searchParams: Prom
             const body = (
               <>
                 <span className="min-w-0 flex-1 text-sm">
-                  <span className="font-medium">{t(`entity.${r.entity}`)} #{r.entityId}</span> · {r.action}
+                  <span className="font-medium">{t(`entity.${r.entity}`)} {r.entityLabel ? `«${r.entityLabel}»` : `#${r.entityId}`}</span> · {actionLabel(r.action)}
                   {fields.length ? <span className="text-muted-foreground"> · {fields.map(fieldLabel).join(', ')}</span> : null}
                 </span>
                 <span className="shrink-0 text-xs text-muted-foreground">
-                  {[r.actorName, r.source && r.source !== 'panel' ? t(`source.${r.source}`) : null].filter(Boolean).join(' · ')} · {formatDateTime(r.at)}
+                  {[r.actorName, r.source && r.source !== 'panel' ? sourceLabel(r.source) : null].filter(Boolean).join(' · ')} · {formatDateTime(r.at)}
                 </span>
               </>
             )

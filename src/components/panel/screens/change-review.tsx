@@ -38,7 +38,11 @@ export function ChangeReview({
   const [quote, setQuote] = useState(false)
   const [busy, setBusy] = useState(false)
   const [reason, setReason] = useState('')
-  const hasText = fields.some((f) => f.ownerText)
+  const hasText = fields.some((f) => f.ownerText && f.changed)
+  const changed = fields.filter((f) => f.changed)
+  const unchanged = fields.filter((f) => !f.changed)
+  const labelsOf = (keys: string[]) => fields.filter((f) => keys.includes(f.key)).map((f) => f.label).join(', ')
+  const allButText = changed.filter((f) => !f.ownerText).map((f) => f.key)
 
   const submit = async (keys: string[] | 'all-but-text') => {
     setBusy(true)
@@ -62,7 +66,7 @@ export function ChangeReview({
 
   return (
     <fieldset disabled={busy} className="space-y-5">
-      {fields.map((f) => (
+      {changed.map((f) => (
         <Card key={f.key} className="gap-0 py-0 shadow-xs">
           <CardContent className="space-y-3 p-4 sm:p-6">
             <label className="flex min-h-11 items-center gap-3">
@@ -74,16 +78,25 @@ export function ChangeReview({
                   else next.delete(f.key)
                   setAccept(next)
                 }}
-                disabled={!f.changed}
               />
               <span className="text-sm font-medium">{f.label}</span>
-              {!f.changed && <span className="text-xs text-muted-foreground">{t('changes.same')}</span>}
             </label>
             {f.ownerText && <p className="text-xs text-warning">{t('changes.ownerText')}</p>}
             {f.diff}
           </CardContent>
         </Card>
       ))}
+
+      {unchanged.length > 0 && (
+        <details className="rounded-lg border px-4 py-3 text-sm">
+          <summary className="flex min-h-11 cursor-pointer items-center text-muted-foreground">{t('changes.unchanged', { count: unchanged.length })}</summary>
+          <ul className="mt-2 space-y-1 text-muted-foreground">
+            {unchanged.map((f) => (
+              <li key={f.key}>{f.label}</li>
+            ))}
+          </ul>
+        </details>
+      )}
 
       {hasText && (
         <Card className="gap-0 py-0 shadow-xs">
@@ -105,11 +118,23 @@ export function ChangeReview({
       )}
 
       <div className="flex flex-wrap gap-2">
-        <Button onClick={() => void submit([...accept])}>{busy ? t('action.saving') : t('changes.applySelected')}</Button>
+        <ConfirmDialog
+          trigger={<Button disabled={busy || accept.size === 0}>{busy ? t('action.saving') : t('changes.applySelected')}</Button>}
+          title={t('changes.publishConfirm', { count: accept.size })}
+          body={labelsOf([...accept])}
+          destructive={false}
+          confirmLabel={t('changes.publish')}
+          onConfirm={() => submit([...accept])}
+        />
         {hasText && (
-          <Button variant="outline" onClick={() => void submit('all-but-text')}>
-            {t('changes.applyAllButText')}
-          </Button>
+          <ConfirmDialog
+            trigger={<Button variant="outline" disabled={busy}>{t('changes.applyAllButText')}</Button>}
+            title={t('changes.publishConfirm', { count: allButText.length })}
+            body={`${labelsOf(allButText)}. ${t('changes.ownerTextStays')}`}
+            destructive={false}
+            confirmLabel={t('changes.publish')}
+            onConfirm={() => submit('all-but-text')}
+          />
         )}
         <ConfirmDialog
           trigger={<Button variant="outline">{t('changes.reject')}</Button>}

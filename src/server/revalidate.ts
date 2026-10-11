@@ -15,3 +15,16 @@ export async function revalidateCatalog(paths: string[] = []) {
 /** Public URLs that show a studio: its profile and its city's catalogue pages. */
 export const studioPaths = (slug: string, citySlug?: string | null) =>
   [`/vyrobnyky/${slug}`, ...(citySlug ? [`/vyrobnyky/misto/${citySlug}`, `/maister-klasy/${citySlug}`] : [])]
+
+/** Refresh the public pages of these studios (profile + city pages); used after a write outside the editor. */
+export async function revalidateStudios(db: import('./db').Db, studioIds: number[]) {
+  if (!studioIds.length) return
+  const { inArray, eq } = await import('drizzle-orm')
+  const { studios, cities } = await import('./db/schema/catalog')
+  const rows = await db
+    .select({ slug: studios.slug, citySlug: cities.slug })
+    .from(studios)
+    .leftJoin(cities, eq(cities.id, studios.cityId))
+    .where(inArray(studios.id, studioIds))
+  await revalidateCatalog(rows.flatMap((r) => studioPaths(r.slug, r.citySlug)))
+}

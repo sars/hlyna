@@ -6,7 +6,7 @@ import { t } from '@/components/panel/lib/i18n'
 type Price = { text: string; source: string | null; dateText: string | null }
 type Media = { id: number; fileName: string; alt: string | null; status: string; variants: Record<string, { file: string | null } | undefined> | null }
 
-const mediaSrc = (m: Media) => `/api/media/file/${encodeURIComponent(m.variants?.thumbnail?.file ?? m.fileName)}`
+const mediaSrc = (m: Media) => `/media/${encodeURIComponent(m.variants?.thumbnail?.file ?? m.fileName)}`
 
 const SHOW = 5
 
