@@ -98,8 +98,8 @@ function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: st
       <SectionHead title={title} id={id}>{note && <p className="m-0 text-sm text-umber">{note}</p>}</SectionHead>
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0">{head.map((s) => <MakerRow key={s.id} s={s} />)}</ul>
       {tail.length > 0 && (
-        <details>
-          <summary className="cursor-pointer font-bold">{`Показати ще ${tail.length}`}</summary>
+        <details className="group">
+          <summary className="cursor-pointer font-bold"><span className="group-open:hidden">{`Показати ще ${tail.length}`}</span><span className="hidden group-open:inline">Згорнути</span></summary>
           <ul className="m-0 mt-2.5 grid list-none grid-cols-1 gap-2.5 p-0">{tail.map((s) => <MakerRow key={s.id} s={s} />)}</ul>
         </details>
       )}

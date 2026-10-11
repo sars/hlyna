@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
+
 import { latestUpdate } from '@/lib/catalog'
 
 import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
@@ -13,7 +15,7 @@ import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
 import { fmt, getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, inCity, oblastLabel, staleNote, type Span } from '@/lib/present'
+import { cleanName, firstAddress, inCity, oblastLabel, roundNice, staleNote, type Span } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { cityContent } from '@/lib/places'
 import { certificateCities } from '@/lib/topics'
@@ -115,7 +117,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
   ]
 
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{
@@ -150,6 +152,9 @@ export default async function CityMasterClassesPage({ params }: Args) {
             <Link href={`/vyrobnyky/misto/${city.slug}`}>Більше про кераміку {where} →</Link>
           </p>
         )}
+        <p className="m-0">
+          <Link href={`/mapa?misto=${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Показати на мапі →</Link>
+        </p>
         <Updated />
       </div>
 
@@ -159,7 +164,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
 
           <section aria-labelledby="list">
             <SectionHead title={`Де пройти майстер-клас ${where}`} id="list">
-              <p className="m-0 text-sm text-umber">«Від» — найнижча ціна разового заняття з прайсу студії. Курси, абонементи й корпоративи — у профілі.</p>
+              <p className="m-0 text-sm text-umber">Ціна — разове групове заняття для дорослих з прайсу студії. Курси, абонементи й корпоративи — у профілі.</p>
             </SectionHead>
             <ul className="m-0 grid grid-cols-1 list-none gap-2.5 p-0">
               {sorted.map((s) => {
@@ -196,7 +201,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
                         </span>
                       )}
                     </div>
-                    {from ? <span className="text-[15px] font-semibold whitespace-nowrap text-terra sm:text-right">від {fmt(from)} грн</span> : null}
+                    {from ? <span className="text-[15px] font-semibold whitespace-nowrap text-terra sm:text-right">{fmt(roundNice(from))} грн</span> : null}
                   </li>
                 )
               })}
@@ -242,7 +247,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           </section>
         </div>
 
-        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
+        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
           <RequestForm sourcePage={`/maister-klasy/${city.slug}`} defaultWhat="master-class" defaultCity={city.name} />
           <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny" className="rounded-[20px] bg-cobalt p-4 text-clay no-underline hover:text-clay">
             <b className="font-display text-sm uppercase">Для команди</b>
@@ -250,6 +255,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           </Link>
         </aside>
       </div>
+      <MobileRequestBar />
     </main>
   )
 }

@@ -87,24 +87,24 @@ export default async function PricesPage() {
               <div key={key} className="grid grid-cols-1 gap-2">
                 <h3 className="h-display m-0 text-[17px]">{title}</h3>
                 <div className="overflow-x-auto rounded-2xl bg-card">
-                  <table className="w-full min-w-[520px] border-collapse text-[15px]">
+                  <table className="w-full border-collapse text-[14px] sm:text-[15px]">
                     <thead>
-                      <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
-                        <th className="border-b border-line px-3.5 py-3">Що</th>
-                        <th className="border-b border-line px-3.5 py-3">Здебільшого</th>
-                        <th className="border-b border-line px-3.5 py-3">Медіана</th>
-                        <th className="border-b border-line px-3.5 py-3 text-right">Студій</th>
+                      <tr className="text-left text-[12px] tracking-wide text-umber uppercase sm:text-[12.5px]">
+                        <th className="border-b border-line px-3 py-3 sm:px-3.5">Що</th>
+                        <th className="border-b border-line px-3 py-3 sm:px-3.5">Медіана</th>
+                        <th className="border-b border-line px-3 py-3 sm:px-3.5">Здебільшого</th>
+                        <th className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">Студій</th>
                       </tr>
                     </thead>
                     <tbody>
                       {rows.map((s) => (
                         <tr key={s.cat.key}>
-                          <td className="border-b border-line px-3.5 py-3">
-                            <a href={`#${s.cat.key}`} className="font-semibold text-ink no-underline">{s.cat.label}</a> <span className="text-[13px] text-umber">{s.cat.unit}</span>
+                          <td className="border-b border-line px-3 py-3 sm:px-3.5">
+                            <a href={`#${s.cat.key}`} className="font-semibold text-ink no-underline">{s.cat.label}</a> <span className="text-[13px] text-umber">{s.cat.unit}<span className="sm:hidden"> · {s.n} студ.</span></span>
                           </td>
-                          <td className="border-b border-line px-3.5 py-3 whitespace-nowrap">{span(s)}</td>
-                          <td className="border-b border-line px-3.5 py-3 font-semibold whitespace-nowrap text-terra">{grn(s.median)}</td>
-                          <td className="border-b border-line px-3.5 py-3 text-right">{s.n}</td>
+                          <td className="border-b border-line px-3 py-3 font-semibold whitespace-nowrap text-terra sm:px-3.5">{grn(s.median)}</td>
+                          <td className="border-b border-line px-3 py-3 sm:px-3.5 sm:whitespace-nowrap">{span(s)}</td>
+                          <td className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">{s.n}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -122,22 +122,22 @@ export default async function PricesPage() {
             <p className="m-0 text-sm text-umber">Медіана ціни з особи в містах, де ціну публікують щонайменше три студії.</p>
           </SectionHead>
           <div className="overflow-x-auto rounded-2xl bg-card">
-            <table className="w-full min-w-[440px] border-collapse text-[15px]">
+            <table className="w-full border-collapse text-[14px] sm:text-[15px]">
               <thead>
                 <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
                   <th className="border-b border-line px-3.5 py-3">Місто</th>
                   <th className="border-b border-line px-3.5 py-3">Медіана</th>
                   <th className="border-b border-line px-3.5 py-3">Від–до</th>
-                  <th className="border-b border-line px-3.5 py-3 text-right">Студій</th>
+                  <th className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">Студій</th>
                 </tr>
               </thead>
               <tbody>
                 {cities.map((x) => (
                   <tr key={x.slug}>
-                    <td className="border-b border-line px-3.5 py-3"><Link href={`/maister-klasy/${x.slug}`}>{x.name}</Link></td>
+                    <td className="border-b border-line px-3 py-3 sm:px-3.5"><Link href={`/maister-klasy/${x.slug}`}>{x.name}</Link><span className="text-[13px] text-umber sm:hidden"> · {x.n}</span></td>
                     <td className="border-b border-line px-3.5 py-3 font-semibold whitespace-nowrap text-terra">{grn(x.median)}</td>
-                    <td className="border-b border-line px-3.5 py-3 whitespace-nowrap">{x.min === x.max ? grn(x.min) : `${fmt(x.min)}–${grn(x.max)}`}</td>
-                    <td className="border-b border-line px-3.5 py-3 text-right">{x.n}</td>
+                    <td className="border-b border-line px-3 py-3 sm:px-3.5 sm:whitespace-nowrap">{x.min === x.max ? grn(x.min) : `${fmt(x.min)}–${grn(x.max)}`}</td>
+                    <td className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">{x.n}</td>
                   </tr>
                 ))}
               </tbody>

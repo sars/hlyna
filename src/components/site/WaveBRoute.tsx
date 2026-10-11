@@ -6,10 +6,11 @@ import React from 'react'
 import { SectionHead } from '@/components/site/Bits'
 import { MakerRow } from '@/components/site/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
-import { fmt, getAllStudios, type StudioCard } from '@/lib/catalog'
+import { fmt, getAllStudios, groupByCity, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
 import { evidenceLine } from '@/lib/topics'
 import { fillCopy } from '@/lib/waveA'
+import { makerCities } from '@/lib/makers'
 import { EVENT_KIND, eventEnd, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/lib/waveB'
 import { ogImage } from '@/utilities/ogImage'
 
@@ -50,8 +51,8 @@ function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: st
         {head.map((s) => <MakerRow key={s.id} s={s} />)}
       </ul>
       {tail.length > 0 && (
-        <details>
-          <summary className="cursor-pointer font-bold">{`Показати ще ${tail.length}`}</summary>
+        <details className="group">
+          <summary className="cursor-pointer font-bold"><span className="group-open:hidden">{`Показати ще ${tail.length}`}</span><span className="hidden group-open:inline">Згорнути</span></summary>
           <ul className="m-0 mt-2.5 grid list-none grid-cols-1 gap-2.5 p-0">
             {tail.map((s) => <MakerRow key={s.id} s={s} />)}
           </ul>
@@ -249,8 +250,13 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
     { label: meta.crumb },
   ]
   const studios = waveBStudios(p.data)
+  // Selections of makers link to the makers pages of the cities they cover.
+  const makerSlugs = new Set((await makerCities()).map((g) => g.city.slug))
+  const cityLinks = ['brendy-posudu', 'pratsyuyut-z-biznesom', 'yalynkovi-prykrasy'].includes(id)
+    ? groupByCity(studios).filter((g) => g.studios.length >= 2 && makerSlugs.has(g.city.slug)).map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}` }))
+    : []
   return (
-    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={studios} related={(RELATED[id] ?? []).filter((r) => r.href !== meta.path)}>
+    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={studios} cityLinks={cityLinks} related={(RELATED[id] ?? []).filter((r) => r.href !== meta.path)}>
       <Block d={p.data} />
     </WavePage>
   )

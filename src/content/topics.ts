@@ -769,6 +769,7 @@ type ProductCfg = {
   form?: string
   priceNote?: string
   index?: string // price index category with the same meaning (/tsiny-2026)
+  priceExclude?: RegExp // lines about other things that merely mention this product
 }
 
 function productTopic(p: ProductCfg): Topic {
@@ -787,10 +788,10 @@ function productTopic(p: ProductCfg): Topic {
     ogImg: p.ogImg,
     lists: [{ title: `Хто робить: ${p.crumb.toLowerCase()}`, formats: [], match: (s) => p.re.test(productText(s)) && !isExhibitingOnly(s), types: MAKERS, byCity: true }],
     evidence: p.re,
-    price: { re: p.priceRe ?? p.re, exclude: CLASS_PRICE_SETS, index: p.index, title: 'Ціни в прайсах майстрів', note: p.priceNote ?? 'Роздрібні ціни з сайтів, Instagram і маркетплейсів майстрів; ціна залежить від розміру, поливи й розпису.' },
+    price: { re: p.priceRe ?? p.re, exclude: p.priceExclude ? new RegExp(`${CLASS_PRICE_SETS.source}|${p.priceExclude.source}`, 'iu') : CLASS_PRICE_SETS, index: p.index, title: 'Ціни в прайсах майстрів', note: p.priceNote ?? 'Роздрібні ціни з сайтів, Instagram і маркетплейсів майстрів; ціна залежить від розміру, поливи й розпису.' },
     sections: [{ kicker: 'Що варто знати', title: 'На що зважати', items: p.items }],
     faq: (c) => [
-      { q: `Скільки коштують ${p.crumb.toLowerCase()} ручної роботи?`, a: priceRange(c) ? `У прайсах майстрів каталогу — здебільшого ${priceRange(c)} за виріб; авторські й великі речі дорожчі.` : 'Майстри здебільшого не публікують ціни на ці вироби — уточнюйте в профілях.' },
+      { q: `Скільки коштують ${p.crumb.toLowerCase()} ручної роботи?`, a: priceRange(c) ? `У прайсах майстрів каталогу — здебільшого ${priceRange(c)} за виріб; авторські й великі речі дорожчі.` : 'У каталозі цін на ці вироби поки мало — уточнюйте в профілях майстрів.' },
       ...p.faq,
     ],
     related: p.related,
@@ -828,6 +829,8 @@ export const productTopics: Record<string, Topic> = {
     key: 'cups',
     slug: 'chashky',
     index: 'cup',
+    // «Масельничка, чашка й тарілка — …», «свічник у формі чашки» are not a cup price.
+    priceExclude: /^[^—–:]*?(?:масельн|маслянк|свічник|свічк|цукорниц|глечик|чайник)|usd|eur|\$|€/,
     crumb: 'Чашки і кухлі',
     what: 'чашки, горнята, кухлі й філіжанки',
     h1: 'Чашки і кухлі ручної роботи від українських майстрів',

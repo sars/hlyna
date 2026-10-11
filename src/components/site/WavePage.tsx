@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { latestUpdate } from '@/lib/catalog'
+
 import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RichText } from '@/components/site/PlaceContent'
@@ -58,6 +60,7 @@ export function WavePage({
   studios = [],
   children,
   related = [],
+  cityLinks = [],
 }: {
   copy: WaveCopy
   known: Known
@@ -69,6 +72,7 @@ export function WavePage({
   studios?: StudioCard[]
   children: React.ReactNode
   related?: { label: string; href: string }[]
+  cityLinks?: { label: string; href: string }[]
 }) {
   const [first, ...rest] = copy.sections
   const picks = (copy.picks ?? []).map((p) => ({ ...p, studios: p.slugs.map((s) => known.get(s)).filter((s): s is StudioCard => !!s) })).filter((p) => p.studios.length)
@@ -80,12 +84,22 @@ export function WavePage({
       {studios.length > 0 && <JsonLd data={ldItemList(copy.title, studios)} />}
 
       <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={crumbs} />
+        <Breadcrumbs items={crumbs} modified={latestUpdate(studios)} />
         <span className="kicker">{kicker}</span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{copy.title}</h1>
         <p className="m-0 max-w-[70ch] text-lg">
           <RichText text={copy.lead} known={known} />
         </p>
+        {cityLinks.length > 0 && (
+          <nav aria-label="У містах" className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-semibold text-umber">У містах:</span>
+            {cityLinks.map((l) => (
+              <Link key={l.href} href={l.href} className="rounded-full border border-line bg-card px-3 py-1.5 text-sm font-semibold text-ink no-underline hover:bg-sand">
+                {l.label}
+              </Link>
+            ))}
+          </nav>
+        )}
         <Updated />
       </div>
 
@@ -175,7 +189,7 @@ export function WavePage({
           )}
         </div>
 
-        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24">
+        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
           <RequestForm sourcePage={path} defaultWhat={form} defaultCity={city} />
         </aside>
       </div>

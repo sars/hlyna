@@ -7,7 +7,7 @@ import { SectionHead } from '@/components/site/Bits'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
-import { fillCopy, partyData, partyLines, waveCopy } from '@/lib/waveA'
+import { fillCopy, liveFormatCityPages, partyData, partyLines, waveCopy } from '@/lib/waveA'
 import { ogImage } from '@/utilities/ogImage'
 
 // Birthdays and parties in a clay studio (kids' birthdays, hen parties, renting the studio for a group).
@@ -37,8 +37,11 @@ export default async function Page() {
   const p = await load()
   if (!p) notFound()
   const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  // Kids' pages by city: where a party usually starts.
+  const kidsCities = (await liveFormatCityPages()).filter((x) => x.format === 'dlya-ditey').map((x) => ({ label: x.cityName, href: `/maister-klasy/${x.city}/dlya-ditey` }))
   return (
     <WavePage
+      cityLinks={kidsCities}
       copy={p.copy}
       known={known}
       kicker="Майстер-класи"

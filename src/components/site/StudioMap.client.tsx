@@ -36,8 +36,41 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
   const [active, setActive] = useState<MapFilter[]>([])
   const [ready, setReady] = useState(false)
   const [failed, setFailed] = useState(false)
+  const [city, setCity] = useState<string | null>(null)
+  const popupRef = useRef<{ remove: () => void } | null>(null)
 
   const shown = useMemo(() => (all ?? []).filter((f) => active.every((a) => f.properties.f.includes(a))), [all, active])
+  const cityName = city ? all?.find((f) => f.properties.citySlug === city)?.properties.city : undefined
+  const inCityShown = city ? shown.filter((f) => f.properties.citySlug === city).length : 0
+  const inCityAll = city ? (all ?? []).filter((f) => f.properties.citySlug === city).length : 0
+
+  // ?misto=<city> zooms to a city and opens its entry in the list below; ?f=wheel,kids restores filters.
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search)
+    const c = q.get('misto')
+    const f = (q.get('f') ?? '').split(',').filter((k) => filters.some((x) => x.key === k)) as MapFilter[]
+    /* eslint-disable react-hooks/set-state-in-effect -- one-time sync from the URL after hydration */
+    if (c) setCity(c)
+    if (f.length) setActive(f)
+    /* eslint-enable react-hooks/set-state-in-effect */
+    if (c) {
+      const el = document.getElementById(`misto-${c}`) as HTMLDetailsElement | null
+      if (el) el.open = true
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') popupRef.current?.remove()
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [filters])
+
+  // Keep the filters in the address so a filtered map can be shared.
+  useEffect(() => {
+    const u = new URL(window.location.href)
+    if (active.length) u.searchParams.set('f', active.join(','))
+    else u.searchParams.delete('f')
+    window.history.replaceState(null, '', u.toString())
+  }, [active])
 
   useEffect(() => {
     let cancelled = false
@@ -74,7 +107,12 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
         m.addLayer({ id: 'clusters-n', type: 'symbol', source: 'studios', filter: ['has', 'point_count'], layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-size': 12, 'text-font': ['Noto Sans Bold'] }, paint: { 'text-color': '#fff' } })
         m.addLayer({ id: 'points', type: 'circle', source: 'studios', filter: ['!', ['has', 'point_count']], paint: { 'circle-color': C.cobalt, 'circle-radius': 7, 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } })
 
-        const popup = (lngLat: [number, number], html: string) => new maplibregl.Popup({ maxWidth: '300px', closeButton: true }).setLngLat(lngLat).setHTML(html).addTo(m)
+        const popup = (lngLat: [number, number], html: string) => {
+          popupRef.current?.remove()
+          const p = new maplibregl.Popup({ maxWidth: '300px', closeButton: true }).setLngLat(lngLat).setHTML(html).addTo(m)
+          popupRef.current = p
+          return p
+        }
         m.on('click', 'clusters', async (e) => {
           const f = e.features![0] as MapGeoJSONFeature
           const zoom = await (m.getSource('studios') as GeoJSONSource).getClusterExpansionZoom(f.properties.cluster_id as number)
@@ -140,7 +178,13 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
         ))}
       </div>
       <p className="m-0 text-sm text-umber" aria-live="polite">
-        {failed ? 'Мапа не відкрилася в цьому браузері (потрібен WebGL) — нижче той самий перелік за містами.' : all ? `На мапі: ${shown.length} з ${all.length}` : 'Завантажуємо мапу…'}
+        {failed
+          ? 'Мапа не відкрилася в цьому браузері (потрібен WebGL) — нижче той самий перелік за містами.'
+          : all
+            ? cityName
+              ? `${cityName}: ${inCityShown} з ${inCityAll} · по Україні: ${shown.length} з ${all.length}`
+              : `На мапі: ${shown.length} з ${all.length}`
+            : 'Завантажуємо мапу…'}
         {active.length > 0 && (
           <button type="button" onClick={() => setActive([])} className="ml-3 text-cobalt underline">
             скинути фільтри

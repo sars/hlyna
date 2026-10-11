@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
 
+import { MobileRequestBar } from './MobileRequestBar.client'
+
 import { latestUpdate } from '@/lib/catalog'
 
 import { Breadcrumbs, container, DocPhoto, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
@@ -13,7 +15,7 @@ import { REQUEST_HREF } from '@/content/navigation'
 import type { Topic } from '@/content/topics'
 import { groupByCity, MIN_LIST, TYPE_LABEL, type StudioCard } from '@/lib/catalog'
 import { cleanName, stripPersonal, staleNote } from '@/lib/present'
-import { evidenceLine, type TopicData } from '@/lib/topics'
+import { evidenceLine, topicCityLinks, type TopicData } from '@/lib/topics'
 
 function Row({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: boolean }) {
   const line = stripPersonal(evidenceLine(s, re))
@@ -63,7 +65,16 @@ export function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re:
           <h3 className="h-display m-0 text-[17px]">
             {g.city.name} <span className="text-terra">{g.studios.length}</span>
           </h3>
-          <ul className={grid}>{g.studios.map((s) => <Row key={s.id} s={s} re={re} showCity={false} />)}</ul>
+          <ul className={grid}>{g.studios.slice(0, g.studios.length > SHOW + 2 ? SHOW : undefined).map((s) => <Row key={s.id} s={s} re={re} showCity={false} />)}</ul>
+          {g.studios.length > SHOW + 2 && (
+            <details className="group grid grid-cols-1 gap-3">
+              <summary className="cursor-pointer list-none justify-self-start rounded-full border border-line bg-cream px-4 py-2.5 text-sm font-bold text-cobalt group-open:mb-3">
+                <span className="group-open:hidden">Показати ще {g.studios.length - SHOW}</span>
+                <span className="hidden group-open:inline">Згорнути</span>
+              </summary>
+              <ul className={grid}>{g.studios.slice(SHOW).map((s) => <Row key={s.id} s={s} re={re} showCity={false} />)}</ul>
+            </details>
+          )}
         </section>
       ))}
       {small.length > 0 && (
@@ -112,8 +123,9 @@ function CityJump({ groups, variant }: { groups: { slug: string; name: string; n
 }
 
 // Shared layout for topic pages (src/content/topics.ts). Business topics get the request form in the aside.
-export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, known }: { topic: Topic; data: TopicData; h1?: string; crumb?: string; extraParents?: { label: string; href: string }[]; content?: PlaceContent | null; known?: Map<string, StudioCard> }) {
+export async function TopicPage({ topic, data, h1, crumb, extraParents = [], content, known }: { topic: Topic; data: TopicData; h1?: string; crumb?: string; extraParents?: { label: string; href: string }[]; content?: PlaceContent | null; known?: Map<string, StudioCard> }) {
   const { ctx, lists, all, examples } = data
+  const cityLinks = await topicCityLinks(topic, data)
   const place = content && known ? content : null
   const priceWhere = examples.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
   const faq = mergeFaq(topic.faq(ctx), (place?.faq ?? []).map((f) => ({ q: f.q, a: fixPriceRef(f.a, priceWhere) })))
@@ -135,6 +147,16 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
           <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{title}</h1>
           {place?.lead && <p className="m-0 max-w-[70ch] text-lg">{place.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
           <p className={`m-0 max-w-[70ch] ${place?.lead ? '' : 'text-lg'}`}>{topic.lead(ctx)}</p>
+          {cityLinks.length > 0 && (
+            <nav aria-label="У містах" className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-semibold text-umber">У містах:</span>
+              {cityLinks.map((l) => (
+                <Link key={l.href} href={l.href} className="rounded-full border border-line bg-card px-3 py-1.5 text-sm font-semibold text-ink no-underline hover:bg-sand">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
+          )}
           <Updated />
         </div>
         {topic.photo && <DocPhoto photo={topic.photo} priority />}
@@ -183,7 +205,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
                 </ul>
               </div>
             ) : (
-              <p className="m-0">Студії здебільшого не публікують ціни на цей формат — ціни уточнюйте в самих студіях{topic.form ? ' або надішліть запит' : ''}.</p>
+              <p className="m-0">У каталозі цін на цей формат поки немає — уточнюйте в самих студіях{topic.form ? ' або надішліть запит' : ''}.</p>
             )}
           </section>
 
@@ -232,7 +254,7 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
           {place && <PlaceSources c={place} />}
         </div>
 
-        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24">
+        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
           <CityJump groups={jump} variant="card" />
           {topic.form ? (
             <RequestForm sourcePage={topic.path} defaultWhat={topic.form} defaultCity={ctx.place} />
@@ -265,13 +287,5 @@ export function TopicPage({ topic, data, h1, crumb, extraParents = [], content, 
 }
 
 // On phones the form sits after all the content: a slim bar keeps the request one tap away.
-export function MobileRequestBar() {
-  return (
-    <div className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-clay/95 px-4 py-2.5 pb-[max(10px,env(safe-area-inset-bottom))] backdrop-blur lg:hidden">
-      <a href="#zapyt-forma" className="flex w-full justify-center rounded-full bg-terra px-5 py-3 font-bold text-cream no-underline hover:text-cream">
-        Отримати пропозиції
-      </a>
-    </div>
-  )
-}
+export { MobileRequestBar }
 

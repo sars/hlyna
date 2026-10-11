@@ -122,7 +122,7 @@ export default async function BusinessIndex() {
           </div>
         </section>
       </div>
-      <aside className="lg:sticky lg:top-24">
+      <aside className="lg:sticky lg:top-24 lg:self-start">
         <RequestForm sourcePage="/dlya-biznesu" />
       </aside>
     </main>

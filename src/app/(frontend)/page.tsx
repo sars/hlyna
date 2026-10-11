@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
+
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { REQUEST_HREF, STUDIO_JOIN_HREF } from '@/content/navigation'
@@ -74,7 +76,7 @@ export default async function HomePage() {
   const faq = faqFor(f)
   const s = await stats()
   return (
-    <main>
+    <main className="pb-20 lg:pb-0">
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -253,6 +255,7 @@ export default async function HomePage() {
           <Link href={STUDIO_JOIN_HREF} className="justify-self-start rounded-full bg-ochre px-[22px] py-[13px] font-bold text-ink no-underline hover:text-ink">Додати студію</Link>
         </div>
       </section>
+      <MobileRequestBar />
     </main>
   )
 }

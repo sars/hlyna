@@ -160,7 +160,7 @@ export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx
         </div>
 
         {guide.form && (
-          <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24">
+          <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
             <RequestForm sourcePage={guide.path} defaultWhat={guide.form.what} forStudio={guide.form.studio} />
           </aside>
         )}

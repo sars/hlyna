@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
+
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
@@ -173,7 +175,7 @@ export default async function StudioPage({ params }: Args) {
   const street = firstAddress(s.address)
 
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -302,7 +304,7 @@ export default async function StudioPage({ params }: Args) {
           )}
         </div>
 
-        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
+        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
           {dormant ? (
             <div className="grid grid-cols-1 gap-2 rounded-[20px] border border-l-[6px] border-line border-l-ochre bg-card p-[18px]">
               <p className="font-display m-0 text-sm tracking-wide uppercase">{s.status === 'closed' ? 'Не працює' : 'Актуальність не підтверджена'}</p>
@@ -330,6 +332,7 @@ export default async function StudioPage({ params }: Args) {
           </div>
         </aside>
       </div>
+      <MobileRequestBar />
     </main>
   )
 }

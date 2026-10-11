@@ -3,6 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
+
 import { latestUpdate } from '@/lib/catalog'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
@@ -72,7 +74,7 @@ export default async function CityMakersPage({ params }: Args) {
   const faq = mergeFaq(baseFaq, (content?.faq ?? []).map((f) => ({ q: f.q, a: fixPriceRef(f.a, priceWhere) })))
 
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
+    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{
@@ -182,10 +184,11 @@ export default async function CityMakersPage({ params }: Args) {
           </section>
           {content && <PlaceSources c={content} />}
         </div>
-        <aside className="grid grid-cols-1 gap-4 lg:sticky lg:top-24">
+        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
           <RequestForm sourcePage={`/vyrobnyky/misto/${city.slug}`} defaultWhat="tableware" defaultCity={city.name} />
         </aside>
       </div>
+      <MobileRequestBar />
     </main>
   )
 }

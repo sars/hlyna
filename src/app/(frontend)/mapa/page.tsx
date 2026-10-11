@@ -50,7 +50,7 @@ export default async function MapPage() {
         </SectionHead>
         <div className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map((g) => (
-            <details key={g.city.slug} open={g.studios.length <= 3} className="group">
+            <details key={g.city.slug} id={`misto-${g.city.slug}`} open={g.studios.length <= 3} className="group scroll-mt-24">
               <summary className="cursor-pointer list-none font-semibold">
                 {g.city.name} <span className="text-terra">{g.studios.length}</span>
               </summary>

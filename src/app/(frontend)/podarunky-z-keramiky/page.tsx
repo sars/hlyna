@@ -46,8 +46,8 @@ function Items({ items }: { items: GiftItem[] }) {
     <>
       <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0">{items.slice(0, SHOW).map(row)}</ul>
       {items.length > SHOW && (
-        <details className="mt-2">
-          <summary className="cursor-pointer font-bold">Показати ще {items.length - SHOW}</summary>
+        <details className="group mt-2">
+          <summary className="cursor-pointer font-bold"><span className="group-open:hidden">Показати ще {items.length - SHOW}</span><span className="hidden group-open:inline">Згорнути</span></summary>
           <ul className="mt-2 grid list-none grid-cols-1 gap-2 p-0">{items.slice(SHOW).map(row)}</ul>
         </details>
       )}

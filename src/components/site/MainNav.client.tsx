@@ -145,10 +145,10 @@ export function MainNav() {
             </button>
           </div>
           {mainNav.map((s, i) => (
-            <details key={s.id} open={i === 0} className="border-b border-line">
+            <details key={s.id} open={i === 0} className="group border-b border-line">
               <summary className="font-display flex cursor-pointer list-none justify-between py-4 text-base font-semibold uppercase">
                 {s.label}
-                <span aria-hidden className="text-terra">+</span>
+                <span aria-hidden className="text-terra"><span className="group-open:hidden">+</span><span className="hidden group-open:inline">−</span></span>
               </summary>
               <ul className="mb-3.5 grid grid-cols-1 gap-1">
                 {s.columns.flatMap((c) => c.links).map((l) => (
@@ -161,9 +161,9 @@ export function MainNav() {
               </ul>
             </details>
           ))}
-          <details className="border-b border-line">
+          <details className="group border-b border-line">
             <summary className="font-display flex cursor-pointer list-none justify-between py-4 text-base font-semibold uppercase">
-              Ще <span aria-hidden className="text-terra">+</span>
+              Ще <span aria-hidden className="text-terra"><span className="group-open:hidden">+</span><span className="hidden group-open:inline">−</span></span>
             </summary>
             <ul className="mb-3.5 grid grid-cols-1 gap-1">
               {[...simpleNav, { label: 'Для студій', href: STUDIO_JOIN_HREF }].map((l) => (
