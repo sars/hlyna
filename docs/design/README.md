@@ -88,4 +88,4 @@
 
 ## Фавіконка (вже в `public/`)
 
-Куманець «чаша зверху», теракота, три окремі малюнки для 16/32/48 (`favicon.ico`, `favicon-16.png`, `favicon-32.png`), `favicon.svg` з темною темою всередині, `apple-touch-icon.png` і `icon-192/512.png` на кістяній плитці, `manifest.ts` із `purpose: maskable`. Теги в `layout.tsx` уже оновлені. Проміжні варіанти — `experiments/favicon/` (поза git).
+Куманець «чаша зверху», теракота, три окремі малюнки для 16/32/48 (`favicon.ico`, `favicon-16.png`, `favicon-32.png`), `favicon.svg` з темною темою всередині, `apple-touch-icon.png` і `icon-192/512.png` на кістяній плитці, `manifest.ts` із `purpose: maskable`. Теги в `layout.tsx` уже оновлені.

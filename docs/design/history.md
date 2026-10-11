@@ -1,6 +1,6 @@
 # Як ми прийшли до цього дизайну
 
-Сесія 11.10.2026, Родіон + Claude (Cowork). Результат — `docs/design/template/` і `README.md` поруч. Усі проміжні варіанти лежать поза git у `experiments/creative-home…5/` (кожен: `index.html` + `img/` + `standalone.html` одним файлом).
+Сесія 11.10.2026, Родіон + Claude (Cowork). Результат — `docs/design/template/` і `README.md` поруч. Проміжні варіанти (`experiments/creative-home…5/`) видалено 11.10.2026 після вибору; лишилися контакт-листи архіву `experiments/creative-home/_sheets/` (поза git).
 
 ## 1. Проблема
 

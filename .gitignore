@@ -24,3 +24,6 @@ node_modules/
 # Screenshots (pnpm shots)
 .shots/
 .snapshots/
+
+# Design and photo experiments (local only)
+experiments/
