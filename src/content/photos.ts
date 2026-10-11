@@ -31,8 +31,6 @@ export type DocPhotoKey = keyof typeof docPhotos
 // (JPEG, sRGB, no EXIF). The frame number of each slot is in the comment (index: docs/design/photo-index.tsv).
 export type SitePhoto = { src: string; width: number; height: number; alt: string }
 
-const slot = ({ src, width, height, alt }: DocPhoto): SitePhoto => ({ src, width, height, alt })
-
 export const sitePhotos = {
   // Wordmark window (8:3 strip, decorative: the text on top carries the meaning). Frame 331; the phone file is the same crop at 1200 px.
   wordmarkDesktop: { src: '/images/site/home-wordmark-1.jpg', width: 2400, height: 900, alt: '' },
