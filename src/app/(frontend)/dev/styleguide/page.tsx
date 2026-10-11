@@ -36,6 +36,7 @@ import { IndexCell, StudioCell, StudioCells } from '@/components/ui/StudioCell'
 import { StudioRow, StudioRows } from '@/components/ui/StudioRow'
 import { Term } from '@/components/ui/Term'
 import { Updated } from '@/components/ui/Updated'
+import { VesselWindow, VesselWindows } from '@/components/ui/VesselWindow'
 import { WordmarkWindow } from '@/components/ui/WordmarkWindow'
 import { sitePhotos } from '@/content/photos'
 import { glossary } from '@/content/glossary'
@@ -139,7 +140,7 @@ export default async function StyleguidePage() {
         </p>
         <Updated />
         <nav aria-label="Розділи стайлгайду" className="flex flex-wrap gap-1.5">
-          {['colors', 'type', 'rules', 'buttons', 'heads', 'panels', 'facts', 'cards', 'tables', 'chips', 'faq', 'term', 'epi', 'forms', 'lists', 'studios', 'marks', 'wordmark'].map((k) => (
+          {['colors', 'type', 'rules', 'buttons', 'heads', 'panels', 'facts', 'cards', 'tables', 'chips', 'faq', 'term', 'epi', 'forms', 'lists', 'studios', 'marks', 'wordmark', 'vessels'].map((k) => (
             <Chip key={k} href={`#sg-${k}`} size="sm" as="a">{k}</Chip>
           ))}
         </nav>
@@ -391,11 +392,19 @@ export default async function StyleguidePage() {
       </Block>
 
       <Block id="sg-marks" title="17 · Мапа, форма запиту, нижній бар">
-        <Note>MapFrame, VesselWindow, RequestForm і MobileRequestBar ще не переписані: вони з’являться на кроках 3–6 (SYSTEM.md §9).</Note>
+        <Note>MapFrame і повна RequestForm ще не переписані: вони з’являться на кроках 5–6 (SYSTEM.md §9). Компактна форма і нижній бар — на головній.</Note>
       </Block>
 
       <Block id="sg-wordmark" title="18 · WordmarkWindow">
         <WordmarkWindow photo={{ desktop: sitePhotos.wordmarkDesktop, mobile: sitePhotos.wordmarkMobile }} />
+      </Block>
+
+      <Block id="sg-vessels" title="19 · VesselWindow">
+        <VesselWindows>
+          <VesselWindow shape="jug" photo={sitePhotos.vesselJug} title="Ліплення з глини" caption="без кола, з джгутів і пласта" href="/maister-klasy/lipennya" />
+          <VesselWindow shape="bowl" photo={sitePhotos.vesselBowl} title="Гончарне коло" caption="центрування, витягування" href="/maister-klasy/honcharne-kolo" />
+          <VesselWindow shape="plate" photo={sitePhotos.vesselPlate} title="Розпис" caption="ангоби й полива по сирцю" href="/maister-klasy/rozpys" />
+        </VesselWindows>
       </Block>
     </main>
   )
