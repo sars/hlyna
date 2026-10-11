@@ -58,7 +58,12 @@ db_steps() { # db_steps URL PROD(0|1)
 
 smoke() { # smoke BASE_RESOLVE
   step "smoke"
-  local fail=0 code
+  local fail=0 code n
+  # The Docker build caches an empty catalogue (no DB at build time); after a switch the data cache must be refilled,
+  # otherwise list pages, the sitemap and the map render empty while still answering 200.
+  ssh hlyna 'cd /opt/hlyna && S=$(grep ^REVALIDATE_SECRET= .env | cut -d= -f2) && curl -s -X POST --resolve hlyna.com.ua:443:127.0.0.1 "https://hlyna.com.ua/revalidate?secret=$S"' | tee -a "$LOG"; echo
+  n=$(curl -s --resolve hlyna.com.ua:443:89.116.24.123 https://hlyna.com.ua/catalog-sitemap.xml | grep -c '<loc>')
+  echo "$n URLs in catalog-sitemap.xml (expect 600+)" | tee -a "$LOG"; [ "$n" -ge 600 ] || fail=1
   for path in / /vyrobnyky /maister-klasy/kyiv /dlya-biznesu /mapa /tsiny-2026 /kabinet/vhid /panel/vhid /health; do
     code=$(curl -s -o /dev/null -w '%{http_code}' --resolve hlyna.com.ua:443:89.116.24.123 "https://hlyna.com.ua$path")
     echo "$code $path" | tee -a "$LOG"; [ "$code" = 200 ] || fail=1

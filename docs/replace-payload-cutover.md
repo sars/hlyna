@@ -105,3 +105,16 @@ container, and the media tar back into the volume.
 2. Rehearse `deploy/cutover.sh rehearse` on a fresh prod dump (migrate, verify, both-backend snapshot diff, panel and cabinet smoke).
 3. `deploy/cutover.sh run` (backup, freeze cabinet, migrate, verify, switch `DATA_BACKEND=app`, smoke, keep rollback ready); issue Rodion's panel invite (`scripts/app/invite.ts`); switch the hourly Instagram job to `scripts/app/*` + `push-ig-status.sh`.
 4. After a stable week: remove Payload (collections, config, admin routes, `payload` deps, legacy kabinet auth and webhook), archive Payload tables to `payload_legacy`, drop after 30 days.
+
+## Cutover record (2026-10-12, 01:10 Kyiv / 2026-10-11 22:10 UTC)
+- Ran `YES=1 bash deploy/cutover.sh run` from a clean origin/main (`b76528c`) on Rodion's authorisation. Total 60 s.
+- Backup: `/var/backups/hlyna/pre-cutover-20261012-011030.dump` (+ `media-pre-cutover-20261012-011030.tgz`).
+- Verify: 815 studios, 32 600 studio fields, 144 cities, 2 requests, 1 claim, 1 owner, 1 admin, 6 353 versions — no mismatches.
+- Gotcha: after the switch the catalogue data cache still held the empty build-time result, so list pages, the sitemap
+  (60 URLs) and the map GeoJSON were empty while every page answered 200. A `/revalidate` fixed it at once.
+  `smoke()` in `deploy/cutover.sh` now revalidates and fails if `catalog-sitemap.xml` has fewer than 600 URLs.
+- After revalidation: full prod snapshot 660 pages vs `prod-before-cutover` = 0 differences in all 11 categories;
+  link check 642 pages clean; Telegram webhook OK (no errors, 0 pending); no app errors in logs.
+- Owner `owner_1` («Осоння», both studios) is active; it has no password yet (the studio never used its first link),
+  so issue a fresh invite when they ask (`USER_ID=owner_1 … scripts/app/invite.ts`). Admin invite issued for Rodion.
+- Payload stays installed (read-only fallback: `DATA_BACKEND` unset + restart) until removal after a stable week.
