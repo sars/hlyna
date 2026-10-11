@@ -1,6 +1,7 @@
 /**
  * Geocode published studios for the map with OpenStreetMap Nominatim (free, public API).
- *   pnpm payload run scripts/geocode.ts          (DRY=1: resolve only, don't save; FORCE=1: redo studios that have geo)
+ *   pnpm payload run scripts/geocode.ts          (DRY=1: resolve only, don't save; FORCE=1: redo studios that have geo;
+ *                                                 SLUGS=a,b: only these studios, always redone)
  * Nominatim policy: ≤1 request per second, a real User-Agent with contact, results cached — every query is
  * stored in UkraineCeramics/_ops/geocode_cache.json and never sent twice (also when run against production).
  * Precision: address (house found) → street (only the street matched) → settlement (city centre).
@@ -15,6 +16,7 @@ const CACHE_FILE = process.env.GEO_CACHE || '/Users/rodik/Claude/UkraineCeramics
 const UA = 'hlyna.com.ua geocoder (rodion@brocoders.com)'
 const DRY = process.env.DRY === '1'
 const FORCE = process.env.FORCE === '1'
+const SLUGS = new Set((process.env.SLUGS || '').split(',').map((x) => x.trim()).filter(Boolean))
 
 type Hit = { lat: number; lng: number; rank: number; type: string; name: string } | null
 const cache: Record<string, Hit> = fs.existsSync(CACHE_FILE) ? JSON.parse(fs.readFileSync(CACHE_FILE, 'utf8')) : {}
@@ -73,7 +75,8 @@ const cityById = new Map(cities.map((c) => [c.id, c as City]))
 const counts = { address: 0, street: 0, settlement: 0, none: 0, skipped: 0 }
 
 for (const s of studios as Studio[]) {
-  if (!FORCE && s.geo?.lat && s.geo?.lng) { counts.skipped++; continue }
+  if (SLUGS.size && !SLUGS.has(s.slug ?? '')) continue
+  if (!FORCE && !SLUGS.size && s.geo?.lat && s.geo?.lng) { counts.skipped++; continue }
   const city = cityById.get(s.city as number)
   if (!city) { counts.none++; continue }
   const oblast = (city.oblast || s.oblast || '').trim()
