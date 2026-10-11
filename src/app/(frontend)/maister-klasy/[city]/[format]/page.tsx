@@ -10,6 +10,7 @@ import { getAllStudios, MIN_LIST } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
+import { redirectOldCitySlug } from '@/lib/redirects'
 
 // One master-class format in one city (e.g. /maister-klasy/kyiv/honcharne-kolo). Exists only where the
 // city has at least MIN_LIST places for the format AND the page has its own written copy.
@@ -50,7 +51,10 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 export default async function Page({ params }: Args) {
   const { city, format } = await params
   const p = await load(city, format)
-  if (!p) notFound()
+  if (!p) {
+    await redirectOldCitySlug(city, (c) => `/maister-klasy/${c}/${format}`)
+    notFound()
+  }
   const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
   const f = FORMAT_PAGES[format as FormatSlug]
   const path = `/maister-klasy/${city}/${format}`

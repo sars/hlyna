@@ -21,6 +21,7 @@ import { localPrices } from '@/lib/priceIndex'
 import { certificateCities } from '@/editorial/topics'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
+import { redirectOldCitySlug } from '@/lib/redirects'
 
 export const revalidate = 86400
 
@@ -52,8 +53,12 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 }
 
 export default async function CityMakersPage({ params }: Args) {
-  const g = await makerCity((await params).city)
-  if (!g) notFound()
+  const citySlug = (await params).city
+  const g = await makerCity(citySlug)
+  if (!g) {
+    await redirectOldCitySlug(citySlug, (c) => `/vyrobnyky/misto/${c}`)
+    notFound()
+  }
   const { city, studios } = g
   const where = inCity(city.name)
   const region = oblastLabel(city)

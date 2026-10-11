@@ -5,6 +5,7 @@ import { TopicPage } from '@/components/site/TopicPage'
 import { topics } from '@/content/topics'
 import { MIN_LIST, pluralUk } from '@/lib/catalog'
 import { certificateCities, topicData, topicMetadata } from '@/editorial/topics'
+import { redirectOldCitySlug } from '@/lib/redirects'
 
 export const revalidate = 86400
 
@@ -37,6 +38,9 @@ export async function generateMetadata({ params }: Args) {
 export default async function Page({ params }: Args) {
   const { city } = await params
   const p = await load(city)
-  if (!p) notFound()
+  if (!p) {
+    await redirectOldCitySlug(city, (c) => `/sertyfikaty/${c}`)
+    notFound()
+  }
   return <TopicPage topic={{ ...topic, path: p.path }} data={p.data} h1={p.h1} crumb={p.name} extraParents={[{ label: 'Сертифікати', href: '/sertyfikaty' }]} />
 }
