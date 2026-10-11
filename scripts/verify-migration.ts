@@ -20,6 +20,12 @@ import { toLegacyCity, toLegacyClaim, toLegacyRequest, toLegacyStudio } from '..
 const OUT = process.env.VERIFY_REPORT || 'verify-report.json'
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 const db = drizzle(pool, { schema: s })
+// Read-only on purpose: Payload pushes its dev schema unless PAYLOAD_MIGRATING=true, and runs pending migrations
+// whenever NODE_ENV=production (that once hit production from a script). Refuse both.
+if (process.env.NODE_ENV === 'production' || process.env.PAYLOAD_MIGRATING !== 'true') {
+  console.error('verify-migration: run with NODE_ENV=development PAYLOAD_MIGRATING=true (read-only).')
+  process.exit(2)
+}
 const payload = await getPayload({ config })
 
 const groupBy = <T, K>(xs: T[], key: (x: T) => K) => {

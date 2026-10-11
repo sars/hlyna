@@ -22,6 +22,25 @@ type AppDb = NodePgDatabase<typeof s>
 const REPORT = process.env.MIGRATION_REPORT || 'migration-report.json'
 const pool = new Pool({ connectionString: process.env.DATABASE_URL })
 
+// Safety: production needs PROD=1; and since this truncates app.*, refuse once the new stack has been used
+// (panel, kabinet or Telegram writes in the audit log) unless ALLOW_WIPE=1 — after cutover the app schema is the truth.
+{
+  const url = process.env.DATABASE_URL ?? ''
+  const prod = process.env.NODE_ENV === 'production' || /@(?:127\.0\.0\.1|localhost):15432\//.test(url) || /@db(?::\d+)?\//.test(url)
+  if (prod && process.env.PROD !== '1') {
+    console.error('migrate-from-payload: this looks like production. Re-run with PROD=1 if you mean it.')
+    process.exit(2)
+  }
+  const used = await pool
+    .query(`select count(*)::int as n from app.audit_log where source in ('panel','kabinet','telegram')`)
+    .then((r) => r.rows[0].n as number)
+    .catch(() => 0)
+  if (used > 0 && process.env.ALLOW_WIPE !== '1') {
+    console.error(`migrate-from-payload: app.* already has ${used} writes from the panel/kabinet/Telegram; refilling would erase them. ALLOW_WIPE=1 to override.`)
+    process.exit(2)
+  }
+}
+
 type Row = Record<string, any>
 const q = async (c: PoolClient, sql: string, params: unknown[] = []) => (await c.query(sql, params)).rows as Row[]
 const groupBy = <T extends Row>(rows: T[], key: string) => {

@@ -35,3 +35,13 @@ export type StudioFormat = (typeof STUDIO_FORMATS)[number]
 export type RequestWhat = (typeof REQUEST_WHAT)[number]
 export type RequestStatus = (typeof REQUEST_STATUS)[number]
 export type UserRole = (typeof USER_ROLES)[number]
+
+export const REQUEST_WHAT_LABEL: Record<RequestWhat, string> = {
+  tableware: 'Посуд для закладу',
+  'logo-mugs': 'Чашки з логотипом',
+  'corporate-gifts': 'Корпоративні подарунки',
+  'corporate-workshop': 'Корпоратив з ліплення з глини',
+  'master-class': 'Майстер-клас',
+  other: 'Інше',
+  studio: 'Студія: додати / оновити профіль',
+}

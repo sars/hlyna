@@ -101,16 +101,7 @@ Branch `replace-payload/panel` (from `replace-payload/phase2`). Design: `docs/re
   editor, «Ще». No page errors (hydration warnings in the run come from Playwright's caret-hiding style on inputs).
 
 ## Remaining before cutover
-- **Kabinet → `change_sets`**: owners' saves go to change sets (not Payload drafts); owner photo uploads as
-  `media.status='pending'`, attached on approval.
-- **Public pages → new data layer**: replace Payload Local API reads in `src/lib/catalog.ts` and pages with the Drizzle
-  layer (`src/server/legacy.ts` already maps rows to the old document shape); 301s for old studio and city slugs;
-  media URLs `/api/media/file/*` → `/media/*`; full-site snapshot diff = 0.
-- **Public writes**: `/api/requests`, claim form and new-studio form on the new services (same contracts), Telegram
-  notifications from the services.
-- **Scripts**: import-ig, import-ig-highlights, geocode, tag-studios, alt-names, address-from-text → services with
-  `source: 'script:…'`, one `POST /revalidate` at the end, `import_runs` rows (feeds the Instagram screen).
-- **Caddy** `/media/*` + 301 `/api/media/file/*`; Instagram status upload; release script with backup → drizzle
-  migrations → app.
-- **Cutover rehearsal** on a fresh prod dump, then cutover, then removing Payload (collections, admin, config,
-  migrations, dependencies) and the old `/kabinet` auth.
+Milestone 3 (cabinet on change sets, public forms, ported import scripts, Caddy /media, Instagram status upload,
+release script and rehearsal) is done — see `docs/replace-payload-cutover.md`. What is left there: public pages on
+the new data layer (after main's refactor lands), merge with `DATA_BACKEND` unset, a final rehearsal, the cutover,
+and removing Payload.

@@ -46,7 +46,8 @@ function statusLine(t: string | null) {
   return { at: Number.isNaN(Date.parse(at!)) ? null : at!, message: Number.isNaN(Date.parse(at!)) ? s : rest.join(' ') }
 }
 
-export async function instagramStatus(db: Db) {
+/** Status computed from the scanner's files (posts, highlights, notes, logs). */
+export async function instagramFileStatus() {
   const [posts, postsDone, hl, hlDone, notes, extract, st, stHl, scanLog, hlLog, stopped, stoppedHl] = await Promise.all([
     text('entries_ig_posts.jsonl'),
     text('posts_done.txt'),
@@ -68,7 +69,6 @@ export async function instagramStatus(db: Db) {
       acc[k] = (acc[k] ?? 0) + 1
       return acc
     }, {})
-  const runs = await db.select().from(importRuns).orderBy(desc(importRuns.startedAt)).limit(20).catch(() => [])
   return {
     dir: IG_DIR(),
     reachable: posts !== null || st !== null,
@@ -76,6 +76,22 @@ export async function instagramStatus(db: Db) {
     posts: { status: statusLine(st), stopped: stopped?.trim() || null, done: lines(postsDone).length, entries: postRows.length, byStatus: statusCounts(postRows), notes: lines(notes).length },
     highlights: { status: statusLine(stHl), stopped: stoppedHl?.trim() || null, done: lines(hlDone).length, entries: jsonl(hl).length, extracted: lines(extract).length },
     recentLog: [...lines(scanLog).slice(-8), ...lines(hlLog).slice(-8)].sort().slice(-12).reverse(),
-    runs,
   }
+}
+export type InstagramFileStatus = Awaited<ReturnType<typeof instagramFileStatus>>
+
+/**
+ * In production the server can't see the scanner's files: the hourly job uploads ig-status.json (made by
+ * scripts/app/ig-status-json.ts, same shape as instagramFileStatus) into IG_STATUS_DIR. If it's there, use it.
+ */
+export async function instagramStatus(db: Db) {
+  const uploaded = await text('ig-status.json')
+  let files: InstagramFileStatus
+  try {
+    files = uploaded ? { ...(JSON.parse(uploaded) as InstagramFileStatus), dir: IG_DIR() } : await instagramFileStatus()
+  } catch {
+    files = await instagramFileStatus()
+  }
+  const runs = await db.select().from(importRuns).orderBy(desc(importRuns.startedAt)).limit(20).catch(() => [])
+  return { ...files, runs }
 }

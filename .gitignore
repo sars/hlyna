@@ -29,3 +29,8 @@ node_modules/
 .migration/
 migration-report.json
 verify-report.json
+
+# cutover runs
+cutover-*.log
+migration-report-*.json
+verify-report-*.json

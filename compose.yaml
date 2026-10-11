@@ -18,8 +18,12 @@ services:
       # The app reaches the db over the private compose network; this wins over
       # any DATABASE_URL in .env (that one is for local dev).
       DATABASE_URL: postgres://hlyna:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD missing in .env}@db:5432/hlyna
+      MEDIA_DIR: /app/public/media
+      IG_STATUS_DIR: /app/ops/instagram
     volumes:
       - media:/app/public/media
+      # Ops files uploaded by jobs on the Mac (e.g. ops/instagram/ig-status.json for /panel/instagram).
+      - ./ops:/app/ops:ro
     depends_on:
       db:
         condition: service_healthy
@@ -73,6 +77,8 @@ services:
       - '443:443/udp'
     volumes:
       - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Serves /media/* directly (read-only).
+      - media:/srv/media:ro
       # Certificates. Losing this means re-issuing from Let's Encrypt (rate-limited).
       - caddy_data:/data
       - caddy_config:/config

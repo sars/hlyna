@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 
+import { appBackend } from '@/lib/backend'
+import { kabinetAuthResponse } from '@/lib/kabinetAuthResponse'
+
 import { payloadClient } from '@/lib/kabinet'
 import { clientIp, normalizeLogin, OWNER_COOKIE, rateLimited, sessionValue, verifyPassword } from '@/lib/ownerAuth'
 
@@ -7,6 +10,12 @@ const MAX_FAILS = 5
 const LOCK_MS = 15 * 60_000
 
 export async function POST(req: Request) {
+  if (appBackend()) {
+    const body = (await req.json().catch(() => null)) as Record<string, string> | null
+    const { signInOwner } = await import('@/server/auth/kabinet-adapter')
+    const res = await signInOwner(String(body?.login ?? '').trim(), String(body?.password ?? ''), req.headers)
+    return kabinetAuthResponse(res)
+  }
   const ip = clientIp(req.headers)
   if (rateLimited(`login:${ip}`, 10, LOCK_MS)) return NextResponse.json({ error: 'Забагато спроб. Спробуйте за 15 хвилин.' }, { status: 429 })
   const body = (await req.json().catch(() => null)) as Record<string, string> | null

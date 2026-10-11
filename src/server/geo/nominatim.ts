@@ -23,9 +23,10 @@ type Row = { lat: string; lon: string; display_name: string; addresstype?: strin
 
 /** One Nominatim search (q plus extra params such as featuretype), cached by its full parameter string. */
 async function ask(query: string, extra = ''): Promise<Row[]> {
-  const key = extra ? `${query}|${extra}` : query
+  // «rows:» keeps these entries apart from the older script format ({lat,lng,…} per query) in the same cache file.
+  const key = `rows:${extra ? `${query}|${extra}` : query}`
   const cache = await loadCache()
-  if (key in cache) return cache[key] as never
+  if (Array.isArray(cache[key])) return cache[key] as never
   const run = async () => {
     const wait = Math.max(0, last + 1100 - Date.now())
     if (wait) await new Promise((r) => setTimeout(r, wait))

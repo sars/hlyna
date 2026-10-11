@@ -1,6 +1,8 @@
 import { timingSafeEqual } from 'node:crypto'
 
+import { appBackend } from '@/lib/backend'
 import { tg } from '@/lib/telegram'
+import { legacyTelegramPOST } from '@/lib/telegramLegacyWebhook'
 import { db } from '@/server/db'
 import type { Actor } from '@/server/services/audit'
 import { handleTap, tapRejectClaim, type TgKeyboard } from '@/server/telegram/actions'
@@ -45,6 +47,7 @@ const say = (text: string, extra: Record<string, unknown> = {}) =>
   tg('sendMessage', { chat_id: process.env.TELEGRAM_CHAT_ID, text, disable_web_page_preview: true, ...extra })
 
 export async function POST(req: Request) {
+  if (!appBackend()) return legacyTelegramPOST(req)
   if (!secretOk(req)) return new Response('forbidden', { status: 403 })
   const update = (await req.json().catch(() => null)) as Update | null
   if (!update) return Response.json({ ok: true })
