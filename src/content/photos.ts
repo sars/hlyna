@@ -25,3 +25,28 @@ export const docPhotos = {
 } satisfies Record<string, DocPhoto>
 
 export type DocPhotoKey = keyof typeof docPhotos
+
+// Photos of the site's own chrome (home page, headers of lists): the owner's archive, no credit line.
+// docs/design/photo-plan.md says which frame goes where. Until the frames are exported (step 4 of docs/design/SYSTEM.md §9)
+// every slot points at a file that already exists in public/images, so pages and the styleguide render now.
+export type SitePhoto = { src: string; width: number; height: number; alt: string }
+
+const slot = ({ src, width, height, alt }: DocPhoto): SitePhoto => ({ src, width, height, alt })
+
+export const sitePhotos = {
+  // Wordmark window (8:3 strip, decorative: the text on top carries the meaning). Plan: frame 331.
+  wordmarkDesktop: { ...slot(docPhotos.wheelHands), alt: '' },
+  wordmarkMobile: { ...slot(docPhotos.wheelHands), alt: '' },
+  // Home «Що ви шукаєте?», cards 01–06 (1:1). Plan: 01 stock, 02 frame 542, 03 82, 04 346, 05 320, 06 408.
+  cardVenues: slot(docPhotos.restaurantTable),
+  cardLogo: slot(docPhotos.tealMug),
+  cardGifts: slot(docPhotos.festiveWare),
+  cardPair: slot(docPhotos.wheelTop),
+  cardClass: slot(docPhotos.potterOutdoors),
+  cardCertificate: slot(docPhotos.handbuilding),
+  // Home market block (4:5, plan: frame 505) and «Для студій» (3:4, plan: frame 57).
+  market: slot(docPhotos.glazedBottles),
+  forStudios: slot(docPhotos.schoolStudio),
+} satisfies Record<string, SitePhoto>
+
+export type SitePhotoKey = keyof typeof sitePhotos
