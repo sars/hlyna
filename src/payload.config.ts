@@ -8,11 +8,13 @@ import { en } from '@payloadcms/translations/languages/en'
 import { uk } from '@payloadcms/translations/languages/uk'
 
 import { Categories } from './collections/Categories'
+import { Claims } from './collections/Claims'
 import { Cities } from './collections/Cities'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Posts } from './collections/Posts'
 import { Requests } from './collections/Requests'
+import { StudioOwners } from './collections/StudioOwners'
 import { Studios } from './collections/Studios'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
@@ -31,6 +33,7 @@ export default buildConfig({
       // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
       // Feel free to delete this at any time. Simply remove the line below.
       beforeLogin: ['@/components/BeforeLogin'],
+      beforeDashboard: ['@/components/admin/OwnerQueue'],
     },
     importMap: {
       baseDir: path.resolve(dirname),
@@ -71,7 +74,7 @@ export default buildConfig({
     // Migrations run when the production server starts, not during `next build` (the build only reads data).
     prodMigrations: process.env.NEXT_PHASE === 'phase-production-build' ? undefined : migrations,
   }),
-  collections: [Studios, Cities, Requests, Pages, Posts, Media, Categories, Users],
+  collections: [Studios, Cities, Requests, Claims, StudioOwners, Pages, Posts, Media, Categories, Users],
   i18n: {
     fallbackLanguage: 'uk',
     supportedLanguages: { uk, en },

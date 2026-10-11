@@ -80,6 +80,29 @@ export const getAllStudios = cache(async () => (await getCatalog()).filter((s) =
 
 export const getStudioBySlug = cache(async (slug: string) => (await getCatalog()).find((s) => s.slug === slug) ?? null)
 
+export type StudioPhoto = { url: string; full: string; alt: string; width: number; height: number }
+
+// Published photos of one studio (owner uploads, shown only with photo consent). Separate from the catalogue
+// query so the big cached list stays small.
+export const getStudioPhotos = unstable_cache(
+  async (id: number): Promise<StudioPhoto[]> => {
+    if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
+    const payload = await getPayload({ config: configPromise })
+    const doc = await payload
+      .findByID({ collection: 'studios', id, depth: 1, overrideAccess: true, select: { photos: true, consent: true, _status: true } })
+      .catch(() => null)
+    if (!doc?.consent?.photos || doc._status !== 'published') return []
+    return (doc.photos ?? [])
+      .filter((p): p is Exclude<typeof p, number> => typeof p === 'object' && Boolean(p?.url))
+      .map((p) => {
+        const big = p.sizes?.large?.url ? p.sizes.large : p
+        return { url: big.url as string, full: p.url as string, alt: p.alt || '', width: big.width || 1400, height: big.height || 933 }
+      })
+  },
+  ['studio-photos-v1'],
+  { revalidate: 3600, tags: ['studios'] },
+)
+
 export const texts = (s: Studio) =>
   [s.description, ...(s.services ?? []).map((x) => x.text), ...(s.products ?? []).map((x) => x.text), ...(s.prices ?? []).map((x) => x.text)]
     .filter(Boolean)

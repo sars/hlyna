@@ -32,6 +32,8 @@ for (const [slug, x] of notes) {
   if (x.status && x.status !== 'ok' && !x.status.startsWith('renamed')) continue
   const doc = (await payload.find({ collection: 'studios', where: { slug: { equals: slug } }, limit: 1, depth: 0, draft: true })).docs[0] as Studio | undefined
   if (!doc) { console.log('missing', slug); continue }
+  // An owner's unpublished edits wait for review: don't write over them.
+  if (doc.pendingOwnerChanges) { console.log('skip (owner draft)', doc.slug); continue }
   const handEdited = doc.recentNote && imported[slug] !== undefined && doc.recentNote !== imported[slug]
   const data: Partial<Studio> = {
     activity: {

@@ -77,6 +77,8 @@ const payload = await getPayload({ config })
 const { docs } = await payload.find({ collection: 'studios', depth: 0, limit: 5000, pagination: false, draft: true })
 let changed = 0
 for (const s of docs as Studio[]) {
+  // An owner's unpublished edits wait for review: don't write over them.
+  if (s.pendingOwnerChanges) { console.log('skip (owner draft)', s.slug); continue }
   const handle = handleOf(s.instagram)
   const name = s.name ?? ''
   const own = parts(name)

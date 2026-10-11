@@ -70,6 +70,8 @@ export interface Config {
     studios: Studio;
     cities: City;
     requests: Request;
+    claims: Claim;
+    'studio-owners': StudioOwner;
     pages: Page;
     posts: Post;
     media: Media;
@@ -95,6 +97,8 @@ export interface Config {
     studios: StudiosSelect<false> | StudiosSelect<true>;
     cities: CitiesSelect<false> | CitiesSelect<true>;
     requests: RequestsSelect<false> | RequestsSelect<true>;
+    claims: ClaimsSelect<false> | ClaimsSelect<true>;
+    'studio-owners': StudioOwnersSelect<false> | StudioOwnersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     posts: PostsSelect<false> | PostsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -297,6 +301,14 @@ export interface Studio {
     notes?: string | null;
   };
   /**
+   * Ставиться, коли схвалено заявку власника (колекція «Заявки на профіль»).
+   */
+  ownerVerified?: boolean | null;
+  /**
+   * Власник зберіг чернетку в кабінеті. Перегляньте її й натисніть «Опублікувати» — позначка зніметься сама.
+   */
+  pendingOwnerChanges?: boolean | null;
+  /**
    * Генерується з назви, якщо порожній
    */
   slug?: string | null;
@@ -481,6 +493,61 @@ export interface Request {
    */
   commission5?: number | null;
   notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Перевірка: контакт має збігатися з публічним Instagram, сайтом чи телефоном студії. Якщо не збігається — попросіть власника написати в Instagram «Глини» з акаунта студії. Потім статус «Схвалено» → збережіть → скопіюйте посилання для пароля й надішліть власнику.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claims".
+ */
+export interface Claim {
+  id: number;
+  status: 'pending' | 'approved' | 'rejected';
+  rejectReason?: string | null;
+  inviteLink?: string | null;
+  studio: number | Studio;
+  otherStudios?: (number | Studio)[] | null;
+  name: string;
+  contact: string;
+  represents?: boolean | null;
+  /**
+   * Якщо ця людина вже має кабінет — оберіть її, і студії додадуться до того самого кабінету.
+   */
+  linkToOwner?: (number | null) | StudioOwner;
+  owner?: (number | null) | StudioOwner;
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Хто керує профілями в кабінеті /kabinet. Посилання для пароля дійсне 7 днів і спрацьовує один раз — надішліть його власнику самі (Instagram, Telegram, email).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "studio-owners".
+ */
+export interface StudioOwner {
+  id: number;
+  name: string;
+  /**
+   * Власник обирає логін сам, коли встановлює пароль.
+   */
+  login?: string | null;
+  contact?: string | null;
+  studios?: (number | Studio)[] | null;
+  active?: boolean | null;
+  /**
+   * Позначте й збережіть: з’явиться нове посилання (старе перестане діяти).
+   */
+  regenerateLink?: boolean | null;
+  inviteLink?: string | null;
+  inviteExpires?: string | null;
+  inviteTokenHash?: string | null;
+  passwordHash?: string | null;
+  failedLogins?: number | null;
+  lockUntil?: string | null;
+  lastLoginAt?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1190,6 +1257,14 @@ export interface PayloadLockedDocument {
         value: number | Request;
       } | null)
     | ({
+        relationTo: 'claims';
+        value: number | Claim;
+      } | null)
+    | ({
+        relationTo: 'studio-owners';
+        value: number | StudioOwner;
+      } | null)
+    | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
@@ -1379,6 +1454,8 @@ export interface StudiosSelect<T extends boolean = true> {
         contactedAt?: T;
         notes?: T;
       };
+  ownerVerified?: T;
+  pendingOwnerChanges?: T;
   slug?: T;
   status?: T;
   confidence?: T;
@@ -1431,6 +1508,46 @@ export interface RequestsSelect<T extends boolean = true> {
   dealAmount?: T;
   commission5?: T;
   notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "claims_select".
+ */
+export interface ClaimsSelect<T extends boolean = true> {
+  status?: T;
+  rejectReason?: T;
+  inviteLink?: T;
+  studio?: T;
+  otherStudios?: T;
+  name?: T;
+  contact?: T;
+  represents?: T;
+  linkToOwner?: T;
+  owner?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "studio-owners_select".
+ */
+export interface StudioOwnersSelect<T extends boolean = true> {
+  name?: T;
+  login?: T;
+  contact?: T;
+  studios?: T;
+  active?: T;
+  regenerateLink?: T;
+  inviteLink?: T;
+  inviteExpires?: T;
+  inviteTokenHash?: T;
+  passwordHash?: T;
+  failedLogins?: T;
+  lockUntil?: T;
+  lastLoginAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

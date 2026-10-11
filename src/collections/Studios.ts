@@ -1,4 +1,4 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, FieldAccess } from 'payload'
 
 import { authenticated } from '../access/authenticated'
 import { authenticatedOrPublished } from '../access/authenticatedOrPublished'
@@ -17,6 +17,9 @@ export const STUDIO_TYPES = [
 ] as const
 
 // What a studio offers, as filter tags for hub pages. Set by scripts/tag-studios.ts from the research data; editable in admin.
+// Internal research and consent fields are not part of the public REST/GraphQL output.
+const adminRead: FieldAccess = ({ req }) => Boolean(req.user)
+
 export const STUDIO_FORMATS = [
   { label: 'Гончарне коло', value: 'wheel' },
   { label: 'Ліплення з глини', value: 'handbuilding' },
@@ -54,7 +57,7 @@ export const Studios: CollectionConfig = {
   admin: {
     useAsTitle: 'name',
     group: 'Каталог',
-    defaultColumns: ['name', 'type', 'city', 'status', 'instagram', 'confidence', 'updatedAt'],
+    defaultColumns: ['name', 'type', 'city', 'status', 'pendingOwnerChanges', 'instagram', 'updatedAt'],
     listSearchableFields: ['name', 'slug', 'instagram', 'website'],
     description:
       'Студії, бренди й майстри. Фільтри списку: місто, тип, згода на запити (consent.requests), робота з HoReCa (b2b.worksWithHoreca).',
@@ -66,6 +69,13 @@ export const Studios: CollectionConfig = {
   },
   hooks: {
     beforeValidate: [ensureUniqueSlug({ collection: 'studios', from: 'name' })],
+    // An admin publishing the owner's draft clears the «changes from owner» flag.
+    beforeChange: [
+      ({ data, req }) => {
+        if (data && data._status === 'published' && req.user) data.pendingOwnerChanges = false
+        return data
+      },
+    ],
     afterChange: [revalidateCatalogAfterChange],
     afterDelete: [revalidateCatalogAfterDelete],
   },
@@ -338,6 +348,7 @@ export const Studios: CollectionConfig = {
               name: 'consent',
               label: 'Згода студії',
               type: 'group',
+              access: { read: adminRead },
               fields: [
                 { name: 'photos', label: 'Згода на фото', type: 'checkbox', defaultValue: false },
                 {
@@ -356,6 +367,25 @@ export const Studios: CollectionConfig = {
       ],
     },
     // Sidebar
+    {
+      name: 'ownerVerified',
+      label: 'Профіль підтверджено студією',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { position: 'sidebar', description: 'Ставиться, коли схвалено заявку власника (колекція «Заявки на профіль»).' },
+    },
+    {
+      name: 'pendingOwnerChanges',
+      access: { read: adminRead },
+      label: 'Є зміни від власника',
+      type: 'checkbox',
+      defaultValue: false,
+      index: true,
+      admin: {
+        position: 'sidebar',
+        description: 'Власник зберіг чернетку в кабінеті. Перегляньте її й натисніть «Опублікувати» — позначка зніметься сама.',
+      },
+    },
     {
       name: 'slug',
       label: 'Slug (латиницею)',
@@ -380,6 +410,7 @@ export const Studios: CollectionConfig = {
     },
     {
       name: 'confidence',
+      access: { read: adminRead },
       label: 'Достовірність даних',
       type: 'select',
       options: [
@@ -391,6 +422,7 @@ export const Studios: CollectionConfig = {
     },
     {
       name: 'sources',
+      access: { read: adminRead },
       label: 'Джерела',
       type: 'array',
       labels: { singular: 'Джерело', plural: 'Джерела' },
@@ -399,6 +431,7 @@ export const Studios: CollectionConfig = {
     },
     {
       name: 'sourceId',
+      access: { read: adminRead },
       label: 'ID імпорту',
       type: 'text',
       unique: true,

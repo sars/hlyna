@@ -63,6 +63,8 @@ const { docs } = await payload.find({ collection: 'studios', depth: 0, limit: 50
 const counts: Record<string, number> = {}
 let changed = 0
 for (const s of docs as Studio[]) {
+  // An owner's unpublished edits wait for review: don't write over them.
+  if (s.pendingOwnerChanges) { console.log('skip (owner draft)', s.slug); continue }
   const e = (s.sourceId && raw.get(s.sourceId)) || {}
   const text = [
     s.description, s.summary, s.publicDescription,

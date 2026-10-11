@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 
 const WHAT = [
@@ -108,7 +109,10 @@ export function RequestForm({
   if (studio)
     return (
       <form onSubmit={onSubmit} className="grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]" noValidate>
-        <p className="font-display m-0 text-sm tracking-wide uppercase">Додати / оновити студію</p>
+        <p className="font-display m-0 text-sm tracking-wide uppercase">Додати нову студію</p>
+        <p className="m-0 text-sm text-umber">
+          Ваша студія вже є в каталозі? Відкрийте її профіль у <Link href="/vyrobnyky">списку виробників</Link> чи на <Link href="/mapa">мапі</Link> й натисніть «Подати заявку» в блоці «Це ваша студія?» — так ви отримаєте доступ до кабінету.
+        </p>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
           <label className={label}>
             Назва студії чи ім’я майстра
@@ -118,29 +122,18 @@ export function RequestForm({
             Місто
             <input name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ваше місто" autoComplete="address-level2" className={field} />
           </label>
-          <label className={`${label} sm:col-span-2`}>
+          <label className={label}>
             Instagram або сайт
             <input name="studioLinks" placeholder="@студія або https://…" className={field} />
           </label>
-          <label className={`${label} sm:col-span-2`}>
-            Що додати чи змінити
-            <textarea name="details" rows={3} placeholder="Нова студія, адреса, ціни, формати, умови для бізнесу, що виправити…" className={field} />
-          </label>
           <label className={label}>
-            Телефон або Telegram
-            <input name="contactPhoneOrTelegram" inputMode="tel" placeholder="+380… або @нік" className={field} />
-          </label>
-          <label className={label}>
-            Email
-            <input name="contactEmail" type="email" placeholder="ви@студія.ua" className={field} />
+            Телефон, Telegram або email
+            <input name="contactPhoneOrTelegram" placeholder="+380… або @нік" className={field} />
           </label>
         </div>
-        <label className="flex items-start gap-2 text-sm text-umber">
-          <input type="checkbox" name="photoConsent" className="mt-0.5 size-4 accent-[var(--color-terra)]" /> Дозволяємо показувати фото наших робіт із підписом студії
-        </label>
         <input type="text" name="website2" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
         <button type="submit" disabled={state === 'sending'} className="justify-self-start rounded-full bg-terra px-5 py-3 font-bold text-cream hover:bg-terra-dark disabled:opacity-60">
-          {state === 'sending' ? 'Надсилаємо…' : 'Надіслати дані студії'}
+          {state === 'sending' ? 'Надсилаємо…' : 'Додати студію'}
         </button>
         {state === 'error' && <p className="m-0 text-sm text-[var(--error)]">{error}</p>}
         <p className="m-0 text-[12.5px] text-umber">Профіль безкоштовний. Студія платить 5% лише з замовлень, укладених через наш запит.</p>

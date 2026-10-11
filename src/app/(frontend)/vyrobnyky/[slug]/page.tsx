@@ -6,16 +6,17 @@ import React from 'react'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
+import Image from 'next/image'
+
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { InstagramPosts } from '@/components/site/InstagramPosts.client'
 import { StudioCard } from '@/components/site/StudioCard'
-import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
-import { getAllStudios, getCatalog, getStudioBySlug, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
+import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
 import { amountsIn, cleanAddress, cleanName, cleanPublic, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
 
 export const revalidate = 86400
@@ -174,6 +175,7 @@ export default async function StudioPage({ params }: Args) {
     ...(channels.length && !exhibiting ? [['Де продає', channels.join(' · ')] as [string, React.ReactNode]] : []),
   ]
   const street = firstAddress(s.address)
+  const photos = await getStudioPhotos(s.id)
 
   return (
     <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
@@ -192,13 +194,35 @@ export default async function StudioPage({ params }: Args) {
           ...(altNames.length ? { alternateName: altNames } : {}),
           ...(profileUrls(s).length ? { sameAs: profileUrls(s) } : {}),
           ...(priceRange && s.type !== 'maker' && !dormant ? { priceRange } : {}),
+          ...(photos.length ? { image: photos.map((p) => `${site.url}${p.url}`) } : {}),
         }}
       />
       <div className="grid grid-cols-1 gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityHref ? [{ label: city.name, href: cityHref }] : []), { label: name }]} modified={s.updatedAt} />
-        <span className="kicker">{typeLabel}{city ? ` · ${city.name}` : ''}</span>
+        <span className="kicker">
+          {typeLabel}
+          {city ? ` · ${city.name}` : ''}
+        </span>
         <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06] break-words">{name}</h1>
+        {s.ownerVerified && <p className="m-0 -mt-2 text-sm font-semibold text-umber">✓ Профіль підтверджено студією</p>}
         {shownAlt.length > 0 && <p className="m-0 -mt-2 text-sm break-words text-umber">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}
+        {photos.length > 0 && (
+          <div className="grid grid-cols-1 gap-2">
+            <Image src={photos[0].url} alt={photos[0].alt} width={photos[0].width} height={photos[0].height} priority sizes="(min-width:1200px) 760px, 100vw" className="aspect-[3/2] w-full max-w-[760px] rounded-[22px] object-cover" />
+            {photos.length > 1 && (
+              <ul className="m-0 grid max-w-[760px] list-none grid-cols-3 gap-2 p-0 sm:grid-cols-5">
+                {photos.slice(1).map((p) => (
+                  <li key={p.url}>
+                    <a href={p.full} target="_blank" rel="noopener">
+                      <Image src={p.url} alt={p.alt} width={p.width} height={p.height} loading="lazy" sizes="(min-width:640px) 150px, 33vw" className="aspect-square w-full rounded-xl object-cover" />
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <p className="m-0 text-[12.5px] text-umber">Фото: {name}, публікуються зі згоди студії.</p>
+          </div>
+        )}
         <div className="grid grid-cols-1 max-w-[70ch] gap-3 text-lg">
           {description.split(/\n{2,}/).map((para, i) => (
             <p key={i} className="m-0">{para}</p>
@@ -329,7 +353,15 @@ export default async function StudioPage({ params }: Args) {
             <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} />
           )}
           <div className="rounded-[20px] border border-line bg-cream p-4 text-sm">
-            <b>Це ваша студія?</b> Додайте фото, умови для бізнесу й ціни — це безкоштовно. <Link href={STUDIO_JOIN_HREF}>Оновити профіль →</Link>
+            {s.ownerVerified ? (
+              <>
+                <b>Ви представляєте цю студію?</b> Оновлюйте профіль у кабінеті. <Link href="/kabinet">Увійти →</Link>
+              </>
+            ) : (
+              <>
+                <b>Це ваша студія?</b> Керуйте профілем: фото, ціни, умови для бізнесу — безкоштовно. <Link href={`/kabinet/zayavka?studio=${s.slug}`}>Подати заявку →</Link>
+              </>
+            )}
           </div>
         </aside>
       </div>
