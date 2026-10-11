@@ -42,7 +42,7 @@ export const sitePhotos = {
   cardLogo: { src: '/images/site/home-path-02-1.jpg', width: 1200, height: 1200, alt: 'Відтиск штампа-квітки на сирій тарілці з рожевим краєм' }, // 542
   cardGifts: { src: '/images/site/home-path-03-1.jpg', width: 1200, height: 1200, alt: 'Чашка ручної роботи з червоними сердечками на дерев’яній полиці' }, // 82
   cardPair: { src: '/images/site/home-path-04-1.jpg', width: 1200, height: 1200, alt: 'Дві пари рук тримають свіжу миску на гончарному колі, вигляд згори' }, // 346
-  cardClass: { src: '/images/site/home-path-05-1.jpg', width: 1200, height: 1200, alt: 'Майстриня за гончарним колом у літньому дворі' }, // 320
+  cardClass: { src: '/images/site/home-path-05-1.jpg', width: 1200, height: 1200, alt: 'Руки центрують глину на гончарному колі, вигляд згори' }, // 318 (not 320: a smiling face would be the subject)
   cardCertificate: { src: '/images/site/home-path-06-1.jpg', width: 1200, height: 1200, alt: 'Свіжу глиняну миску передають з рук у руки на тлі листя' }, // 408
   // Home market block (4:5) and «Для студій» (3:4).
   market: { src: '/images/site/home-market-1.jpg', width: 1200, height: 1500, alt: 'Миска в сирій поливі сохне на столі перед випалом' }, // 505
