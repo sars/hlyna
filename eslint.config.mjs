@@ -50,4 +50,23 @@ const eslintConfig = [
   },
 ]
 
+// Public pages ship no auth or panel JavaScript: the site and its components may not import client auth,
+// the panel UI, or server-only auth/db modules (server components reach data through src/lib).
+eslintConfig.push({
+  files: ['src/app/(frontend)/**', 'src/components/site/**'],
+  ignores: ['src/app/(frontend)/kabinet/**'],
+  rules: {
+    'no-restricted-imports': [
+      'error',
+      {
+        patterns: [
+          { group: ['better-auth/react', 'better-auth/client', 'better-auth/client/*'], message: 'No auth client JS on public pages.' },
+          { group: ['**/components/panel/**', '@/components/panel/**'], message: 'Panel UI must not be imported by public pages.' },
+          { group: ['**/server/auth/**', '@/server/auth/**'], message: 'Auth lives on the server and in /kabinet, /panel only.' },
+        ],
+      },
+    ],
+  },
+})
+
 export default eslintConfig
