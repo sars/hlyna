@@ -23,6 +23,7 @@ import { amountsIn, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
 import { link, ListBlock, PriceItem } from '@/components/profile/blocks'
+import { redirectOldStudioSlug } from '@/lib/redirects'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -55,7 +56,10 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 export default async function StudioPage({ params }: Args) {
   const { slug } = await params
   const s = await getStudioBySlug(slug)
-  if (!s) notFound()
+  if (!s) {
+    await redirectOldStudioSlug(slug)
+    notFound()
+  }
 
   const name = cleanName(s.name)
   // A bare Instagram handle already shown in «Коротко» is not an alternative name.

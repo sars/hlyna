@@ -32,6 +32,17 @@ hlyna.com.ua {
 		format json
 	}
 
+	# Uploaded images straight from the media volume (the app writes them there). /api/media/file/* is the
+	# Payload-era address of the same files: one permanent hop to /media/*.
+	@legacyMedia path_regexp legacyMedia ^/api/media/file/(.+)$
+	redir @legacyMedia /media/{re.legacyMedia.1} permanent
+	handle_path /media/* {
+		root * /srv/media
+		header Cache-Control "public, max-age=2592000"
+		header X-Content-Type-Options nosniff
+		file_server
+	}
+
 	# lb_try_duration holds requests for a few seconds while the app restarts.
 	# While the app restarts after a deploy, answer with a short branded page instead of a blank 502.
 	handle_errors 502 503 504 {

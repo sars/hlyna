@@ -21,6 +21,7 @@ import { cityContent } from '@/editorial/places'
 import { certificateCities } from '@/editorial/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/editorial/wave-a'
 import { fmt, roundNice, type Span } from '@/lib/money'
+import { redirectOldCitySlug } from '@/lib/redirects'
 
 export const revalidate = 86400
 
@@ -84,8 +85,12 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
 }
 
 export default async function CityMasterClassesPage({ params }: Args) {
-  const g = await cityData((await params).city)
-  if (!g) notFound()
+  const citySlug = (await params).city
+  const g = await cityData(citySlug)
+  if (!g) {
+    await redirectOldCitySlug(citySlug, (c) => `/maister-klasy/${c}`)
+    notFound()
+  }
   const { city, studios } = g
   const where = inCity(city.name)
   const region = oblastLabel(city)

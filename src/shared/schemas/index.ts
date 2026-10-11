@@ -1,0 +1,183 @@
+// Zod schemas shared by forms (client safeParse), the API (Hono zValidator, phase 2+) and scripts.
+// Messages are the same Ukrainian texts the current Payload hooks and /kabinet routes return.
+import { z } from 'zod'
+
+import { CLAIM_STATUS, CONFIDENCE, GEO_PRECISION, REQUEST_STATUS, REQUEST_WHAT, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY } from '../options'
+
+// ---------- helpers
+/** Trimmed string capped at `max` characters (cap, not reject — the current hooks slice silently). */
+export const capped = (max: number) =>
+  z
+    .union([z.string(), z.number()])
+    .transform((v) => String(v).trim().slice(0, max))
+/** Same, but '' becomes null. */
+export const cappedOrNull = (max: number) => capped(max).transform((v) => (v === '' ? null : v))
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+/** Accepts «site.com» and «https://site.com»; returns a normalised absolute URL or '' when unparsable. */
+export const looseUrl = z
+  .string()
+  .transform((s) => s.trim().slice(0, 300))
+  .transform((s) => {
+    if (!s) return ''
+    try {
+      return new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`).toString()
+    } catch {
+      return ''
+    }
+  })
+const lines = (max: number, itemMax = 300) =>
+  z
+    .array(z.unknown())
+    .default([])
+    .transform((xs) => xs.map((x) => (typeof x === 'string' ? x.trim().slice(0, itemMax) : '')).filter(Boolean).slice(0, max))
+export const INSTAGRAM_POST_RE = /^https:\/\/www\.instagram\.com\/(p|reel)\/[\w-]+\/?$/
+
+// ---------- public request form (POST /api/requests)
+export const requestCreate = z
+  .object({
+    what: z.enum(REQUEST_WHAT),
+    details: cappedOrNull(5000).optional(),
+    studioName: cappedOrNull(200).optional(),
+    studioLinks: cappedOrNull(500).optional(),
+    photoConsent: z.boolean().optional(),
+    quantity: cappedOrNull(200).optional(),
+    deadline: cappedOrNull(200).optional(),
+    budgetPerItem: cappedOrNull(200).optional(),
+    city: cappedOrNull(120).optional(),
+    logo: z.boolean().optional(),
+    contactName: cappedOrNull(200).optional(),
+    contactPhoneOrTelegram: cappedOrNull(200).optional(),
+    contactEmail: cappedOrNull(254).optional(),
+    sourcePage: cappedOrNull(500).optional(),
+    // honeypot: bots fill every input
+    website2: z.string().max(0, 'Запит не прийнято.').optional().or(z.literal('')),
+  })
+  .superRefine((d, ctx) => {
+    const phone = d.contactPhoneOrTelegram ?? ''
+    const email = d.contactEmail ?? ''
+    if (!phone && !email)
+      ctx.addIssue({ code: 'custom', path: ['contactPhoneOrTelegram'], message: 'Вкажіть телефон, Telegram або email, щоб ми могли відповісти.' })
+    if (phone && phone.replace(/[^\p{L}\p{N}]/gu, '').length < 4)
+      ctx.addIssue({ code: 'custom', path: ['contactPhoneOrTelegram'], message: 'Перевірте телефон або Telegram.' })
+    if (email && !EMAIL_RE.test(email)) ctx.addIssue({ code: 'custom', path: ['contactEmail'], message: 'Перевірте email.' })
+  })
+export type RequestCreate = z.output<typeof requestCreate>
+
+// ---------- «Це ваша студія?» claim (POST /api/kabinet/claim)
+export const claimCreate = z.object({
+  name: capped(120).pipe(z.string().min(1, "Вкажіть ім'я і контакт.")),
+  contact: capped(160).pipe(z.string().min(1, "Вкажіть ім'я і контакт.")),
+  studio: capped(200).pipe(z.string().min(1, 'Студію не знайдено.')),
+  otherStudios: lines(5, 200),
+  represents: z.literal(true, { error: 'Підтвердьте, що представляєте студію.' }),
+  website2: z.string().max(0).optional().or(z.literal('')),
+})
+export type ClaimCreate = z.output<typeof claimCreate>
+
+// ---------- owner edits in /kabinet: this whitelist IS the permission (nothing else can be written by an owner)
+export const ownerPriceLine = z.object({
+  text: capped(300),
+  date: capped(60).optional().default(''),
+  source: capped(120).optional().default(''),
+})
+export const ownerStudioEdit = z.object({
+  ownerAbout: capped(4000).optional().default(''),
+  ownerNews: capped(600).optional().default(''),
+  ownerQuote: capped(200).optional().default(''),
+  services: lines(40),
+  products: lines(40),
+  prices: z
+    .array(ownerPriceLine)
+    .default([])
+    .transform((xs) => xs.filter((p) => p.text).slice(0, 40)),
+  address: capped(300).optional().default(''),
+  website: looseUrl.optional().default(''),
+  instagram: looseUrl.optional().default(''),
+  phone: capped(60).optional().default(''),
+  email: capped(120).optional().default(''),
+  b2b: z
+    .object({
+      minOrder: capped(200).optional().default(''),
+      leadTime: capped(200).optional().default(''),
+      logoMethods: lines(10),
+      foodSafe: z.boolean().optional().default(false),
+      dishwasherSafe: z.boolean().optional().default(false),
+      worksWithHoreca: z.boolean().optional().default(false),
+      worksWithCorporate: z.boolean().optional().default(false),
+    })
+    .default({ minOrder: '', leadTime: '', logoMethods: [], foodSafe: false, dishwasherSafe: false, worksWithHoreca: false, worksWithCorporate: false }),
+  instagramPosts: z
+    .array(z.string())
+    .default([])
+    .transform((xs) => xs.map((u) => u.trim()).filter((u) => INSTAGRAM_POST_RE.test(u)).slice(0, 3)),
+  keepPhotos: z.array(z.coerce.number().int()).default([]),
+})
+export type OwnerStudioEdit = z.output<typeof ownerStudioEdit>
+export const OWNER_FIELDS = Object.keys(ownerStudioEdit.shape) as (keyof OwnerStudioEdit)[]
+
+// ---------- panel: full studio edit (phase 6 uses it; defined now so the schema and the form agree)
+export const priceLine = z.object({ text: z.string().trim().min(1).max(300), source: z.string().trim().max(120).nullish(), dateText: z.string().trim().max(60).nullish() })
+export const studioEdit = z.object({
+  name: z.string().trim().min(1, 'Назва обовʼязкова.').max(200),
+  slug: z
+    .string()
+    .trim()
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Лише латиниця, цифри й дефіси.')
+    .max(160),
+  type: z.enum(STUDIO_TYPES).nullable(),
+  status: z.enum(STUDIO_STATUSES).nullable(),
+  visibility: z.enum(STUDIO_VISIBILITY),
+  confidence: z.enum(CONFIDENCE).nullable(),
+  cityId: z.number().int().positive().nullable(),
+  oblast: z.string().trim().max(120).nullable(),
+  address: z.string().trim().max(300).nullable(),
+  geoLat: z.number().min(-90).max(90).nullable(),
+  geoLng: z.number().min(-180).max(180).nullable(),
+  geoPrecision: z.enum(GEO_PRECISION).nullable(),
+  summary: z.string().trim().max(200).nullable(),
+  publicDescription: z.string().trim().max(8000).nullable(),
+  recentNote: z.string().trim().max(1000).nullable(),
+  descriptionInternal: z.string().trim().max(20000).nullable(),
+  ownerQuoteApproved: z.boolean().nullable(),
+  instagram: z.string().trim().max(300).nullable(),
+  website: z.string().trim().max(300).nullable(),
+  facebook: z.string().trim().max(300).nullable(),
+  phone: z.string().trim().max(60).nullable(),
+  email: z.string().trim().max(120).nullable(),
+  b2bMinOrder: z.string().trim().max(200).nullable(),
+  b2bLeadTime: z.string().trim().max(200).nullable(),
+  b2bFoodSafe: z.boolean().nullable(),
+  b2bDishwasherSafe: z.boolean().nullable(),
+  b2bWorksWithHoreca: z.boolean().nullable(),
+  b2bWorksWithCorporate: z.boolean().nullable(),
+  consentPhotos: z.boolean().nullable(),
+  consentRequests: z.boolean().nullable(),
+  consentNotes: z.string().trim().max(2000).nullable(),
+  alternateNames: z.array(z.string().trim().min(1).max(200)).max(30),
+  formats: z.array(z.enum(STUDIO_FORMATS)).max(STUDIO_FORMATS.length),
+  services: z.array(z.string().trim().min(1).max(300)).max(80),
+  products: z.array(z.string().trim().min(1).max(300)).max(80),
+  salesChannels: z.array(z.string().trim().min(1).max(300)).max(40),
+  otherLinks: z.array(z.string().trim().min(1).max(500)).max(40),
+  sources: z.array(z.string().trim().min(1).max(500)).max(80),
+  instagramPosts: z.array(z.string().regex(INSTAGRAM_POST_RE, 'Посилання на пост Instagram (p або reel).')).max(3),
+  b2bLogoMethods: z.array(z.string().trim().min(1).max(200)).max(10),
+  prices: z.array(priceLine).max(80),
+  photoIds: z.array(z.number().int().positive()).max(30),
+  expectedRevision: z.number().int().positive(),
+})
+export type StudioEdit = z.output<typeof studioEdit>
+
+export const cityEdit = z.object({
+  name: z.string().trim().min(1).max(120),
+  slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
+  oblast: z.string().trim().max(120).nullable(),
+  population: z.number().int().nonnegative().nullable(),
+  isOver100k: z.boolean().nullable(),
+})
+
+export const requestStatusChange = z.object({ status: z.enum(REQUEST_STATUS), note: z.string().trim().max(2000).optional() })
+export const claimDecision = z.discriminatedUnion('status', [
+  z.object({ status: z.literal(CLAIM_STATUS[1]), linkToOwnerId: z.string().nullish() }),
+  z.object({ status: z.literal(CLAIM_STATUS[2]), rejectReason: z.string().trim().max(1000).optional() }),
+])

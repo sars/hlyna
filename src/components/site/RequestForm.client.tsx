@@ -102,10 +102,10 @@ export function RequestForm({
     }
     setState('sending')
     try {
-      const res = await fetch('/api/requests', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
+      const res = await fetch('/api/zapyt', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
       if (!res.ok) throw new Error(String(res.status))
-      const json = (await res.json().catch(() => null)) as { doc?: { id?: number } } | null
-      setRequestId(json?.doc?.id ?? null)
+      const json = (await res.json().catch(() => null)) as { id?: number | null; doc?: { id?: number } } | null
+      setRequestId(json?.id ?? json?.doc?.id ?? null)
       setState('done')
     } catch {
       setError('Не вдалося надіслати. Спробуйте ще раз за хвилину.')

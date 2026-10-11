@@ -27,3 +27,13 @@ node_modules/
 
 # Design and photo experiments (local only)
 experiments/
+
+# Payload → app migration runs
+.migration/
+migration-report.json
+verify-report.json
+
+# cutover runs
+cutover-*.log
+migration-report-*.json
+verify-report-*.json

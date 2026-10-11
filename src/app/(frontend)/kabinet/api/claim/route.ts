@@ -1,11 +1,20 @@
 import { NextResponse } from 'next/server'
 
+import { appBackend } from '@/lib/backend'
+
 import { payloadClient } from '@/lib/kabinet'
 import { clientIp, rateLimited } from '@/lib/ownerAuth'
 import { claimKeyboard, notifyOwnerTelegram } from '@/lib/telegram'
 
 // «Це ваша студія?» — a studio representative asks to manage the profile. Saved as a pending claim for an admin to verify.
 export async function POST(req: Request) {
+  if (appBackend()) {
+    const { db } = await import('@/server/db')
+    const { submitClaim } = await import('@/server/services/publicForms')
+    const { clientIp } = await import('@/server/services/limits')
+    const r = await submitClaim(db, await req.json().catch(() => null), clientIp(req.headers))
+    return r.ok ? NextResponse.json({ ok: true, id: r.id }) : NextResponse.json({ error: r.error }, { status: r.status })
+  }
   const ip = clientIp(req.headers)
   if (rateLimited(`claim:${ip}`, 5, 3600_000)) return NextResponse.json({ error: 'Забагато заявок. Спробуйте пізніше.' }, { status: 429 })
   const body = (await req.json().catch(() => null)) as Record<string, unknown> | null

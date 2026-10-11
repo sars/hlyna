@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791716715098,
+      "tag": "0000_init_app_schema",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791717812700,
+      "tag": "0001_auth_rate_limit_bigint",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791721394736,
+      "tag": "0002_panel_cities_locative",
+      "breakpoints": true
+    }
+  ]
+}

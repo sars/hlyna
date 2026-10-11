@@ -6,6 +6,7 @@ import { cache } from 'react'
 import type { City, Studio } from '@/payload-types'
 import { cleanAddress, cleanPublic } from './present'
 import { wholeAmountsIn } from './money'
+import { appBackend } from './backend'
 
 // Read-only data layer for public pages. One cached query per request; pages are statically
 // generated and revalidated, so the database is hit rarely.
@@ -29,6 +30,12 @@ export type StudioCard = Studio & { cityDoc: City | null; unverified?: boolean }
 const loadStudiosRaw = async (): Promise<StudioCard[]> => {
     // The Docker build has no database: render empty and let /revalidate refill after deploy.
     if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
+    if (appBackend()) {
+      const { loadPublicCatalog } = await import('@/server/publicCatalog')
+      const { studios, cities } = await loadPublicCatalog()
+      const byId = new Map(cities.map((c) => [c.id, c]))
+      return studios.map((s) => ({ ...publicText(s), unverified: isUnverified(s), cityDoc: byId.get(s.city as number) ?? null }))
+    }
     const payload = await getPayload({ config: configPromise })
     const [studios, cities] = await Promise.all([
       payload.find({
@@ -49,7 +56,7 @@ const loadStudiosRaw = async (): Promise<StudioCard[]> => {
 // Scripts (pnpm payload run …) have no Next data cache: HLYNA_SCRIPT=1 reads the database directly,
 // so build scripts see exactly what the pages see.
 let scriptLoad: Promise<StudioCard[]> | null = null
-const loadStudios = process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= loadStudiosRaw()) : unstable_cache(loadStudiosRaw, ['studios-all-v6'], { revalidate: 3600, tags: ['studios'] })
+const loadStudios = process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= loadStudiosRaw()) : unstable_cache(loadStudiosRaw, ['studios-all-v6', appBackend() ? 'app' : 'payload'], { revalidate: 3600, tags: ['studios'] })
 
 // Research annotations stay in the database (admin sees them) but never reach public pages.
 const cleanList = <T extends { text: string }>(xs?: T[] | null) => (xs ?? []).map((x) => ({ ...x, text: cleanPublic(x.text) })).filter((x) => x.text)
@@ -88,6 +95,7 @@ export type StudioPhoto = { url: string; full: string; alt: string; width: numbe
 export const getStudioPhotos = unstable_cache(
   async (id: number): Promise<StudioPhoto[]> => {
     if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
+    if (appBackend()) return (await import('@/server/publicCatalog')).loadPublicPhotos(id)
     const payload = await getPayload({ config: configPromise })
     const doc = await payload
       .findByID({ collection: 'studios', id, depth: 1, overrideAccess: true, select: { photos: true, consent: true, _status: true } })
@@ -100,7 +108,7 @@ export const getStudioPhotos = unstable_cache(
         return { url: big.url as string, full: p.url as string, alt: p.alt || '', width: big.width || 1400, height: big.height || 933 }
       })
   },
-  ['studio-photos-v1'],
+  ['studio-photos-v1', appBackend() ? 'app' : 'payload'],
   { revalidate: 3600, tags: ['studios'] },
 )
 
