@@ -1,14 +1,11 @@
 import type { Metadata, Viewport } from 'next'
 import { Raleway, Unbounded } from 'next/font/google'
-import { draftMode } from 'next/headers'
 import React from 'react'
 
-import { AdminBar } from '@/components/AdminBar'
 import { JsonLd } from '@/components/site/JsonLd'
 import { SiteFooter } from '@/components/site/SiteFooter'
 import { SiteHeader } from '@/components/site/SiteHeader'
 import { site } from '@/content/site'
-import { Providers } from '@/providers'
 import { getServerSideURL } from '@/utilities/getURL'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
@@ -18,9 +15,7 @@ import './globals.css'
 const unbounded = Unbounded({ subsets: ['cyrillic', 'latin'], weight: ['500', '600', '700'], variable: '--font-unbounded', display: 'swap' })
 const raleway = Raleway({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-raleway', display: 'swap' })
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const { isEnabled } = await draftMode()
-
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html className={`${unbounded.variable} ${raleway.variable}`} lang="uk" data-theme="light">
       <head>
@@ -38,12 +33,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body>
-        <Providers>
-          <AdminBar adminBarProps={{ preview: isEnabled }} />
-          <SiteHeader />
-          {children}
-          <SiteFooter />
-        </Providers>
+        <SiteHeader />
+        {children}
+        <SiteFooter />
       </body>
     </html>
   )
