@@ -1,82 +1,67 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, DocPhoto, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
+import { Block, FaqRich, InnerCols, InnerHero, InnerMain, Related } from '@/components/site/Inner'
 import { JsonLd } from '@/components/site/JsonLd'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { RequestForm } from '@/components/site/RequestForm.client'
-import { MobileRequestBar } from '@/components/site/TopicPage'
-import type { Block, Guide } from '@/content/guides'
+import { Button } from '@/components/ui/Button'
+import { Chip } from '@/components/ui/Chip'
+import { ChipGroup } from '@/components/ui/ChipGroup'
+import { CtaBand } from '@/components/ui/CtaBand'
+import { DataTable } from '@/components/ui/DataTable'
+import { Epigraph } from '@/components/ui/Epigraph'
+import { Kicker } from '@/components/ui/Kicker'
+import { nobreak } from '@/components/ui/NoBreak'
+import { NumberedList } from '@/components/ui/NumberedList'
+import { REQUEST_HREF } from '@/content/navigation'
+import type { Block as GuideBlock, Guide } from '@/content/guides'
 import { docPhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import type { GuideCtx } from '@/editorial/guides'
 
-function BlockView({ b }: { b: Block }) {
-  if ('p' in b) return <p className="m-0 max-w-[70ch]">{b.p}</p>
+function BlockView({ b }: { b: GuideBlock }) {
+  if ('p' in b) return <p className="m-0 max-w-read">{b.p}</p>
   if ('list' in b)
     return (
-      <ul className="m-0 grid grid-cols-1 gap-2 pl-5 marker:text-terra">
+      <ul className="m-0 grid max-w-read list-none gap-1.5 p-0">
         {b.list.map((x) => (
-          <li key={x}>{x}</li>
+          <li key={x} className="before:text-terracotta-text before:content-['—_']">
+            {x}
+          </li>
         ))}
       </ul>
     )
-  if ('steps' in b)
+  if ('steps' in b) return <NumberedList columns={2} items={b.steps.map(([t, d]) => ({ title: t, text: d }))} />
+  if ('table' in b) {
+    const cols = b.table.head.map((h, j) => ({ key: `c${j}`, label: h }))
     return (
-      <ol className="m-0 grid grid-cols-1 list-none gap-2.5 p-0 sm:grid-cols-2">
-        {b.steps.map(([t, d], i) => (
-          <li key={t} className="grid grid-cols-1 content-start gap-1 rounded-2xl bg-card p-4 sm:[&:last-child:nth-child(odd)]:col-span-2">
-            <span className="font-display text-sm text-terra">{i + 1}</span>
-            <b>{t}</b>
-            <span className="text-[15px] text-umber">{d}</span>
-          </li>
-        ))}
-      </ol>
+      <DataTable
+        mode={cols.length >= 5 ? 'scroll' : 'stack'}
+        columns={cols}
+        rows={b.table.rows.map((r, i) => Object.fromEntries(r.map((c, j) => [`c${j}`, j === 0 && b.table.links?.[i] ? <Link key={j} href={b.table.links[i]!}>{c}</Link> : nobreak(c)])))}
+      />
     )
-  if ('table' in b)
-    return (
-      <div className="overflow-x-auto rounded-2xl bg-card">
-        <table className="w-full border-collapse text-[14.5px]">
-          <thead>
-            <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
-              {b.table.head.map((h) => (
-                <th key={h} className="border-b border-line px-3.5 py-3 align-bottom">{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {b.table.rows.map((r, i) => (
-              <tr key={r[0]} className="align-top">
-                {r.map((c, j) => (
-                  <td key={j} className={`border-b border-line px-3.5 py-3 ${j === 0 ? 'font-semibold' : c.length <= 14 ? 'whitespace-nowrap' : ''} ${i === b.table.rows.length - 1 ? 'border-b-0' : ''}`}>
-                    {j === 0 && b.table.links?.[i] ? <Link href={b.table.links[i]!}>{c}</Link> : c}
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    )
+  }
   return (
-    <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+    <ChipGroup>
       {b.links.map((l) => (
-        <li key={l.href}>
-          <Link href={l.href} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold no-underline hover:bg-sand">
-            {l.label} →
-          </Link>
-        </li>
+        <Chip key={l.href} href={l.href}>
+          {l.label} →
+        </Chip>
       ))}
-    </ul>
+    </ChipGroup>
   )
 }
 
 // Layout for guides (/hayidy/*) and /dlya-studiy: factual lead, optional verse and photo, sections, FAQ, form.
 export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx; parents: { label: string; href?: string }[] }) {
   const faq = guide.faq(ctx)
-  const photo = guide.photo ? docPhotos[guide.photo] : null
-  const bar = guide.form && !guide.form.studio
+  const photo = guide.photo ? docPhotos[guide.photo] : undefined
+  const bar = Boolean(guide.form && !guide.form.studio)
+  const request = guide.form ? '#zapyt-forma' : REQUEST_HREF
   return (
-    <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 ${bar ? 'pb-28 lg:pb-16' : 'pb-16'}`}>
+    <InnerMain bar={bar}>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{
@@ -92,80 +77,49 @@ export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx
           publisher: { '@type': 'Organization', name: site.name, url: site.url },
         }}
       />
-      <div className={`grid grid-cols-1 items-start gap-8 ${photo ? 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]' : ''}`}>
-        <div className="grid grid-cols-1 gap-4">
-          <Breadcrumbs items={[...parents, { label: guide.h1 }]} />
-          <span className="kicker">{guide.kicker}</span>
-          <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">{guide.h1}</h1>
-          <p className="m-0 max-w-[70ch] text-lg">{guide.lead(ctx)}</p>
-          <Updated />
-        </div>
-        {photo && <DocPhoto photo={photo} priority />}
-      </div>
-
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid grid-cols-1 gap-10">
-          {guide.verse && <Epigraph lines={guide.verse} />}
-          {guide.sections.length > 2 && (
-            <nav aria-label="Зміст" className="grid grid-cols-1 gap-2">
-              <p className="kicker m-0">Зміст</p>
-              <ol className="m-0 grid grid-cols-1 gap-1 pl-5 marker:text-terra">
-                {guide.sections.map((s) => (
-                  <li key={s.id}>
-                    <a href={`#${s.id}`}>{s.title}</a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
-          )}
-          {guide.sections.map((s) => (
-            <section key={s.id} aria-labelledby={s.id} className="scroll-mt-24">
-              <SectionHead kicker={s.kicker} title={s.title} id={s.id} />
-              <div className="grid grid-cols-1 gap-4">
-                {s.blocks(ctx).map((b, i) => (
-                  <BlockView key={i} b={b} />
-                ))}
-              </div>
-            </section>
-          ))}
-
-          <section aria-labelledby="faq">
-            <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-            <div className="grid grid-cols-1 gap-2.5">
-              {faq.map((f, i) => (
-                <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
-                  <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">
-                    {f.q}
-                    <span aria-hidden className="font-display text-terra group-open:hidden">+</span>
-                    <span aria-hidden className="font-display hidden text-terra group-open:inline">–</span>
-                  </summary>
-                  <p className="mt-0 mb-3.5">{f.a}</p>
-                </details>
-              ))}
-            </div>
-          </section>
-
-          <nav aria-label="Схожі сторінки" className="grid grid-cols-1 gap-3">
-            <p className="kicker m-0">Дивіться також</p>
-            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-              {guide.related.map((r) => (
-                <li key={r.href}>
-                  <Link href={r.href} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
-                    {r.label}
-                  </Link>
+      <InnerHero
+        crumbs={[...parents, { label: guide.h1 }]}
+        kicker={guide.kicker}
+        title={guide.h1}
+        lead={<p className="m-0">{guide.lead(ctx)}</p>}
+        photo={photo}
+        actions={
+          <Button href={request} variant="cobalt" arrow>
+            {guide.form?.studio ? 'Додати студію' : 'Отримати пропозиції'}
+          </Button>
+        }
+      />
+      <InnerCols aside={guide.form ? <RequestForm sourcePage={guide.path} defaultWhat={guide.form.what} forStudio={guide.form.studio} /> : undefined}>
+        {guide.verse && <Epigraph lines={guide.verse} />}
+        {guide.sections.length > 2 && (
+          <nav aria-label="Зміст" className="grid gap-2">
+            <Kicker as="p">Зміст</Kicker>
+            <ol className="m-0 grid list-none gap-1 p-0">
+              {guide.sections.map((s, i) => (
+                <li key={s.id} className="grid grid-cols-[28px_minmax(0,1fr)]">
+                  <span className="font-mono text-xs leading-[1.9] text-terracotta-text">{i + 1}</span>
+                  <a href={`#${s.id}`} className="text-ink hover:text-cobalt">
+                    {s.title}
+                  </a>
                 </li>
               ))}
-            </ul>
+            </ol>
           </nav>
-        </div>
-
-        {guide.form && (
-          <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
-            <RequestForm sourcePage={guide.path} defaultWhat={guide.form.what} forStudio={guide.form.studio} />
-          </aside>
         )}
-      </div>
+        {guide.sections.map((s) => (
+          <Block key={s.id} id={s.id} kicker={s.kicker} title={s.title}>
+            {s.blocks(ctx).map((b, i) => (
+              <BlockView key={i} b={b} />
+            ))}
+          </Block>
+        ))}
+        <Block id="faq" kicker="Питання і відповіді" title="Часті питання">
+          <FaqRich items={faq.map((f) => ({ q: f.q, a: f.a }))} />
+        </Block>
+        <Related items={guide.related} />
+        <CtaBand tone="ink" title={guide.form?.studio ? 'Додайте студію — профіль безкоштовний' : 'Опишіть, що потрібно, — студії відповідуть напряму'} cta={{ label: guide.form?.studio ? 'Додати студію' : 'Отримати пропозиції', href: request }} />
+      </InnerCols>
       {bar && <MobileRequestBar />}
-    </main>
+    </InnerMain>
   )
 }

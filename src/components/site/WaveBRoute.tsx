@@ -3,9 +3,14 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { SectionHead } from '@/components/site/Bits'
-import { MakerRow } from '@/components/site/MakerRow'
+import { Block, InfoList } from '@/components/site/Inner'
 import { WavePage } from '@/components/site/WavePage'
+import { CityHead } from '@/components/ui/CityHead'
+import { DataTable } from '@/components/ui/DataTable'
+import { FaqItem } from '@/components/ui/Faq'
+import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
+import { MoreLink } from '@/components/ui/MoreLink'
+import { StudioCell, StudioCells } from '@/components/ui/StudioCell'
 import { getAllStudios, groupByCity, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
 import { evidenceLine } from '@/editorial/topics'
@@ -44,64 +49,64 @@ function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: st
   const head = studios.slice(0, COLLAPSE)
   const tail = studios.slice(COLLAPSE)
   return (
-    <section aria-labelledby={id} className="grid grid-cols-1 gap-3">
-      <SectionHead title={title} id={id}>
-        {note && <p className="m-0 text-sm text-umber">{note}</p>}
-      </SectionHead>
-      <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0">
-        {head.map((s) => <MakerRow key={s.id} s={s} />)}
-      </ul>
-      {tail.length > 0 && (
-        <details className="group">
-          <summary className="cursor-pointer font-bold"><span className="group-open:hidden">{`Показати ще ${tail.length}`}</span><span className="hidden group-open:inline">Згорнути</span></summary>
-          <ul className="m-0 mt-2.5 grid list-none grid-cols-1 gap-2.5 p-0">
-            {tail.map((s) => <MakerRow key={s.id} s={s} />)}
-          </ul>
-        </details>
-      )}
-    </section>
+    <Block id={id} title={title} note={note}>
+      <div>
+        <MakerRows>
+          {head.map((s) => (
+            <MakerRow key={s.id} s={s} />
+          ))}
+        </MakerRows>
+        {tail.length > 0 && (
+          <details className="group">
+            <MoreLink as="summary">
+              <span className="group-open:hidden">{`Показати ще ${tail.length}`}</span>
+              <span className="hidden group-open:inline">Згорнути</span>
+            </MoreLink>
+            <MakerRows>
+              {tail.map((s) => (
+                <MakerRow key={s.id} s={s} />
+              ))}
+            </MakerRows>
+          </details>
+        )}
+      </div>
+    </Block>
   )
 }
 
 function EvidenceList({ items, title, id }: { items: { s: StudioCard; line: string }[]; title: string; id: string }) {
   if (!items.length) return null
   return (
-    <section aria-labelledby={id} className="grid grid-cols-1 gap-3">
-      <SectionHead title={title} id={id} />
-      <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
+    <Block id={id} title={title}>
+      <StudioCells>
         {items.map(({ s, line }) => (
-          <li key={s.id} className="grid grid-cols-1 content-start gap-0.5 rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-            <Link href={`/vyrobnyky/${s.slug}`} className="font-bold">{cleanName(s.name)}</Link>
-            {s.cityDoc && <span className="text-[13px] text-umber">{s.cityDoc.name}</span>}
-            {line && <span className="text-umber">{line}</span>}
-          </li>
+          <StudioCell key={s.id} s={s} line={line} showCity />
         ))}
-      </ul>
-    </section>
+      </StudioCells>
+    </Block>
   )
 }
 
-function EventRow({ e }: { e: EventItem }) {
-  return (
-    <li className="grid grid-cols-1 gap-0.5 rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-      <span className="text-[12.5px] font-semibold tracking-wide text-terra uppercase">{EVENT_KIND[e.kind] ?? 'Подія'}{e.city ? ` · ${e.city}` : ''}</span>
-      {e.link ? <a href={e.link} target="_blank" rel="noopener nofollow" className="font-bold">{e.name}</a> : <b>{e.name}</b>}
-      {(e.nextDate || e.months) && (
-        <span className="text-umber">
-          {e.nextDate
-            ? e.nextDate <= new Date().toISOString().slice(0, 10)
-              ? `Триває до ${eventEnd(e).split('-').reverse().join('.')}`
-              : `${e.approx ? 'Орієнтовно' : 'Дата'}: ${e.nextDate.split('-').reverse().join('.')}`
-            : e.months}
-        </span>
-      )}
-      {e.venue && <span className="text-umber">{e.venue}</span>}
-      {e.entry && <span className="text-umber">Вхід: {e.entry}</span>}
-    </li>
-  )
+function eventItem(e: EventItem) {
+  const when = e.nextDate
+    ? e.nextDate <= new Date().toISOString().slice(0, 10)
+      ? `Триває до ${eventEnd(e).split('-').reverse().join('.')}`
+      : `${e.approx ? 'Орієнтовно' : 'Дата'}: ${e.nextDate.split('-').reverse().join('.')}`
+    : e.months
+  return {
+    kicker: `${EVENT_KIND[e.kind] ?? 'Подія'}${e.city ? ` · ${e.city}` : ''}`,
+    title: e.link ? (
+      <a href={e.link} target="_blank" rel="noopener nofollow">
+        {e.name}
+      </a>
+    ) : (
+      e.name
+    ),
+    lines: [when || null, e.venue || null, e.entry ? `Вхід: ${e.entry}` : null],
+  }
 }
 
-function Block({ d }: { d: WaveBData }) {
+function LiveBlock({ d }: { d: WaveBData }) {
   switch (d.id) {
     case 'brendy-posudu':
       return (
@@ -112,101 +117,81 @@ function Block({ d }: { d: WaveBData }) {
       )
     case 'etsy':
       return (
-        <section aria-labelledby="shops" className="grid grid-cols-1 gap-3">
-          <SectionHead title="Магазини з України на Etsy" id="shops">
-            <p className="m-0 text-sm text-umber">Продажі, відгуки й рейтинг — з вітрини Etsy на момент перевірки (жовтень 2026).</p>
-          </SectionHead>
-          <div className="overflow-x-auto rounded-2xl bg-card">
-            <table className="w-full min-w-[520px] border-collapse text-[14.5px]">
-              <thead>
-                <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
-                  <th className="border-b border-line px-3.5 py-3">Магазин</th>
-                  <th className="border-b border-line px-3.5 py-3">Продажі</th>
-                  <th className="border-b border-line px-3.5 py-3">Відгуки</th>
-                  <th className="border-b border-line px-3.5 py-3">Рейтинг</th>
-                  <th className="border-b border-line px-3.5 py-3">На Etsy</th>
-                </tr>
-              </thead>
-              <tbody>
-                {d.shops.map((e) => (
-                  <tr key={e.url}>
-                    <td className="border-b border-line px-3.5 py-2.5">
-                      {e.slug ? <Link href={`/vyrobnyky/${e.slug}`}>{e.name ?? e.shop}</Link> : <a href={e.url} target="_blank" rel="noopener nofollow">{e.name ?? e.shop}</a>}
-                    </td>
-                    <td className="border-b border-line px-3.5 py-2.5">{e.sales ? fmt(e.sales) : '—'}</td>
-                    <td className="border-b border-line px-3.5 py-2.5">{e.reviews ? fmt(e.reviews) : '—'}</td>
-                    <td className="border-b border-line px-3.5 py-2.5">{e.rating ? String(e.rating).replace('.', ',') : '—'}</td>
-                    <td className="border-b border-line px-3.5 py-2.5">{e.years ?? '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+        <Block id="shops" title="Магазини з України на Etsy" note="Продажі, відгуки й рейтинг — з вітрини Etsy на момент перевірки (жовтень 2026).">
+          <DataTable
+            mode="scroll"
+            columns={[{ key: 'shop', label: 'Магазин' }, { key: 'sales', label: 'Продажі', numeric: true, align: 'end' }, { key: 'reviews', label: 'Відгуки', numeric: true, align: 'end' }, { key: 'rating', label: 'Рейтинг', numeric: true, align: 'end' }, { key: 'years', label: 'На Etsy' }]}
+            rows={d.shops.map((e) => ({
+              shop: e.slug ? <Link href={`/vyrobnyky/${e.slug}`}>{e.name ?? e.shop}</Link> : <a href={e.url} target="_blank" rel="noopener nofollow">{e.name ?? e.shop}</a>,
+              sales: e.sales ? fmt(e.sales) : '—',
+              reviews: e.reviews ? fmt(e.reviews) : '—',
+              rating: e.rating ? String(e.rating).replace('.', ',') : '—',
+              years: e.years ?? '—',
+            }))}
+          />
+        </Block>
       )
     case 'podiyi':
       return (
         <>
           {d.upcoming.length > 0 && (
-            <section aria-labelledby="soon" className="grid grid-cols-1 gap-3">
-              <SectionHead title="Найближчі" id="soon" />
-              <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">{d.upcoming.map((e) => <EventRow key={e.name} e={e} />)}</ul>
-            </section>
+            <Block id="soon" title="Найближчі">
+              <InfoList columns={2} items={d.upcoming.map(eventItem)} />
+            </Block>
           )}
           {d.recurring.length > 0 && (
-            <section aria-labelledby="yearly" className="grid grid-cols-1 gap-3">
-              <SectionHead title="Щороку й щосезону" id="yearly" />
-              <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">{d.recurring.map((e) => <EventRow key={e.name} e={e} />)}</ul>
-            </section>
+            <Block id="yearly" title="Щороку й щосезону">
+              <InfoList columns={2} items={d.recurring.map(eventItem)} />
+            </Block>
           )}
           {d.paused.length > 0 && (
-            <section aria-labelledby="paused" className="grid grid-cols-1 gap-3">
-              <SectionHead title="Призупинені або завершені" id="paused" />
-              <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">{d.paused.map((e) => <EventRow key={e.name} e={e} />)}</ul>
-            </section>
+            <Block id="paused" title="Призупинені або завершені">
+              <InfoList columns={2} items={d.paused.map(eventItem)} />
+            </Block>
           )}
         </>
       )
     case 'muzei-keramiky':
       return (
-        <section aria-labelledby="venues" className="grid grid-cols-1 gap-5">
-          <SectionHead title="Музеї й галереї за містами" id="venues" />
-          {d.groups.map((g) => (
-            <div key={g.city} className="grid grid-cols-1 gap-2">
-              <h3 className="m-0 text-lg">{g.city}</h3>
-              <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
-                {g.list.map((m) => (
-                  <li key={m.name} className="grid grid-cols-1 content-start gap-0.5 rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-                    {m.slug ? <Link href={`/vyrobnyky/${m.slug}`} className="font-bold">{m.name}</Link> : m.website ? <a href={m.website} target="_blank" rel="noopener nofollow" className="font-bold">{m.name}</a> : <b>{m.name}</b>}
-                    {m.address && <span className="text-umber">{firstAddress(m.address) || m.address}</span>}
-                    {m.what && <span className="text-umber">{m.what}</span>}
-                  </li>
-                ))}
-              </ul>
+        <Block id="venues" title="Музеї й галереї за містами">
+          {d.groups.map((g, gi) => (
+            <div key={g.city}>
+              <CityHead id={`venue-${gi}`} name={g.city} />
+              <InfoList
+                columns={2}
+                items={g.list.map((m) => ({
+                  title: m.slug ? <Link href={`/vyrobnyky/${m.slug}`}>{m.name}</Link> : m.website ? <a href={m.website} target="_blank" rel="noopener nofollow">{m.name}</a> : m.name,
+                  lines: [m.address ? firstAddress(m.address) || m.address : null, m.what || null],
+                }))}
+              />
             </div>
           ))}
-        </section>
+        </Block>
       )
     case 'yalynkovi-prykrasy':
       return <EvidenceList items={d.lines} title="Хто робить новорічну кераміку" id="who" />
     case 'vydy-keramiky':
       return (
-        <section aria-labelledby="who" className="grid grid-cols-1 gap-4">
-          <SectionHead title="Хто з українських майстрів працює з чим" id="who" />
-          {d.groups.filter((g) => g.studios.length).map((g) => (
-            <details key={g.key} className="rounded-2xl bg-card px-4 py-1">
-              <summary className="cursor-pointer py-3 font-bold">{`${g.label}: ${g.studios.length}`}</summary>
-              <ul className="m-0 mb-3 grid list-none grid-cols-1 gap-1.5 p-0 sm:grid-cols-2">
-                {g.studios.slice(0, 40).map((s) => (
-                  <li key={s.id}>
-                    <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>
-                    {s.cityDoc && <span className="text-umber"> · {s.cityDoc.name}</span>}
-                  </li>
-                ))}
-              </ul>
-            </details>
-          ))}
-        </section>
+        <Block id="who" title="Хто з українських майстрів працює з чим">
+          <div className="ui-faq">
+            {d.groups
+              .filter((g) => g.studios.length)
+              .map((g) => (
+                <FaqItem key={g.key} q={`${g.label}: ${g.studios.length}`}>
+                  <ul className="m-0 mb-3 grid list-none gap-1.5 p-0 sm:grid-cols-2">
+                    {g.studios.slice(0, 40).map((s) => (
+                      <li key={s.id} className="text-[15px]">
+                        <Link href={`/vyrobnyky/${s.slug}`} className="text-cobalt underline underline-offset-[3px]">
+                          {cleanName(s.name)}
+                        </Link>
+                        {s.cityDoc && <span className="text-ink-2"> · {s.cityDoc.name}</span>}
+                      </li>
+                    ))}
+                  </ul>
+                </FaqItem>
+              ))}
+          </div>
+        </Block>
       )
     case 'dohliad-za-keramikoyu':
       return d.studios.length < 3 ? null : <EvidenceList items={d.studios.slice(0, 24).map((s) => ({ s, line: evidenceLine(s, /посудомий|мікрохвил|духов|руками|догляд|полив/iu) }))} title="Що кажуть самі студії" id="studios" />
@@ -258,7 +243,7 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
     : []
   return (
     <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={studios} cityLinks={cityLinks} related={(RELATED[id] ?? []).filter((r) => r.href !== meta.path)}>
-      <Block d={p.data} />
+      <LiveBlock d={p.data} />
     </WavePage>
   )
 }

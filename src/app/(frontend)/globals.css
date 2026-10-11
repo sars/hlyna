@@ -41,7 +41,7 @@
   --spacing-block: clamp(36px, 5vw, 64px);
   --spacing-hero: clamp(18px, 3vw, 32px);
   --container-wrap: 1600px;
-  --container-read: 70ch;
+  --container-read: 42em; /* em, not ch: a ch measure shifts when the web font swaps in */
   --container-faq: 900px;
   --container-narrow: 760px;
   --radius-btn: 2px;
@@ -249,7 +249,6 @@
 
   /* FAQ: native details with a +/– sign. */
   .ui-faq details { border-bottom: 1px solid var(--color-rule); }
-  .ui-faq details:first-child { border-top: 1px solid var(--color-rule); }
   .ui-faq summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 20px; align-items: baseline; padding: 15px 0; font-family: var(--font-display); font-weight: 600; font-size: 15.5px; line-height: 1.25; }
   .ui-faq summary::-webkit-details-marker { display: none; }
   .ui-faq summary:hover { color: var(--color-cobalt); }
