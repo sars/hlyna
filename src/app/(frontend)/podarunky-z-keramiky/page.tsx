@@ -7,7 +7,7 @@ import { SectionHead } from '@/components/site/Bits'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
-import { fillCopy, giftsData, waveCopy, type GiftItem } from '@/lib/waveA'
+import { fillCopy, giftsData, waveCopy, type GiftItem } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
 
 // Ceramic gifts by budget: every item is a real price line from a studio's price list, linked to the studio.

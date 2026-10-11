@@ -4,8 +4,8 @@ import React from 'react'
 import { TopicPage } from '@/components/site/TopicPage'
 import { productTopics } from '@/content/topics'
 import { getAllStudios, MIN_LIST } from '@/lib/catalog'
-import { productContent } from '@/lib/places'
-import { topicData, topicMetadata } from '@/lib/topics'
+import { productContent } from '@/editorial/places'
+import { topicData, topicMetadata } from '@/editorial/topics'
 
 export const revalidate = 86400
 

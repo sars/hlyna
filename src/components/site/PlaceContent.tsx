@@ -4,7 +4,7 @@ import React from 'react'
 import { SectionHead } from '@/components/site/Bits'
 import type { StudioCard } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
-import type { PlaceContent } from '@/lib/places'
+import type { PlaceContent } from '@/editorial/places'
 
 // Editorial blocks for city and product pages. Studio links are checked against the published catalogue:
 // a slug that isn't published renders as plain text, never as a broken link.

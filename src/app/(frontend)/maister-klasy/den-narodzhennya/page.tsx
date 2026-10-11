@@ -7,7 +7,7 @@ import { SectionHead } from '@/components/site/Bits'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
-import { fillCopy, liveFormatCityPages, partyData, partyLines, waveCopy } from '@/lib/waveA'
+import { fillCopy, liveFormatCityPages, partyData, partyLines, waveCopy } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
 
 // Birthdays and parties in a clay studio (kids' birthdays, hen parties, renting the studio for a group).

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { GuidePage } from '@/components/site/GuidePage'
 import { aboutPage } from '@/content/guides'
-import { guideCtx, guideMetadata } from '@/lib/guides'
+import { guideCtx, guideMetadata } from '@/editorial/guides'
 
 export const revalidate = 86400
 

@@ -8,11 +8,11 @@ import { copies } from '@/content/waveC'
 import factsData from '@/content/waveC/facts.json'
 import formatsData from '@/content/waveC/formats.json'
 import newYearJson from '@/content/waveC/newyear.json'
-import { getAllStudios, groupByCity, hasFormat, type StudioCard } from './catalog'
-import { facts } from './facts'
-import { isExhibitingOnly } from './present'
-import { fillCopy, type WaveCopy, type WaveVars } from './waveA'
-import { newYearData } from './waveB'
+import { getAllStudios, groupByCity, hasFormat, type StudioCard } from '@/lib/catalog'
+import { facts } from '@/lib/facts'
+import { isExhibitingOnly } from '@/lib/present'
+import { fillCopy, type WaveCopy, type WaveVars } from '@/editorial/copy'
+import { newYearData } from '@/editorial/wave-b'
 
 export const waveCCopy = (id: string): WaveCopy | null => (copies as Record<string, WaveCopy>)[id] ?? null
 

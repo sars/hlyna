@@ -3,7 +3,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, Updated } from '@/components/site/Bits'
-import { liveWaveBPages } from '@/lib/waveB'
+import { liveWaveBPages } from '@/editorial/wave-b'
 import { ogImage } from '@/utilities/ogImage'
 
 export const metadata: Metadata = {

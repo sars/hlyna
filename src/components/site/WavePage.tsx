@@ -11,7 +11,7 @@ import { MobileRequestBar } from '@/components/site/TopicPage'
 import type { StudioCard } from '@/lib/catalog'
 import { ldItemList } from '@/lib/ld'
 import { cleanName } from '@/lib/present'
-import type { WaveCopy } from '@/lib/waveA'
+import type { WaveCopy } from '@/editorial/wave-a'
 
 // Wave A page layout: written copy around a live data block. Order: lead → first section → live data
 // (lists, prices) → other sections → picks → FAQ → sources. Studio links in copy are [Name](slug),

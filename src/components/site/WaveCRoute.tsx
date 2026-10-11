@@ -9,8 +9,8 @@ import { WavePage } from '@/components/site/WavePage'
 import { isBuilt } from '@/content/navigation'
 import { getAllStudios, type StudioCard } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
-import { fillCopy } from '@/lib/waveA'
-import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/lib/waveC'
+import { fillCopy } from '@/editorial/wave-a'
+import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/editorial/wave-c'
 import { ogImage } from '@/utilities/ogImage'
 
 // Wave C page: reviewed copy (src/content/waveC) around structured blocks rendered from JSON

@@ -6,7 +6,7 @@ import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/
 import { JsonLd } from '@/components/site/JsonLd'
 import { guides } from '@/content/guides'
 import { site } from '@/content/site'
-import { liveWaveBPages } from '@/lib/waveB'
+import { liveWaveBPages } from '@/editorial/wave-b'
 import { ogImage } from '@/utilities/ogImage'
 
 export const metadata: Metadata = {

@@ -2,7 +2,7 @@ import React from 'react'
 
 import { TopicPage } from '@/components/site/TopicPage'
 import { topics } from '@/content/topics'
-import { topicData, topicMetadata } from '@/lib/topics'
+import { topicData, topicMetadata } from '@/editorial/topics'
 
 export const revalidate = 86400
 

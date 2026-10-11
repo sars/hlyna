@@ -8,7 +8,7 @@ import { MobileRequestBar } from '@/components/site/TopicPage'
 import type { Block, Guide } from '@/content/guides'
 import { docPhotos } from '@/content/photos'
 import { site } from '@/content/site'
-import type { GuideCtx } from '@/lib/guides'
+import type { GuideCtx } from '@/editorial/guides'
 
 function BlockView({ b }: { b: Block }) {
   if ('p' in b) return <p className="m-0 max-w-[70ch]">{b.p}</p>

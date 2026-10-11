@@ -7,7 +7,7 @@ import { latestUpdate } from '@/lib/catalog'
 
 import { Breadcrumbs, container, DocPhoto, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
-import { fixPriceRef, mergeFaq, type PlaceContent } from '@/lib/places'
+import { fixPriceRef, mergeFaq, type PlaceContent } from '@/editorial/places'
 import { ldStudio } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
@@ -15,7 +15,7 @@ import { REQUEST_HREF } from '@/content/navigation'
 import type { Topic } from '@/content/topics'
 import { groupByCity, MIN_LIST, TYPE_LABEL, type StudioCard } from '@/lib/catalog'
 import { cleanName, stripPersonal, staleNote } from '@/lib/present'
-import { evidenceLine, topicCityLinks, type TopicData } from '@/lib/topics'
+import { evidenceLine, topicCityLinks, type TopicData } from '@/editorial/topics'
 
 function Row({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: boolean }) {
   const line = stripPersonal(evidenceLine(s, re))
@@ -122,7 +122,7 @@ function CityJump({ groups, variant }: { groups: { slug: string; name: string; n
   )
 }
 
-// Shared layout for topic pages (src/content/topics.ts). Business topics get the request form in the aside.
+// Shared layout for topic pages (src/content/topics/). Business topics get the request form in the aside.
 export async function TopicPage({ topic, data, h1, crumb, extraParents = [], content, known }: { topic: Topic; data: TopicData; h1?: string; crumb?: string; extraParents?: { label: string; href: string }[]; content?: PlaceContent | null; known?: Map<string, StudioCard> }) {
   const { ctx, lists, all, examples } = data
   const cityLinks = await topicCityLinks(topic, data)

@@ -12,9 +12,9 @@ import path from 'node:path'
 
 import type { StudioCard } from '../src/lib/catalog'
 import { cleanName, firstAddress, publicPrices } from '../src/lib/present'
-import { evidenceLine } from '../src/lib/topics'
-import type { WaveVars } from '../src/lib/waveA'
-import { anniversaryData, staffGiftsData, WAVE_C, waveCFacts, winterData, type WaveCId } from '../src/lib/waveC'
+import { evidenceLine } from '../src/editorial/topics'
+import type { WaveVars } from '../src/editorial/wave-a'
+import { anniversaryData, staffGiftsData, WAVE_C, waveCFacts, winterData, type WaveCId } from '../src/editorial/wave-c'
 
 const ROOT = '/Users/rodik/Claude/UkraineCeramics'
 const OUT = path.join(ROOT, '_site_content/waveC')

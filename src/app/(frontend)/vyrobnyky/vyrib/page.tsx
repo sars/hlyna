@@ -7,7 +7,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { site } from '@/content/site'
 import { productTopics } from '@/content/topics'
 import { MIN_LIST, pluralUk } from '@/lib/catalog'
-import { topicData } from '@/lib/topics'
+import { topicData } from '@/editorial/topics'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
 

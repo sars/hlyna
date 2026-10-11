@@ -1,14 +1,14 @@
 // Live numbers for guide pages (/hayidy/*, /dlya-studiy): counts from the catalogue and price ranges from the
 // price index, so guide text never drifts from the data it quotes.
-import { getAllStudios, groupByCity, offersMasterClasses, worksWithCompanies, worksWithVenues } from './catalog'
-import { priceIndex } from './priceIndex'
+import { getAllStudios, groupByCity, offersMasterClasses, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
+import { priceIndex } from '@/lib/priceIndex'
 import type { Metadata } from 'next'
 
 import type { Guide } from '@/content/guides'
 import { docPhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
-import { fmt } from './money'
+import { fmt } from '@/lib/money'
 
 export type GuidePrice = { range: string; median: string; n: number; rangeNum: string; medianNum: string }
 export type GuideCtx = {

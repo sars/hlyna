@@ -3,9 +3,7 @@
 // routes that are not built yet (PLANNED) are filtered out of what is rendered, so no page links
 // to a 404. When a planned page ships, remove its prefix from PLANNED. `node scripts/check-links.mjs` verifies.
 
-import { liveWaveIds } from './waveA/live'
-import { liveWaveBIds } from './waveB/live'
-import { liveWaveCIds } from './waveC/live'
+import { hasWrittenCopy } from '@/editorial/live'
 
 export type NavLink = { label: string; href: string; note?: string }
 export type NavColumn = { title: string; links: NavLink[] }
@@ -67,10 +65,9 @@ const WAVE_HREFS: Record<string, string> = {
   '/dlya-biznesu/podarunky-spivrobitnykam': 'podarunky-spivrobitnykam',
   '/novyi-rik-i-rizdvo': 'novyi-rik-i-rizdvo',
 }
-const waveLive = new Set([...liveWaveIds, ...liveWaveBIds, ...liveWaveCIds])
 export const isBuilt = (href: string) =>
   !PLANNED.some((p) => href === p || href.startsWith(p + '/') || href.startsWith(p + '#') || href.startsWith(p + '?')) &&
-  (!(href.split(/[?#]/)[0] in WAVE_HREFS) || waveLive.has(WAVE_HREFS[href.split(/[?#]/)[0]]))
+  (!(href.split(/[?#]/)[0] in WAVE_HREFS) || hasWrittenCopy(WAVE_HREFS[href.split(/[?#]/)[0]]))
 const liveLinks = (links: NavLink[]) => links.filter((l) => isBuilt(l.href))
 
 const mainNavPlan: NavSection[] = [

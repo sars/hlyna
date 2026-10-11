@@ -7,7 +7,7 @@ import { SectionHead } from '@/components/site/Bits'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
-import { fillCopy, waveCopy, whereToBuyData } from '@/lib/waveA'
+import { fillCopy, waveCopy, whereToBuyData } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
 
 // Where to buy contemporary Ukrainian ceramics: shops and galleries by city, makers' own online shops, Etsy.

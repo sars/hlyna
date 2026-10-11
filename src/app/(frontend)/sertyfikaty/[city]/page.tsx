@@ -4,7 +4,7 @@ import React from 'react'
 import { TopicPage } from '@/components/site/TopicPage'
 import { topics } from '@/content/topics'
 import { MIN_LIST, pluralUk } from '@/lib/catalog'
-import { certificateCities, topicData, topicMetadata } from '@/lib/topics'
+import { certificateCities, topicData, topicMetadata } from '@/editorial/topics'
 
 export const revalidate = 86400
 

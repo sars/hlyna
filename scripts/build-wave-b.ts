@@ -13,12 +13,12 @@ import { getAllStudios, groupByCity, hasFormat, worksWithVenues, type StudioCard
 import { facts } from '../src/lib/facts'
 import { cleanName, firstAddress, publicPrices } from '../src/lib/present'
 import { productText } from '../src/lib/products'
-import { evidenceLine } from '../src/lib/topics'
+import { evidenceLine } from '../src/editorial/topics'
 import {
   BLACK_SMOKED, businessData, careData, CARE, etsyData, MATERIALS, materialsData, MILK_FIRED, NEW_YEAR, newYearData,
   smokeData, tablewareBrandsData, WAVE_B, type EventItem, type MuseumItem, type WaveBId,
-} from '../src/lib/waveB'
-import type { WaveVars } from '../src/lib/waveA'
+} from '../src/editorial/wave-b'
+import type { WaveVars } from '../src/editorial/wave-a'
 
 const ROOT = '/Users/rodik/Claude/UkraineCeramics'
 const OUT = path.join(ROOT, '_site_content/waveB')

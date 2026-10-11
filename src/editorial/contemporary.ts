@@ -1,5 +1,5 @@
 // Editorial selections (/dobirky/*), picked from the data, not paid and not a ranking.
-import { getAllStudios, type StudioCard } from './catalog'
+import { getAllStudios, type StudioCard } from '@/lib/catalog'
 
 // Kept out of editorial picks (they stay in the catalogue and all regular lists).
 const NOT_PICKED = /gunia|rodionpresent|osonnia/

@@ -9,7 +9,7 @@ import { Faq } from '@/components/site/SelectionFaq'
 import { StudioCard } from '@/components/site/StudioCard'
 import { pluralUk } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
-import { kosivOpishne } from '@/lib/selections'
+import { kosivOpishne } from '@/editorial/contemporary'
 import { ogImage } from '@/utilities/ogImage'
 
 export const revalidate = 86400

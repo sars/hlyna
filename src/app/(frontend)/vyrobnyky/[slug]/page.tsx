@@ -17,9 +17,11 @@ import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
-import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
-import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
+import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
+import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
 import { amountsIn, typicalRange } from '@/lib/money'
+import { formFor, groupPrices } from '@/lib/profile'
+import { link, ListBlock, PriceItem } from '@/components/profile/blocks'
 
 export const revalidate = 86400
 export const dynamicParams = true
@@ -47,82 +49,6 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     alternates: { canonical: `/vyrobnyky/${s.slug}` },
     openGraph: { images: ogImage({ title: name, kicker: [TYPE_LABEL[s.type ?? 'other'], city].filter(Boolean).join(' · '), sub: stripPersonal(s.summary ?? '') }) },
   }
-}
-
-const link = (href: string, label: string) => (
-  <a href={href} target="_blank" rel="noopener nofollow" className="break-all">
-    {label}
-  </a>
-)
-
-// The request form opens on what this studio is known for.
-function formFor(s: Card): string {
-  if (hasFormat(s, 'logo')) return 'logo-mugs'
-  if (hasFormat(s, 'horeca')) return 'tableware'
-  if (hasFormat(s, 'corporate-gifts')) return 'corporate-gifts'
-  if (offersMasterClasses(s)) return 'master-class'
-  if (hasFormat(s, 'corporate-workshop')) return 'corporate-workshop'
-  return 'other'
-}
-
-// Price lines grouped the way people read a price list.
-const GROUPS: [string, RegExp][] = [
-  ['Майстер-класи', /(?<!\p{L})мк(?!\p{L})|майстер-клас|заняття|урок|побачен|для двох|гончарств|ліплен|ліпк|розпис|гончарн\p{L}* (?:кол|круг)/iu],
-  ['Курси й абонементи', /курс|абонемент|\d+\s*занять|місяц/iu],
-  ['Для компаній', /корпоратив|тімбілд|тимбілд|для компан|для команд|груп[аиу]?\s+до|оптов|гурт/iu],
-  ['Коворкінг і послуги', /коворк|оренд|полиц|глина\s+\d|^\s*(?:випал|сертифікат)/iu],
-]
-// Prices from before 2025 move to «Старші ціни» when the studio has newer ones (they stay visible, but last).
-const OLD_GROUP = 'Старші ціни (до 2025 року)'
-function groupPrices(lines: PriceLine[]) {
-  const out = new Map<string, PriceLine[]>()
-  const hasNew = lines.some((l) => (l.year ?? 0) >= 2025)
-  for (const l of lines) {
-    if (hasNew && l.year && l.year < 2025) {
-      out.set(OLD_GROUP, [...(out.get(OLD_GROUP) ?? []), l])
-      continue
-    }
-    // Courses and company prices first: «МК» appears in many course lines too.
-    const order = [GROUPS[1], GROUPS[2], GROUPS[3], GROUPS[0]]
-    const g = order.find(([, re]) => re.test(l.text))?.[0] ?? 'Вироби'
-    out.set(g, [...(out.get(g) ?? []), l])
-  }
-  return [...GROUPS.map(([g]) => g), 'Вироби', OLD_GROUP].filter((g) => out.has(g)).map((g) => [g, out.get(g)!] as const)
-}
-
-const SHOW = 12
-
-function ListBlock({ title, items }: { title: string; items: string[] }) {
-  const head = items.slice(0, SHOW)
-  const rest = items.slice(SHOW)
-  return (
-    <div className="rounded-2xl bg-card p-4">
-      <p className="kicker mb-2">{title}</p>
-      <ul className="m-0 grid grid-cols-1 gap-1 pl-5">
-        {head.map((t) => <li key={t}>{t}</li>)}
-      </ul>
-      {rest.length > 0 && (
-        <details className="group mt-2">
-          <summary className="cursor-pointer list-none text-sm font-bold text-cobalt">
-            <span className="group-open:hidden">Ще {rest.length}</span>
-            <span className="hidden group-open:inline">Згорнути</span>
-          </summary>
-          <ul className="m-0 mt-1 grid grid-cols-1 gap-1 pl-5">
-            {rest.map((t) => <li key={t}>{t}</li>)}
-          </ul>
-        </details>
-      )}
-    </div>
-  )
-}
-
-function PriceItem({ p }: { p: PriceLine }) {
-  return (
-    <li className="rounded-xl bg-card px-4 py-3 [font-variant-numeric:lining-nums]">
-      {p.text}
-      {p.source && <span className="text-[12.5px] text-umber"> · {p.source}</span>}
-    </li>
-  )
 }
 
 export default async function StudioPage({ params }: Args) {

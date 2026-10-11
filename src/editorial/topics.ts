@@ -2,11 +2,11 @@ import type { Metadata } from 'next'
 
 import { topics, type Topic, type TopicCtx } from '@/content/topics'
 import { ogImage } from '@/utilities/ogImage'
-import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
-import { facts } from './facts'
+import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
+import { facts } from '@/lib/facts'
 
-import { isExhibitingOnly, publicPrices, splitSource } from './present'
-import { amountsIn, fmt, fromTo, near, spanOf } from './money'
+import { isExhibitingOnly, publicPrices, splitSource } from '@/lib/present'
+import { amountsIn, fmt, fromTo, near, spanOf } from '@/lib/money'
 
 // A museum or museum shop is listed on class pages only if its own services name a class it runs.
 const museumOnly = (s: StudioCard) =>
@@ -136,11 +136,11 @@ export async function topicCityLinks(topic: Topic, data: TopicData): Promise<{ l
   if (data.ctx.place) return []
   const format = topic.path.match(/^\/maister-klasy\/([a-z-]+)$/)?.[1]
   if (format) {
-    const { liveFormatCityPages } = await import('./waveA')
+    const { liveFormatCityPages } = await import('@/editorial/wave-a')
     return (await liveFormatCityPages()).filter((p) => p.format === format).sort((a, b) => b.count - a.count).map((p) => ({ label: p.cityName, href: `/maister-klasy/${p.city}/${p.format}` }))
   }
   if (topic.path === '/sertyfikaty') return (await certificateCities()).map((c) => ({ label: c.name, href: `/sertyfikaty/${c.slug}` }))
-  const { makerCities } = await import('./makers')
+  const { makerCities } = await import('@/lib/makers')
   const withPage = new Set((await makerCities()).map((g) => g.city.slug))
   return groupByCity(data.all)
     .filter((g) => g.studios.length >= MIN_LIST && withPage.has(g.city.slug))

@@ -8,7 +8,7 @@ import { StudioList } from '@/components/site/TopicPage'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios, MIN_LIST } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
-import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/lib/waveA'
+import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
 
 // One master-class format in one city (e.g. /maister-klasy/kyiv/honcharne-kolo). Exists only where the

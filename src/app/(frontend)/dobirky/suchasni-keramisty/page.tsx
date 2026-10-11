@@ -10,7 +10,7 @@ import { Faq } from '@/components/site/SelectionFaq'
 import { StudioCard } from '@/components/site/StudioCard'
 import { verses } from '@/content/verses'
 import { groupByCity, pluralUk } from '@/lib/catalog'
-import { contemporaryPicks } from '@/lib/selections'
+import { contemporaryPicks } from '@/editorial/contemporary'
 import { ogImage } from '@/utilities/ogImage'
 
 export const revalidate = 86400

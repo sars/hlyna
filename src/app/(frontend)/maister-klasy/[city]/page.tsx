@@ -17,9 +17,9 @@ import { pickVerse } from '@/content/verses'
 import { getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress, inCity, oblastLabel, staleNote } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
-import { cityContent } from '@/lib/places'
-import { certificateCities } from '@/lib/topics'
-import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/lib/waveA'
+import { cityContent } from '@/editorial/places'
+import { certificateCities } from '@/editorial/topics'
+import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/editorial/wave-a'
 import { fmt, roundNice, type Span } from '@/lib/money'
 
 export const revalidate = 86400
