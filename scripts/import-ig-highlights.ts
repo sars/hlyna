@@ -3,8 +3,9 @@
  *   pnpm payload run scripts/import-ig-highlights.ts        (DRY=1 to print only)
  * Source: UkraineCeramics/09_instagram/posts_scan/hl_extract.jsonl, one line per studio:
  *   {slug, checked:"YYYY-MM-DD", prices:[…], services:[…], address?, formats:[…]}
- * Only adds: new price/service lines (skipping ones already present), an address when the studio has none,
- * and format tags. Never removes or rewrites existing data. Idempotent.
+ * Adds new price/service lines; a fresh price replaces older lines for the same offer (old ones logged to price_history.jsonl);
+ * sets an address when the studio has none,
+ * and adds format tags. Idempotent.
  */
 import fs from 'node:fs'
 import { getPayload } from 'payload'
@@ -19,6 +20,16 @@ const FILE = process.env.HL_EXTRACT || '/Users/rodik/Claude/UkraineCeramics/09_i
 const DRY = process.env.DRY === '1'
 const FORMATS = new Set(['wheel', 'handbuilding', 'painting', 'kids', 'couples', 'courses', 'certificates', 'corporate-workshop', 'corporate-gifts', 'logo', 'horeca', 'new-year'])
 const norm = (s: string) => s.toLowerCase().replace(/\([^)]*\)/g, '').replace(/[^\p{L}\p{N}]+/gu, ' ').trim()
+const HISTORY = '/Users/rodik/Claude/UkraineCeramics/16_prices/price_history.jsonl'
+// The offer part of a price line: words before the first price/dash, without numbers.
+const offerWords = (s: string) =>
+  new Set(norm(s.split(/\s[—–-]\s|\d[\d\s]*\s*(?:грн|₴)/)[0]).split(' ').filter((w) => w.length > 2 && !/\d/.test(w)))
+function sameOffer(a: string, b: string) {
+  const A = offerWords(a), B = offerWords(b)
+  if (!A.size || !B.size) return false
+  const inter = [...A].filter((w) => B.has(w)).length
+  return inter / Math.min(A.size, B.size) >= 0.7
+}
 
 const rows = new Map<string, X>()
 for (const l of fs.readFileSync(FILE, 'utf8').split('\n')) if (l.trim()) { const x = JSON.parse(l) as X; rows.set(x.slug, x) }
@@ -33,7 +44,14 @@ for (const [slug, x] of rows) {
   const addS = (x.services ?? []).filter((t) => t && !have.has(norm(t)))
   const formats = [...new Set<Format>([...(doc.formats ?? []), ...((x.formats ?? []).filter((f) => FORMATS.has(f)) as Format[])])]
   const data: Partial<Studio> = {}
-  if (addP.length) data.prices = [...(doc.prices ?? []), ...addP.map((text) => ({ text }))]
+  if (addP.length) {
+    // Fresh prices replace older lines for the same offer (same wording before the price); replaced lines go to a
+    // history log so a price index over time stays possible.
+    const kept = (doc.prices ?? []).filter((p) => !addP.some((n) => sameOffer(p.text, n)))
+    const replaced = (doc.prices ?? []).filter((p) => !kept.includes(p))
+    if (replaced.length && !DRY) fs.appendFileSync(HISTORY, replaced.map((p) => JSON.stringify({ slug, replacedAt: x.checked, text: p.text })).join('\n') + '\n')
+    data.prices = [...kept, ...addP.map((text) => ({ text }))]
+  }
   if (addS.length) data.services = [...(doc.services ?? []), ...addS.map((text) => ({ text }))]
   if (x.address && !/\d/.test(doc.address ?? '')) data.address = x.address
   if (formats.length !== (doc.formats ?? []).length) data.formats = formats
