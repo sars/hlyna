@@ -13,28 +13,28 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 - **Honest:** only collected data; never invent studios, prices, cases, reviews. Say the model openly but briefly (`site.model` in `src/content/site.ts`). Don't publish the legal entity.
 - **Flexible wording:** no site-wide «від 30 штук»; minimum order lives in profiles. «Корпоратив з ліплення з глини».
 - **Voice:** `docs/voice/README.md` — factual lead, then at most one short verse epigraph (`Epigraph`, `src/content/verses.ts`), then warm, clear potters' prose. Never explain the verse.
-- **Language:** Ukrainian only; English later via Payload localization and `/en` routes; never Russian.
+- **Language:** Ukrainian only; English later via `/en` routes; never Russian.
 - **Scope:** studio-scale ceramics made in Ukraine. Makers who now work abroad, suppliers, factories, media, course platforms and gift-certificate aggregators stay as drafts.
 - **Photos:** only with the maker's consent; stock photos (`public/images/stock`, CC0) only for site chrome.
 - **Mobile first and fast:** server components by default, client components only for interaction, `next/image`, fonts self-hosted by `next/font`.
 - **No paid services** without the owner's explicit approval. No GitHub Actions/CI (paid minutes) — checks run locally (Stop hook, `pnpm lint`, `pnpm build`).
 
 ## Stack
-Next.js 16 (App Router) + Payload 3 (admin at `/admin`, Postgres) + Tailwind 4 with design tokens 1A in `src/app/(frontend)/globals.css` (`bg-clay`, `text-cobalt`, `bg-terra`, `text-umber`, `border-line`, `font-display`, utilities `kicker`, `h-display`, `band`). Fonts: Unbounded (headings) + Raleway (body).
+Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Auth (staff in `/panel`, studio owners in `/kabinet`) + Hono for `/api/panel` + Tailwind 4 with design tokens 1A in `src/app/(frontend)/globals.css` (`bg-clay`, `text-cobalt`, `bg-terra`, `text-umber`, `border-line`, `font-display`, utilities `kicker`, `h-display`, `band`). Fonts: Unbounded (headings) + Raleway (body).
 
 ## Where things are
 - `src/content/` — site facts (`site.ts`) and navigation (`navigation.ts`). Copy and menus are edited here, by an LLM.
 - `src/components/site/` — header, mega menu, footer, request form, JSON-LD.
 - `src/app/(frontend)/` — public pages; `llms.txt`, `health`, `manifest` routes.
-- `src/collections/` — Payload collections: Studios, Cities, Requests (+ template Pages, Posts, Media, Users).
-- `scripts/` — `import-studios.ts` (data → DB), `shots.mjs` (phone + desktop screenshots).
+- `src/server/` — data layer: `db/schema` (Drizzle, schema `app`), `services/*` (all writes: requests, claims, owner changes, studio editor, imports — each audited), `auth/` (Better Auth, guards), `api/panel.ts` (Hono), `telegram/` (bot buttons → same services), `publicCatalog.ts` + `legacy.ts` (rows → the record shapes in `src/types/catalog.ts` that pages render).
+- `src/app/(panel)/panel` + `src/components/panel/` — the admin panel (own layout and bundle; nothing of it loads on public pages, `scripts/check-bundles.mjs` enforces it).
+- `scripts/app/*` — data scripts (imports, tags, geocoding, fixes, invites); they refuse production without `PROD=1`. `scripts/snapshot.mjs` (page snapshots and diffs), `scripts/check-links.mjs`, `shots.mjs`.
 - `deploy/` — Docker Compose + Caddy on the owner's VPS, backups (`deploy/README.md`).
 
 ## Commands
-- `pnpm dev` — site on http://localhost:3000, admin on /admin (local Postgres `hlyna`).
+- `pnpm dev` — site on http://localhost:3000, panel on /panel (local Postgres, `DATABASE_URL`; invite yourself with `USER_ID=<email> BASE=http://localhost:3000 pnpm exec tsx scripts/app/invite.ts`).
 - `pnpm shots /path` — screenshots to `.shots/` (dev server must run). Look once per finished screen.
-- `pnpm import:studios` — import/refresh studios from `../UkraineCeramics/_master/all_entries.jsonl` (unchanged ones are skipped). `pnpm import:studios:prune` also deletes studios gone from the data that nobody enriched. `pnpm find:duplicates` lists likely duplicates; record them in `../UkraineCeramics/_ops/name_aliases.tsv`, run `python3 _ops/merge.py` there, then prune.
-- `pnpm generate:types` after collection changes; `pnpm exec tsc --noEmit` before finishing (the Stop hook runs it).
+- Schema changes: edit `src/server/db/schema`, `pnpm db:generate`, review the SQL in `drizzle/`, commit; apply with `pnpm db:migrate` (see deploy/README.md). `pnpm exec tsc --noEmit` before finishing (the Stop hook runs it).
 - `pnpm build` — production build (needs the database reachable).
 
 ## How to work

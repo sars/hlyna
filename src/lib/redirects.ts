@@ -1,18 +1,16 @@
 import { permanentRedirect } from 'next/navigation'
 
-import { appBackend } from './backend'
+import { currentCitySlug, currentStudioSlug } from '@/server/publicCatalog'
 
 // A renamed studio or city keeps its old URLs: before a page gives up with 404, check the slug history and 301 to
-// the current slug. Only the new data layer keeps that history (DATA_BACKEND=app); under Payload this is a no-op.
+// the current slug.
 
 export async function redirectOldStudioSlug(slug: string, path = (s: string) => `/vyrobnyky/${s}`): Promise<void> {
-  if (!appBackend()) return
-  const current = await (await import('@/server/publicCatalog')).currentStudioSlug(slug)
+  const current = await currentStudioSlug(slug)
   if (current) permanentRedirect(path(current))
 }
 
 export async function redirectOldCitySlug(slug: string, path: (city: string) => string): Promise<void> {
-  if (!appBackend()) return
-  const current = await (await import('@/server/publicCatalog')).currentCitySlug(slug)
+  const current = await currentCitySlug(slug)
   if (current) permanentRedirect(path(current))
 }

@@ -38,8 +38,8 @@ const read = (rel) => {
 for (const m of manifests) {
   const route = path.relative(path.join(NEXT, 'server', 'app'), m).replace('_client-reference-manifest.js', '')
   const isPanel = route.startsWith('panel') || route.startsWith('(panel)')
-  const isPayload = route.startsWith('(payload)') || route.startsWith('admin') || route.startsWith('api')
-  if (isPayload) continue
+  const isApi = route.startsWith("api")
+  if (isApi) continue
   const src = fs.readFileSync(m, 'utf8')
   // The manifest lists every client module the route renders, keyed by its source path.
   const modules = [...src.matchAll(/"([^"]+\.(?:tsx|ts|jsx|js|mjs))"/g)].map((x) => x[1])

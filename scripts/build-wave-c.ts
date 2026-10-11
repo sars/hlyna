@@ -1,6 +1,6 @@
 /**
  * Wave C: build the data packs writers use (one JSON per page) for the corporate-occasion and winter pages.
- *   HLYNA_SCRIPT=1 pnpm payload run scripts/build-wave-c.ts
+ *   HLYNA_SCRIPT=1 pnpm exec tsx scripts/build-wave-c.ts
  * Reads the published catalogue (same filters as the site), the structured JSON the pages render
  * (src/content/waveC/{formats,facts,newyear}.json) and the research notes, and writes
  * UkraineCeramics/_site_content/waveC/data/<id>.json and INDEX.json. Nothing is invented: every fact in a pack

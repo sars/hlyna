@@ -90,6 +90,6 @@ services:
 
 volumes:
   pgdata: # the database; backed up by deploy/backup.sh
-  media: # Payload uploads; backed up by deploy/backup.sh
+  media: # uploaded photos (/media/*); backed up by deploy/backup.sh
   caddy_data:
   caddy_config:

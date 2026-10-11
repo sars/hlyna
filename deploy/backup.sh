@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Nightly backup: pg_dump (custom format) + Payload media, keeps 14 days.
+# Nightly backup: pg_dump (custom format) + uploaded media, keeps 14 days.
 #   deploy/backup.sh                 run by hlyna-backup.timer
 #   BACKUP_DIR=/tmp/x deploy/backup.sh
 set -euo pipefail

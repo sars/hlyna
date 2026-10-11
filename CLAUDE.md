@@ -1,7 +1,5 @@
 @AGENTS.md
 
-Payload CMS reference: `.claude/skills/payload/SKILL.md` (details in `.claude/skills/payload/reference/`).
-
 <!-- BEGIN:nextjs-agent-rules -->
 
 # This is NOT the Next.js you know

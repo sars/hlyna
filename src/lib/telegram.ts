@@ -1,5 +1,5 @@
 // Telegram messages to the site owner (TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID), optionally with inline buttons
-// that the webhook in app/(payload)/api/telegram/webhook handles. Never throws: a failed notification must not
+// that the webhook in app/api/telegram/webhook handles. Never throws: a failed notification must not
 // break the action that triggered it.
 
 export type TgButton = { text: string; callback_data?: string; url?: string }

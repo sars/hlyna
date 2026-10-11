@@ -37,3 +37,4 @@ verify-report.json
 cutover-*.log
 migration-report-*.json
 verify-report-*.json
+.env*.local

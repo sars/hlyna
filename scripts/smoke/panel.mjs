@@ -73,6 +73,8 @@ async function run(name, viewport, first) {
 
 try {
   await run('desktop', { width: 1280, height: 860 }, true)
+  // Sign-in is rate-limited to 3 attempts per 10 s per IP: let the desktop attempts expire first.
+  await new Promise((r) => setTimeout(r, 11_000))
   await run('phone', { width: 390, height: 844 }, false)
 } catch (e) {
   errors.push(`FAILED: ${e.message}`)

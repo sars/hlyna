@@ -1,6 +1,6 @@
 /**
  * Wave B: build the data packs writers use (one JSON per page) and the derived data the pages render.
- *   HLYNA_SCRIPT=1 pnpm payload run scripts/build-wave-b.ts
+ *   HLYNA_SCRIPT=1 pnpm exec tsx scripts/build-wave-b.ts
  * Reads the published catalogue (same filters as the site) plus research files in UkraineCeramics, writes:
  *   - UkraineCeramics/_site_content/waveB/data/<id>.json and INDEX.json (for writers; nothing invented)
  *   - src/content/waveB/events.json, museums.json (rendered on /podiyi and /muzei-keramiky)

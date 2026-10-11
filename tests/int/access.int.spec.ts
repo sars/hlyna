@@ -1,17 +1,21 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-// Kabinet edits: the route must refuse before reading any input when the owner doesn't own the studio.
-const kab = vi.hoisted(() => ({ owner: null as null | { id: number }, owned: null as null | { id: number; slug: string } }))
-vi.mock('@/lib/kabinet', () => ({
-  MAX_PHOTOS: 10,
-  currentOwner: async () => kab.owner,
-  ownedStudio: async () => kab.owned,
-  payloadClient: async () => {
-    throw new Error('must not be reached')
+// Kabinet edits: no session → 401; a studio the owner doesn't own → 403 (from the service), before anything is saved.
+const st = vi.hoisted(() => ({ user: null as null | { id: string; role: string; name: string }, calls: 0 }))
+class Forbidden extends Error {}
+class Invalid extends Error {}
+vi.mock('@/server/auth/guards', () => ({ currentUser: async () => st.user }))
+vi.mock('@/server/db', () => ({ db: {} }))
+vi.mock('@/server/services/limits', () => ({ rateLimited: async () => false, clientIp: () => '127.0.0.1' }))
+vi.mock('@/server/services/studioEditor', () => ({ Invalid }))
+vi.mock('@/server/services/kabinet', () => ({
+  Forbidden,
+  submitOwnerEdit: async () => {
+    st.calls++
+    throw new Forbidden('Немає доступу до цієї студії.')
   },
 }))
-vi.mock('@/lib/telegram', () => ({ notifyOwnerTelegram: async () => undefined, ownerEditKeyboard: () => undefined }))
 
 const post = async () => {
   const { POST } = await import('@/app/(frontend)/kabinet/api/studio/[slug]/route')
@@ -22,29 +26,32 @@ const post = async () => {
 
 describe('kabinet access', () => {
   beforeEach(() => {
-    kab.owner = null
-    kab.owned = null
+    st.user = null
+    st.calls = 0
   })
-  it('401 without a session', async () => {
+  it('401 without a session, nothing submitted', async () => {
+    expect((await post()).status).toBe(401)
+    expect(st.calls).toBe(0)
+  })
+  it('401 for a signed-in non-owner (staff session is not a cabinet session)', async () => {
+    st.user = { id: 'u1', role: 'editor', name: 'Редактор' }
     expect((await post()).status).toBe(401)
   })
   it('403 for a studio the owner does not own', async () => {
-    kab.owner = { id: 7 }
+    st.user = { id: 'o1', role: 'owner', name: 'Власниця' }
     expect((await post()).status).toBe(403)
   })
 })
 
+vi.mock('@/server/services/publicForms', () => ({
+  submitRequest: async () => ({ ok: true, id: 12 }),
+}))
+
 describe('public request create response', () => {
-  it('anonymous create answers with the id only', async () => {
-    const { publicCreateResponse } = await import('@/collections/Requests')
-    const full = { id: 12, status: 'new', commission5: 50, notes: 'internal', studiosSent: [1] }
-    const out = await publicCreateResponse({ operation: 'create', req: { user: null }, result: full } as never)
-    expect(out).toEqual({ id: 12 })
-  })
-  it('logged-in users and other operations get the full result', async () => {
-    const { publicCreateResponse } = await import('@/collections/Requests')
-    const full = { id: 12, status: 'new', notes: 'internal' }
-    expect(await publicCreateResponse({ operation: 'create', req: { user: { id: 1 } }, result: full } as never)).toEqual(full)
-    expect(await publicCreateResponse({ operation: 'update', req: { user: null }, result: full } as never)).toEqual(full)
+  it('answers with the id only (no internal fields)', async () => {
+    const { POST } = await import('@/app/api/zapyt/route')
+    const res = await POST(new Request('http://localhost/api/zapyt', { method: 'POST', body: JSON.stringify({ what: 'other' }) }))
+    expect(res.status).toBe(201)
+    expect(await res.json()).toEqual({ ok: true, id: 12, doc: { id: 12 } })
   })
 })

@@ -1,12 +1,10 @@
-import configPromise from '@payload-config'
-import { getPayload } from 'payload'
 import { unstable_cache } from 'next/cache'
 import { cache } from 'react'
 
-import type { City, Studio } from '@/payload-types'
+import type { City, Studio } from '@/types/catalog'
 import { cleanAddress, cleanPublic } from './present'
 import { wholeAmountsIn } from './money'
-import { appBackend } from './backend'
+import { loadPublicCatalog, loadPublicPhotos } from '@/server/publicCatalog'
 
 // Read-only data layer for public pages. One cached query per request; pages are statically
 // generated and revalidated, so the database is hit rarely.
@@ -26,39 +24,21 @@ export const TYPE_LABEL: Record<string, string> = {
 // fresher Instagram evidence. Such a studio keeps its profile but is left out of every list, count and map.
 export type StudioCard = Studio & { cityDoc: City | null; unverified?: boolean }
 
-// depth 0 + a separate city lookup keeps the cached payload small (Next's data cache limit is 2 MB per entry).
+// Studios and cities load separately so the cached entry stays small (Next's data cache limit is 2 MB per entry).
 const loadStudiosRaw = async (): Promise<StudioCard[]> => {
     // The Docker build has no database: render empty and let /revalidate refill after deploy.
     if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
-    if (appBackend()) {
-      const { loadPublicCatalog } = await import('@/server/publicCatalog')
-      const { studios, cities } = await loadPublicCatalog()
-      const byId = new Map(cities.map((c) => [c.id, c]))
-      return studios.map((s) => ({ ...publicText(s), unverified: isUnverified(s), cityDoc: byId.get(s.city as number) ?? null }))
-    }
-    const payload = await getPayload({ config: configPromise })
-    const [studios, cities] = await Promise.all([
-      payload.find({
-        collection: 'studios',
-        where: { _status: { equals: 'published' } },
-        depth: 0,
-        limit: 5000,
-        pagination: false,
-        overrideAccess: false,
-        select: { sources: false, consent: false, sourceId: false, confidence: false, photos: false },
-      }),
-      payload.find({ collection: 'cities', depth: 0, limit: 2000, pagination: false, overrideAccess: false }),
-    ])
-    const byId = new Map(cities.docs.map((c) => [c.id, c]))
-    return studios.docs.map((s) => ({ ...publicText(s as Studio), unverified: isUnverified(s as Studio), cityDoc: (typeof s.city === 'object' ? s.city : byId.get(s.city as number)) ?? null }))
+    const { studios, cities } = await loadPublicCatalog()
+    const byId = new Map(cities.map((c) => [c.id, c]))
+    return studios.map((s) => ({ ...publicText(s), unverified: isUnverified(s), cityDoc: byId.get(s.city as number) ?? null }))
 }
 
-// Scripts (pnpm payload run …) have no Next data cache: HLYNA_SCRIPT=1 reads the database directly,
+// Scripts (tsx …) have no Next data cache: HLYNA_SCRIPT=1 reads the database directly,
 // so build scripts see exactly what the pages see.
 let scriptLoad: Promise<StudioCard[]> | null = null
-const loadStudios = process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= loadStudiosRaw()) : unstable_cache(loadStudiosRaw, ['studios-all-v6', appBackend() ? 'app' : 'payload'], { revalidate: 3600, tags: ['studios'] })
+const loadStudios = process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= loadStudiosRaw()) : unstable_cache(loadStudiosRaw, ['studios-all-v7'], { revalidate: 3600, tags: ['studios'] })
 
-// Research annotations stay in the database (admin sees them) but never reach public pages.
+// Research annotations stay in the database (the panel shows them) but never reach public pages.
 const cleanList = <T extends { text: string }>(xs?: T[] | null) => (xs ?? []).map((x) => ({ ...x, text: cleanPublic(x.text) })).filter((x) => x.text)
 const publicText = (s: Studio): Studio => ({
   ...s,
@@ -95,20 +75,9 @@ export type StudioPhoto = { url: string; full: string; alt: string; width: numbe
 export const getStudioPhotos = unstable_cache(
   async (id: number): Promise<StudioPhoto[]> => {
     if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
-    if (appBackend()) return (await import('@/server/publicCatalog')).loadPublicPhotos(id)
-    const payload = await getPayload({ config: configPromise })
-    const doc = await payload
-      .findByID({ collection: 'studios', id, depth: 1, overrideAccess: true, select: { photos: true, consent: true, _status: true } })
-      .catch(() => null)
-    if (!doc?.consent?.photos || doc._status !== 'published') return []
-    return (doc.photos ?? [])
-      .filter((p): p is Exclude<typeof p, number> => typeof p === 'object' && Boolean(p?.url))
-      .map((p) => {
-        const big = p.sizes?.large?.url ? p.sizes.large : p
-        return { url: big.url as string, full: p.url as string, alt: p.alt || '', width: big.width || 1400, height: big.height || 933 }
-      })
+    return loadPublicPhotos(id)
   },
-  ['studio-photos-v1', appBackend() ? 'app' : 'payload'],
+  ['studio-photos-v2'],
   { revalidate: 3600, tags: ['studios'] },
 )
 

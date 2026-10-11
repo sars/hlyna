@@ -1,4 +1,4 @@
-import type { Studio } from '@/payload-types'
+import type { Studio } from '@/types/catalog'
 
 // What a studio makes: summary, products and services (not the long research description, which mentions
 // techniques like «декорування» that are not products). Used by product pages and product chips.

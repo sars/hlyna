@@ -1,4 +1,3 @@
-import { withPayload } from '@payloadcms/next/withPayload'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -13,15 +12,10 @@ const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
 const nextConfig: NextConfig = {
   // Self-hosted in Docker (see Dockerfile / deploy/README.md).
   output: 'standalone',
-  // Temporarily required on Windows until Next.js fixes Turbopack Sass resolution.
-  // See: https://github.com/vercel/next.js/issues/86431
-  sassOptions: {
-    loadPaths: ['./node_modules/@payloadcms/ui/dist/scss/'],
-  },
   images: {
     localPatterns: [
       {
-        pathname: '/api/media/file/**',
+        pathname: '/media/**',
       },
       {
         pathname: '/images/**',
@@ -49,10 +43,17 @@ const nextConfig: NextConfig = {
 
     return webpackConfig
   },
+  // The Payload admin is gone; old bookmarks land on the panel.
+  async redirects() {
+    return [
+      { source: '/admin', destination: '/panel', statusCode: 301 },
+      { source: '/admin/:path*', destination: '/panel', statusCode: 301 },
+    ]
+  },
   reactStrictMode: true,
   turbopack: {
     root: path.resolve(dirname),
   },
 }
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+export default nextConfig

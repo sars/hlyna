@@ -1,6 +1,6 @@
 /**
  * Wave A: build the data packs writers use (one JSON per page) and the derived shop data the pages render.
- *   HLYNA_SCRIPT=1 pnpm payload run scripts/build-wave-a.ts
+ *   HLYNA_SCRIPT=1 pnpm exec tsx scripts/build-wave-a.ts
  * Reads the published catalogue (same filters as the site) plus research files in UkraineCeramics, writes:
  *   - UkraineCeramics/_site_content/waveA/data/<id>.json and INDEX.json (for writers; nothing invented)
  *   - src/content/waveA/etsy.json, stockists.json (rendered on /de-kupyty-keramiku)

@@ -1,4 +1,4 @@
-// Cabinet smoke on the new stack (DATA_BACKEND=app): invite → set password → cabinet list → edit (text, price, photo)
+// Cabinet smoke: invite → set password → cabinet list → edit (text, price, photo)
 // → saved as a change set; sign out, wrong password, sign in; claim form; request form. Desktop 1280 and phone 390.
 // Screenshots in .shots/m3/. Also checks the database after each write.
 import { chromium } from '@playwright/test'

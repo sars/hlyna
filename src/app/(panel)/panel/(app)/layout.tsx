@@ -1,6 +1,4 @@
-import { notFound } from 'next/navigation'
 
-import { appBackend } from '@/lib/backend'
 import type { ReactNode } from 'react'
 
 import { AppSidebar } from '@/components/panel/shell/app-sidebar'
@@ -13,8 +11,6 @@ export const dynamic = 'force-dynamic'
 
 /** Everything behind the sign-in: staff only (owners are sent to their cabinet). */
 export default async function PanelAppLayout({ children }: { children: ReactNode }) {
-  // The panel only exists once the site runs on the new stack (DATA_BACKEND=app); before the cutover it is a 404.
-  if (!appBackend()) notFound()
   const me = await panelUserOrRedirect('editor')
   const role = me.role === 'admin' ? 'admin' : 'editor'
   const menu = <UserMenu me={{ name: me.name, email: me.email, role }} className="w-full" />

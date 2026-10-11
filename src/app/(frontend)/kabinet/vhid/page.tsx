@@ -3,10 +3,10 @@ import React from 'react'
 
 import { container } from '@/components/site/Bits'
 import { AuthForm } from '@/components/site/KabinetForms.client'
-import { currentOwner } from '@/lib/kabinet'
+import { kabinetOwner } from '@/lib/kabinetData'
 
 export default async function Login() {
-  if (await currentOwner()) redirect('/kabinet')
+  if (await kabinetOwner()) redirect('/kabinet')
   return (
     <main className={`${container} grid gap-5 pt-8 pb-16`}>
       <h1 className="h-display m-0 text-[clamp(24px,3.4vw,36px)]">Вхід до кабінету студії</h1>

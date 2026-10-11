@@ -1,15 +1,13 @@
-// Map rows of the new `app` schema back to the document shape Payload returns today (payload-types `Studio`,
-// `City`, `Request`, `Claim`). Used by the migration verifier now and by the public catalog in phase 3, so the
-// public pages and lib/* keep working unchanged when the data source switches.
+// Map rows of the `app` schema into the record shapes the public pages render (src/types/catalog: `Studio`, `City`).
+// The shapes are the ones the site was built on (inherited from the former Payload collections), so pages and lib/*
+// stay simple: they never see Drizzle rows.
 import type { InferSelectModel } from 'drizzle-orm'
 
-import type { cities, claims, requests, studioPrices, studios } from './db/schema'
+import type { cities, studioPrices, studios } from './db/schema'
 
 type StudioRow = InferSelectModel<typeof studios>
 type PriceRow = InferSelectModel<typeof studioPrices>
 type CityRow = InferSelectModel<typeof cities>
-type RequestRow = InferSelectModel<typeof requests>
-type ClaimRow = InferSelectModel<typeof claims>
 
 const iso = (v: string | null | undefined) => (v ? new Date(v).toISOString() : null)
 const texts = (xs: string[] | null | undefined) => (xs ?? []).map((text) => ({ text }))
@@ -97,50 +95,5 @@ export function toLegacyStudio(s: StudioRow, prices: PriceRow[], photoIds: numbe
     updatedAt: iso(s.updatedAt),
     createdAt: iso(s.createdAt),
     _status: s.visibility === 'public' ? ('published' as const) : ('draft' as const),
-  }
-}
-
-export function toLegacyRequest(r: RequestRow, studiosSent: number[]) {
-  return {
-    id: r.id,
-    what: r.what,
-    details: r.details,
-    studioName: r.studioName,
-    studioLinks: r.studioLinks,
-    photoConsent: r.photoConsent,
-    quantity: r.quantity,
-    deadline: r.deadline,
-    budgetPerItem: r.budgetPerItem,
-    city: r.city,
-    logo: r.logo,
-    contactName: r.contactName,
-    contactPhoneOrTelegram: r.contactPhoneOrTelegram,
-    contactEmail: r.contactEmail,
-    sourcePage: r.sourcePage,
-    status: r.status,
-    studiosSent,
-    dealAmount: r.dealAmountKop == null ? null : r.dealAmountKop / 100,
-    commission5: r.commissionKop == null ? null : r.commissionKop / 100,
-    notes: r.notes,
-    updatedAt: iso(r.updatedAt),
-    createdAt: iso(r.createdAt),
-  }
-}
-
-export function toLegacyClaim(c: ClaimRow, studioId: number | null, otherStudios: number[], legacyOwnerId: (userId: string | null) => number | null) {
-  return {
-    id: c.id,
-    status: c.status,
-    rejectReason: c.rejectReason,
-    studio: studioId,
-    otherStudios,
-    name: c.name,
-    contact: c.contact,
-    represents: c.represents,
-    linkToOwner: legacyOwnerId(c.linkToOwnerId),
-    owner: legacyOwnerId(c.ownerId),
-    notes: c.notes,
-    updatedAt: iso(c.updatedAt),
-    createdAt: iso(c.createdAt),
   }
 }

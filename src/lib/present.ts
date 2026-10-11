@@ -1,6 +1,6 @@
 // Presentation helpers: turn raw research data into tidy public text. Display-only: the database
 // keeps everything; these functions decide what a visitor (and an LLM) sees.
-import type { City, Studio } from '@/payload-types'
+import type { City, Studio } from '@/types/catalog'
 
 import { amountsIn } from './money'
 

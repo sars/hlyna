@@ -1,6 +1,6 @@
 # Deploy: fresh Ubuntu VPS (Hostinger)
 
-Three containers from `compose.yaml`: `app` (Next.js + Payload), `db` (Postgres 16, not exposed), `caddy` (HTTPS for hlyna.com.ua; www and hlyna.com redirect to it). The app lives in `/opt/hlyna`.
+Three containers from `compose.yaml`: `app` (Next.js: site, /panel, /kabinet, APIs), `db` (Postgres 16, not exposed), `caddy` (HTTPS for hlyna.com.ua; www and hlyna.com redirect to it). The app lives in `/opt/hlyna`.
 
 ## 1. DNS (at the registrar)
 A records, all pointing to the VPS IPv4 (add AAAA too if the VPS has IPv6):
@@ -44,7 +44,7 @@ nano .env
 ```
 Fill in:
 - `POSTGRES_PASSWORD` = `openssl rand -hex 24`
-- `PAYLOAD_SECRET`, `CRON_SECRET`, `PREVIEW_SECRET` = `openssl rand -hex 32` each
+- `BETTER_AUTH_SECRET`, `REVALIDATE_SECRET`, `TELEGRAM_WEBHOOK_SECRET` = `openssl rand -hex 32` each; `BETTER_AUTH_URL=https://hlyna.com.ua`
 - `NEXT_PUBLIC_SERVER_URL=https://hlyna.com.ua`
 - `DATABASE_URL` can stay as is: compose overrides it with the db container address.
 
@@ -76,11 +76,11 @@ cd /opt/hlyna && deploy/release.sh    # git pull + build + up -d + health check
 Same thing by hand: `git pull && docker compose up -d --build`.
 
 ## Database migrations
-- **Production runs them automatically.** `prodMigrations` in `src/payload.config.ts` applies every pending migration from `src/migrations/` when the app starts (`NODE_ENV=production`). Applied ones are tracked in the `payload_migrations` table, so a restart is a no-op. A fresh database is built entirely by `20261010_140549_initial`.
-- **Dev uses push.** `pnpm dev` syncs the local schema straight from the collections; no migration is needed to try a change.
-- **After changing collections or fields:** run `pnpm payload migrate:create <short_name>` (e.g. `add_studio_tags`), review the generated `src/migrations/<stamp>_<name>.ts`, run `pnpm generate:types`, and commit the `.ts`, `.json` and updated `index.ts` together with the collection change. The next `deploy/release.sh` applies it.
-- **Check a migration before deploying:** `createdb hlyna_migtest && DATABASE_URL=postgresql://localhost:5432/hlyna_migtest pnpm payload migrate && dropdb hlyna_migtest`.
-- Status on the server: `docker compose exec db psql -U hlyna hlyna -c "select name, batch, created_at from payload_migrations"`. Never edit a migration that production has already applied; add a new one.
+- **Schema `app` is managed by Drizzle.** Change `src/server/db/schema/*`, run `pnpm db:generate`, review the generated SQL in `drizzle/`, commit it with the code.
+- **Apply on production before (or together with) the deploy that needs it**, from a clean checkout of `main` on the Mac through the SSH tunnel:
+  `ssh -N -L 15432:172.18.0.2:5432 hlyna &` then `DATABASE_URL=postgres://hlyna:<pw>@127.0.0.1:15432/hlyna pnpm db:migrate` (drizzle-kit records applied files in schema `drizzle`). Take a backup first for anything destructive.
+- **Check a migration first** on a fresh prod dump restored locally (`createdb hlyna_migtest`, `pg_restore`, `pnpm db:migrate`).
+- The former Payload tables (schema `public`) were dropped on 2026-10-12; see `docs/replace-payload-cutover.md` for the backup that holds them.
 
 ## Everyday commands
 ```bash

@@ -1,6 +1,6 @@
 // @vitest-environment node
-// Milestone 4: the public catalogue read from schema `app` (DATA_BACKEND=app). Same document shape and order as
-// Payload's anonymous read, hidden fields left out, photos only with consent, old slugs resolved for 301s.
+// The public catalogue read from schema `app`: record shape and order the pages expect, hidden fields left out,
+// photos only with consent, old slugs resolved for 301s.
 // Uses PANEL_TEST_DATABASE_URL (default hlyna_apptest).
 import { sql } from 'drizzle-orm'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'

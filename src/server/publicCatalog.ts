@@ -1,15 +1,14 @@
-// Public catalogue reads on the new data layer (DATA_BACKEND=app). Returns exactly what lib/catalog.ts got from
-// Payload before: published studios in Payload's document shape (via legacy.ts), sorted by name, with the fields
-// Payload's field access hides from anonymous readers left out. Pages and lib/* don't change.
+// Public catalogue reads: published studios in the record shape the pages render (via legacy.ts), sorted by name,
+// with internal fields (owner text, unapproved quote, consent, sources…) left out.
 import { and, asc, eq, inArray } from 'drizzle-orm'
 
-import type { City, Studio } from '@/payload-types'
+import type { City, Studio } from '@/types/catalog'
 import { db, schema } from './db'
 import { toLegacyCity, toLegacyStudio } from './legacy'
 
 const { studios, studioPrices, cities, studioPhotos, media, studioSlugHistory, citySlugHistory } = schema
 
-// Fields the Payload query left out (select) or Payload's field access hid from anonymous reads.
+// Internal fields never shown to anonymous readers.
 const HIDDEN = ['sources', 'consent', 'sourceId', 'confidence', 'photos', 'ownerAbout', 'ownerNews', 'pendingOwnerChanges'] as const
 
 export async function loadPublicCatalog(): Promise<{ studios: Studio[]; cities: City[] }> {
@@ -25,9 +24,9 @@ export async function loadPublicCatalog(): Promise<{ studios: Studio[]; cities: 
   const out = rows.map((r) => {
     const doc = toLegacyStudio(r, byStudio.get(r.id) ?? [], []) as Record<string, unknown>
     for (const k of HIDDEN) delete doc[k]
-    // ownerQuote is readable to the public only once approved (Payload field access).
+    // ownerQuote is public only once approved.
     if (!r.ownerQuoteApproved) delete doc.ownerQuote
-    // Payload returns null, not [], for empty localized arrays.
+    // Empty services/products are null (the shape pages were built on).
     for (const k of ['services', 'products'] as const) if (Array.isArray(doc[k]) && !(doc[k] as unknown[]).length) doc[k] = null
     return doc as unknown as Studio
   })

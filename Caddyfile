@@ -33,7 +33,7 @@ hlyna.com.ua {
 	}
 
 	# Uploaded images straight from the media volume (the app writes them there). /api/media/file/* is the
-	# Payload-era address of the same files: one permanent hop to /media/*.
+	# Old (pre-2026-10-12) address of the same files: one permanent hop to /media/*.
 	@legacyMedia path_regexp legacyMedia ^/api/media/file/(.+)$
 	redir @legacyMedia /media/{re.legacyMedia.1} permanent
 	handle_path /media/* {

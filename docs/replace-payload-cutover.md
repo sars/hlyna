@@ -118,3 +118,14 @@ container, and the media tar back into the volume.
 - Owner `owner_1` («Осоння», both studios) is active; it has no password yet (the studio never used its first link),
   so issue a fresh invite when they ask (`USER_ID=owner_1 … scripts/app/invite.ts`). Admin invite issued for Rodion.
 - Payload stays installed (read-only fallback: `DATA_BACKEND` unset + restart) until removal after a stable week.
+
+## Payload removal (2026-10-12, Rodion: «давай все зараз»)
+Done the same night instead of after a stable week.
+
+- **Backup first:** `/var/backups/hlyna/pre-payload-removal-20261012-012103.dump` (pg_dump -Fc, whole DB, 69 tables: 46 Payload in `public`, 23 in `app`; `pg_restore --list` checked) + `media-pre-payload-removal-20261012-012103.tgz` (empty volume, no photos yet). This dump is the only copy of the Payload tables — keep it.
+- **Code:** Payload removed completely — collections, `payload.config.ts`, `payload-types.ts` (catalogue shapes kept in `src/types/catalog.ts`), the `(payload)` route group (`/admin`, REST, GraphQL), hooks/access/fields, Payload migrations, the legacy cabinet auth (`lib/kabinet.ts`, `lib/ownerAuth.ts`) and legacy Telegram handler, the `DATA_BACKEND` flag (the new stack is the only path), the Payload-booting scripts (`scripts/*.ts` → `scripts/app/*`), `migrate-from-payload` / `verify-migration` (git history only), `@payloadcms/*`, `payload`, `graphql`. `/admin` → 301 `/panel`. The Telegram webhook moved to `src/app/api/telegram/webhook` (same URL).
+- **Database:** `deploy/sql/2026-10-12-drop-payload.sql` drops every `public` table and enum (reviewed list; nothing in `app`/`drizzle` depends on them; fails and rolls back if anything is left in `public`). Tested on a fresh prod dump before running on prod.
+- **Verification:** tests (111), tsc, lint, production build, bundle check, a 60-URL sample covering every page type (local vs prod and prod before vs after), panel + cabinet smoke, webhook 403 without the secret, prod check-links.
+
+**Rollback** (if ever needed): redeploy commit `d98065d` (the last code that still contains Payload, running with `DATA_BACKEND=app`) — `git checkout d98065d && bash deploy/push.sh` from a clean checkout — and, only if Payload itself must serve again, restore its tables from the dump:
+`ssh hlyna 'cd /opt/hlyna && docker compose exec -T db pg_restore -U hlyna -d hlyna -n public --no-owner < /var/backups/hlyna/pre-payload-removal-20261012-012103.dump'`, then unset `DATA_BACKEND` in `.env` and restart the app. Anything written through the panel/cabinet after the cutover lives only in `app.*`.
