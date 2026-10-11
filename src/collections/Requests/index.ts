@@ -19,7 +19,7 @@ const adminOnly: { create: FieldAccess; update: FieldAccess } = {
  * The public form only needs to know the request was saved: a create without a logged-in user
  * answers with the id alone, so internal fields (status, studiosSent, commission5, notes…) never leave the server.
  */
-const publicCreateResponse: CollectionAfterOperationHook = ({ operation, req, result }) => {
+export const publicCreateResponse: CollectionAfterOperationHook = ({ operation, req, result }) => {
   if (operation !== 'create' || req.user || !result || typeof result !== 'object') return result
   return { id: (result as { id: number }).id } as typeof result
 }

@@ -1,0 +1,500 @@
+# Дизайн-система «Глина» — єдине джерело для UI
+
+Оновлено 11.10.2026. Це **специфікація** для кожного агента, який торкається `src/components/*`, `src/app/(frontend)/*` або `globals.css`. Якщо щось тут розходиться з кодом — правильний цей документ; якщо чогось тут нема — спочатку допиши сюди, потім у код.
+
+Звідки взято: бриф головної `README.md`, історія `history.md`, затверджений макет `template/index.html`, варіанти внутрішніх сторінок `experiments/design-options/` (власник обрав **шапку A**, **внутрішню A** і **смугу цифр із B**), фотоплан `photo-plan.md`, голос `docs/voice/README.md`, правила сайту `AGENTS.md`. Живий приклад кожного примітива — `/dev/styleguide` (§8).
+
+---
+
+## 1. Принципи
+
+1. **Реєстр, не лендінг.** Кістяний папір, чорнило, кобальт як полива, одна теракотова крапка (знак-куманець). Жодних тіней, градієнтів, великих радіусів, карток «із повітрям».
+2. **Лінійки замість карток.** Структуру задають лінійки: 2px чорнило під заголовками і в шапці, 1px напівпрозорі між рядками й колонками. Фон у блоків нема (виняток: плитки цифр і службові примітки на `paper-2`, біла плашка цитати).
+3. **Одна теракота.** Теракота `#b4532e` — тільки знак у шапці/футері, великі номери, лічильники міст, пунктир словника. Ніколи — кнопки, фони, тексти на темному. Дрібний теракотовий текст — лише `terracotta-text`.
+4. **Кобальт — дія і число.** Кнопки запиту, панелі, посилання в таблицях, цифри у смузі фактів, «+/–» у FAQ, епіграф. Персик — акцент тільки на темному.
+5. **Запит — перший.** «Отримати пропозиції» видно зверху (шапка + кнопка в геро), після відповіді (смуга після цін) і в кінці (смуга або форма в бічній колонці); на телефоні — закріплений бар.
+6. **Порядок для ЛЛМ.** Крихти → кікер → H1 → лід із цифрами і датою → смуга цифр → таблиця → деталі → FAQ → «Оновлено». Вірш — один, після ліду, не в таблицях і не в FAQ, без пояснення.
+7. **Фото за змістом і зі згоди.** Архів власника без явних знаків студії, без портретів «у камеру», без підписів; чужі — лише CC0/Unsplash і лише там, де архів порожній; профілі студій — тільки фото самої студії. Деталі — `photo-plan.md`.
+8. **Мобільний перший і швидкий.** Серверні компоненти; клієнтські лише для взаємодії (меню, форма, мапа, бар). Нативні `details`, `dialog`, `popover`; без shadcn/Radix. Жодного горизонтального скролу; таблиці на телефоні стають стеком.
+9. **Один набір імен.** Токени названі за роллю (`paper`, `ink`, `rule`, `terracotta-text`), палітра 1A і її утиліти (`bg-clay`, `kicker`, `h-display`, `band`) вилучаються повністю; змішувати не можна.
+10. **Нічого вигаданого.** Усі числа у смузі фактів, таблицях і прикладах — із `stats()`/`facts()`/`ctx`; у стайлгайді — реальні студії з бази або порожній стан.
+
+---
+
+## 2. Токени
+
+### 2.1 Кольори (`@theme` у `globals.css`)
+
+| Токен | Значення | Роль |
+|---|---|---|
+| `--color-paper` | `#efe9de` | фон сторінки, шапки, футера, мегаменю, шухляди |
+| `--color-paper-2` | `#e4dccd` | плитки цифр, службові примітки («студія ще не вказала»), мапа до завантаження |
+| `--color-paper-white` | `#ffffff` | біла плашка цитати/відповіді (`QuoteBlock`) |
+| `--color-ink` | `#15130f` | текст, 2px лінійки, кнопка за замовчуванням, чорні панелі й картки |
+| `--color-ink-2` | `#4e483f` | другорядний текст, кікери, крихти, підписи, шапка таблиці |
+| `--color-cobalt` | `#1d3ec6` | кобальтові панелі й форма запиту, посилання в таблицях, цифри, «+/–», підкреслення меню, фокус |
+| `--color-cobalt-deep` | `#132b8f` | hover кобальту, епіграф, текст кнопки `paper` |
+| `--color-on-cobalt-2` | `#cfd7ff` | другорядний текст на кобальті (кікер, примітки форми, текст промо) |
+| `--color-on-ink-2` | `#d6cfc2` | другорядний текст на чорному (картки, панель «Для студій») |
+| `--color-peach` | `#ffd9a8` | акцент лише на темному: курсивне слово, номери кроків, кнопка `peach`, CTA у картках, галочка чекбокса |
+| `--color-terracotta` | `#b4532e` | знак-куманець, номери ≥ 24px, пунктир словника (не текст < 19px) |
+| `--color-terracotta-text` | `#a84a27` | дрібний теракотовий текст: лічильники міст 13–14px, кікери гайдів 12px, нотатки «останній пост…» |
+| `--color-rule` | `rgb(21 19 15 / .2)` | тонкі 1px лінійки на папері |
+| `--color-rule-on-dark` | `rgb(239 233 222 / .4)` | тонкі лінійки на кобальті й чорному |
+
+Інших кольорів нема: ні зеленого «успіху», ні червоного «помилки», ні сірого. Стан помилки форми — `terracotta-text` на папері, `peach` на кобальті; успіх — звичайний текст із 2px лінійкою зверху.
+
+**Дозволені пари (WCAG 2.x, пораховано 11.10.2026).** AA для тексту < 18px (або < 14px bold) — ≥ 4.5; для великого — ≥ 3; для нетекстових елементів — ≥ 3.
+
+| Передній план | Фон | Контраст | Де можна |
+|---|---|---|---|
+| ink | paper | 15.35 | усюди |
+| ink-2 | paper | 7.48 | другорядний текст, кікери 11–12px |
+| ink | paper-2 | 13.62 | плитки, примітки |
+| ink-2 | paper-2 | 6.64 | підписи у плитках |
+| cobalt | paper | 6.80 | посилання, цифри, «+/–» |
+| cobalt-deep | paper | 9.82 | епіграф, hover |
+| cobalt | paper-2 | 6.03 | цифри у плитках |
+| cobalt | paper-white | 8.21 | посилання в `QuoteBlock` |
+| terracotta-text | paper | 4.73 | **єдиний дозволений дрібний теракотовий текст** |
+| terracotta | paper | 4.12 | лише великий текст (≥ 24px bold / ≥ 19px) і нетекст: знак, пунктир, номери `NumberedList` 24px |
+| terracotta | paper-white | 4.98 | те саме |
+| terracotta-text | paper-2 | 4.20 | лише ≥ 18px — дрібний теракотовий текст на `paper-2` **заборонено** |
+| paper | ink | 15.35 | текст на чорному |
+| on-ink-2 | ink | 11.98 | другорядний на чорному |
+| peach | ink | 13.91 | акцент на чорному |
+| ink | peach | 13.91 | кнопка `peach` |
+| paper | cobalt | 6.80 | текст на кобальті, поля форми |
+| on-cobalt-2 | cobalt | 5.80 | другорядний на кобальті, 11px кікери — AA ✓ |
+| peach | cobalt | 6.16 | курсивне слово, номери, помилка форми |
+| cobalt-deep | paper | 9.82 | текст кнопки `paper` на кобальті |
+| rule-on-dark (.6 для підкреслення поля) | cobalt | 3.41 | нижня межа інпута на кобальті (нетекст ≥ 3 ✓) |
+
+**Заборонені пари:** terracotta на ink (3.73) і на cobalt; peach на paper (1.10); cobalt на ink; terracotta-text < 18px на paper-2; rule (1.53) як єдина межа інтерактивного елемента (для полів на папері підкреслення — `ink-2` 2px).
+
+### 2.2 Лінійки, радіуси, тіні, рух
+
+| Що | Значення |
+|---|---|
+| Лінійка розділу / шапки / верх таблиці та списку | `2px solid var(--color-ink)` (`border-t-2 border-ink`) |
+| Лінійка між рядками і колонками | `1px solid var(--color-rule)` (`border-b border-rule`) |
+| На темному | `1px solid var(--color-rule-on-dark)` |
+| Смуга цитати | `6px solid var(--color-cobalt)` ліворуч |
+| Епіграф | `2px solid var(--color-cobalt)` ліворуч, відступ 16px |
+| Рамка чипа, кнопки «Меню», «Закрити» | `box-shadow: inset 0 0 0 1.5px var(--color-ink)` |
+| Рамка кнопки `ghost` | `inset 0 0 0 2px currentColor` |
+| Радіус | `--radius-btn: 2px` на кнопках, чипах, тултипі; **0** на всьому іншому (фото, панелі, поля, мапа) |
+| Тіні | нема |
+| Фокус | `outline: 3px solid var(--color-cobalt); outline-offset: 3px`; на кобальті — `outline-color: var(--color-paper)` |
+| Рух | `transition: background .2s, color .2s`; стрілка `→` зсув 4px; фото в картці `scale(1.04)` за .6s; усе вимикається при `prefers-reduced-motion` |
+| z-index | тултип 5 · шапка 20 · мобільний бар 30 · шухляда/діалог 50 |
+
+### 2.3 Простір і контейнер
+
+| Токен | Значення | Роль |
+|---|---|---|
+| `--spacing-gutter` | `clamp(16px, 3vw, 40px)` | бокові поля (`px-gutter`) |
+| `--container-wrap` | `1600px` | ширина контенту (`max-w-wrap mx-auto px-gutter`); кольорові панелі — на всю ширину, їх вміст знову в `wrap` |
+| `--container-read` | `70ch` | колонка читання: лід, абзаци, опис студії |
+| `--container-faq` | `900px` | FAQ |
+| `--container-narrow` | `760px` | 404, помилка, `/zapyt`, кабінет |
+| `--spacing-section` | `clamp(56px, 8vw, 110px)` | між розділами головної |
+| `--spacing-block` | `clamp(36px, 5vw, 64px)` | між блоками внутрішньої сторінки |
+| `--spacing-hero` | `clamp(18px, 3vw, 32px)` | відступи геро внутрішньої |
+| Колонки | `clamp(28px, 4vw, 56px)` | між текстом і бічною колонкою |
+| Рядок списку | `13–14px 0` | `StudioRow`, `MakerRow`, FAQ 15–16px |
+| Комірка | `18px` (`cards`), `24px` (мега, гайди, формати) | відступ від вертикальної лінійки |
+| Поле форми | `padding-block: 7px`, між парою полів `16px` | |
+| Сітки карток | `10px` (< lg), `14px` (≥ lg) | `PhotoCard` |
+| Якір | `scroll-margin-top: 6rem` | під липку шапку |
+
+Решта відступів — стандартна шкала Tailwind (4px).
+
+### 2.4 Брейкпоінти (перевизначити `--breakpoint-*`)
+
+| Ім'я | Значення | Що перемикає |
+|---|---|---|
+| `sm` | `40rem` (640) | 2 колонки комірок студій; ціна в `MakerRow` праворуч; правий кікер геро з'являється |
+| `md` | `50rem` (800) | смуга цифр 5 колонок; таблиця з стеку у рядки; `NumberedList` 2 колонки; футер 4 колонки; гайди 3 колонки; міста 4 колонки; кроки 3 колонки |
+| `lg` | `60rem` (960) | головне меню замість «Меню»; службова смужка; дві колонки сторінки (текст + липка бічна); сітка 3×2 фотокарток; смуга форматів; геро 7/5 |
+| `xl` | `80rem` (1280) | лише для ширших полів, якщо знадобиться |
+
+Макети мали ще 600/700/860/1000 — їх зведено до `sm`/`md`/`lg`; `2xl` вилучити.
+
+### 2.5 Шрифтові токени
+
+| Токен | Значення |
+|---|---|
+| `--font-display` | `var(--font-unbounded), 'Arial Black', system-ui, sans-serif` |
+| `--font-body` | `var(--font-golos), 'Helvetica Neue', Arial, sans-serif` |
+| `--font-serif` | `var(--font-playfair), Georgia, serif` |
+| `--font-mono` | `var(--font-jetbrains), Menlo, monospace` |
+
+`--font-sans` не визначати (щоб `font-sans` зі старого коду не компілювався мовчки).
+
+### 2.6 Кістяк `globals.css`
+
+```css
+@import 'tailwindcss';
+
+@theme {
+  --breakpoint-sm: 40rem; --breakpoint-md: 50rem; --breakpoint-lg: 60rem; --breakpoint-xl: 80rem;
+  --color-paper: #efe9de; --color-paper-2: #e4dccd; --color-paper-white: #ffffff;
+  --color-ink: #15130f; --color-ink-2: #4e483f;
+  --color-cobalt: #1d3ec6; --color-cobalt-deep: #132b8f;
+  --color-on-cobalt-2: #cfd7ff; --color-on-ink-2: #d6cfc2;
+  --color-peach: #ffd9a8;
+  --color-terracotta: #b4532e; --color-terracotta-text: #a84a27;
+  --color-rule: rgb(21 19 15 / .2); --color-rule-on-dark: rgb(239 233 222 / .4);
+  --font-display: …; --font-body: …; --font-serif: …; --font-mono: …;
+  --spacing-gutter: clamp(16px, 3vw, 40px);
+  --spacing-section: clamp(56px, 8vw, 110px); --spacing-block: clamp(36px, 5vw, 64px); --spacing-hero: clamp(18px, 3vw, 32px);
+  --container-wrap: 1600px; --container-read: 70ch; --container-faq: 900px; --container-narrow: 760px;
+  --radius-btn: 2px;
+  /* розміри з §3: text-h1, text-h2, text-h2-poster, text-lead, text-body, text-small, text-kicker, text-label, text-epi, text-btn */
+  --text-h1: clamp(28px, 3.4vw, 46px); --text-h1--line-height: 1.08; --text-h1--letter-spacing: -.01em; --text-h1--font-weight: 600;
+  --text-h2: clamp(19px, 2.2vw, 26px); --text-h2--line-height: 1.12; --text-h2--letter-spacing: .01em; --text-h2--font-weight: 600;
+  --text-h2-poster: clamp(30px, 5.2vw, 76px); --text-h2-poster--line-height: .95; --text-h2-poster--letter-spacing: -.01em; --text-h2-poster--font-weight: 800;
+  --text-lead: 18px; --text-lead--line-height: 1.5;
+  --text-body: 17px; --text-body--line-height: 1.5;
+  --text-small: 15px; --text-small--line-height: 1.45;
+  --text-kicker: 12px; --text-kicker--letter-spacing: .08em;
+  --text-label: 11px; --text-label--letter-spacing: .06em;
+  --text-epi: clamp(19px, 1.7vw, 24px); --text-epi--line-height: 1.3;
+  --text-btn: 13.5px; --text-btn--letter-spacing: .03em;
+}
+
+@layer base {
+  html { color-scheme: light; -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { background: var(--color-paper); color: var(--color-ink); font-family: var(--font-body); font-size: var(--text-body); line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  main { overflow-x: clip; }
+  h1, h2, h3 { font-weight: 600; text-wrap: balance; }
+  :focus-visible { outline: 3px solid var(--color-cobalt); outline-offset: 3px; }
+  [data-tone='cobalt'] :focus-visible, [data-tone='ink'] :focus-visible { outline-color: var(--color-paper); }
+  @media (prefers-reduced-motion: reduce) { *, ::before, ::after { transition: none !important; animation: none !important; } html { scroll-behavior: auto; } }
+}
+
+@layer components {
+  /* лише те, що Tailwind-утилітами незручно: .ui-table (стек з data-label), .ui-faq (+/– через ::before),
+     .ui-term (тултип ::after), .ui-wordmark (вікно у фото + @supports), .nav-* (шапка: caret, [aria-expanded]),
+     .map-pop (попапи MapLibre). Кожен клас задокументовано у відповідному компоненті §4. */
+}
+```
+
+Вилучити: `@import 'tw-animate-css'`, `@config tailwind.config.mjs` (і сам файл), `@plugin "@tailwindcss/typography"` і залежності `@tailwindcss/typography`, `tw-animate-css` (перевірено 11.10.2026: `prose` і `animate-*` у `src` не вживаються), `@custom-variant dark`, усі `@source inline(...)`, блок `:root` із shadcn-змінними (`--background`, `--card`, `--primary`, `--radius`, `--sidebar-*`, `--chart-*`, `--success/--warning/--error`), `@theme inline`, `html{opacity:0}` і `data-theme`, утиліти `band`/`kicker`/`h-display`, `.container`.
+
+### 2.7 Карта міграції 1A → нова
+
+Механічно: `grep -rnE '<шаблон>' src --include='*.tsx'`, замінити за таблицею, потім `pnpm exec tsc --noEmit` і `pnpm lint`. «Компонент» означає: не підставляти клас, а обгорнути в примітив із §4.
+
+| 1A (токен / утиліта / патерн) | Було | Нова заміна | Примітка |
+|---|---|---|---|
+| `--color-clay` / `bg-clay` | `#f3e7da` кремовий фон | `bg-paper` | **не** теракота — тому ім'я `clay` зникає |
+| `--color-cream` / `bg-cream` | `#fffaf4` фон карток/полів | поля: прозоре тло + підкреслення (`Field`); плашка «Показати ще»: `MoreLink`; цитата: `bg-paper-white` (`QuoteBlock`) | нема 1:1 |
+| `--color-sand` / `bg-sand` | пігулки, hover карток | `Chip` (рамка 1.5px, без фону); hover: `hover:text-cobalt` | нема 1:1 |
+| `bg-card` | `#fbf3ea` фон карток | без фону: `StudioCell`/`StudioRow`/`NumberedList`/`FaqItem`/`SideBox`; плитки цифр і примітки: `bg-paper-2` | 111 випадків у 42 файлах — найбільша частина роботи |
+| `text-ink` / `border-ink` | `#2a2018` | `text-ink` / `border-ink` (значення змінюється на `#15130f`) | ім'я лишається, роль та сама |
+| `text-umber` / `--color-umber` | `#6c5243` другорядний | `text-ink-2` | 189 випадків |
+| `text-cream` | текст на темному | `text-paper` | |
+| `border-line` / `--color-line` | `#e1c7ae` рамки | `border-rule` (1px) між рядками; `border-ink border-t-2` під заголовками; рамки карток — прибрати | |
+| `bg-terra` + `text-cream` | теракотова CTA | `<Button variant="ink">` або `variant="cobalt"` | теракота — ніколи фон |
+| `hover:bg-terra-dark`, `--color-terra-dark` | | hover кнопки (кобальт) | |
+| `text-terra` | лічильники, «+/–», зауваження, номери | лічильники 13–14px → `text-terracotta-text`; номери ≥ 24px → `text-terracotta`; «+/–» → `text-cobalt`; «останній пост…» → `text-terracotta-text` mono 11.5 | |
+| `border-terra`, `border-terra/40` | цитата власника, попередження | `border-cobalt` (6px) у `QuoteBlock`; попередження — `bg-paper-2` без рамки | |
+| `accent-[var(--color-terra)]` | чекбокс | `accent-cobalt` на папері, `accent-peach` на кобальті | |
+| `bg-cobalt` | синя смуга | `<Panel tone="cobalt">` (значення → `#1d3ec6`) | |
+| `text-cobalt`, `hover:text-cobalt-dark` | посилання | `text-cobalt`, `hover:text-cobalt-deep` | |
+| `--color-ochre` / `text-ochre` / `bg-ochre` / `!text-ochre` / `border-l-ochre` | кікер і номери на темному, кнопка «Додати студію», смуга цитати | на темному → `text-peach`; кнопка → `<Button variant="peach">`; смуга → `border-cobalt` | |
+| `--color-sage` | «успіх» | прибрати; успіх — звичайний текст | лише у `KabinetForms`/`StudioEditForm` |
+| `--error`, `text-[var(--error)]` | помилка | `text-terracotta-text` (папір) / `text-peach` (кобальт) | |
+| `kicker` (утиліта: Unbounded 11.5px терра) | | `<Kicker>` (mono 12px, ink-2) | 185 випадків |
+| `h-display` + `text-[clamp(26px,4vw,44px)] leading-[1.06]` | H1 | `font-display text-h1` (без uppercase) | |
+| `h-display` + `text-[17px]` (заголовки міст) | | `<CityHead>` | |
+| `band` (смугаста стрічка) | | **видалити**, еквівалента нема — єдиний колір у шапці тепер знак | |
+| `rounded-full`, `rounded-xl`, `rounded-2xl`, `rounded-[14/18/20/22/26px]` | | `rounded-none` (фото, панелі, мапа) або `rounded-btn` (кнопки, чипи) | 162 випадки |
+| `shadow-[…]` (мегаменю) | | прибрати; межа — `border-b-2 border-ink` | |
+| `container` (`Bits.container`, 1200px, px-4/5) | | `wrap` = `mx-auto max-w-wrap px-gutter` (експорт із `src/components/ui/layout.ts`) | 69 випадків |
+| `font-sans` | Raleway | `font-body` | |
+| `font-display` | Unbounded | `font-display` (ваги лише 600/800) | `font-bold` (700) не вантажиться → замінити на `font-semibold`/`font-extrabold` |
+| `font-mono` (системний) | | `font-mono` (JetBrains) | |
+| `text-[#5a3f2c]`, `border-ochre` в `Epigraph` | | `<Epigraph>` новий (Playfair, cobalt-deep) | |
+| `text-[13px] text-umber` (крихти, «Оновлено») | | `<Breadcrumbs>`, `<Updated>` (mono 12px) | |
+| `overflow-x-auto rounded-2xl bg-card` + `<table>` | | `<DataTable>` | |
+| `details … rounded-2xl bg-card` (FAQ, «Показати ще») | | `<Faq>`, `<MoreLink as="summary">` | |
+| `.map-pop`, `.maplibregl-popup-content` (1A хекси) | | кольори з токенів, радіус 2px | |
+| `themeColor: '#2a4fa8'` (`layout.tsx`), кольори `manifest.ts` | | `#efe9de` (papier) і `#1d3ec6` | див. §7 |
+| `src/app/(frontend)/og/route.tsx` `C = {…1A}` | | нові токени після 2-го раунду OG (§7) | |
+
+Перевірка наприкінці (крок 9 §9): `grep -rnE 'bg-clay|bg-cream|bg-sand|bg-card|text-umber|text-cream|border-line|bg-terra|text-terra\b|terra-dark|ochre|sage|\bkicker\b|h-display|\bband\b|rounded-(full|xl|2xl|\[)|shadow-|font-sans|cobalt-dark' src` має повернути нуль рядків.
+
+---
+
+## 3. Типографіка
+
+### 3.1 Шкала
+
+| Роль | Шрифт · вага | Розмір (моб → деск) | Інтерліньяж | Трекінг | Регістр | Де |
+|---|---|---|---|---|---|---|
+| Вордмарк «ГЛИНА» | Unbounded 800 | `min(345px, calc((100vw − 2·gutter) / 4.4))` | .9 | −.02em | верхній | лише головна, `WordmarkWindow` |
+| Логотип у шапці/футері | Unbounded 800 | 22px / 22px (футер 16px) | 1 | .02em | верхній | `Header`, `Footer` |
+| H1 | Unbounded 600 | `clamp(28px, 3.4vw, 46px)` | 1.08 | −.01em | як у реченні | усі сторінки; головна теж (не плакатний) |
+| H2 плакатний | Unbounded 800 | `clamp(30px, 5.2vw, 76px)`; у панелях до 84/68px | .95 | −.01em | верхній + курсивне слово Playfair .9em (cobalt на папері, peach на темному) | **лише головна** (`SectionHead variant="poster"`) |
+| H2 розділу | Unbounded 600 | `clamp(19px, 2.2vw, 26px)` | 1.12 | .01em | верхній, без курсиву | внутрішні сторінки (`SectionHead`) |
+| H3 міста / комірки | Unbounded 600 | 15.5–17px; картка фото 21px; крок 19px; формат 20px | 1.15–1.2 | 0 | як у реченні | `CityHead`, `StudioCell`, `PhotoCard`, кроки, гайди |
+| Лід | Golos 400, числа `b` 600 | 18px | 1.5 | 0 | | під H1, max 70ch |
+| Текст | Golos 400 | 17px | 1.5 | 0 | | `body` |
+| Дрібний текст | Golos 400 | 14.5–15px, ink-2 | 1.45 | 0 | | примітки, опис у рядках |
+| Підпис/примітка форми | Golos 400 | 12.5–13px | 1.4 | 0 | | `fine`, плитки |
+| Кікер | JetBrains Mono 400 | 12px (11px у мега/футері) | 1.4 | .08em | верхній | `Kicker`, `Updated`, шапка таблиці-підпис |
+| Мітка/шапка таблиці/чип | JetBrains Mono 500 | 11–11.5px | 1 | .06em | верхній | `th`, `Chip`, `Field label`, `data-label` |
+| Меню | JetBrains Mono 400 | 12px | 1 | .06em | верхній | `nav-*` |
+| Крихти | JetBrains Mono 400 | 12px, ink-2 | 1.4 | .04em | звичайний | `Breadcrumbs` |
+| Футер | JetBrains Mono 400 (заголовки 500) | 11.5px | 1.7 | .03em (.08em заголовки) | заголовки верхній | `Footer` |
+| Епіграф | Playfair Display italic 400 | `clamp(19px, 1.7vw, 24px)` | 1.3 | 0 | | `Epigraph`, max 30ch |
+| Підтвердження форми | Playfair Display italic 400 | 20px | 1.3 | 0 | | `RequestForm` done |
+| Кнопка | Unbounded 600 | 13.5px (sm: 12px) | 1 | .03em | верхній | `Button` |
+| Посилання «ще» | Unbounded 600 | 12.5–13px | 1 | .04em | верхній | `MoreLink` |
+| Число в геро | Unbounded 600 | 22px, cobalt, `tabular-nums` | 1 | 0 | | `Stat inline` |
+| Число у смузі / плитці | Unbounded 800 | `clamp(20px, 2.2vw, 28px)` / `clamp(26px, 2.6vw, 36px)`, cobalt | 1 | 0 | | `FactStrip`, `Stat tile` |
+| Номер картки / кроку | Unbounded 800 | 56px / `clamp(48px, 6vw, 88px)` | .8 | −.02em | | `PhotoCard`, кроки |
+| Номер пункту | Unbounded 800 | 24px, terracotta | 1 | 0 | | `NumberedList` |
+| Ціна у рядку | Unbounded 600 | 17px, cobalt, `tabular-nums`, `nowrap` | 1.2 | 0 | | `MakerRow` |
+
+Числа всюди `font-variant-numeric: tabular-nums` (таблиці, смуги, ціни); текст — `lining-nums`.
+
+### 3.2 `next/font` (`src/app/(frontend)/layout.tsx`)
+
+```ts
+import { Golos_Text, JetBrains_Mono, Playfair_Display, Unbounded } from 'next/font/google'
+
+const unbounded = Unbounded({ subsets: ['cyrillic', 'latin'], weight: ['600', '800'], variable: '--font-unbounded', display: 'swap' })
+const golos = Golos_Text({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600'], variable: '--font-golos', display: 'swap' })
+const playfair = Playfair_Display({ subsets: ['cyrillic', 'latin'], weight: ['400'], style: ['italic'], variable: '--font-playfair', display: 'swap', preload: false })
+const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500'], variable: '--font-jetbrains', display: 'swap', preload: false })
+// <html className={`${unbounded.variable} ${golos.variable} ${playfair.variable} ${jetbrains.variable}`} lang="uk">
+```
+
+- **Підмножини:** `cyrillic` (покриває ї, є, ґ — U+0490/0491 входить) + `latin` (цифри, пунктуація, латинські назви студій, домен). `latin-ext`/`cyrillic-ext` не вантажити. Preload-посилання генеруються лише для `subsets`, тож `cyrillic` + `latin` × ваги = кількість preload.
+- **Preload:** Unbounded (2 ваги × 2 підмножини = 4) і Golos (3 × 2 = 6) — це 10 preload-файлів. Якщо Lighthouse покаже забагато — перейти на `weight: 'variable'` для обох (по 1 файлу на підмножину, 4 preload; обидва шрифти на Google Fonts варіативні). Playfair і Mono — `preload: false` (нижче першого екрана; Mono в меню з'являється зі `swap`, це прийнятно).
+- **Ваги:** Unbounded 600/800 (400 ніде не потрібен; 700 для OG береться окремо з `src/assets/fonts`). Mono — лише 500 (використати і для 400-ролей; різниця в 12px непомітна). Playfair — лише italic 400 (500 з макета не потрібен).
+- `adjustFontFallback` — за замовчуванням (true).
+- Для OG/Satori потрібні TTF у `src/assets/fonts`: Unbounded 800 (є лише 700 — завантажити з Google Fonts, OFL), Golos Text 400/500, JetBrains Mono 500; Raleway-Medium.ttf видалити після міграції OG.
+
+---
+
+## 4. Компоненти
+
+### 4.0 Правила
+
+- **Примітиви** — `src/components/ui/*.tsx`, серверні, без стану, без імпорту даних сайту. Іменування файлів — за компонентом (`Button.tsx`), експорт іменований. Клієнтські лише: `MainNav.client`, `MobileDrawer.client` (усередині `MainNav`), `RequestForm.client`, `MobileRequestBar.client`, мапи, `InstagramPosts.client`, кабінетні форми.
+- **Композити** — `src/components/site/*` збирають примітиви й знають про `site`, `navigation`, каталог. Шаблони сторінок (`TopicPage`, `WavePage`, `GuidePage`) лишаються в `site/`.
+- Стилі — утиліти Tailwind з токенами §2; власні класи лише в `@layer components` і лише з префіксами `ui-*` (примітиви) і `nav-*` (шапка). Ніяких інлайнових хексів.
+- Панелі задають тон атрибутом `data-tone="cobalt|ink"`; дочірні примітиви читають його через `group-data-[tone=cobalt]:…` або селектори в `@layer components` (кікер, лінійки, кнопка за замовчуванням, фокус).
+- Усі списки студій, FAQ, таблиці рендеряться на сервері повністю (нічого не ховати за JS — ЛЛМ і пошук читають HTML).
+- Кожен примітив показаний у `/dev/styleguide` (§8); новий примітив без запису там і тут не приймається.
+
+### 4.1 Примітиви (`src/components/ui/`)
+
+| Компонент | Призначення | Props (коротко) | Варіанти | Вигляд | Можна / не можна | Замінює |
+|---|---|---|---|---|---|---|
+| **`Button`** | усі кнопки й кнопкоподібні посилання | `href?` (→ `next/link`), `type?`, `variant`, `size: 'md'∣'sm'`, `arrow?`, `full?`, `disabled?`, `children` | `ink` (за замовч.: bg ink, text paper, hover cobalt) · `cobalt` (hover cobalt-deep) · `paper` (bg paper, text cobalt-deep; на кобальті; hover ink/paper) · `peach` (bg peach, text ink; на чорному; hover paper) · `ghost` (прозора, inset 2px currentColor; hover ink/paper) | `inline-flex`, висота 52px (`sm` 44px), `padding 0 1.4em`, Unbounded 600 13.5px (sm 12px) .03em верхній, `rounded-btn`, `white-space: nowrap`; `arrow` додає `<span class="ui-arrow">→</span>` зі зсувом 4px на hover; `disabled:opacity-60` | Можна: один primary на екран-блок. Не можна: теракотове тло, пігулки, іконки замість тексту, два `cobalt` поруч (другий — `ghost`) | усі `rounded-full bg-terra…`, `border border-line bg-card px-4 py-2 font-bold`, кнопки `KabinetForms`, `error.tsx` |
+| **`Kicker`** | рядок над заголовком, мітки «Що нового:», «У містах:» | `children`, `as?: 'span'∣'p'`, `tone?: 'default'∣'terracotta'`, `className?` | `terracotta` — тільки кікери гайдів на головній (`terracotta-text`) | Mono 12px .08em верхній ink-2; на панелях — `on-cobalt-2` / `on-ink-2` автоматично | Не можна: Unbounded, теракота за замовчуванням, 11.5px | утиліта `kicker` |
+| **`SectionHead`** | голова розділу з лінійкою | `title`, `id`, `kicker?`, `note?` (рядок 14.5px ink-2, max 70ch), `more?: {label, href}` (праворуч, `MoreLink`), `level?: 2∣3`, `variant?: 'rule'∣'poster'` | `rule` (за замовч.): grid gap 6, `padding-bottom 12`, `border-b-2 border-ink`, `margin-bottom 18`; заголовок `font-display text-h2 uppercase` · `poster` (лише головна): `text-h2-poster uppercase`, `more` в одному рядку по базовій лінії на ≥ md, курсивне слово через `<Italic>` | | Не можна: `poster` на внутрішніх; курсив у `rule`; заголовок без `id` (на нього ведуть `aria-labelledby`) | `Bits.SectionHead`, усі `<div className="mb-6 grid…"><span className="kicker">…<h2 className={h2}>` на головній |
+| **`Italic`** | курсивне слово в плакатному H2 | `children` | — | Playfair italic 400, `.9em`, `text-transform: none`, cobalt на папері, peach на темному | Лише в `SectionHead variant="poster"` і H2 панелей головної | — |
+| **`CityHead`** | H3 міста над списком | `name`, `count?`, `id` | — | flex baseline gap 10; Unbounded 600 17px; `count` Unbounded 600 14px `terracotta-text`; `padding-bottom 8`, `border-b-2 border-ink`, `margin-top 26` | | `h-display text-[17px]` + `text-terra` у `TopicPage.StudioList`, `/vyrobnyky` |
+| **`Rule`** | явна горизонтальна лінійка | `tone?: 'thin'∣'ink'∣'on-dark'`, `className?` | `thin` 1px rule · `ink` 2px ink · `on-dark` 1px rule-on-dark | `<hr>` без відступів | Вертикальні лінійки — не компонент, а `border-l border-rule` + `pl-6` у сітці | — |
+| **`Panel`** | суцільна кольорова панель | `tone: 'cobalt'∣'ink'`, `bleed?: boolean`, `as?`, `className?`, `children` | `bleed` — на всю ширину вікна з `wrap` усередині, `padding-block clamp(44px,7vw,96px)`; без `bleed` — вставний блок (форма, промо) з `padding clamp(18px,2.4vw,28px)` | `data-tone`, `bg-cobalt text-paper` / `bg-ink text-paper`; усередині кікер → `on-*-2`, лінійки → `rule-on-dark`, `Button` за замовчуванням → `paper` (кобальт) / `peach` (чорний) | Не можна: тінь, радіус, рамка; два `bleed` поспіль без паперу між ними | синя смуга і чорний блок головної, промо мегаменю, обгортка `RequestForm` |
+| **`FactStrip`** | цифри сторінки під лідом | `items: {value: string, label: string}[]` (3–5), `label?` (aria, за замовч. «Цифри сторінки») | — | grid 2 → 5 колонок на md; `border-t-2 border-ink`, `border-b border-rule`, `margin-top 10`; комірка `padding 14px 16px 14px 0` + `border-r border-rule` (остання без); на < md непарні зліва без відступу, парні без правої лінійки, рядки від 3-го з верхньою 1px, останній непарний — на всю ширину; `value` Unbounded 800 `clamp(20px,2.2vw,28px)` cobalt `tabular-nums`; `label` 13px ink-2 | Значення лише з `ctx`/`stats()`: кількість студій, міст, діапазон цін, термін, «оновлено». Не можна: < 3 пунктів, вигадані числа, на панелях | нове (з внутрішньої B) |
+| **`Stat`** | число з підписом | `value`, `label`, `variant: 'inline'∣'tile'` | `inline` (геро): `b` Unbounded 600 22px cobalt + 14px ink-2 у рядок, набір через flex gap 8/28 · `tile` (ринок): `bg-paper-2 p-[14px_16px]`, число Unbounded 800 `clamp(26px,2.6vw,36px)` cobalt, підпис 13px ink-2; сітка 2 → 4 колонки на sm, gap 12 | | | числа геро й плитки головної |
+| **`PhotoCard`** | нумерована фотокартка напряму | `n: '01'…`, `title`, `text`, `cta`, `href`, `tone: 'ink'∣'cobalt'`, `photo: SitePhoto` | ≥ lg — комірка сітки 3×2: фото 1:1, номер 56px Unbounded 800 paper `mix-blend-mode: difference` у лівому верхньому куті (12/14px), текст на тлі tone (h3 Unbounded 600 21px, p 14.5px `on-*-2` max 36ch, CTA mono 12px .06em верхній peach) · < lg — рядок: фото 108px на всю висоту ліворуч, номер mono 12px .1em peach над назвою 16px, текст 13px `line-clamp-2`, CTA 11px | `sizes="(min-width:960px) 33vw, 108px"`, hover фото `scale(1.04)` | Не можна: горизонтальна стрічка на телефоні; більше 6; інша пропорція фото | картки напрямів головної |
+| **`VesselWindow`** | фото у формі посудини | `shape: 'jug'∣'bowl'∣'plate'`, `photo`, `title`, `caption`, `href` | `jug` 128×170 (3:4), `bowl`/`plate` 170×170 | SVG `<clipPath clipPathUnits="objectBoundingBox">` з `template/index.html` (`#jug`, `#bowl`, `#plate`) один раз у `main`; ≥ lg — смуга з трьох плиток через `border-r border-rule`, вікно ліворуч, Unbounded 600 20px + mono підпис праворуч, під смугою 1px лінійка; md–lg — три в ряд по центру; < md — стовпчик, вікно 120px ліворуч | Лише головна. Не ставити поруч зі списком міст у дві колонки (відкинуто) | нове |
+| **`DataTable`** | будь-яка таблиця | `caption`, `columns: {key, label, align?: 'start'∣'end', numeric?, mono?}[]`, `rows: Record<key, ReactNode>[]`, `mode?: 'stack'∣'scroll'` (за замовч. `stack`), `className?` | `stack`: < md `thead` ховається, `tr` → блок з `padding 12px 0` і 1px лінійкою, `td` → рядок із `::before content: attr(data-label) ' · '` mono 11px верхній ink-2, перший `td` 600 16px без мітки · `scroll`: для ≥ 5 колонок (`/tsiny-2026`) — `overflow-x: auto` без фону й радіуса, `min-width` таблиці | `border-top: 2px ink`; `caption` ліворуч mono 11.5px .08em верхній ink-2; `th` mono 500 11px .06em верхній ink-2, `padding 10px 0`, 1px знизу; `td` 15px `padding 11px 0`, 1px знизу, `vertical-align: top`, між колонками `padding-left 14`; `numeric` → `tabular-nums` + `nowrap` на ≥ md; посилання cobalt `underline` offset 3; `mono` колонка (джерело) mono 12px ink-2 nowrap | Клас `ui-table` у `@layer components`. Не можна: фон, радіус, зебра, рамки навколо комірок | таблиці `GuidePage`, `/tsiny-2026`, приклади цін `TopicPage` (замість списку плашок → таблиця Студія / Місто / З прайсу / Джерело) |
+| **`Chip`** | тег, лічильник, фільтр | `href?`, `children`, `count?`, `size?: 'md'∣'sm'`, `active?`, `tone?: 'ink'∣'cobalt'`, `as?: 'a'∣'span'∣'button'` | `md`: mono 11.5px .04em верхній, `padding 7px 11px`, `inset 1.5px ink`, `rounded-btn`, hover `bg-ink text-paper`; `count` `terracotta-text` 500 з відступом 5px · `sm` (у `MakerRow`): 10.5px, `padding 4px 7px`, `inset 1px rule`, без hover · `tone="cobalt"`: inset 1.5px cobalt + text cobalt (акцентний формат) · `active`: `bg-ink text-paper` (фільтри мапи) | Теги «Дивіться також» = `md` з `padding 9px 14px` | Не можна: пігулки, фон `sand`, заливка кобальтом | усі `rounded-full bg-sand…`, чипи міст, `tags`, фільтри `StudioMap` |
+| **`ChipGroup`** | набір чипів із міткою | `label?` (`Kicker`), `aria-label`, `children`, `as?: 'nav'∣'div'` | — | flex wrap gap 8, align center | | `nav aria-label="У містах"`, «Дивіться також» |
+| **`Faq`** + **`FaqItem`** | питання-відповіді + JSON-LD | `Faq`: `items: {q, a}[]`, `id?`, `title?`, `kicker?`, `jsonLd?: boolean` (за замовч. true), `openFirst?` · `FaqItem`: `q`, `children`, `open?` | — | `details` з `border-b border-rule` (перший ще `border-t`); `summary` grid `1fr auto` gap 20 baseline, `padding 15px 0`, Unbounded 600 15.5px (головна 16px) 1.25, `list-style: none`; знак `.ui-faq-pm` mono 18px cobalt, `details[open] … ::before {content:"–"}` інакше `"+"`; відповідь 17px ink-2 max 62ch, `margin-bottom 18` | Клас `ui-faq`. Не можна: фон, радіус, іконки, JS | `SelectionFaq`, FAQ у `TopicPage`/`WavePage`/`GuidePage`/`/mapa` |
+| **`Term`** | слово зі словника з тултипом | `children`, `def`, `side?: 'start'∣'end'` | — | `<abbr class="ui-term" tabIndex={0} data-def>`; `text-decoration: underline dotted 1.5px terracotta`, offset 4px, `cursor: help`; тултип `::after content: attr(data-def)`: `bg-ink text-paper` 14px Golos 1.4, `padding 8px 11px`, `max-width min(300px, 70vw)`, `rounded-btn`, над словом (`bottom: calc(100% + 8px)`), `left: 0` (`side="end"` → `right: 0`), показ на `:hover`/`:focus`, `z-index 5` | Визначення — з `docs/voice/glossary.md` (винести у `src/content/glossary.ts`). Слово має бути пояснене і в тексті (для ЛЛМ) — тултип дублює, не замінює. Не можна: на панелях, у заголовках, у таблицях | нове |
+| **`Epigraph`** | вірш після ліду | `lines: string[]` | — | `<figure aria-label="Епіграф">`, `p` Playfair italic `text-epi` cobalt-deep, кожен рядок `display: block`, `max-width 30ch`, `padding-left 16`, `border-l-2 border-cobalt`; без смужки знизу | Один на сторінку; тільки на папері; не в геро внутрішніх (після ліду, у колонці тексту); на головній — у геро під кнопками | `Bits.Epigraph` (ochre + смужка) |
+| **`Field`** + **`Input`/`Textarea`/`Select`/`Checkbox`** | поля форм | `Field`: `label`, `htmlFor`, `hint?`, `error?`, `children` · контроли: нативні props + `invalid?` | тон беруть від батьківської `Panel` (`data-tone="cobalt"`) або паперу | `Field` grid gap 3 `padding-block 7`; `label` mono 11px .08em верхній (на кобальті `opacity .85`); контрол `font: inherit; font-size 16px` (iOS без зуму), `border: 0; border-bottom: 2px`, тло прозоре, `padding 6px 0`, `rounded-none`, `width 100%`; на кобальті: текст paper, межа `rgb(239 233 222 / .6)`, placeholder `.55`; на папері: текст ink, межа `ink-2`, placeholder `ink-2`; `Select` `appearance: none` + chevron SVG (paper на кобальті, ink на папері); `Textarea` `min-height 56`, `resize: vertical`; `Checkbox` 16px, `accent-peach` / `accent-cobalt`; помилка — текст 13px `peach`/`terracotta-text` + межа того ж кольору, `aria-invalid`; пара полів — `grid-cols-2 gap-4` (`FieldRow`) | Не можна: рамки з радіусом, тло `cream`, мітки 13px Golos | поля `RequestForm`, `KabinetForms`, `StudioEditForm` |
+| **`Breadcrumbs`** | крихти + JSON-LD | як зараз: `items`, `modified?` | — | `nav` mono 12px .04em ink-2; роздільник `›` з `opacity .6`, `margin-inline 6`; hover cobalt; JSON-LD `BreadcrumbList` + `WebPage` без змін | | `Bits.Breadcrumbs` (13px Raleway) |
+| **`Updated`** | «Оновлено: …» | `date?` (за замовч. `site.dataUpdated`) | — | mono 12px .06em верхній ink-2 | Є на кожній публічній сторінці | `Bits.Updated` |
+| **`NumberedList`** | пункти розділу з номерами | `items: {title, text}[]`, `columns?: 1∣2`, `start?` | `columns=2` на ≥ md, `column-gap 32` | `ol` з `border-t border-rule`; `li` grid `44px 1fr`, `padding 14px 0`, `border-b border-rule`; номер Unbounded 800 24px terracotta (`grid-row 1/3`); заголовок Unbounded 600 15.5px; текст 15px ink-2 | Не можна: картки, `sm:[&:last-child:nth-child(odd)]:col-span-2` | пункти `TopicPage.sections`, `PlacePicks`, `GuidePage` items, кроки `WavePage` |
+| **`QuoteBlock`** | відповідь-цитата з джерелом | `children`, `source?` | — | `bg-paper-white`, `border-l-[6px] border-cobalt`, `padding 16px 20px` (головна 18/22), grid gap 8, 17px; `source` mono 11.5px .05em верхній ink-2 | Одна на розділ («Найчастіше в прайсах — …») | `border-l-ochre bg-cream` на головній, відповідь про ціни в `TopicPage`, цитата власника в профілі (без `source`) |
+| **`CtaBand`** | смуга запиту після відповіді / в кінці | `title`, `text?`, `cta: {label, href}`, `tone: 'ink'∣'cobalt'` | `ink` → кнопка `peach` · `cobalt` → кнопка `paper`, текст `on-cobalt-2` | `Panel` без `bleed`, flex `space-between` wrap gap 16, `padding 18px 22px`; `title` Unbounded 600 17px блоком, текст 16px max 60ch | Після відповіді про ціни — `cobalt`; наприкінці контенту — `ink`. Не більше двох на сторінку. Не плутати з вилученою утилітою `band` | нове |
+| **`MoreLink`** | «Показати ще N →», «Усі міста →» | `href?`, `as?: 'a'∣'summary'`, `children` | `summary` — для `details` «Показати ще / Згорнути» | Unbounded 600 12.5–13px .04em верхній, `padding 12px 0`, hover cobalt, стрілка `ui-arrow` | | `rounded-full border border-line bg-cream … summary`, лінки «Усі … →» |
+| **`StudioCell`** | студія в сітці (профіль «Інші студії», `/vyrobnyky`) | `s: StudioCard`, `showCity?`, `line?` | — | `ul.ui-cells` з `border-t-2 border-ink`; на ≥ sm 2 колонки: непарна комірка `border-r border-rule pr-[18px]`, парна `pl-[18px]`; `a` grid gap 6 `padding 14px 0` `border-b border-rule` `h-full`; тип (+ місто) mono 11px .06em верхній ink-2; назва Unbounded 600 16px (hover cobalt); опис 14px ink-2 `line-clamp-3`; «останній пост…» mono 11.5px `terracotta-text`; «Профіль →» mono 12px .06em верхній cobalt | Без фото, поки студія не дала згоди; без фону й радіуса | `StudioCard` |
+| **`StudioRow`** | студія у тематичному списку | `s`, `line` (evidence), `showCity?` | — | `ul.ui-rows`; `li > a` grid `1fr auto` (≥ md `96px 1fr auto`) gap `2px 16px`, `padding 13px 0`, `border-b border-rule`; тип mono 11px верхній ink-2; назва Unbounded 600 15.5px; рядок 14px ink-2 `line-clamp-2` `overflow-wrap: anywhere`; стрілка mono 14px cobalt по центру праворуч; hover → назва cobalt | | `TopicPage.Row` |
+| **`MakerRow`** | студія у списку міста майстер-класів | `s`, `price?: {value, unit}` | — | `ul.ui-makers` `border-t-2 border-ink`; `li` grid `1fr auto` gap `4px 18px`, `padding 14px 0`, 1px лінійка; назва Unbounded 600 16px; мета mono 12px ink-2 («Студія · адреса · @ig», ig підкреслено); опис 14px ink-2; чипи `Chip size="sm"` (акцентний формат `tone="cobalt"`); ціна праворуч, `grid-row 1/4`, Unbounded 600 17px cobalt `nowrap` + `small` mono 10.5px верхній ink-2 («з особи»); < sm ціна під текстом ліворуч | Ціна — разове групове заняття з прайсу; якщо нема — колонку не рендерити | `MakerRow`, рядки `/maister-klasy/[city]` |
+| **`CityList`** | міста з лічильниками | `items: {name, href, count}[]`, `columns?: 2∣4` | — | grid 2 → 4 колонки на md, `gap 0 24px`, `border-t-2 border-ink`; `a` flex `space-between` baseline, `padding 12px 0`, `border-b border-rule`, 600 17px, hover cobalt; лічильник Unbounded 600 14px `terracotta-text` | | плитки `rounded-[14px] bg-card` на `/vyrobnyky/misto`, `/maister-klasy`, список міст головної |
+| **`SmallCities`** | «Ще міста і села» | `groups: {name, studios}[]` | — | grid 1 → 2 колонки, `gap 4px 24px`, 15px; назва 600 + посилання з підкресленням | | `TopicPage.StudioList small` |
+| **`Facts`** | «Коротко» профілю | `rows: [label, ReactNode][]` | — | `dl` `border-t-2 border-ink`; рядок grid 1 → `130px 1fr` на sm, `padding 10px 0`, 1px лінійка; `dt` mono 11px верхній ink-2; `dd` 15.5px `overflow-wrap: anywhere`, посилання cobalt підкреслені | | таблиця фактів профілю |
+| **`ListBlock`** / **`PriceList`** | «Вироби / Послуги», ціни профілю | `title`, `items` · `items: {text, source?}[]` | — | `ListBlock`: `Kicker` з 1px лінійкою, пункти 15px `padding 4px 0` з `«— »` `terracotta-text`; `PriceList`: рядки `padding 9px 0` 1px лінійка, grid `1fr auto`, джерело mono 11.5px ink-2 nowrap (< sm у стовпчик) | | `profile/blocks.ListBlock`, `PriceItem` |
+| **`SideBox`** | блок у бічній колонці без форми | `title` (`Kicker`), `children` | — | `border-t-2 border-ink pt-3` grid gap 8 15px; список міст усередині 2 колонки з 1px лінійками і лічильником `terracotta-text` | | `CityJump card`, «Це ваша студія?», «Купити або замовити», «Подарувати або піти командою» |
+| **`Note`** | службова примітка | `children` | — | `bg-paper-2 p-[16px_18px]` 15.5px max 70ch, без рамки | «Студія ще не вказала…», попередження «така студія вже є» | `bg-sand border-terra/40`, `bg-card` примітки |
+| **`MapFrame`** | контейнер мапи | `height: 'profile'∣'list'`, `children`, `fallback?` | `profile` 200/260px · `list` `60vh min 360 max 720` | `bg-paper-2`, `border border-rule`, `rounded-none`, `overflow: hidden`; поки мапа не завантажилась — mono 12px верхній ink-2 по центру; попапи MapLibre: `bg-paper`, `rounded-btn`, Golos 14px, посилання cobalt; маркери cobalt (студія) / terracotta (кілька поруч); легенда — кружки 12px | | обгортки `ProfileMap`, `StudioMap`, `.map-pop` |
+| **`IndexCell`** | редакційна комірка (добірки, кейси, формати) | `href`, `kicker?`, `title`, `text?`, `cta?` | — | як `StudioCell`, але заголовок Unbounded 600 17px, текст 15px | | `rounded-[18px] bg-card` на `/dobirky`, `/keysy` |
+| **`WordmarkWindow`** | «ГЛИНА» як вікно у фото | `photo: {desktop: SitePhoto, mobile: SitePhoto}` | — | §6.3 | Лише головна | нове |
+| **`Mark`** | знак-куманець | `size?: 22∣26∣28`, `className?` | — | інлайн `<svg viewBox="0 0 64 64" aria-hidden fill="currentColor">` з трьома path фавіконки (`experiments/design-options/menu.js` → `MARK`), колір `text-terracotta` | Єдиний теракотовий елемент у шапці й футері | — |
+
+`SitePhoto = { src, width, height, alt }` — реєстр `sitePhotos` у `src/content/photos.ts` (§6).
+
+### 4.2 Композити (`src/components/site/`)
+
+**`SiteHeader`** (сервер) + **`MainNav.client`**. Замінює поточні `SiteHeader`/`MainNav`. Однакова на всіх сторінках.
+
+- Службова смужка (`nav-util`, лише ≥ lg): `border-b border-rule`; `utilityNav` mono 11px .06em верхній ink-2, gap 22, `padding-block 7`; праворуч «UA» 500 ink. hover cobalt.
+- Шапка (`nav-head`): `position: sticky; top: 0; z-index 20; bg-paper; border-b-2 border-ink`. Рядок `wrap` grid `auto 1fr auto` gap 20 `padding-block 12`: логотип (`Mark` 26px + «ГЛИНА» Unbounded 800 22px .02em; `aria-label="Глина — на головну"`) · `nav aria-label="Головне меню"` по центру · `Button size="sm" arrow` «Отримати пропозиції» (href `requestHrefFor(pathname)`), на < lg текст «Запит».
+- Пункти (`nav-sec`): `button` для розділів із мегаменю / `Link` для `simpleNav`; mono 12px .06em верхній, `padding 4px 0`, `border-b-2 transparent`, hover і `[aria-expanded=true]` → `border-cobalt`; `emphasis` → text cobalt; caret 6px (`nav-caret`), обертається при відкритті. Gap `clamp(10px,1.8vw,26px)`, flex-wrap.
+- < lg: grid `auto 1fr auto auto`, меню ховається, з'являється `Button variant="ghost" size="sm"` «Меню» (`aria-controls="mobile-menu"`), кнопка «Запит →».
+- Мегаменю (`nav-mega`): усі панелі в HTML, видима одна (`hidden`); `absolute inset-x-0 top-full bg-paper border-b-2 border-ink` (без тіні); усередині `wrap` grid `3×1fr + 1.1fr` `padding-block 28px 32px`; колонка `pl-6 border-l border-rule` (перша без); заголовок колонки mono 11px .08em верхній ink-2 з 1px лінійкою; посилання 600 15.5px 1.25 `padding 7px 0`, hover cobalt; `small` 13px ink-2. Промо — `Panel tone="cobalt"` (вставна) `ml-6 p-[22px]` grid gap 10: `b` Unbounded 600 17px, `p` 14.5px `on-cobalt-2`, `Button variant="peach" size="sm"`. Логіка (клік + hover-intent, Escape, клік поза, закриття на навігації) — як зараз.
+- Шухляда (`nav-drawer`): нативний `<dialog id="mobile-menu" aria-label="Меню">` на `showModal()`; `position: fixed; inset: 0; max-width: none; max-height: none; bg-paper; padding 14px gutter 40px; overflow-y: auto`; `::backdrop` не потрібен (на всю ширину). Верх: логотип + `Button ghost sm` «Закрити», `border-b-2 border-ink`. Розділи — `details` (перший `open`): `summary` Unbounded 600 15px верхній `padding 16px 0`, знак «+/–» mono 20px cobalt праворуч (`nav-pm`), 1px лінійка; посилання 600 16px `padding 7px 0`. Далі `details` «Ще» (`simpleNav` + «Для студій» → `STUDIO_JOIN_HREF`), службові посилання mono 11px, і `Button variant="cobalt" full arrow` «Отримати пропозиції». Закриття: Escape (нативно), кнопка, навігація. `body { overflow: hidden }` поки відкрито.
+- Усі власні класи — `nav-*` у `@layer components`; решта — утиліти.
+
+**`SiteFooter`.** `footer` у `wrap`: `margin-top clamp(56px,8vw,96px)`, `border-t-2 border-ink`, `padding-block 26px 44px`, grid 1 → `1.2fr 1fr 1fr 1fr` на md, gap 18; mono 11.5px .03em 1.7 ink-2. Перша колонка: `Mark` 22px + «ГЛИНА» (Unbounded 800 16px), `site.description`, «Дані оновлено: …», рядок `© рік · Глина · hlyna.com.ua`. Колонки `footerColumns`: заголовок mono 500 верхній .08em ink з `margin-bottom 6`, посилання блоком, hover cobalt. Без фону, без нижньої лінійки.
+
+**`RequestForm.client`.** Завжди у `Panel tone="cobalt"` (вставна), `id="zapyt-forma"` (на нього ведуть бар і кнопки «Отримати пропозиції» на сторінці). Grid gap 2: `Kicker` «Швидкий запит · безкоштовно» (на головній «Запит · безкоштовно»), заголовок Unbounded 600 19–20px paper (`p` з `id` для `aria-labelledby`: «Опишіть, що потрібно — відповідять 3–5 студій» / профіль: «Запит {назва} і ще 2–4 студіям»), поля (`Field`), `sub`: `Button variant="paper"` «Отримати пропозиції» (на головній «Надіслати запит») + `small` mono 11px `on-cobalt-2` «Відповідь напряму від студій», `fine` 12.5px `on-cobalt-2` max 52ch. Honeypot `website2` лишається.
+- `compact` (геро головної): textarea «Що потрібно і скільки», місто, дата, контакт — 4 поля в один стовпчик.
+- повна: `Select` «Що потрібно» (WHAT), пара кількість/дата (тексти з `KIND`), місто, деталі, пара телефон/email, `Checkbox` «Потрібен логотип» (лише де `KIND.logo`).
+- `forStudio` («Додати нову студію»): ті самі поля на кобальті; попередження про наявну студію — `Note` на папері всередині (єдиний світлий блок).
+- Стани: `sending` → кнопка `disabled`; `done` → ховає поля, показує Playfair italic 20px «Запит надіслано · № N» + абзаци 15px paper; `error` → 13px peach над кнопкою.
+- На `/zapyt` і в кабінеті — та сама панель у `max-w-narrow`.
+
+**`MobileRequestBar.client`.** Як зараз за логікою (`#zapyt-forma`, ховається, коли форма на екрані, не на `/zapyt`). Вигляд: `fixed inset-x-0 bottom-0 z-30 bg-paper border-t-2 border-ink`, `padding 10px gutter calc(10px + env(safe-area-inset-bottom))`, `Button variant="cobalt" full arrow` «Отримати пропозиції»; `lg:hidden`; сторінка з баром має `pb-[76px]` на `main` (замість `pb-28`). Без blur і прозорості.
+
+**`TopicPage` / `WavePage` / `GuidePage` / `PlaceContent`** — композиція за §5; власних стилів не мають, лише сітки (`wrap`, `hero`, `cols`): 
+- `hero`: grid 1 → `7fr 5fr` на lg, gap `clamp(20px,3vw,40px)`, `padding-block var(--spacing-hero) clamp(24px,3vw,40px)`, `border-b-2 border-ink`; текстова частина grid gap 14.
+- `cols`: grid 1 → `1.15fr .85fr` на lg, gap `clamp(28px,4vw,56px)`, `padding-top clamp(24px,3vw,40px)`; `aside` на lg `sticky top-[84px]` grid gap 22; головна колонка grid gap `var(--spacing-block)`.
+
+**`InstagramPosts.client`** — комірки як `StudioCell` (ruled), без радіуса.
+
+**`KabinetForms.client` / `StudioEditForm.client`** — `Field` на папері, `Button variant="ink"`, повідомлення — `Note`; фото профілю квадратні без радіуса.
+
+---
+
+## 5. Шаблони сторінок
+
+Скрізь: `SiteHeader` → `main.wrap` → … → `SiteFooter`; `MobileRequestBar` на сторінках із формою або з контекстним запитом. У дужках — де стоїть CTA запиту: **верх / після відповіді / кінець**.
+
+| Сторінка | Порядок блоків (компоненти) |
+|---|---|
+| **Головна** `/` | Геро: рядок кікерів (ліворуч «Українська кераміка ручної роботи», праворуч «Каталог студій і майстрів · оновлено …», правий ховається < sm) → `WordmarkWindow` → `Rule ink` → grid 7/5: [H1 `text-h1` max 18ch, підзаголовок 18px ink-2 max 52ch, `Button cobalt arrow` «Отримати пропозиції» (**верх**) + `Button ghost`, `Epigraph verses.home`, `Stat inline` ×3] ∣ [`RequestForm compact`] · «Що ви шукаєте?» `SectionHead poster` + `more` «Усі напрями →» → 6 `PhotoCard` (01–04 ink, 05–06 cobalt) · `Panel cobalt bleed` «Як це працює»: кікер, H2 плакатний з `Italic` «замість», 3 кроки (номер peach, h3 19px, p 15.5px `on-cobalt-2` max 30ch, вертикальні `rule-on-dark`), `Button paper arrow` «Надіслати запит →» (**після відповіді**) · «Скільки коштує…» `SectionHead poster` + «Ціни 2026 →» → grid 4/8: фото 4:5 ∣ [`QuoteBlock` з `Term` «випали», 4 `Stat tile`, `DataTable` «Типові формати і ціни, 2026» 4 колонки] · «Майстер-класи за містами» `SectionHead poster` + «Усі міста →» → 3 `VesselWindow` → `CityList columns=4` → `ChipGroup` 7 форматів · «Як замовити кераміку без сюрпризів» → 3 гайди в колонках через `border-l border-rule` (`Kicker tone="terracotta"`, h3 19px, p 15px) · `Faq` 6 питань · `Panel ink bleed` «Для студій і майстрів»: grid 4/8 фото 3:4 ∣ H2 плакатний з `Italic`, 3 пункти з `rule-on-dark`, `Button peach` «Додати студію», примітка з посиланням «Вхід для студій» (peach, підкреслено) · `MobileRequestBar` (**кінець** на телефоні; окремої смуги в кінці не додаємо — шаблон затверджено без неї). Тексти й цифри — без змін із поточного `page.tsx`. |
+| **TopicPage** (18 тематичних) | `hero`: [`Breadcrumbs`, `Kicker`, H1, лід 18px з `b` на числах, `FactStrip` (студій · міст · ціни · термін · оновлено — лише ті, що є в `ctx`), `ChipGroup` «У містах:» з лічильниками, `Button cobalt arrow` «Отримати пропозиції» (**верх**, href `#zapyt-forma`) + `Button ghost` «Студії за містами» (`#list0`), `Updated`] ∣ [фото 16:11 без підпису (`DocPhoto` без `figcaption` для `sitePhotos`; з підписом — лише Wikimedia)] · `cols`: головна колонка — `Epigraph` → `PlaceStory` (абзаци max 70ch) → `PlacePicks` як `NumberedList` → розділи `SectionHead` + `NumberedList columns=2` → Ціни: `SectionHead` з `note` → `QuoteBlock` («Найчастіше в прайсах — …» + джерело) → `DataTable` (Студія · Місто · З прайсу · Джерело) → `CtaBand cobalt` (**після відповіді**) → Списки: `SectionHead` + `note` → `ChipGroup` міст-якорів → `CityHead` + `StudioRow` (12, далі `details` з `MoreLink as="summary"`) → `SmallCities` → `PlaceSeeAlso` → `Faq` → `ChipGroup` «Дивіться також» → `CtaBand ink` (**кінець**) → `PlaceSources`; бічна — `RequestForm` (якщо `topic.form`) або `SideBox` з посиланнями, під нею `SideBox` «Міста у списку». `MobileRequestBar`. JSON-LD без змін. |
+| **WavePage** (хвилі B/C, сезонні) | як TopicPage без списків студій: геро з `FactStrip` із чисел копі → `Epigraph` → підказки `NumberedList` → розділи (`DataTable` «Формати поруч», календар) → `Faq` → теги → `CtaBand ink`; бічна `RequestForm`. |
+| **GuidePage** `/hayidy/*` | геро з `DocPhoto` → `Epigraph` → розділи: проза max 70ch + `DataTable` + `NumberedList` → `Faq` → теги → `CtaBand ink`; бічна `RequestForm` (`what`/`studio` з гайда) або `SideBox`. |
+| **Списки** `/vyrobnyky`, `/vyrobnyky/vyrib/[product]`, `/vyrobnyky/misto/[city]` | `Breadcrumbs`, `Kicker`, H1, лід, `FactStrip`, `Updated` → по містах `CityHead` + `StudioCell` сітка (`Показати ще` через `details`) → `SmallCities` → `Faq` (де є) → `CtaBand ink`; бічна (lg) `SideBox` «Купити або замовити» + міста. |
+| **Міста** `/vyrobnyky/misto`, `/maister-klasy`, `/vyrobnyky/vyrib` | геро без фото → `SectionHead` «Міста/Формати» → `CityList columns=4` (формати — `ChipGroup`) → `SmallCities` → `Faq` → `CtaBand ink`. |
+| **Місто майстер-класів** `/maister-klasy/[city]`, `[format]` | геро: крихти, кікер, H1, лід, `FactStrip` (студій · від … грн · формати · оновлено), `ChipGroup` форматів + «Показати на мапі →», `Button cobalt` (**верх**), `Updated` ∣ фото 16:11 (кадр 87) → `Epigraph` (≥ 8 студій) → `SectionHead` + `note` → `MakerRow` список → `ChipGroup` (сертифікат, формати) → `Faq` → `CtaBand ink`; бічна `RequestForm defaultWhat="master-class"`. |
+| **Добірки, кейси** `/dobirky`, `/keysy` | геро → `IndexCell` сітка 2 колонки → для кейсів `CtaBand ink` «Ваша студія робила замовлення?» (`Button peach` → `/zapyt?vid=keys`). Кейс `/keysy/[slug]`: геро з фото студії (лише з Payload) → проза → `Facts` → `CtaBand cobalt`. |
+| **Профіль** `/vyrobnyky/[slug]` | `hero` 7/5: [`Breadcrumbs`, `Kicker` «Тип · Місто», H1 (`break-words`), опис 17px max 70ch (абзаци), `QuoteBlock` цитата власника (без джерела), «Що нового:» `Kicker` + текст, `ChipGroup` статичних чипів (`as="span"`: «працює із закладами», «корпоративні замовлення»), `Button cobalt arrow` «Запит цій студії» (**верх**), `Updated`] ∣ [`Kicker` «Коротко» + `Facts`] · фото студії (лише з Payload, зі згоди): головне 3:2 max 760 + до 5 квадратів, підпис «Фото: {назва}, публікуються зі згоди студії» 12.5px ink-2 · `cols`: Де знайти: `SectionHead` з `note`-адресою → `MapFrame profile` → маршрути (mono кікер + посилання cobalt) · Що робить: 2 `ListBlock` (+ `MoreLink` «Ще N →») · Ціни: `SectionHead note` → `PriceList` · Для бізнесу: `SectionHead kicker` → `Note` або умови → `CtaBand cobalt` (**після відповіді**) · Кейси студії `IndexCell` · Instagram (`InstagramPosts`) · Інші студії міста: `StudioCell` сітка ∣ бічна: `RequestForm` (**кінець** на десктопі), `SideBox` «Це ваша студія?» → «Керувати профілем →». `MobileRequestBar`. |
+| **`/zapyt`** | `max-w-narrow`: `Breadcrumbs`, `Kicker`, H1, лід → `RequestForm` повна/`forStudio` → `Faq` коротке (що далі, 5%). Без `MobileRequestBar`. |
+| **Кабінет** `/kabinet/*` (noindex) | `max-w-narrow`: H1 `text-h1`, пояснення, `Field` на папері, `Button ink`; список студій — `StudioCell`; фото — квадрати без радіуса; статуси — `Note`. Без епіграфа, без запиту. |
+| **404 / error** | `max-w-narrow pt-16 pb-24` grid gap 5: `Kicker` «Помилка 404» / «Тимчасова помилка», H1, абзац 18px ink-2, `ChipGroup` розділів (404) або `Button ink` «Спробувати ще раз» + `Button ghost` «На головну» (error), `MoreLink` «На головну →». Фото нема (кадр 417 з плану — лише якщо власник захоче). |
+| **`/mapa`, `/podiyi`, `/muzei-keramiky`, `/pro-nas`, `/dlya-studiy`, `/de-kupyty-keramiku`, `/tsiny-2026`** | геро без фото (крім `pro-nas` — без) → розділи з `SectionHead` + `DataTable` (`/tsiny-2026` зведена — `mode="scroll"`, решта `stack`) / `MapFrame list` + `Chip active` фільтри / `NumberedList` → `Faq` → `CtaBand ink` або `Panel ink` «Для студій» на `/dlya-studiy`. |
+
+---
+
+## 6. Фото
+
+### 6.1 Правила (коротко; повністю — `photo-plan.md`)
+
+- Архів власника — без окремої згоди; **виключені** кадри зі штампом-знаком 496–497; портрети «в камеру» не для ілюстрацій; людина в сцені — можна.
+- Підписів і кредитів під архівними фото нема → `DocPhoto` отримує варіант без `figcaption` (для `sitePhotos`); підпис лишається тільки для Wikimedia (`docPhotos`, CC BY-SA).
+- Зовнішні фото — лише для сюжетів, яких в архіві нема (посуд у закладі, стос тарілок, діти, піч); перевага Unsplash/CC0; запис у `CREDITS.md`.
+- Профілі й кейси — тільки фото студії з Payload.
+- Alt-тексти — з таблиць `photo-plan.md` (без назви студії й міста).
+- Реєстр `sitePhotos` у `src/content/photos.ts`: `{ src, width, height, alt }`, у коментарі № кадру; файли `public/images/site/<розділ>-<слот>-<n>.jpg` (JPEG q80, sRGB, без EXIF).
+
+**Заглушки на час впровадження** (власник дивиться на зверстаних сторінках):
+
+| Де | Зараз у макетах | Статус |
+|---|---|---|
+| Картка 01 «посуд для закладів», `/dlya-biznesu/posud-dlya-restoraniv`, гайд про посуд | `template/img/rest-plating.jpg` (Unsplash, джерело не записане) / `public/images/stock/restaurant-table.jpg` (pepe nero, CC0) | заглушка; кандидат Big Dodzy (§3 плану) або знайти джерело `rest-plating` |
+| «Сирець сохне» (ринок) | `class-drying-bowls.jpg` (Unsplash) | замінити архівним 505/508, підпис у блоці змінити |
+| Картка 02 «штамп» | `os-stamp.jpg` (кадр 496, знак) | **не публікувати** → 542 |
+| «Для студій» | `os-portrait.jpg` (526, портрет) | → 57 |
+| `/dlya-biznesu/posud-dlya-hoteliv` | нема | заглушка Elena Mozhvilo (Unsplash) до дозйомки |
+| `/maister-klasy/dlya-ditey` | нема | заглушка Kadir Celep (Unsplash) |
+| Гайд про випал, `chornodymlena-i-molochena` | Wikimedia (`docPhotos`) з підписом CC | лишається з підписом |
+| Добірки `/dobirky/*` | без фото | без фото, поки майстри не дадуть свої |
+| Профілі без фото | — | без фото; OG — куманець/герб |
+
+### 6.2 Розміри `next/image` по компонентах
+
+| Компонент | Кроп | Файл | `sizes` |
+|---|---|---|---|
+| `WordmarkWindow` (десктоп) | 8:3 | 2400×900, q75 | через `image-set` (§6.3) |
+| `WordmarkWindow` (телефон) | 8:3 | 1200×450 | `@media (max-width: 959px)` |
+| `PhotoCard` | 1:1 | 1200×1200 | `(min-width:960px) 33vw, 108px` |
+| Фото ринку (головна) | 4:5 | 1200×1500 | `(min-width:960px) 33vw, 100vw` |
+| `VesselWindow` | 3:4 / 1:1 | 600×800 / 600×600 | `(min-width:960px) 170px, 120px` |
+| «Для студій» | 3:4 (< lg 4:3, `object-position: center 30%`) | 1200×1600 | `(min-width:960px) 33vw, 100vw` |
+| `DocPhoto` у геро внутрішніх | 16:11 | 1200×825 | `(min-width:960px) 40vw, 100vw` |
+| Профіль: головне / мініатюри | 3:2 / 1:1 | з Payload | `(min-width:960px) 760px, 100vw` / `(min-width:640px) 150px, 33vw` |
+| OG | 1.91:1 | 1200×630, q70, ≤ 200 KB | — |
+
+Усі фото `object-fit: cover`, `rounded-none`, `priority` лише для першого фото геро; решта lazy.
+
+### 6.3 Вордмарк-вікно (`WordmarkWindow`, серверний)
+
+1. `getImageProps` двічі (без `sizes`, щоб `srcSet` мав `1x/2x`, як у прикладі «Background CSS» у `node_modules/next/dist/docs/01-app/03-api-reference/02-components/image.md`): десктоп `{ src: desktop.src, width: 1600, height: 600, quality: 75, alt: '' }` → Next віддасть ширини ≈ 1920 (1x) і джерельні 2400 (2x; вище джерела не масштабує); телефон `{ width: 800, height: 300 }`.
+2. `srcSet` → `image-set("url" 1x, "url" 2x)` (функція з документації); обидва значення передати інлайн як `style={{ '--wm-d': …, '--wm-m': … }}`.
+3. CSS `@layer components`:
+   ```css
+   .ui-wordmark { font-family: var(--font-display); font-weight: 800; text-transform: uppercase; line-height: .9; letter-spacing: -.02em;
+     font-size: min(345px, calc((100vw - 2 * var(--spacing-gutter)) / 4.4)); width: fit-content; max-width: 100%; margin-left: -.02em;
+     background: var(--wm-m) center 48% / cover no-repeat; -webkit-background-clip: text; background-clip: text; color: transparent; }
+   @media (min-width: 60rem) { .ui-wordmark { background-image: var(--wm-d); } }
+   @supports not ((background-clip: text) or (-webkit-background-clip: text)) { .ui-wordmark { background: none; color: var(--color-ink); } }
+   ```
+4. Preload обох варіантів через `ReactDOM.preload(url1x, { as: 'image', imageSrcSet: srcSet, fetchPriority: 'high', media: '(min-width: 60rem)' })` і те саме з `media: '(max-width: 59.99rem)'` (React 19 підтримує `media`, `imageSrcSet`, `imageSizes`).
+5. Розмітка: `<div class="ui-wordmark" aria-hidden="true">Глина</div>`; справжній `<h1>` нижче. `main { overflow-x: clip }` вже в базі.
+6. Перевірка: `pnpm shots /` — слово рівно по ширині контейнера на 390 і 1280, без обрізання; у Network один запит фото на в'юпорт.
+
+---
+
+## 7. OG-картка — вибір у процесі
+
+Триває 2-й раунд (`experiments/design-options/og-a|b|c.html`, `og.css`, `og-data.js`). Поки власник не вибрав:
+- `src/app/(frontend)/og/route.tsx` лишається як є і мігрує на нові токени **останнім кроком перед прибиранням 1A** (§9, крок 8), щоб не робити двічі.
+- Обмеження Satori: flex і абсолютне позиціювання, без grid, `background-clip`, blend, clip-path; шрифти — TTF з `src/assets/fonts` (потрібні Unbounded 800, Golos Text 400/500, JetBrains Mono 500; для варіанта B ще Playfair Display Italic 400).
+- Фото в OG — ті самі кадри, що на сторінці (`ogImage({img})`), для міст — герби `public/images/coa`, за замовчуванням — кадр 331 або 414; профілі без фото — куманець на папері/кобальті.
+- Разом з OG оновити `manifest.ts` (`background_color: #efe9de`, `theme_color: #1d3ec6`) і `viewport.themeColor` у `layout.tsx` (пропозиція — `#efe9de`, колір шапки; питання власнику §10).
+
+Сюди вписати обраний варіант і специфікацію після рішення.
+
+---
+
+## 8. Стайлгайд `/dev/styleguide`
+
+- Файл `src/app/(frontend)/dev/styleguide/page.tsx`, серверний, `export const metadata = { title: 'Стайлгайд', robots: { index: false, follow: false } }`. У sitemap не потрапляє (`next-sitemap` виключає все, крім `catalog-sitemap.xml`; `/dev` у `catalog-sitemap` не додавати). У `robots.txt` **не** забороняти (інакше `noindex` не прочитають). На `/llms.txt` не згадувати. Посилань на нього із сайту нема.
+- **Видимий у проді** (рішення: так — статичний, дешевий, дає власникові подивитися на телефоні; якщо власник проти — обгорнути в `notFound()` при `NODE_ENV === 'production'`).
+- Рендерить **справжні компоненти з `src/components/ui` і `site`**, не копії розмітки, у такому порядку (кожен блок — `SectionHead` з назвою компонента і `id`): 1 кольори (свотчі зі значенням, роллю і парами з §2.1, читаються з CSS-змінних) · 2 типографіка (усі рядки §3.1 живим текстом) · 3 лінійки/радіус/фокус · 4 `Button` усі варіанти × розміри × стани (hover показати як окремий статичний приклад не треба; `disabled`) на папері, у `Panel cobalt` і `Panel ink` · 5 `Kicker`, `SectionHead rule/poster`, `CityHead`, `MoreLink`, `Breadcrumbs`, `Updated` · 6 `Panel` обидва тони з кікером, текстом і кнопкою · 7 `FactStrip` (цифри з `stats()`), `Stat inline/tile` · 8 `PhotoCard` ×2 (ink, cobalt) з фото з `sitePhotos`, `VesselWindow` ×3 · 9 `DataTable` stack і scroll (рядки з `facts()`/таблиці головної) · 10 `Chip` усі варіанти, `ChipGroup` · 11 `Faq` (3 питання з `faqFor`) · 12 `Term` · 13 `Epigraph` (`verses.home`) · 14 `Field`/`Input`/`Select`/`Textarea`/`Checkbox` на папері й на кобальті, стан помилки · 15 `NumberedList` 1 і 2 колонки, `QuoteBlock`, `CtaBand` обидва тони, `Note`, `SideBox` · 16 `StudioCell`, `StudioRow`, `MakerRow`, `CityList`, `SmallCities`, `Facts`, `ListBlock`, `PriceList`, `IndexCell` — з **реальними** студіями (`getCatalog`, перші 2–4 з Києва; якщо база недоступна під час білда — порожній стан «немає даних», без вигаданих) · 17 `MapFrame` (порожній, fallback-текст) · 18 `RequestForm` compact і повна, `MobileRequestBar` показати як статичний блок (`position: static` через проп `inline`) · 19 `Mark` 22/26/28 · 20 вордмарк (`WordmarkWindow`).
+- Перевірка: `pnpm shots /dev/styleguide` на 390/1280 — порівняти з попереднім знімком у `.shots/`; скрипт `shots.mjs` доповнити перевіркою `document.documentElement.scrollWidth <= window.innerWidth` (друкує попередження про горизонтальний скрол).
+- Доки й код не розходяться: новий примітив → рядок у §4.1 + блок у стайлгайді в одному коміті.
+
+---
+
+## 9. Порядок впровадження
+
+Кожен крок — один коміт (або 2–3 дрібних), без push. Перевірка кожного: `pnpm lint`, `pnpm exec tsc --noEmit`, `pnpm shots <маршрути>` на 390 і 1280 — подивитися знімки, переконатися, що нема горизонтального скролу і що бар/форма не перекривають поля. На кроках 1–3 решта сайту тимчасово змішана (старі класи на нових значеннях `ink`/`cobalt`) — це прийнятно лише до кроку 9.
+
+| # | Крок | Файли | Перевірка |
+|---|---|---|---|
+| 1 | **Токени + шрифти.** Новий `@theme` (§2.6) поруч зі старими 1A-токенами (старі лишаються до кроку 9, але `--color-ink` і `--color-cobalt` одразу отримують нові значення); базові стилі; видалити shadcn-змінні, `html{opacity:0}`, `dark`, typography, `tw-animate-css`, `tailwind.config.mjs`; `next/font` за §3.2; `font-sans` → `font-body` у коді | `globals.css`, `layout.tsx`, `package.json` | `pnpm build`; `pnpm shots /` — шрифти Golos/Unbounded, сторінка не «біла»; Lighthouse: ≤ 10 preload шрифтів |
+| 2 | **Примітиви + стайлгайд.** `src/components/ui/*` з §4.1, `layout.ts` (`wrap`), `@layer components` (`ui-table`, `ui-faq`, `ui-term`, `ui-wordmark`), `src/content/glossary.ts`, `sitePhotos` у `photos.ts` (поки з наявними файлами), `/dev/styleguide` | `src/components/ui/`, `src/app/(frontend)/dev/styleguide/` | `pnpm shots /dev/styleguide`; стек таблиці на 390; тултип не виходить за край; `tsc` |
+| 3 | **Шапка, футер, бар.** `SiteHeader`, `MainNav.client` (`dialog`-шухляда, `nav-*`), `SiteFooter`, `MobileRequestBar` | `src/components/site/` | `pnpm shots / /dlya-biznesu/posud-dlya-restoraniv`; e2e smoke (`tests/e2e`) меню відкривається/закривається, Escape; на 390 «Запит →» в один рядок, шухляда прокручується |
+| 4 | **Головна.** `page.tsx` за §5: `WordmarkWindow`, `PhotoCard`, `Panel`, `Stat`, `DataTable`, `VesselWindow`, `CityList`, `Faq`; `RequestForm compact` на кобальті; фото за `photo-plan.md` §2 (експорт у `public/images/site/`) | `page.tsx`, `photos.ts`, `public/images/site/` | `pnpm shots /`: «ГЛИНА» по ширині; картки 3×2 на 1280, списком на 390; e2e H1 без змін; JSON-LD на місці (`view-source`) |
+| 5 | **TopicPage.** `TopicPage`, `PlaceContent`, `StudioRow`, `SmallCities`, `CityHead`, `FactStrip`, `CtaBand`, `QuoteBlock`, `RequestForm` повна; потім `WavePage`, `GuidePage`, `WaveB/CRoute` | `src/components/site/` | `pnpm shots` 3 тематичних (бізнес, МК-формат, гайд) + одна хвиля; форма липка на 1280, бар ховається над формою на 390; FAQ JSON-LD |
+| 6 | **Профіль і списки.** `vyrobnyky/[slug]`, `StudioCell`, `MakerRow`, `Facts`, `ListBlock/PriceList`, `MapFrame` + стилі попапів, `InstagramPosts`; `/vyrobnyky`, `/vyrobnyky/misto[/city]`, `/vyrobnyky/vyrib[/product]`, `/maister-klasy`, `/maister-klasy/[city][/format]`, `/dobirky*`, `/keysy*`, `/tsiny-2026`, `/mapa` | `src/app/(frontend)/…`, `profile/blocks.tsx` | `pnpm shots` профіль SaGa Pottery, `/maister-klasy/kyiv`, `/vyrobnyky/misto`, `/tsiny-2026`, `/mapa`; таблиця цін scroll без обрізання на 390 |
+| 7 | **Решта.** `/zapyt`, `/kabinet/*` + `KabinetForms`/`StudioEditForm`, 404/`error.tsx`, `/pro-nas`, `/dlya-studiy`, `/podiyi`, `/muzei-keramiky`, `/de-kupyty-keramiku`, `/sertyfikaty*`, `/podarunky-z-keramiky`, `/novyi-rik-i-rizdvo` | | `pnpm shots` кожної; `tests/int` проходять; форма кабінету надсилається |
+| 8 | **OG + manifest + themeColor** після 2-го раунду (§7); TTF у `src/assets/fonts`, прибрати Raleway TTF | `og/route.tsx`, `manifest.ts`, `layout.tsx` | відкрити `/og?…` для 4 типів сторінок, ≤ 200 KB, шрифти рендеряться |
+| 9 | **Прибирання 1A.** Видалити старі токени й утиліти з `globals.css`, `Bits.container`, `StudioCard.tsx`, `SelectionFaq.tsx`; grep-перевірка з §2.7 = 0; запис у `docs/decisions.md` і `docs/STATUS.md`; `AGENTS.md` (власник) | | `pnpm build`; `pnpm shots` головна + 2 внутрішні; grep порожній |
+
+---
+
+## 10. Відкриті питання для власника
+
+1. **Стайлгайд у проді** — лишити відкритим (`noindex`, без посилань) чи ховати за `notFound()` у production?
+2. **Стани форм без зеленого/червоного** — помилка `terracotta-text`/`peach`, успіх звичайним текстом із лінійкою. Прийнятно для кабінету студій?
+3. **`theme-color` браузера** — папір `#efe9de` (як шапка) чи кобальт `#1d3ec6`?
+4. **Словник (`Term`)** — лише вручну у вибраних місцях (головна «випали», гайди) чи автоматично для першої появи кожного слова з `glossary.md` на сторінці?
+5. **Телефон: дві кнопки запиту** (шапка «Запит →» + нижній бар) — лишити обидві, як у макеті, чи прибрати з шапки, коли є бар?
