@@ -27,26 +27,30 @@ export const docPhotos = {
 export type DocPhotoKey = keyof typeof docPhotos
 
 // Photos of the site's own chrome (home page, headers of lists): the owner's archive, no credit line.
-// docs/design/photo-plan.md says which frame goes where. Until the frames are exported (step 4 of docs/design/SYSTEM.md §9)
-// every slot points at a file that already exists in public/images, so pages and the styleguide render now.
+// docs/design/photo-plan.md says which frame goes where; files are cut from the 3000px masters into public/images/site/
+// (JPEG, sRGB, no EXIF). The frame number of each slot is in the comment (index: docs/design/photo-index.tsv).
 export type SitePhoto = { src: string; width: number; height: number; alt: string }
 
 const slot = ({ src, width, height, alt }: DocPhoto): SitePhoto => ({ src, width, height, alt })
 
 export const sitePhotos = {
-  // Wordmark window (8:3 strip, decorative: the text on top carries the meaning). Plan: frame 331.
-  wordmarkDesktop: { ...slot(docPhotos.wheelHands), alt: '' },
-  wordmarkMobile: { ...slot(docPhotos.wheelHands), alt: '' },
-  // Home «Що ви шукаєте?», cards 01–06 (1:1). Plan: 01 stock, 02 frame 542, 03 82, 04 346, 05 320, 06 408.
+  // Wordmark window (8:3 strip, decorative: the text on top carries the meaning). Frame 331; the phone file is the same crop at 1200 px.
+  wordmarkDesktop: { src: '/images/site/home-wordmark-1.jpg', width: 2400, height: 900, alt: '' },
+  wordmarkMobile: { src: '/images/site/home-wordmark-mobile-1.jpg', width: 1200, height: 450, alt: '' },
+  // Home «Що ви шукаєте?», cards 01–06 (1:1). 01: stock CC0 placeholder (pepe nero, Unsplash; no archive frame of a dish in a restaurant).
   cardVenues: slot(docPhotos.restaurantTable),
-  cardLogo: slot(docPhotos.tealMug),
-  cardGifts: slot(docPhotos.festiveWare),
-  cardPair: slot(docPhotos.wheelTop),
-  cardClass: slot(docPhotos.potterOutdoors),
-  cardCertificate: slot(docPhotos.handbuilding),
-  // Home market block (4:5, plan: frame 505) and «Для студій» (3:4, plan: frame 57).
-  market: slot(docPhotos.glazedBottles),
-  forStudios: slot(docPhotos.schoolStudio),
+  cardLogo: { src: '/images/site/home-path-02-1.jpg', width: 1200, height: 1200, alt: 'Відтиск штампа-квітки на сирій тарілці з рожевим краєм' }, // 542
+  cardGifts: { src: '/images/site/home-path-03-1.jpg', width: 1200, height: 1200, alt: 'Чашка ручної роботи з червоними сердечками на дерев’яній полиці' }, // 82
+  cardPair: { src: '/images/site/home-path-04-1.jpg', width: 1200, height: 1200, alt: 'Дві пари рук тримають свіжу миску на гончарному колі, вигляд згори' }, // 346
+  cardClass: { src: '/images/site/home-path-05-1.jpg', width: 1200, height: 1200, alt: 'Майстриня за гончарним колом у літньому дворі' }, // 320
+  cardCertificate: { src: '/images/site/home-path-06-1.jpg', width: 1200, height: 1200, alt: 'Свіжу глиняну миску передають з рук у руки на тлі листя' }, // 408
+  // Home market block (4:5) and «Для студій» (3:4).
+  market: { src: '/images/site/home-market-1.jpg', width: 1200, height: 1500, alt: 'Миска в сирій поливі сохне на столі перед випалом' }, // 505
+  forStudios: { src: '/images/site/home-studios-1.jpg', width: 1200, height: 1600, alt: 'Майстриня за столом у світлій студії, полиці з виробами, світло з вікна' }, // 57
+  // Home format windows (clip-path shapes): jug 3:4, bowl and plate 1:1.
+  vesselJug: { src: '/images/site/home-format-jug-1.jpg', width: 600, height: 800, alt: 'Руки майстрині формують миску з глини на турнетці' }, // 297
+  vesselBowl: { src: '/images/site/home-format-bowl-1.jpg', width: 600, height: 600, alt: 'Руки формують миску на гончарному колі, крупний план' }, // 384
+  vesselPlate: { src: '/images/site/home-format-plate-1.jpg', width: 600, height: 600, alt: 'Миска з блакитними хмаринками і пензель, вигляд згори' }, // 478
 } satisfies Record<string, SitePhoto>
 
 export type SitePhotoKey = keyof typeof sitePhotos
