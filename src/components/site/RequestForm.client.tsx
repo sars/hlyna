@@ -31,6 +31,7 @@ const label = 'grid gap-1 text-[13px] font-semibold text-umber'
 // defaultWhat / defaultCity come from the page (a master-class city page asks about a master class in that city).
 // /zapyt?vid=studiya (or forStudio, on /dlya-studiy) opens the form for studios that want to add or update their profile.
 // /zapyt?what=<kind>&misto=<city slug> (set by the header button from the page the visitor came from) pre-fills the form.
+// /zapyt?vid=keys&slug=<case slug> asks us to remove or correct a case page («Інше» with a prefilled note).
 export function RequestForm({
   sourcePage,
   compact = false,
@@ -51,6 +52,7 @@ export function RequestForm({
   const [requestId, setRequestId] = useState<number | null>(null)
   const [what, setWhat] = useState(defaultWhat)
   const [city, setCity] = useState(defaultCity)
+  const [details, setDetails] = useState('')
   const [studio, setStudio] = useState(forStudio)
   const kind = KIND[what] ?? KIND.other
   // New-studio form: warn when the studio is already in the catalogue and point to the claim instead.
@@ -73,6 +75,11 @@ export function RequestForm({
     const q = new URLSearchParams(window.location.search)
     /* eslint-disable react-hooks/set-state-in-effect -- one-time sync from the URL after hydration */
     if (q.get('vid') === 'studiya') setStudio(true)
+    const caseSlug = q.get('vid') === 'keys' ? (q.get('slug') ?? '').replace(/[^a-z0-9-]/g, '').slice(0, 120) : ''
+    if (caseSlug) {
+      setWhat('other')
+      setDetails(`Прошу зняти або виправити кейс /keysy/${caseSlug}. Що саме: `)
+    }
     const w = q.get('what')
     if (w && KIND[w]) setWhat(w)
     const m = q.get('misto')
@@ -196,7 +203,7 @@ export function RequestForm({
         {!compact && (
           <label className={`${label} sm:col-span-2`}>
             Деталі
-            <textarea name="details" rows={3} placeholder={kind.details} className={field} />
+            <textarea name="details" rows={3} placeholder={kind.details} value={details} onChange={(e) => setDetails(e.target.value)} className={field} />
           </label>
         )}
         <label className={label}>

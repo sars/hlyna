@@ -122,10 +122,19 @@ export function singleClassAmounts(s: Studio): number[] {
 // Birth years and similar personal details are not business information (CLAUDE.md → privacy).
 export function stripPersonal(text: string): string {
   return text
+    // «Народилася в 1964 році, закінчила …» → «Закінчила …» (the rest of the sentence is about work, keep it).
+    .replace(/(^|[.!?]\s+)народи\p{L}*\s+(?:у|в)\s+\d{4}\s+році,\s*(\p{L})/giu, (_m, a: string, c: string) => a + c.toUpperCase())
+    // A short sentence that is only about birth («Народилася 1985 року в Ужгороді.»).
+    .replace(/(^|[.!?]\s+)народи\p{L}*(?:(?<!\p{L})р\.|[^.!?;]){0,40}?\d{4}(?:(?<!\p{L})р\.|[^.!?;]){0,60}?[.!?](?=\s|$)\s*/giu, '$1')
+    // Inline: «…, народилася 1985 року у Львові, …» / «народився у 1985 р.»
     .replace(/,?\s*народи\p{L}*\s+(?:у|в)?\s*\d{4}\s*(?:року|р\.)?(?:\s+(?:у|в)\s+[^,.;]+)?/giu, '')
-    .replace(/\s*\(\s*(?:\d{4}\s*(?:р\.\s*н\.|року народження)|нар\.\s*\d{4})\s*\)/giu, '')
+    // «(нар. 1985 р.)», «(1985 р. н.)», «(1985 року народження)»
+    .replace(/\s*\(\s*(?:\d{4}\s*(?:р\.\s*н\.|року народження)|нар\.\s*(?:у|в)?\s*\d{4}\s*(?:р\.|року)?)\s*\)/giu, '')
     .replace(/,?\s*\d{4}\s*(?:р\.\s*н\.|року народження)/giu, '')
-    .replace(/\s+,/g, ',')
+    // Leftover punctuation after a removed clause.
+    .replace(/^[\s,;]+/u, '')
+    .replace(/\s+([,;])/g, '$1')
+    .replace(/,([.;])/g, '$1')
     .replace(/ {2,}/g, ' ')
     .trim()
 }

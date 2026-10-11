@@ -21,6 +21,7 @@ import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCit
 import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
 import { amountsIn, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
+import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
 import { link, ListBlock, PriceItem } from '@/components/profile/blocks'
 
 export const revalidate = 86400
@@ -111,6 +112,7 @@ export default async function StudioPage({ params }: Args) {
   const routeQuery = encodeURIComponent(placeText.replace(/\s*\([^)]*\)/g, ''))
   const receivesVisitors = ['studio', 'school', 'shop', 'heritage'].includes(s.type ?? '')
   const photos = await getStudioPhotos(s.id)
+  const cases = casesForStudio(s.slug)
 
   return (
     <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
@@ -118,6 +120,7 @@ export default async function StudioPage({ params }: Args) {
         data={{
           '@context': 'https://schema.org',
           '@type': isPersonMaker(s) ? 'Person' : dormant ? 'Organization' : 'LocalBusiness',
+          ...(cases.length ? { '@id': studioLdId(s.slug) } : {}),
           name,
           description: stripPersonal(s.summary || description),
           url: `${site.url}/vyrobnyky/${s.slug}`,
@@ -270,6 +273,22 @@ export default async function StudioPage({ params }: Args) {
               ) : (
                 <p className="m-0 rounded-2xl bg-card p-4">Мінімальну партію, терміни й ціни для бізнесу студія ще не вказала. Надішліть запит — ми передамо його студії разом з іншими, що роблять подібні вироби.</p>
               )}
+            </section>
+          )}
+
+          {cases.length > 0 && (
+            <section aria-labelledby="keysy">
+              <SectionHead kicker="Для бізнесу" title="Кейси студії" id="keysy" />
+              <ul className="m-0 grid grid-cols-1 list-none gap-2 p-0">
+                {cases.map((c) => (
+                  <li key={c.slug}>
+                    <Link href={casePath(c.slug)} className="block rounded-2xl bg-card p-4 text-ink no-underline hover:bg-sand hover:text-ink">
+                      <span className="block text-[13px] text-umber">Кейс · {c.client.type}</span>
+                      <b>{c.title}</b>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
             </section>
           )}
 
