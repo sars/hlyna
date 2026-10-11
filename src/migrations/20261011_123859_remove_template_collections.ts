@@ -146,34 +146,34 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   DROP TABLE "footer_nav_items" CASCADE;
   DROP TABLE "footer" CASCADE;
   DROP TABLE "footer_rels" CASCADE;
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_pages_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_pages_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_posts_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_posts_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_categories_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_categories_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_redirects_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_redirects_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_forms_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_forms_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_form_submissions_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_form_submissions_fk";
   
-  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_search_fk";
+  ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT IF EXISTS "payload_locked_documents_rels_search_fk";
   
-  DROP INDEX "payload_locked_documents_rels_pages_id_idx";
-  DROP INDEX "payload_locked_documents_rels_posts_id_idx";
-  DROP INDEX "payload_locked_documents_rels_categories_id_idx";
-  DROP INDEX "payload_locked_documents_rels_redirects_id_idx";
-  DROP INDEX "payload_locked_documents_rels_forms_id_idx";
-  DROP INDEX "payload_locked_documents_rels_form_submissions_id_idx";
-  DROP INDEX "payload_locked_documents_rels_search_id_idx";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "pages_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "posts_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "categories_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "redirects_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "forms_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "form_submissions_id";
-  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN "search_id";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_pages_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_posts_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_categories_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_redirects_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_forms_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_form_submissions_id_idx";
+  DROP INDEX IF EXISTS "payload_locked_documents_rels_search_id_idx";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "pages_id";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "posts_id";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "categories_id";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "redirects_id";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "forms_id";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "form_submissions_id";
+  ALTER TABLE "payload_locked_documents_rels" DROP COLUMN IF EXISTS "search_id";
   DROP TYPE "public"."enum_pages_hero_links_link_type";
   DROP TYPE "public"."enum_pages_hero_links_link_appearance";
   DROP TYPE "public"."enum_pages_blocks_cta_links_link_type";
