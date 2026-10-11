@@ -24,3 +24,8 @@ node_modules/
 # Screenshots (pnpm shots)
 .shots/
 .snapshots/
+
+# Payload → app migration runs
+.migration/
+migration-report.json
+verify-report.json
