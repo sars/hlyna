@@ -21,6 +21,8 @@ export function Chip({ href, count, size = 'md', active, tone = 'ink', as, class
   const cobalt = tone === 'cobalt'
   const cls = cx(
     'group/chip inline-flex items-center rounded-btn font-mono uppercase no-underline',
+    // 44px tap target on phones without changing the look (the pseudo-element is the extra hit area).
+    interactive && "relative before:absolute before:inset-x-0 before:-inset-y-[9px] before:content-['']",
     size === 'md' ? 'px-[11px] py-[7px] text-[11.5px] leading-none tracking-[.04em]' : 'px-[7px] py-1 text-[10.5px] leading-none tracking-[.04em]',
     size === 'sm' && !cobalt && 'text-ink-2 shadow-[inset_0_0_0_1px_var(--color-rule)]',
     size === 'sm' && cobalt && 'text-cobalt shadow-[inset_0_0_0_1.5px_var(--color-cobalt)]',

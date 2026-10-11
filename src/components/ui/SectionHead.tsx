@@ -17,7 +17,7 @@ export function SectionHead({ title, id, kicker, note, more, level = 2, variant 
         </H>
         {note && <p className="m-0 max-w-read text-[14.5px] leading-[1.45] text-ink-2">{note}</p>}
       </div>
-      {more && <MoreLink href={more.href} className="py-0 md:pb-1">{more.label}</MoreLink>}
+      {more && <MoreLink href={more.href} pad={false} className="md:pb-1">{more.label}</MoreLink>}
     </div>
   )
 }

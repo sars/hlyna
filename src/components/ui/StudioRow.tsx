@@ -15,7 +15,7 @@ export function StudioRow({ s, line, showCity }: { s: StudioCard; line?: string;
   const type = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   return (
     <li>
-      <Link href={`/vyrobnyky/${s.slug}`}>
+      <Link href={`/vyrobnyky/${s.slug}`} data-wide={showCity && s.cityDoc ? '' : undefined}>
         <span className="pt-[3px] font-mono text-[11px] tracking-[.06em] text-ink-2 uppercase">
           {type}
           {showCity && s.cityDoc ? ` · ${s.cityDoc.name}` : ''}

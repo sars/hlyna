@@ -226,7 +226,8 @@
   .ui-table td + td, .ui-table th + th { padding-left: 14px; }
   .ui-table [data-end] { text-align: right; }
   .ui-table [data-numeric] { font-variant-numeric: tabular-nums; }
-  .ui-table td[data-mono] { font-family: var(--font-mono); font-size: 12px; color: var(--color-ink-2); }
+  .ui-table td[data-mono] { font-family: var(--font-mono); font-size: 12px; line-height: 22.5px; color: var(--color-ink-2); }
+  .ui-table-scroll [data-numeric] + [data-mono], .ui-table-scroll th[data-end] + th:not([data-end]) { padding-left: 24px; }
   .ui-table a { color: var(--color-cobalt); text-decoration: underline; text-underline-offset: 3px; }
   .ui-table-scroll { overflow-x: auto; }
   .ui-table-scroll .ui-table { min-width: 640px; }
@@ -234,6 +235,7 @@
     .ui-table td[data-numeric], .ui-table td[data-mono] { white-space: nowrap; }
   }
   @media (max-width: 49.99rem) {
+    .ui-table-scroll caption::after { content: ' · прокрутіть вбік'; }
     .ui-table[data-stack], .ui-table[data-stack] tbody, .ui-table[data-stack] tr, .ui-table[data-stack] td { display: block; }
     .ui-table[data-stack] caption { display: block; width: 100%; }
     .ui-table[data-stack] thead { display: none; }
@@ -258,7 +260,7 @@
 
   /* Glossary term: dotted terracotta underline and a CSS-only tooltip (the definition also stands in the page text). */
   .ui-term { position: relative; text-decoration: underline dotted var(--color-terracotta); text-decoration-thickness: 1.5px; text-underline-offset: 4px; cursor: help; }
-  .ui-term::after { content: attr(data-def); display: none; position: absolute; left: 0; bottom: calc(100% + 8px); z-index: 5; width: max-content; max-width: min(300px, 70vw); padding: 8px 11px; background: var(--color-ink); color: var(--color-paper); border-radius: var(--radius-btn); font-family: var(--font-body); font-size: 14px; font-weight: 400; line-height: 1.4; letter-spacing: 0; text-transform: none; text-decoration: none; pointer-events: none; }
+  .ui-term::after { content: attr(data-def); display: none; position: absolute; left: 0; bottom: calc(100% + 8px); z-index: 5; width: max-content; max-width: min(300px, 70vw); padding: 8px 11px; background: var(--color-ink); color: var(--color-paper); border-radius: var(--radius-btn); font-family: var(--font-body); font-size: 14px; font-weight: 400; line-height: 1.4; letter-spacing: 0; text-transform: none; text-decoration: none; text-align: start; pointer-events: none; }
   .ui-term[data-side='end']::after { left: auto; right: 0; }
   .ui-term:hover::after, .ui-term:focus::after { display: block; }
   @media (max-width: 39.99rem) {
@@ -269,7 +271,7 @@
   }
 
   /* Form controls: underline fields, tone from the panel. */
-  .ui-field { display: grid; gap: 3px; padding-block: 7px; min-width: 0; }
+  .ui-field { display: grid; gap: 3px; align-content: start; padding-block: 7px; min-width: 0; }
   .ui-field > label, .ui-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
   [data-tone='cobalt'] .ui-field > label { opacity: 0.85; }
   .ui-control { width: 100%; min-width: 0; padding: 6px 0; border: 0; border-bottom: 2px solid var(--color-ink-2); border-radius: 0; background-color: transparent; color: var(--color-ink); font: inherit; font-size: 16px; line-height: 1.4; }
@@ -286,7 +288,7 @@
   [data-tone='cobalt'] .ui-error { color: var(--color-peach); }
   .ui-hint { font-size: 12.5px; color: var(--color-ink-2); }
   [data-tone='cobalt'] .ui-hint { color: var(--color-on-cobalt-2); }
-  .ui-check { display: flex; align-items: center; gap: 8px; padding-block: 8px; font-size: 14px; }
+  .ui-check { display: flex; align-items: center; gap: 8px; padding-block: 12px; font-size: 14px; }
   .ui-check input { width: 16px; height: 16px; accent-color: var(--color-cobalt); }
   [data-tone='cobalt'] .ui-check { color: var(--color-on-cobalt-2); }
   [data-tone='cobalt'] .ui-check input { accent-color: var(--color-peach); }
@@ -308,6 +310,7 @@
   .ui-rows .ui-go { grid-column: 2; grid-row: 1 / 4; align-self: center; }
   @media (min-width: 50rem) {
     .ui-rows > li > a { grid-template-columns: 96px minmax(0, 1fr) auto; }
+    .ui-rows > li > a[data-wide] { grid-template-columns: 132px minmax(0, 1fr) auto; }
     .ui-rows .ui-go { grid-column: 3; }
     .ui-rows .ui-line, .ui-rows .ui-stale, .ui-rows .ui-name { grid-column: 2; }
   }

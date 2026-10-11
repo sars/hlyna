@@ -21,7 +21,7 @@ export function ListBlock({ title, items, limit = 12 }: { title: string; items: 
       </ul>
       {rest.length > 0 && (
         <details className="group">
-          <MoreLink as="summary" className="py-1.5 text-cobalt">
+          <MoreLink as="summary" pad={false} className="py-1.5 text-cobalt">
             <span className="group-open:hidden">Ще {rest.length}</span>
             <span className="hidden group-open:inline">Згорнути</span>
           </MoreLink>

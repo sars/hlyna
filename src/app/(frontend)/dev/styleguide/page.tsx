@@ -115,7 +115,7 @@ export default async function StyleguidePage() {
     { value: fmt(byCity.length), label: 'міст і сіл' },
     { value: fmt(mkStudios.length), label: 'місць із майстер-класами' },
     ...(group ? [{ value: `${fmt(group.min)}–${fmt(group.max)}`, label: `грн, разовий майстер-клас ${group.unit}` }] : []),
-    { value: site.dataUpdated, label: 'дані оновлено' },
+    { value: '10.2026', label: 'дані оновлено' },
   ]
   const faqItems = [
     { q: 'Скільки часу займає виготовлення партії кераміки?', a: `Зазвичай ${site.lead.batch} (як зазначають студії).` },
@@ -355,7 +355,7 @@ export default async function StyleguidePage() {
         <NumberedList items={[{ title: 'Одна колонка', text: 'Те саме в одну колонку.' }]} />
         <Note>Студія ще не вказала мінімальне замовлення і терміни — запитайте у запиті.</Note>
         <div className="grid gap-6 md:grid-cols-2">
-          <SideBox title="Міста у списку"><CityList columns={2} items={cityItems.slice(0, 4)} /></SideBox>
+          <SideBox title="Міста у списку"><CityList variant="side" items={cityItems.slice(0, 4)} /></SideBox>
           <SideBox title="Це ваша студія?"><MoreLink href="/dlya-studiy">Керувати профілем</MoreLink></SideBox>
         </div>
         {saga && (
