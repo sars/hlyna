@@ -6,13 +6,14 @@ import React from 'react'
 import { SectionHead } from '@/components/site/Bits'
 import { MakerRow } from '@/components/site/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
-import { fmt, getAllStudios, groupByCity, type StudioCard } from '@/lib/catalog'
+import { getAllStudios, groupByCity, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
 import { evidenceLine } from '@/lib/topics'
 import { fillCopy } from '@/lib/waveA'
 import { makerCities } from '@/lib/makers'
 import { EVENT_KIND, eventEnd, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/lib/waveB'
 import { ogImage } from '@/utilities/ogImage'
+import { fmt } from '@/lib/money'
 
 // Wave B page: reviewed copy (src/content/waveB) around a live block that differs per page.
 // Route files are one-liners: `export default () => <WaveBRoute id="…" />` plus waveBMetadata(id).

@@ -2,12 +2,13 @@
 // rendered by src/components/site/TopicPage.tsx. Lists come from studio format tags
 // (scripts/tag-studios.ts); counts and prices are computed live, the text here stays factual.
 import type { Format, StudioCard } from '@/lib/catalog'
-import { fmt, pluralUk, texts } from '@/lib/catalog'
+import { pluralUk, texts } from '@/lib/catalog'
 import { inCity, isExhibitingOnly } from '@/lib/present'
 import { PRODUCT_RE, productText } from '@/lib/products'
 import { docPhotos, type DocPhoto } from './photos'
 import { site } from './site'
 import { verses } from './verses'
+import { fmt } from '@/lib/money'
 
 // min/max: «здебільшого» range. For whole-Ukraine pages whose price has an `index` category it is the price
 // index's range (same numbers as /tsiny-2026); otherwise the range of this page's own price lines.

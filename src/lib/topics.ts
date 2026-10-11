@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 
 import { topics, type Topic, type TopicCtx } from '@/content/topics'
 import { ogImage } from '@/utilities/ogImage'
-import { fmt, getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
+import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
 import { facts } from './facts'
-import { near } from './priceIndex'
-import { amountsIn, isExhibitingOnly, publicPrices, spanOf, splitSource } from './present'
+
+import { isExhibitingOnly, publicPrices, splitSource } from './present'
+import { amountsIn, fmt, fromTo, near, spanOf } from './money'
 
 // A museum or museum shop is listed on class pages only if its own services name a class it runs.
 const museumOnly = (s: StudioCard) =>
@@ -78,7 +79,7 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
   const idx = topic.price.index && !citySlug ? f.get(topic.price.index) : null
   // One value per studio (its own median), worded by spanOf — the same rule as /tsiny-2026 and city pages.
   const span = spanOf(perStudio)
-  const r = idx ? { min: idx.min, max: idx.max, text: idx.min === idx.max ? `${fmt(idx.min)} грн` : `від ${fmt(idx.min)} до ${fmt(idx.max)} грн`, median: idx.median } : span
+  const r = idx ? { min: idx.min, max: idx.max, text: fromTo(idx.min, idx.max), median: idx.median } : span
   return {
     lists,
     all,

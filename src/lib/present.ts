@@ -2,6 +2,8 @@
 // keeps everything; these functions decide what a visitor (and an LLM) sees.
 import type { City, Studio } from '@/payload-types'
 
+import { amountsIn } from './money'
+
 // ---------- text lists ----------
 
 const norm = (t: string) =>
@@ -105,9 +107,6 @@ export function publicPrices(s: Studio): PriceLine[] {
   return out
 }
 
-export const amountsIn = (text: string) =>
-  [...text.matchAll(/(\d[\d\s]{1,6})(?:[.,]\d+)?\s*(?:грн|₴)/g)].map((m) => Number(m[1].replace(/\s/g, ''))).filter((v) => v >= 150 && v <= 20000)
-
 // Lines about one master class for one person (or a couple): no courses, coworking, products, group totals.
 const CLASS_WORDS = /(?<!\p{L})мк(?!\p{L})|майстер-клас|заняття|урок|гончарств|ліплен|ліпк|розпис|гончарн\p{L}* (?:кол|круг)|побачен|для двох/iu
 const NOT_SINGLE = /курс|абонемент|(?:[3-9]|\d{2,})\s*занять|місяц|коворк|оренд|випал\s+\d|глина\s+\d|\/\s*год|за годину оренди|сертифікат|usd|eur|\$|€|корпоратив|тімбілд|груп[аиу]?\s+до|за групу|для групи|виїзн|день народжен|свят/iu
@@ -116,38 +115,6 @@ export function singleClassAmounts(s: Studio): number[] {
   return publicPrices(s)
     .filter((p) => CLASS_WORDS.test(p.text) && !NOT_SINGLE.test(p.text))
     .flatMap((p) => amountsIn(p.text))
-}
-
-// Round to a believable step: 3 120 → 3 100, 870 → 850.
-export const roundNice = (n: number) => (n < 1000 ? Math.round(n / 50) * 50 : Math.round(n / 100) * 100)
-
-// Typical span, not extremes: 10th–90th percentile once there are enough prices.
-export function typicalRange(amounts: number[]): { min: number; max: number } | null {
-  if (!amounts.length) return null
-  const sorted = [...amounts].sort((a, b) => a - b)
-  const pick = (q: number) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]
-  const r = sorted.length >= 5 ? { min: pick(0.1), max: pick(0.9) } : { min: sorted[0], max: sorted[sorted.length - 1] }
-  return { min: roundNice(r.min), max: roundNice(r.max) }
-}
-
-/**
- * One wording for a set of prices (one value per studio), used by every page so the same studios never
- * produce two different numbers: 1 price → «900 грн», 2 → «900 і 1 300 грн», 3–4 → «від 900 до 1 700 грн»,
- * 5+ → the typical span (10th–90th percentile). Never «від X до X».
- */
-export type Span = { n: number; min: number; max: number; median: number; text: string }
-export function spanOf(values: number[]): Span | null {
-  const v = values.filter((x) => x > 0).sort((a, b) => a - b)
-  if (!v.length) return null
-  const med = roundNice(v[Math.floor(v.length / 2)])
-  const nice = (x: number) => roundNice(x).toLocaleString('uk-UA')
-  if (v.length === 1) return { n: 1, min: roundNice(v[0]), max: roundNice(v[0]), median: med, text: `${nice(v[0])} грн` }
-  if (v.length === 2) {
-    const [a, b] = [roundNice(v[0]), roundNice(v[1])]
-    return { n: 2, min: a, max: b, median: med, text: a === b ? `${nice(a)} грн` : `${nice(a)} і ${nice(b)} грн` }
-  }
-  const r = typicalRange(v)!
-  return { n: v.length, min: r.min, max: r.max, median: med, text: r.min === r.max ? `${r.min.toLocaleString('uk-UA')} грн` : `від ${r.min.toLocaleString('uk-UA')} до ${r.max.toLocaleString('uk-UA')} грн` }
 }
 
 // ---------- people and places ----------

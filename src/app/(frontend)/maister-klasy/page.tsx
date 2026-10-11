@@ -5,8 +5,9 @@ import React from 'react'
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { facts } from '@/lib/facts'
 import { topicList } from '@/content/topics'
-import { fmt, getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { scopeSpan } from '@/lib/priceIndex'
+import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
 

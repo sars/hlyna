@@ -6,9 +6,10 @@ import { copies } from '@/content/waveA'
 import etsyShops from '@/content/waveA/etsy.json'
 import stockistShops from '@/content/waveA/stockists.json'
 import { topics, type Topic } from '@/content/topics'
-import { fmt, getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
-import { amountsIn, inCity, isExhibitingOnly, publicPrices, roundNice, typicalRange } from './present'
+import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from './catalog'
+import { inCity, isExhibitingOnly, publicPrices } from './present'
 import { topicData } from './topics'
+import { amountsIn, fmt, fromTo, roundNice, typicalRange } from './money'
 
 export type WaveCopy = {
   id: string
@@ -58,7 +59,7 @@ const priceVars = (r: { min?: number; max?: number; median?: number; priceText?:
   min: r?.min,
   max: r?.max,
   median: r?.median ? `${fmt(r.median)} грн` : undefined,
-  priceRange: r?.priceText ?? (r?.min && r?.max ? (r.min === r.max ? `${fmt(r.min)} грн` : `від ${fmt(r.min)} до ${fmt(r.max)} грн`) : undefined),
+  priceRange: r?.priceText ?? (r?.min && r?.max ? fromTo(r.min, r.max) : undefined),
 })
 
 // ---------- 1. format × city ----------

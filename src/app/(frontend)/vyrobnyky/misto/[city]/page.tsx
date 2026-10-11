@@ -13,13 +13,14 @@ import { MakerRow } from '@/components/site/MakerRow'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
-import { fmt, getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
+import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { cityStats, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/lib/places'
 import { localPrices } from '@/lib/priceIndex'
 import { certificateCities } from '@/lib/topics'
 import { ogImage } from '@/utilities/ogImage'
+import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
 

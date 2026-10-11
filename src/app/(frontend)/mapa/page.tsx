@@ -6,10 +6,11 @@ import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/
 import { JsonLd } from '@/components/site/JsonLd'
 import { StudioMap } from '@/components/site/StudioMap.client'
 import { site } from '@/content/site'
-import { fmt, groupByCity, pluralUk, TYPE_LABEL } from '@/lib/catalog'
+import { groupByCity, pluralUk, TYPE_LABEL } from '@/lib/catalog'
 import { MAP_FILTERS, mapStudios } from '@/lib/mapData'
 import { cleanName } from '@/lib/present'
 import { ogImage } from '@/utilities/ogImage'
+import { fmt } from '@/lib/money'
 
 export const revalidate = 3600
 

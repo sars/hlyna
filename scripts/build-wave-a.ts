@@ -12,9 +12,10 @@ import path from 'node:path'
 import { topics } from '../src/content/topics'
 import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, type StudioCard } from '../src/lib/catalog'
 import { facts } from '../src/lib/facts'
-import { cleanName, firstAddress, inCity, publicPrices, typicalRange } from '../src/lib/present'
+import { cleanName, firstAddress, inCity, publicPrices } from '../src/lib/present'
 import { evidenceLine, topicData } from '../src/lib/topics'
 import { FORMAT_PAGES, formatCityCandidates, formatCityId, giftsData, partyData, partyLines, whereToBuyData, type FormatSlug, type WaveVars } from '../src/lib/waveA'
+import { typicalRange } from '../src/lib/money'
 
 const ROOT = '/Users/rodik/Claude/UkraineCeramics'
 const OUT = path.join(ROOT, '_site_content/waveA')

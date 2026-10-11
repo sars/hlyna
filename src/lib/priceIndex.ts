@@ -4,7 +4,8 @@
 import { cache } from 'react'
 
 import { getAllStudios, type StudioCard } from './catalog'
-import { publicPrices, roundNice, spanOf, type Span } from './present'
+import { median, near, quantile, roundNice, spanOf, type Span } from './money'
+import { publicPrices } from './present'
 import { PRODUCT_RE } from './products'
 
 export type Category = {
@@ -27,24 +28,6 @@ const COUPLE = /для двох|удвох|вдвох|побачен|для па
 const KIDS = /(?<!\p{L})(?:дит|діт)|школяр|\d+\s*[–-]\s*\d+\s*(?:рок|років)/iu
 const PRIVATE = /індивідуал/iu
 const SETS = /(?<!\p{L})сет(?!\p{L})|набір|комплект|сервіз|(?<!\p{L})мк(?!\p{L})|майстер-клас|занят|ліпк|ліплен|гончарств|курс|оренд|сертифікат|випал/iu
-
-// First price in a piece of text; for a range or alternatives («1 450–1 700 грн», «1100/1300 грн») the lower one,
-// since studios quote «від».
-const PRICE = /(\d[\d\s]{0,6})(?:[.,]\d+)?(?:\s*[–\-/]\s*\d[\d\s]{0,6}(?:[.,]\d+)?)?\s*(?:грн|₴)/u
-const priceIn = (t: string) => {
-  const m = t.match(PRICE)
-  return m ? Number(m[1].replace(/\s/g, '')) : null
-}
-// The price that belongs to the category's own words: «чашки 250–2200 грн, тарілки 545–4000 грн» → cups 250,
-// plates 545. Falls back to the first price in the line.
-export const near = (kw: RegExp) => (t: string) => {
-  const m = t.match(kw)
-  if (m?.index !== undefined) {
-    const v = priceIn(t.slice(m.index, m.index + m[0].length + 70))
-    if (v !== null) return v
-  }
-  return priceIn(t)
-}
 
 export const CATEGORIES: Category[] = [
   { key: 'group', label: 'Разовий майстер-клас', unit: 'з особи', group: 'mk', match: (t) => CLASS.test(t) && !COURSE.test(t) && !NOT_CLASS_PRICE.test(t) && !PRIVATE.test(t) && !COUPLE.test(t) && !KIDS.test(t) && !CORPORATE.test(t) && !/сертифікат|день народжен|свят|виїзн/iu.test(t) && !GROUP_TOTAL.test(t), pick: near(CLASS) },
@@ -69,12 +52,6 @@ export type CategoryStats = {
   p90: number
   examples: Example[]
 }
-
-const median = (a: number[]) => {
-  const s = [...a].sort((x, y) => x - y)
-  return s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2
-}
-const q = (sorted: number[], p: number) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))]
 
 // One value per studio and category: the median of that studio's matching price lines.
 export function studioValues(studios: StudioCard[]) {
@@ -137,7 +114,7 @@ export const priceIndex = cache(async function priceIndex() {
       .sort((a, b) => Math.abs(a.value - med) - Math.abs(b.value - med))
       .slice(0, 4)
       .map((x) => x.lines[0])
-    stats.push({ cat, n: arr.length, p10: roundNice(q(sorted, 0.1)), median: roundNice(med), p90: roundNice(q(sorted, 0.9)), examples })
+    stats.push({ cat, n: arr.length, p10: roundNice(quantile(sorted, 0.1)), median: roundNice(med), p90: roundNice(quantile(sorted, 0.9)), examples })
   }
   // Group master-class price by city (cities with at least 3 studios with a price).
   const byCity = new Map<string, { name: string; slug: string; vals: number[] }>()

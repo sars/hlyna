@@ -5,10 +5,11 @@ import React from 'react'
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { site } from '@/content/site'
-import { fmt, pluralUk } from '@/lib/catalog'
+import { pluralUk } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
 import { priceIndex, type CategoryStats } from '@/lib/priceIndex'
 import { ogImage } from '@/utilities/ogImage'
+import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
 

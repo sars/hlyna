@@ -4,8 +4,9 @@
 import { cache } from 'react'
 
 import { site } from '@/content/site'
-import { fmt } from './catalog'
+
 import { priceIndex, type CategoryStats } from './priceIndex'
+import { fmt } from './money'
 
 export type PriceFact = { min: number; max: number; median: number; n: number; unit: string }
 

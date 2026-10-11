@@ -18,7 +18,8 @@ import { ogImage } from '@/utilities/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard as Card } from '@/lib/catalog'
-import { amountsIn, cleanAddress, inCity, cleanName, cleanPublic, typicalRange, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
+import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal, type PriceLine } from '@/lib/present'
+import { amountsIn, typicalRange } from '@/lib/money'
 
 export const revalidate = 86400
 export const dynamicParams = true

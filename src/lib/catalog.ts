@@ -5,6 +5,7 @@ import { cache } from 'react'
 
 import type { City, Studio } from '@/payload-types'
 import { cleanAddress, cleanPublic } from './present'
+import { wholeAmountsIn } from './money'
 
 // Read-only data layer for public pages. One cached query per request; pages are statically
 // generated and revalidated, so the database is hit rarely.
@@ -140,16 +141,7 @@ export const worksWithCompanies = (s: Studio) =>
   hasFormat(s, 'corporate-gifts') || hasFormat(s, 'corporate-workshop') || hasFormat(s, 'logo') || Boolean(s.b2b?.worksWithCorporate)
 
 // Hryvnia amounts mentioned in a studio's price lines (used for honest "from–to" ranges).
-export function hryvniaAmounts(s: Studio): number[] {
-  const out: number[] = []
-  for (const p of s.prices ?? []) {
-    for (const m of p.text.matchAll(/(\d[\d\s]{1,6})\s*(?:грн|₴)/g)) {
-      const n = Number(m[1].replace(/\s/g, ''))
-      if (n >= 100 && n <= 20000) out.push(n)
-    }
-  }
-  return out
-}
+export const hryvniaAmounts = (s: Studio): number[] => (s.prices ?? []).flatMap((p) => wholeAmountsIn(p.text))
 
 export type CityGroup = { city: City; studios: StudioCard[] }
 
@@ -168,14 +160,6 @@ export function groupByCity(studios: StudioCard[]): CityGroup[] {
 export const latestUpdate = (xs: { updatedAt?: string | null }[]) => xs.reduce<string | null>((m, x) => (x.updatedAt && (!m || x.updatedAt > m) ? x.updatedAt : m), null)
 
 export const MIN_LIST = 3 // no thin pages: a list needs at least 3 real entries (AGENTS.md)
-
-export const fmt = (n: number) => n.toLocaleString('uk-UA')
-
-export function range(nums: number[]) {
-  if (!nums.length) return null
-  const sorted = [...nums].sort((a, b) => a - b)
-  return { min: sorted[0], max: sorted[sorted.length - 1], median: sorted[Math.floor(sorted.length / 2)] }
-}
 
 export const igHandle = (url?: string | null) => url?.replace(/\/$/, '').split('/').pop() ?? ''
 

@@ -3,7 +3,8 @@ import Link from 'next/link'
 import React from 'react'
 
 import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
-import { fmt, getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
+import { getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
+import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
 

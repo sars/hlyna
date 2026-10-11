@@ -9,9 +9,10 @@ import { mainNav } from '@/content/navigation'
 import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { verses } from '@/content/verses'
-import { fmt, getAllStudios, groupByCity, hasFormat, pluralUk, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from '@/lib/catalog'
+import { getAllStudios, groupByCity, hasFormat, pluralUk, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from '@/lib/catalog'
 import { cleanName, stripPersonal } from '@/lib/present'
 import { ogImage } from '@/utilities/ogImage'
+import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
 

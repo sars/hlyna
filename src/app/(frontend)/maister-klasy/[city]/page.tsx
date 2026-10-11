@@ -14,12 +14,13 @@ import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
-import { fmt, getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, inCity, oblastLabel, roundNice, staleNote, type Span } from '@/lib/present'
+import { getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
+import { cleanName, firstAddress, inCity, oblastLabel, staleNote } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { cityContent } from '@/lib/places'
 import { certificateCities } from '@/lib/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/lib/waveA'
+import { fmt, roundNice, type Span } from '@/lib/money'
 
 export const revalidate = 86400
 
