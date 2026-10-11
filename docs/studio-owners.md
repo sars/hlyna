@@ -27,3 +27,20 @@ Studios that are already in the catalogue can claim their profile and edit it th
 - Login: 5 wrong passwords lock the account for 15 minutes; per-IP limits on login, claims and saves.
 - Internal studio fields (consent, sources, sourceId, confidence, «Є зміни від власника») are hidden from the public REST API.
 - Import scripts (`import-ig`, `tag-studios`, `alt-names`) skip studios with an unpublished owner draft.
+
+## Telegram buttons
+Notifications in the owner's chat carry buttons, handled by the bot webhook `POST /api/telegram/webhook`
+(`src/app/(payload)/api/telegram/webhook/route.ts`). It accepts only Telegram (header `X-Telegram-Bot-Api-Secret-Token`
+= `TELEGRAM_WEBHOOK_SECRET` from the server `.env`) and only our chat (`TELEGRAM_CHAT_ID`); anything else gets 403 or is ignored.
+- **«Заявка на профіль #id»:** «✅ Схвалити» runs the same approval as the admin (owner created or extended, studios marked
+  confirmed) and the bot sends the one-time link plus a ready-to-forward Ukrainian message for the studio.
+  «❌ Відхилити» asks for a reason: reply to the bot's «Причина відмови для заявки #id» message, or tap «Відхилити без причини».
+- **«Зміни від власника»:** «✅ Опублікувати» publishes the owner's draft as it is. If the owner wrote text «своїми словами»,
+  the bot first reminds you to rewrite it and offers «Опублікувати без тексту» (that text stays internal either way).
+- **New customer requests:** «📨 Взято в роботу» (status «В роботі»), «✅ Передано студіям», «🗄 Закрити»; the message is
+  edited to show the new status.
+- Double taps are safe: actions that are already done just report the current state.
+- Webhook registration (once, from the server, never prints the token):
+  `set -a; . ./.env; set +a; curl -s "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/setWebhook" --data-urlencode url=https://hlyna.com.ua/api/telegram/webhook --data-urlencode secret_token=$TELEGRAM_WEBHOOK_SECRET`.
+  With a webhook set, `getUpdates` no longer works, so `deploy/set-telegram.sh` (which reads the chat id from getUpdates)
+  needs `deleteWebhook` first if it is ever run again.
