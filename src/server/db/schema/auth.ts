@@ -1,4 +1,4 @@
-import { boolean, index, integer, primaryKey, text, timestamp } from 'drizzle-orm/pg-core'
+import { bigint, boolean, index, integer, primaryKey, text, timestamp } from 'drizzle-orm/pg-core'
 
 import { app, userRole } from './base'
 import { studios } from './catalog'
@@ -85,7 +85,7 @@ export const rateLimit = app.table('rate_limit', {
   id: text('id').primaryKey(),
   key: text('key').notNull().unique(),
   count: integer('count').notNull(),
-  lastRequest: integer('last_request').notNull(),
+  lastRequest: bigint('last_request', { mode: 'number' }).notNull(), // epoch milliseconds
 })
 
 // Which studios an owner manages.
