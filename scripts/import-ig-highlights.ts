@@ -24,11 +24,22 @@ const HISTORY = '/Users/rodik/Claude/UkraineCeramics/16_prices/price_history.jso
 // The offer part of a price line: words before the first price/dash, without numbers.
 const offerWords = (s: string) =>
   new Set(norm(s.split(/\s[—–-]\s|\d[\d\s]*\s*(?:грн|₴)/)[0]).split(' ').filter((w) => w.length > 2 && !/\d/.test(w)))
-function sameOffer(a: string, b: string) {
-  const A = offerWords(a), B = offerWords(b)
+const KIDS = /дит|діт|школ|підліт/i
+// Month index of the source date in a price line: «(…, 03.2026)» or «(…, 2026)».
+function when(s: string) {
+  const m = s.match(/(\d{2})\.(20\d\d)/)
+  if (m) return Number(m[2]) * 12 + Number(m[1])
+  const y = s.match(/\((?:[^)]*?)(20\d\d)\)/)
+  return y ? Number(y[1]) * 12 + 1 : 0
+}
+// Same offer = same audience (kids or not), word overlap ≥ 60 % of the union, and the new line is not older.
+function sameOffer(old: string, fresh: string) {
+  const A = offerWords(old), B = offerWords(fresh)
   if (!A.size || !B.size) return false
+  if (KIDS.test(old) !== KIDS.test(fresh)) return false
   const inter = [...A].filter((w) => B.has(w)).length
-  return inter / Math.min(A.size, B.size) >= 0.7
+  if (inter / new Set([...A, ...B]).size < 0.6) return false
+  return when(fresh) >= when(old)
 }
 
 const rows = new Map<string, X>()
