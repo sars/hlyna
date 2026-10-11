@@ -21,7 +21,7 @@ export async function listClaims(db: Db, status?: 'pending' | 'approved' | 'reje
       name: claims.name,
       contact: claims.contact,
       createdAt: claims.createdAt,
-      studios: sql<string[]>`coalesce((select array_agg(s.name order by cs.is_main desc, cs.position) from ${claimStudios} cs join ${studios} s on s.id = cs.studio_id where cs.claim_id = ${claims.id}), '{}')`,
+      studios: sql<string[]>`coalesce((select array_agg(s.name order by cs.is_main desc, cs.position) from ${claimStudios} cs join ${studios} s on s.id = cs.studio_id where cs.claim_id = "app"."claims"."id"), '{}')`,
     })
     .from(claims)
     .where(status ? eq(claims.status, status) : undefined)

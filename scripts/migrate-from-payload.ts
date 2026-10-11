@@ -15,6 +15,7 @@ import { eq } from 'drizzle-orm'
 
 import * as s from '../src/server/db/schema'
 import { toLegacyStudio } from '../src/server/legacy'
+import { LOCATIVE } from '../src/lib/present'
 
 type AppDb = NodePgDatabase<typeof s>
 
@@ -91,6 +92,8 @@ async function main() {
           slug: c.slug,
           name: c.name ?? c.slug,
           oblast: c.oblast,
+          // The site's hand-written locatives (src/lib/present.ts) become data; unknown cities stay null («у м. X»).
+          locative: LOCATIVE[c.name ?? ''] ?? null,
           population: int(c.population, `city ${c.id} population`),
           isOver100k: c.is_over100k,
           createdAt: ts(c.created_at)!,

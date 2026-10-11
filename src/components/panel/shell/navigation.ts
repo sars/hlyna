@@ -1,6 +1,6 @@
 // The panel's screens, once. The sidebar on a desktop and the tab bar on a phone are two ways of showing this
 // one list; adding a screen is one line here. (Adapted from brocoders/inhouse-ai-starter-kit, MIT.)
-import { ClipboardList, FilePenLine, House, ScrollText, UserCheck, type LucideIcon } from 'lucide-react'
+import { Building2, Camera, ClipboardList, FilePenLine, House, Image, MapPin, ScrollText, UserCheck, Users, type LucideIcon } from 'lucide-react'
 
 import type { StaffRole } from '@/server/auth/roles'
 import { t, type TextKey } from '@/components/panel/lib/i18n'
@@ -11,7 +11,7 @@ export type Screen = {
   icon: LucideIcon
   /** Admins only (editors don't see it). */
   adminOnly?: boolean
-  /** Shown in the phone tab bar (at most five). */
+  /** Shown in the phone tab bar (at most four; the rest sit under «Ще»). */
   tab?: boolean
 }
 
@@ -19,8 +19,13 @@ export const screens: Screen[] = [
   { href: '/panel', labelKey: 'nav.overview', icon: House, tab: true },
   { href: '/panel/zapyty', labelKey: 'nav.requests', icon: ClipboardList, tab: true },
   { href: '/panel/zayavky', labelKey: 'nav.claims', icon: UserCheck, tab: true },
-  { href: '/panel/zminy', labelKey: 'nav.changes', icon: FilePenLine, tab: true },
-  { href: '/panel/zhurnal', labelKey: 'nav.journal', icon: ScrollText, tab: true },
+  { href: '/panel/zminy', labelKey: 'nav.changes', icon: FilePenLine },
+  { href: '/panel/studii', labelKey: 'nav.studios', icon: Building2, tab: true },
+  { href: '/panel/mista', labelKey: 'nav.cities', icon: MapPin },
+  { href: '/panel/media', labelKey: 'nav.media', icon: Image },
+  { href: '/panel/korystuvachi', labelKey: 'nav.users', icon: Users, adminOnly: true },
+  { href: '/panel/instagram', labelKey: 'nav.instagram', icon: Camera },
+  { href: '/panel/zhurnal', labelKey: 'nav.journal', icon: ScrollText },
 ]
 
 export const visibleScreens = (role: StaffRole) => screens.filter((s) => !s.adminOnly || role === 'admin')

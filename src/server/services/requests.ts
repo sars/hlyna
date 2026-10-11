@@ -46,7 +46,7 @@ export async function listRequests(db: Db, f: RequestFilters = {}) {
       studioName: requests.studioName,
       createdAt: requests.createdAt,
       dealAmountKop: requests.dealAmountKop,
-      sentTo: sql<number>`(select count(*)::int from ${requestStudios} rs where rs.request_id = ${requests.id})`,
+      sentTo: sql<number>`(select count(*)::int from ${requestStudios} rs where rs.request_id = "app"."requests"."id")`,
     })
     .from(requests)
     .where(where.length ? and(...where) : undefined)

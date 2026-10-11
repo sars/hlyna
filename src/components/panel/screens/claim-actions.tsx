@@ -14,7 +14,7 @@ import { Textarea } from '@/components/panel/ui/textarea'
 type Owner = { id: string; name: string; login: string | null }
 type Approved = { status: 'approved'; ownerId: string; link: string | null; message: string | null; already: boolean } | { status: 'rejected' }
 
-function CopyBlock({ label, text }: { label: string; text: string }) {
+export function CopyBlock({ label, text }: { label: string; text: string }) {
   const [copied, setCopied] = useState(false)
   return (
     <div className="space-y-1.5">
