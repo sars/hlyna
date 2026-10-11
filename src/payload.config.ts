@@ -7,19 +7,13 @@ import { fileURLToPath } from 'url'
 import { en } from '@payloadcms/translations/languages/en'
 import { uk } from '@payloadcms/translations/languages/uk'
 
-import { Categories } from './collections/Categories'
 import { Claims } from './collections/Claims'
 import { Cities } from './collections/Cities'
 import { Media } from './collections/Media'
-import { Pages } from './collections/Pages'
-import { Posts } from './collections/Posts'
 import { Requests } from './collections/Requests'
 import { StudioOwners } from './collections/StudioOwners'
 import { Studios } from './collections/Studios'
 import { Users } from './collections/Users'
-import { Footer } from './Footer/config'
-import { Header } from './Header/config'
-import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
 import { migrations } from './migrations'
@@ -30,37 +24,12 @@ const dirname = path.dirname(filename)
 export default buildConfig({
   admin: {
     components: {
-      // The `BeforeLogin` component renders a message that you see while logging into your admin panel.
-      // Feel free to delete this at any time. Simply remove the line below.
-      beforeLogin: ['@/components/BeforeLogin'],
       beforeDashboard: ['@/components/admin/OwnerQueue'],
     },
     importMap: {
       baseDir: path.resolve(dirname),
     },
     user: Users.slug,
-    livePreview: {
-      breakpoints: [
-        {
-          label: 'Mobile',
-          name: 'mobile',
-          width: 375,
-          height: 667,
-        },
-        {
-          label: 'Tablet',
-          name: 'tablet',
-          width: 768,
-          height: 1024,
-        },
-        {
-          label: 'Desktop',
-          name: 'desktop',
-          width: 1440,
-          height: 900,
-        },
-      ],
-    },
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
@@ -74,7 +43,7 @@ export default buildConfig({
     // Migrations run when the production server starts, not during `next build` (the build only reads data).
     prodMigrations: process.env.NEXT_PHASE === 'phase-production-build' ? undefined : migrations,
   }),
-  collections: [Studios, Cities, Requests, Claims, StudioOwners, Pages, Posts, Media, Categories, Users],
+  collections: [Studios, Cities, Requests, Claims, StudioOwners, Media, Users],
   i18n: {
     fallbackLanguage: 'uk',
     supportedLanguages: { uk, en },
@@ -86,8 +55,6 @@ export default buildConfig({
     fallback: true,
   },
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
-  plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,
   typescript: {
