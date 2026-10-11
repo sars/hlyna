@@ -1,7 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
+
+import { Button } from '@/components/ui/Button'
+import { Checkbox, Field, FieldRow, Input, Select } from '@/components/ui/Fields'
+import { Kicker } from '@/components/ui/Kicker'
 
 const WHAT = [
   { value: 'tableware', label: 'Посуд для закладу' },
@@ -47,6 +51,7 @@ export function RequestForm({
   forStudio?: boolean
   cityNames?: Record<string, string>
 }) {
+  const uid = useId()
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
   const [error, setError] = useState('')
   const [requestId, setRequestId] = useState<number | null>(null)
@@ -115,6 +120,16 @@ export function RequestForm({
       setState('error')
     }
   }
+
+  // Compact mode (home page) is the cobalt panel of the new design; the other modes still wear the old look until step 5.
+  if (state === 'done' && compact && !studio && !caseFix)
+    return (
+      <div id="zapyt-forma" data-tone="cobalt" role="status" className="group/tone grid gap-2.5 bg-cobalt p-[clamp(18px,2.4vw,28px)] text-paper">
+        <Kicker>Запит надіслано{requestId ? ` · № ${requestId}` : ''}</Kicker>
+        <p className="m-0 text-[15px]">Що далі: ми передамо запит студіям, які роблять саме таке, і напишемо вам. Студії відповідатимуть напряму — з цінами й термінами.</p>
+        <p className="m-0 text-[15px] text-on-cobalt-2">Якщо щось змінилося, відповідайте на наше повідомлення й вкажіть номер запиту.</p>
+      </div>
+    )
 
   if (state === 'done')
     return (
@@ -201,6 +216,59 @@ export function RequestForm({
         </button>
         {state === 'error' && <p className="m-0 text-sm text-[var(--error)]">{error}</p>}
         <p className="m-0 text-[12.5px] text-umber">Профіль безкоштовний. Студія платить 5% лише з замовлень, укладених через наш запит.</p>
+      </form>
+    )
+
+  if (compact)
+    return (
+      <form id="zapyt-forma" data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className="group/tone grid content-start gap-0.5 bg-cobalt p-[clamp(18px,2.4vw,28px)] text-paper" noValidate>
+        <Kicker>Запит · безкоштовно</Kicker>
+        <h2 id={`${uid}-h`} className="m-0 mt-1.5 mb-2 font-display text-[19px] leading-[1.15] font-semibold sm:text-xl">
+          Опишіть, що потрібно — відповідять 3–5 студій
+        </h2>
+        <Field label="Що потрібно" htmlFor={`${uid}-what`}>
+          <Select id={`${uid}-what`} name="what" value={what} onChange={(e) => setWhat(e.target.value)}>
+            {WHAT.map((w) => (
+              <option key={w.value} value={w.value}>
+                {w.label}
+              </option>
+            ))}
+          </Select>
+        </Field>
+        <FieldRow>
+          {kind.qty ? (
+            <Field label={kind.qty} htmlFor={`${uid}-qty`}>
+              <Input id={`${uid}-qty`} name="quantity" inputMode="numeric" placeholder={kind.qtyPh} />
+            </Field>
+          ) : (
+            <span />
+          )}
+          <Field label={kind.date} htmlFor={`${uid}-date`}>
+            <Input id={`${uid}-date`} name="deadline" placeholder={kind.datePh} />
+          </Field>
+        </FieldRow>
+        <Field label="Місто" htmlFor={`${uid}-city`}>
+          <Input id={`${uid}-city`} name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ваше місто" autoComplete="address-level2" />
+        </Field>
+        <FieldRow>
+          <Field label="Телефон або Telegram" htmlFor={`${uid}-tel`}>
+            <Input id={`${uid}-tel`} name="contactPhoneOrTelegram" inputMode="tel" placeholder="+380… або @нік" />
+          </Field>
+          <Field label="Email" htmlFor={`${uid}-mail`}>
+            <Input id={`${uid}-mail`} name="contactEmail" type="email" placeholder="ви@компанія.ua" />
+          </Field>
+        </FieldRow>
+        {kind.logo && <Checkbox name="logo" label="Потрібен логотип" />}
+        <input type="text" name="website2" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
+        <div className="mt-2.5 flex flex-wrap items-center gap-3.5">
+          <Button type="submit" disabled={state === 'sending'}>
+            {state === 'sending' ? 'Надсилаємо…' : 'Отримати пропозиції'}
+          </Button>
+        </div>
+        {state === 'error' && <p className="ui-error m-0 mt-2" role="alert">{error}</p>}
+        <p className="m-0 mt-2.5 max-w-[52ch] text-[12.5px] leading-[1.4] text-on-cobalt-2">
+          Безкоштовно для замовника. Запит отримають 3–5 студій, які роблять такі вироби. Студії платять нам 5% лише з укладених замовлень.
+        </p>
       </form>
     )
 
