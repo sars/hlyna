@@ -1,70 +1,158 @@
 @import 'tailwindcss';
-@import 'tw-animate-css';
 
 /* The /panel has its own stylesheet; keep its classes out of the public site's CSS. */
 @source not '../../components/panel';
 @source not '../(panel)';
 
-@config '../../../tailwind.config.mjs';
-
-@custom-variant dark (&:is([data-theme='dark'] *));
-@custom-variant sm (@media (width >= theme(--breakpoint-sm)));
-@custom-variant md (@media (width >= theme(--breakpoint-md)));
-@custom-variant lg (@media (width >= theme(--breakpoint-lg)));
-@custom-variant xl (@media (width >= theme(--breakpoint-xl)));
-@custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
-
-@layer base {
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-weight: unset;
-    font-size: unset;
-  }
-}
-
-@plugin "@tailwindcss/typography";
-
-@source inline("lg:col-span-4");
-@source inline("lg:col-span-6");
-@source inline("lg:col-span-8");
-@source inline("lg:col-span-12");
-@source inline("border-border");
-@source inline("bg-card");
-@source inline("border-error");
-@source inline("bg-error/30");
-@source inline("border-success");
-@source inline("bg-success/30");
-@source inline("border-warning");
-@source inline("bg-warning/30");
-
+/* Design system «Глина» (docs/design/SYSTEM.md §2). The 1A palette below the new tokens stays until step 9. */
 @theme {
+  /* Breakpoints (§2.4). 2xl is removed. */
   --breakpoint-sm: 40rem;
-  --breakpoint-md: 48rem;
-  --breakpoint-lg: 64rem;
+  --breakpoint-md: 50rem;
+  --breakpoint-lg: 60rem;
   --breakpoint-xl: 80rem;
-  --breakpoint-2xl: 86rem;
-  --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
-  --font-sans: var(--font-raleway), 'Helvetica Neue', Arial, sans-serif;
+  --breakpoint-2xl: initial;
+
+  /* Colours, named by role (§2.1) */
+  --color-paper: #efe9de;
+  --color-paper-2: #e4dccd;
+  --color-paper-white: #ffffff;
+  --color-ink: #15130f;
+  --color-ink-2: #4e483f;
+  --color-cobalt: #1d3ec6;
+  --color-cobalt-deep: #132b8f;
+  --color-on-cobalt-2: #cfd7ff;
+  --color-on-ink-2: #d6cfc2;
+  --color-peach: #ffd9a8;
+  --color-terracotta: #b4532e;
+  --color-terracotta-text: #a84a27;
+  --color-rule: rgb(21 19 15 / 0.2);
+  --color-rule-on-dark: rgb(239 233 222 / 0.4);
+
+  /* Fonts (§2.5). --font-sans is deliberately not defined. */
   --font-display: var(--font-unbounded), 'Arial Black', system-ui, sans-serif;
-  /* Brand palette 1A */
+  --font-body: var(--font-golos), 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: var(--font-playfair), Georgia, serif;
+  --font-mono: var(--font-jetbrains), Menlo, monospace;
+
+  /* Space and containers (§2.3) */
+  --spacing-gutter: clamp(16px, 3vw, 40px);
+  --spacing-section: clamp(56px, 8vw, 110px);
+  --spacing-block: clamp(36px, 5vw, 64px);
+  --spacing-hero: clamp(18px, 3vw, 32px);
+  --container-wrap: 1600px;
+  --container-read: 70ch;
+  --container-faq: 900px;
+  --container-narrow: 760px;
+  --radius-btn: 2px;
+
+  /* Type scale (§3.1) */
+  --text-h1: clamp(28px, 3.4vw, 46px);
+  --text-h1--line-height: 1.08;
+  --text-h1--letter-spacing: -0.01em;
+  --text-h1--font-weight: 600;
+  --text-h2: clamp(19px, 2.2vw, 26px);
+  --text-h2--line-height: 1.12;
+  --text-h2--letter-spacing: 0.01em;
+  --text-h2--font-weight: 600;
+  --text-h2-poster: clamp(30px, 5.2vw, 76px);
+  --text-h2-poster--line-height: 0.95;
+  --text-h2-poster--letter-spacing: -0.01em;
+  --text-h2-poster--font-weight: 800;
+  --text-lead: 18px;
+  --text-lead--line-height: 1.5;
+  --text-body: 17px;
+  --text-body--line-height: 1.5;
+  --text-small: 15px;
+  --text-small--line-height: 1.45;
+  --text-kicker: 12px;
+  --text-kicker--letter-spacing: 0.08em;
+  --text-label: 11px;
+  --text-label--letter-spacing: 0.06em;
+  --text-epi: clamp(19px, 1.7vw, 24px);
+  --text-epi--line-height: 1.3;
+  --text-btn: 13.5px;
+  --text-btn--letter-spacing: 0.03em;
+
+  /* Brand palette 1A: removed in step 9 (ink and cobalt above already took the new values) */
   --color-clay: #f3e7da;
   --color-sand: #efdcc8;
   --color-cream: #fffaf4;
-  --color-ink: #2a2018;
+  --color-card: #fbf3ea;
   --color-umber: #6c5243;
   --color-line: #e1c7ae;
   --color-terra: #b4683f;
   --color-terra-dark: #97542f;
-  --color-cobalt: #2a4fa8;
   --color-cobalt-dark: #203d85;
   --color-ochre: #d9a441;
   --color-sage: #5f7e6a;
 }
 
+/* 1A leftovers still read by components: var(--error) in the forms. */
+:root {
+  --error: #a63a2a;
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+    font-variant-numeric: lining-nums;
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  /* min-h + flex column: the 1A pages rely on it (w-full on mx-auto mains); revisit in step 3 with the footer. */
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-body);
+    font-size: var(--text-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    overflow-x: clip;
+  }
+  h1,
+  h2,
+  h3 {
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  /* Default border colour of the 1A pages (bare `border` classes). Pages get explicit rule/ink borders in steps 3-8. */
+  * {
+    border-color: var(--color-line);
+  }
+  a {
+    color: var(--color-cobalt);
+  }
+  a:hover {
+    color: var(--color-cobalt-deep);
+  }
+  :focus-visible {
+    outline: 3px solid var(--color-cobalt);
+    outline-offset: 3px;
+  }
+  [data-tone='cobalt'] :focus-visible,
+  [data-tone='ink'] :focus-visible {
+    outline-color: var(--color-paper);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      transition: none !important;
+      animation: none !important;
+    }
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
+
+/* 1A container: removed in step 9 with Bits.container. */
 @layer utilities {
   .container {
     width: 100%;
@@ -72,148 +160,33 @@
     padding-inline: 1rem;
   }
 
-  @variant sm {
+  @media (width >= theme(--breakpoint-sm)) {
     .container {
       max-width: var(--breakpoint-sm);
     }
   }
 
-  @variant md {
+  @media (width >= theme(--breakpoint-md)) {
     .container {
       max-width: var(--breakpoint-md);
       padding-inline: 2rem;
     }
   }
 
-  @variant lg {
+  @media (width >= theme(--breakpoint-lg)) {
     .container {
       max-width: var(--breakpoint-lg);
     }
   }
 
-  @variant xl {
+  @media (width >= theme(--breakpoint-xl)) {
     .container {
       max-width: var(--breakpoint-xl);
     }
   }
-
-  @variant 2xl {
-    .container {
-      max-width: var(--breakpoint-2xl);
-    }
-  }
 }
 
-:root {
-  /* Design 1A «Глина і кобальт». Single light look by choice (see AGENTS.md). */
-  --background: #f3e7da;
-  --foreground: #2a2018;
-  --card: #fbf3ea;
-  --card-foreground: #2a2018;
-  --popover: #fbf3ea;
-  --popover-foreground: #2a2018;
-  --primary: #b4683f;
-  --primary-foreground: #fffaf4;
-  --secondary: #efdcc8;
-  --secondary-foreground: #2a2018;
-  --muted: #efdcc8;
-  --muted-foreground: #6c5243;
-  --accent: #efdcc8;
-  --accent-foreground: #2a2018;
-  --destructive: #a63a2a;
-  --destructive-foreground: #fffaf4;
-  --border: #e1c7ae;
-  --input: #e1c7ae;
-  --ring: #2a4fa8;
-  --chart-1: #b4683f;
-  --chart-2: #2a4fa8;
-  --chart-3: #d9a441;
-  --chart-4: #5f7e6a;
-  --chart-5: #6c5243;
-  --radius: 1.25rem;
-  --sidebar: #fbf3ea;
-  --sidebar-foreground: #2a2018;
-  --sidebar-primary: #b4683f;
-  --sidebar-primary-foreground: #fffaf4;
-  --sidebar-accent: #efdcc8;
-  --sidebar-accent-foreground: #2a2018;
-  --sidebar-border: #e1c7ae;
-  --sidebar-ring: #2a4fa8;
-  --success: #5f7e6a;
-  --warning: #d9a441;
-  --error: #a63a2a;
-  color-scheme: light;
-}
-
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-}
-
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground min-h-[100vh] flex flex-col;
-  }
-}
-
-html {
-  opacity: 0;
-}
-
-html[data-theme='dark'],
-html[data-theme='light'] {
-  opacity: initial;
-}
-
-@layer base {
-  html { font-variant-numeric: lining-nums; -webkit-text-size-adjust: 100%; }
-  body { background: var(--background); color: var(--foreground); font-family: var(--font-sans); line-height: 1.6; }
-  a { color: var(--color-cobalt); }
-  a:hover { color: var(--color-cobalt-dark); }
-  :focus-visible { outline: 2.5px solid var(--color-cobalt); outline-offset: 2px; border-radius: 6px; }
-}
-
+/* 1A utilities: removed in step 9 */
 @utility band {
   height: 12px;
   background: repeating-linear-gradient(90deg, var(--color-terra) 0 16px, var(--color-clay) 16px 20px, var(--color-cobalt) 20px 36px, var(--color-clay) 36px 40px, var(--color-ochre) 40px 56px, var(--color-clay) 56px 60px);
@@ -235,7 +208,7 @@ html[data-theme='light'] {
 }
 
 /* Map popups (/mapa) */
-.maplibregl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: var(--font-sans); color: #2a2018; }
+.maplibregl-popup-content { border-radius: 14px; padding: 12px 14px; font-family: var(--font-body); color: #2a2018; }
 .map-pop { display: grid; gap: 4px; font-size: 14px; line-height: 1.35; }
 .map-pop a { color: #2a4fa8; }
 .map-pop ul { margin: 4px 0 0; padding-left: 16px; max-height: 220px; overflow: auto; }

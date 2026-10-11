@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next'
-import { Raleway, Unbounded } from 'next/font/google'
+import { Golos_Text, JetBrains_Mono, Playfair_Display, Unbounded } from 'next/font/google'
 import React from 'react'
 
 import { JsonLd } from '@/components/site/JsonLd'
@@ -12,12 +12,15 @@ import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import './globals.css'
 
 // Fonts are downloaded at build time and served from our own domain (no requests to Google at runtime).
-const unbounded = Unbounded({ subsets: ['cyrillic', 'latin'], weight: ['500', '600', '700'], variable: '--font-unbounded', display: 'swap' })
-const raleway = Raleway({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-raleway', display: 'swap' })
+const unbounded = Unbounded({ subsets: ['cyrillic', 'latin'], weight: ['600', '800'], variable: '--font-unbounded', display: 'swap' })
+const golos = Golos_Text({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600'], variable: '--font-golos', display: 'swap' })
+// Below the first screen: not preloaded.
+const playfair = Playfair_Display({ subsets: ['cyrillic', 'latin'], weight: ['400'], style: ['italic'], variable: '--font-playfair', display: 'swap', preload: false })
+const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500'], variable: '--font-jetbrains', display: 'swap', preload: false })
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html className={`${unbounded.variable} ${raleway.variable}`} lang="uk" data-theme="light">
+    <html className={`${unbounded.variable} ${golos.variable} ${playfair.variable} ${jetbrains.variable}`} lang="uk">
       <head>
         <link href="/favicon.ico" rel="icon" sizes="48x48" />
         <link href="/favicon-16.png" rel="icon" type="image/png" sizes="16x16" />
@@ -51,4 +54,4 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image' },
 }
 
-export const viewport: Viewport = { themeColor: '#2a4fa8', width: 'device-width', initialScale: 1, viewportFit: 'cover' }
+export const viewport: Viewport = { themeColor: '#efe9de', width: 'device-width', initialScale: 1, viewportFit: 'cover' }
