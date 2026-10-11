@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { payloadClient } from '@/lib/kabinet'
 import { clientIp, rateLimited } from '@/lib/ownerAuth'
-import { notifyOwnerTelegram, siteUrl } from '@/lib/telegram'
+import { claimKeyboard, notifyOwnerTelegram } from '@/lib/telegram'
 
 // «Це ваша студія?» — a studio representative asks to manage the profile. Saved as a pending claim for an admin to verify.
 export async function POST(req: Request) {
@@ -42,8 +42,6 @@ export async function POST(req: Request) {
   await notifyOwnerTelegram([
     `Заявка на профіль #${claim.id}: ${[main.name, ...otherDocs.map((d) => d.name)].join(', ')}`,
     `Від: ${name}, ${contact}`,
-    '',
-    `${siteUrl()}/admin/collections/claims/${claim.id}`,
-  ])
+  ], claimKeyboard(claim.id))
   return NextResponse.json({ ok: true, id: claim.id })
 }

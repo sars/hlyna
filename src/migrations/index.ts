@@ -8,6 +8,7 @@ import * as migration_20261011_052428_request_studio_type from './20261011_05242
 import * as migration_20261011_093108_studio_owners_claims from './20261011_093108_studio_owners_claims';
 import * as migration_20261011_094618_owner_text_fields from './20261011_094618_owner_text_fields';
 import * as migration_20261011_101644_request_status_closed from './20261011_101644_request_status_closed';
+import * as migration_20261011_103604_request_status_in_progress from './20261011_103604_request_status_in_progress';
 
 export const migrations = [
   {
@@ -58,6 +59,11 @@ export const migrations = [
   {
     up: migration_20261011_101644_request_status_closed.up,
     down: migration_20261011_101644_request_status_closed.down,
-    name: '20261011_101644_request_status_closed'
+    name: '20261011_101644_request_status_closed',
+  },
+  {
+    up: migration_20261011_103604_request_status_in_progress.up,
+    down: migration_20261011_103604_request_status_in_progress.down,
+    name: '20261011_103604_request_status_in_progress'
   },
 ];

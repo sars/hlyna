@@ -10,6 +10,7 @@ export const REQUEST_WHAT_OPTIONS = [
 
 export const REQUEST_STATUS_OPTIONS = [
   { label: 'Новий', value: 'new' },
+  { label: 'В роботі', value: 'in_progress' },
   { label: 'Переслано студіям', value: 'forwarded' },
   { label: 'Студія відповіла', value: 'replied' },
   { label: 'Угода', value: 'deal' },

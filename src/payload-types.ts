@@ -492,7 +492,7 @@ export interface Request {
   contactEmail?: string | null;
   sourcePage?: string | null;
   website2?: string | null;
-  status: 'new' | 'forwarded' | 'replied' | 'deal' | 'lost' | 'closed';
+  status: 'new' | 'in_progress' | 'forwarded' | 'replied' | 'deal' | 'lost' | 'closed';
   studiosSent?: (number | Studio)[] | null;
   dealAmount?: number | null;
   /**

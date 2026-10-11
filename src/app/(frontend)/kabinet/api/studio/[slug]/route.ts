@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { currentOwner, MAX_PHOTOS, ownedStudio, payloadClient } from '@/lib/kabinet'
 import { clientIp, rateLimited } from '@/lib/ownerAuth'
-import { notifyOwnerTelegram, siteUrl } from '@/lib/telegram'
+import { notifyOwnerTelegram, ownerEditKeyboard } from '@/lib/telegram'
 import type { Studio } from '@/payload-types'
 
 const MAX_FILE = 8 * 1024 * 1024
@@ -109,8 +109,6 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   await notifyOwnerTelegram([
     `Зміни від власника: ${studio.name}`,
     `${owner.name}${files.length ? `, нових фото: ${files.length}` : ''}${text(d.ownerAbout, 10) || text(d.ownerNews, 10) ? ', є текст «своїми словами» — перепишіть голосом сайту' : ''}`,
-    '',
-    `${siteUrl()}/admin/collections/studios/${studio.id}`,
-  ])
+  ], ownerEditKeyboard(studio.id))
   return NextResponse.json({ ok: true })
 }
