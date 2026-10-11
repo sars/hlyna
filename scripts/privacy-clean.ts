@@ -20,6 +20,8 @@ const cap = (t: string) => t.replace(/^\s*(\p{Ll})/u, (m) => m.toUpperCase()).re
 
 // Generic phrase rules (all studios).
 const RULES: [RegExp, string][] = [
+  // Full birth date: «нар. 24.07.1983 в Опішному»
+  [/,?\s*нар\.\s*\d{1,2}\.\d{1,2}\.\d{4}(?:\s+(?:у|в)\s+[^;,.]+)?/giu, ''],
   // A sentence that is only about birth.
   [/(^|[.!?]\s+)народи\p{L}*(?:(?<!\p{L})р\.|[^.!?;]){0,40}?\d{4}(?:(?<!\p{L})р\.|[^.!?;]){0,60}?[.!?](?=\s|$)\s*/giu, '$1'],
   // «Народилася в 1964 році, закінчила …» → «Закінчила …»
