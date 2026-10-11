@@ -32,8 +32,9 @@ export async function ownedStudio(owner: StudioOwner, slug: string): Promise<Stu
 
 // Fields an owner may change. Everything else (status, sources, consent notes, internal description, requests…) stays admin-only.
 export const OWNER_FIELDS = [
-  'summary',
-  'publicDescription',
+  'ownerAbout', // internal, rewritten by us
+  'ownerNews', // internal, rewritten by us
+  'ownerQuote', // shown only after approval
   'services',
   'products',
   'prices',

@@ -227,6 +227,11 @@ export default async function StudioPage({ params }: Args) {
           {description.split(/\n{2,}/).map((para, i) => (
             <p key={i} className="m-0">{para}</p>
           ))}
+          {s.ownerQuote && s.ownerQuoteApproved && (
+            <figure className="m-0 border-l-[3px] border-terra py-1 pl-4">
+              <blockquote className="m-0 text-[17px]">Студія про себе: «{s.ownerQuote}»</blockquote>
+            </figure>
+          )}
           {recentNote && (
             <p className="m-0">
               <span className="kicker mr-2">Що нового:</span>{' '}

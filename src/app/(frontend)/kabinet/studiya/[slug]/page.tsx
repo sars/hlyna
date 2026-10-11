@@ -16,8 +16,10 @@ export default async function EditStudio({ params }: { params: Promise<{ slug: s
   const initial: EditInitial = {
     slug,
     name: s.name,
-    summary: t(s.summary),
-    publicDescription: t(s.publicDescription),
+    publicNow: t(s.publicDescription || s.summary),
+    ownerAbout: t(s.ownerAbout),
+    ownerNews: t(s.ownerNews),
+    ownerQuote: t(s.ownerQuote),
     services: (s.services ?? []).map((x) => x.text),
     products: (s.products ?? []).map((x) => x.text),
     prices: (s.prices ?? []).map((p) => ({ text: p.text, date: t(p.date), source: t(p.source) })),

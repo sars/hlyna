@@ -198,6 +198,13 @@ export interface Studio {
    * Показується на сайті. Якщо порожньо — показуємо «Опис (з досліджень)».
    */
   publicDescription?: string | null;
+  ownerAbout?: string | null;
+  ownerNews?: string | null;
+  /**
+   * Показується як «Студія про себе: “…”» лише після позначки «Цитату схвалено».
+   */
+  ownerQuote?: string | null;
+  ownerQuoteApproved?: boolean | null;
   /**
    * Абзац своїми словами за останніми постами. Оновлює scripts/import-ig.ts; можна редагувати.
    */
@@ -1373,6 +1380,10 @@ export interface StudiosSelect<T extends boolean = true> {
       };
   summary?: T;
   publicDescription?: T;
+  ownerAbout?: T;
+  ownerNews?: T;
+  ownerQuote?: T;
+  ownerQuoteApproved?: T;
   recentNote?: T;
   description?: T;
   formats?: T;

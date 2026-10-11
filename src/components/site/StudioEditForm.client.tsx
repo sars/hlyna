@@ -7,8 +7,10 @@ import { kButton, kField, kLabel } from './KabinetForms.client'
 export type EditInitial = {
   slug: string
   name: string
-  summary: string
-  publicDescription: string
+  publicNow: string
+  ownerAbout: string
+  ownerNews: string
+  ownerQuote: string
   services: string[]
   products: string[]
   prices: { text: string; date: string; source?: string }[]
@@ -42,8 +44,9 @@ export function StudioEditForm({ initial }: { initial: EditInitial }) {
     const g = (k: string) => String(f.get(k) ?? '')
     if (newFiles.some((n) => !n.alt.trim())) return setMsg({ ok: false, text: 'Додайте короткий опис до кожного нового фото (що на ньому).' })
     const data = {
-      summary: g('summary'),
-      publicDescription: g('publicDescription'),
+      ownerAbout: g('ownerAbout'),
+      ownerNews: g('ownerNews'),
+      ownerQuote: g('ownerQuote'),
       services: split(g('services')),
       products: split(g('products')),
       prices: prices.filter((p) => p.text.trim()),
@@ -90,15 +93,26 @@ export function StudioEditForm({ initial }: { initial: EditInitial }) {
   return (
     <form onSubmit={onSubmit} className="grid grid-cols-1 gap-5" noValidate>
       <section className={section}>
-        <p className={h}>Опис</p>
+        <p className={h}>Про студію</p>
+        {initial.publicNow && (
+          <details className="rounded-xl bg-cream px-3 py-2 text-[14px]">
+            <summary className="cursor-pointer font-semibold text-umber">Що зараз написано на сайті</summary>
+            <p className="m-0 mt-2 whitespace-pre-line">{initial.publicNow}</p>
+          </details>
+        )}
         <label className={kLabel}>
-          Коротко, до 200 знаків (для карток і пошуку)
-          <input name="summary" defaultValue={initial.summary} maxLength={200} className={kField} />
+          Розкажіть про студію своїми словами
+          <textarea name="ownerAbout" defaultValue={initial.ownerAbout} rows={7} className={kField} />
+          <span className="font-normal">Що робите, з якої глини, які поливи, хто веде заняття, для кого, що вирізняє. Ми не публікуємо цей текст напряму: редактор перепише його в єдиному стилі сайту.</span>
         </label>
         <label className={kLabel}>
-          Опис студії
-          <textarea name="publicDescription" defaultValue={initial.publicDescription} rows={8} className={kField} />
-          <span className="font-normal">Пишіть фактами: що робите, з якої глини, які поливи, хто проводить заняття, для кого. Без «унікальний» і «найкращий» — конкретика переконує краще. Абзаци розділяйте порожнім рядком.</span>
+          Що нового (нова колекція, формат, розклад, ярмарок)
+          <textarea name="ownerNews" defaultValue={initial.ownerNews} rows={3} className={kField} />
+        </label>
+        <label className={kLabel}>
+          Одне речення від студії для цитати (до 200 знаків, необов’язково)
+          <input name="ownerQuote" defaultValue={initial.ownerQuote} maxLength={200} placeholder="Наприклад: «Ліпимо повільно й даємо глині говорити»" className={kField} />
+          <span className="font-normal">Показується як «Студія про себе» після нашого схвалення.</span>
         </label>
       </section>
 

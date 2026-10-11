@@ -58,6 +58,8 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     photoIds.push(media.id)
   }
 
+  const now = new Date()
+  const ownerSource = `від студії, ${String(now.getMonth() + 1).padStart(2, '0')}.${now.getFullYear()}`
   const igPosts = (Array.isArray(d.instagramPosts) ? d.instagramPosts : [])
     .map((u) => text(u, 200))
     .filter((u) => /^https:\/\/www\.instagram\.com\/(p|reel)\/[\w-]+\/?$/.test(u))
@@ -65,8 +67,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
     .map((u) => ({ url: u }))
 
   const data: Partial<Studio> = {
-    summary: text(d.summary, 200),
-    publicDescription: text(d.publicDescription, 4000),
+    // Free text from the owner is kept internal: we rewrite it in the site voice before anything is published.
+    ownerAbout: text(d.ownerAbout, 4000),
+    ownerNews: text(d.ownerNews, 600),
+    ownerQuote: text(d.ownerQuote, 200),
+    ownerQuoteApproved: text(d.ownerQuote, 200) === (studio.ownerQuote ?? '') ? Boolean(studio.ownerQuoteApproved) : false,
     services: lines(d.services),
     products: lines(d.products),
     prices: (Array.isArray(d.prices) ? d.prices : [])
@@ -75,7 +80,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
       .map((p) => {
         const t = text(p.text, 300)
         const old = (studio.prices ?? []).find((x) => x.text === t)
-        return { text: t, date: text(p.date, 60), source: old && text(p.source, 120) === (old.source ?? '') ? old.source ?? '' : 'від студії' }
+        return { text: t, date: text(p.date, 60), source: old && text(p.source, 120) === (old.source ?? '') ? old.source ?? '' : ownerSource }
       })
       .filter((p) => p.text)
       .slice(0, 40),
@@ -103,7 +108,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ slug: s
   await payload.update({ collection: 'studios', id: studio.id, data, draft: true, overrideAccess: true, depth: 0, context: { ownerEdit: true } })
   await notifyOwnerTelegram([
     `Зміни від власника: ${studio.name}`,
-    `${owner.name}${files.length ? `, нових фото: ${files.length}` : ''}`,
+    `${owner.name}${files.length ? `, нових фото: ${files.length}` : ''}${text(d.ownerAbout, 10) || text(d.ownerNews, 10) ? ', є текст «своїми словами» — перепишіть голосом сайту' : ''}`,
     '',
     `${siteUrl()}/admin/collections/studios/${studio.id}`,
   ])

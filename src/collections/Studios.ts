@@ -162,6 +162,29 @@ export const Studios: CollectionConfig = {
               admin: { description: 'Показується на сайті. Якщо порожньо — показуємо «Опис (з досліджень)».' },
             },
             {
+              type: 'collapsible',
+              label: 'Від власника (кабінет)',
+              admin: {
+                initCollapsed: false,
+                condition: (data) => Boolean(data?.ownerAbout || data?.ownerNews || data?.ownerQuote),
+                description:
+                  'Текст власника на сайті напряму не показується. Перепишіть корисне в «Опис для сайту» / «Що нового» голосом сайту (docs/voice, anti-generic.md), потім опублікуйте.',
+              },
+              fields: [
+                { name: 'ownerAbout', label: 'Про студію своїми словами (від власника)', type: 'textarea', access: { read: adminRead } },
+                { name: 'ownerNews', label: 'Що нового (від власника)', type: 'textarea', access: { read: adminRead } },
+                {
+                  name: 'ownerQuote',
+                  label: 'Цитата студії (до 200 знаків)',
+                  type: 'text',
+                  maxLength: 200,
+                  access: { read: ({ req, doc }) => Boolean(req.user) || Boolean(doc?.ownerQuoteApproved) },
+                  admin: { description: 'Показується як «Студія про себе: “…”» лише після позначки «Цитату схвалено».' },
+                },
+                { name: 'ownerQuoteApproved', label: 'Цитату схвалено', type: 'checkbox', defaultValue: false },
+              ],
+            },
+            {
               name: 'recentNote',
               label: 'Що нового (з Instagram)',
               type: 'textarea',

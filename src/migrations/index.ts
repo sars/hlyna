@@ -6,6 +6,7 @@ import * as migration_20261010_190427_add_alternate_names from './20261010_19042
 import * as migration_20261010_194941_add_geo from './20261010_194941_add_geo';
 import * as migration_20261011_052428_request_studio_type from './20261011_052428_request_studio_type';
 import * as migration_20261011_093108_studio_owners_claims from './20261011_093108_studio_owners_claims';
+import * as migration_20261011_094618_owner_text_fields from './20261011_094618_owner_text_fields';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20261011_093108_studio_owners_claims.up,
     down: migration_20261011_093108_studio_owners_claims.down,
-    name: '20261011_093108_studio_owners_claims'
+    name: '20261011_093108_studio_owners_claims',
+  },
+  {
+    up: migration_20261011_094618_owner_text_fields.up,
+    down: migration_20261011_094618_owner_text_fields.down,
+    name: '20261011_094618_owner_text_fields'
   },
 ];

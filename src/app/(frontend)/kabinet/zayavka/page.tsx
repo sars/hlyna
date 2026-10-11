@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
@@ -8,7 +9,16 @@ import { getStudioBySlug } from '@/lib/catalog'
 export default async function ClaimPage({ searchParams }: { searchParams: Promise<{ studio?: string }> }) {
   const { studio: slug } = await searchParams
   const studio = slug ? await getStudioBySlug(slug) : null
-  if (!studio) notFound()
+  if (slug && !studio) notFound()
+  if (!studio)
+    return (
+      <main className={`${container} grid gap-5 pt-8 pb-16`}>
+        <h1 className="h-display m-0 text-[clamp(24px,3.4vw,36px)]">Керувати профілем студії</h1>
+        <p className="m-0 max-w-[62ch]">
+          Знайдіть свою студію в <Link href="/vyrobnyky">каталозі</Link> чи на <Link href="/mapa">мапі</Link>, відкрийте профіль і натисніть «Подати заявку» в блоці «Це ваша студія?». Студії ще немає в каталозі? <Link href="/dlya-studiy">Додайте її</Link>.
+        </p>
+      </main>
+    )
   return (
     <main className={`${container} grid gap-5 pt-8 pb-16`}>
       <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: studio.name, href: `/vyrobnyky/${studio.slug}` }, { label: 'Керувати профілем' }]} />
