@@ -3,6 +3,7 @@
 //   node scripts/check-bundles.mjs            (run after pnpm build)
 import fs from 'node:fs'
 import path from 'node:path'
+import zlib from 'node:zlib'
 
 const NEXT = path.resolve('.next')
 const FORBIDDEN = [/components[\\/]panel[\\/]/, /@base-ui[\\/]react/, /@tanstack[\\/]react-query/, /@tanstack[\\/]react-virtual/, /better-auth[\\/](react|client)/, /node_modules[\\/]sonner[\\/]/, /node_modules[\\/]hono[\\/]/]
@@ -42,6 +43,16 @@ for (const m of manifests) {
   const src = fs.readFileSync(m, 'utf8')
   // The manifest lists every client module the route renders, keyed by its source path.
   const modules = [...src.matchAll(/"([^"]+\.(?:tsx|ts|jsx|js|mjs))"/g)].map((x) => x[1])
+  if (isPanel) {
+    // Panel budget (kit DESIGN.md): the client JS a panel screen loads, gzip, ≤ 200 KB. Lazy chunks (MapLibre) are
+    // not in the manifest, so this measures what the first render needs.
+    const chunks = [...new Set([...src.matchAll(/static\/chunks\/[^"]+\.js/g)].map((x) => x[0]))]
+    const gz = chunks.reduce((n, c) => n + zlib.gzipSync(Buffer.from(read(`/_next/${c}`))).length, 0)
+    if (gz > PANEL_BUDGET) {
+      bad++
+      console.error(`✗ ${route}: panel client JS ${Math.round(gz / 1024)} KB gzip > ${PANEL_BUDGET / 1024} KB budget`)
+    }
+  }
   if (!isPanel) {
     const hits = modules.filter((mod) => FORBIDDEN.some((re) => re.test(mod)))
     if (hits.length) {
@@ -53,5 +64,3 @@ for (const m of manifests) {
 
 if (bad) process.exit(1)
 console.log(`✓ ${manifests.length} route manifests checked: no panel or API client code on public pages.`)
-void PANEL_BUDGET
-void read

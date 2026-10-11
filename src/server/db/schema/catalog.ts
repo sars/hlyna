@@ -33,9 +33,20 @@ export const cities = app.table('cities', {
   slug: text('slug').notNull().unique(),
   name: text('name').notNull(),
   oblast: text('oblast'),
+  // «у Києві», «в Одесі»: the locative the site writes in leads; null → «у м. <name>»
+  locative: text('locative'),
   population: integer('population'),
   isOver100k: boolean('is_over_100k'),
   ...withTracking(),
+})
+
+// Old city slugs, so a rename keeps every old URL working (301 to the new one).
+export const citySlugHistory = app.table('city_slug_history', {
+  oldSlug: text('old_slug').primaryKey(),
+  cityId: integer('city_id')
+    .notNull()
+    .references(() => cities.id, { onDelete: 'cascade' }),
+  changedAt: ts('changed_at').notNull().defaultNow(),
 })
 
 // One wide row per studio: every field is 1:1 with the profile. Ordered string lists are text[];

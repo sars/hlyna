@@ -31,7 +31,7 @@ export async function overview(db: Db) {
   const [publicStudios, hiddenStudios, noPrices, noGeo, noInstagram, staleIg, checked30, ownerVerified] = await Promise.all([
     count(db.select({ n }).from(studios).where(pub)),
     count(db.select({ n }).from(studios).where(eq(studios.visibility, 'hidden'))),
-    count(db.select({ n }).from(studios).where(and(pub, sql`not exists (select 1 from ${studioPrices} p where p.studio_id = ${studios.id})`))),
+    count(db.select({ n }).from(studios).where(and(pub, sql`not exists (select 1 from ${studioPrices} p where p.studio_id = "app"."studios"."id")`))),
     count(db.select({ n }).from(studios).where(and(pub, sql`(${studios.geoPrecision} is null or ${studios.geoPrecision} = 'settlement')`))),
     count(db.select({ n }).from(studios).where(and(pub, sql`coalesce(${studios.instagram},'') = ''`))),
     count(db.select({ n }).from(studios).where(and(pub, lt(studios.activityLastPostDate, daysAgo(365))))),
