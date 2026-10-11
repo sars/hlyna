@@ -94,3 +94,14 @@ container, and the media tar back into the volume.
    changed (snapshot diff on prod).
 3. Rehearse once more on a fresh dump, then `deploy/cutover.sh run`.
 4. Removal phase.
+
+## Milestone 4: public pages on the new data layer (2026-10-11)
+- `src/lib/catalog.ts` reads `src/server/publicCatalog.ts` when `DATA_BACKEND=app`: published studios in Payload's document shape (legacy mapper), sorted by name then id, with the fields Payload's anonymous read hides left out (ownerAbout, ownerNews, unapproved ownerQuote, consent, sources, sourceId, confidence, pendingOwnerChanges); empty localized arrays as `null` like Payload. Photos come from `/media/*` with photo consent. Sitemap, llms.txt, map GeoJSON, editorial builders and the studio search all go through the catalogue.
+- Renamed studios and cities: profile, city, city×format and certificate pages 308 to the current slug from `studio_slug_history` / `city_slug_history` (`src/lib/redirects.ts`); no-op under Payload.
+- Proof: fresh prod dump in `hlyna_m4`, app.* filled by migrate-from-payload; full snapshot (655 URLs) with `DATA_BACKEND` unset vs `=app`: 0 differences in status, title, description, canonical, OG, JSON-LD, text, links, headings, structure, classes; after merging /keysy, a focused snapshot of the 13 case/profile pages: 0 differences. Page weight on the app build equals today's (JS 189 KB gzip, home HTML 144 KB).
+
+## Remaining cutover checklist
+1. Merge `replace-payload/m4` into main with `DATA_BACKEND` unset; deploy; prod snapshot sample vs before = 0 diff; check-links.
+2. Rehearse `deploy/cutover.sh rehearse` on a fresh prod dump (migrate, verify, both-backend snapshot diff, panel and cabinet smoke).
+3. `deploy/cutover.sh run` (backup, freeze cabinet, migrate, verify, switch `DATA_BACKEND=app`, smoke, keep rollback ready); issue Rodion's panel invite (`scripts/app/invite.ts`); switch the hourly Instagram job to `scripts/app/*` + `push-ig-status.sh`.
+4. After a stable week: remove Payload (collections, config, admin routes, `payload` deps, legacy kabinet auth and webhook), archive Payload tables to `payload_legacy`, drop after 30 days.
