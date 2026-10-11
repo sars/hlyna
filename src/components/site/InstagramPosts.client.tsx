@@ -27,12 +27,28 @@ export function InstagramPosts({ urls, handle }: { urls: string[]; handle?: stri
 }
 
 function Post({ url, handle, show }: { url: string; handle?: string; show: boolean }) {
-  const [loaded, setLoaded] = useState(false)
+  // The card stays until Instagram's embed reports its real height (postMessage «MEASURE»). An embed that loads
+  // empty (blocked, private, deleted post, no third-party frames) never reports, so the card simply stays.
+  const frame = useRef<HTMLIFrameElement>(null)
+  const [height, setHeight] = useState(0)
+  useEffect(() => {
+    if (!show) return
+    const onMessage = (e: MessageEvent) => {
+      if (!/^https:\/\/www\.instagram\.com$/.test(e.origin) || e.source !== frame.current?.contentWindow) return
+      try {
+        const msg = typeof e.data === 'string' ? JSON.parse(e.data) : e.data
+        const h = Number(msg?.details?.height)
+        if (msg?.type === 'MEASURE' && h > 200) setHeight(Math.min(h, 900))
+      } catch {}
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [show])
   const code = url.match(/\/(p|reel)\/([\w-]+)/)
   if (!code) return null
   return (
     <div className="overflow-hidden rounded-2xl border border-line bg-card">
-      {!loaded && (
+      {!height && (
         <a href={url} target="_blank" rel="noopener nofollow" className="flex items-center justify-between gap-3 px-4 py-3.5 text-[15px] text-ink no-underline hover:text-cobalt">
           <span>
             <span className="block font-semibold">{code[1] === 'reel' ? 'Відео' : 'Пост'} в Instagram</span>
@@ -43,11 +59,12 @@ function Post({ url, handle, show }: { url: string; handle?: string; show: boole
       )}
       {show && (
         <iframe
+          ref={frame}
           src={`https://www.instagram.com/${code[1]}/${code[2]}/embed/`}
           title={handle ? `Пост @${handle} в Instagram` : 'Пост в Instagram'}
           loading="lazy"
-          onLoad={() => setLoaded(true)}
-          className={loaded ? 'block h-[480px] w-full border-0 sm:h-[560px]' : 'block h-0 w-full border-0'}
+          style={height ? { height } : undefined}
+          className={height ? 'block w-full border-0' : 'block h-0 w-full border-0'}
         />
       )}
     </div>

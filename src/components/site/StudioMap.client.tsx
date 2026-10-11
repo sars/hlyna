@@ -148,10 +148,18 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
         }
         // /mapa?studio=<slug> (from a profile's «Показати на мапі студій»): centre on that studio and open its popup.
         const studio = new URLSearchParams(window.location.search).get('studio')
-        const target = studio ? data.features.find((f) => f.properties.slug === studio && f.properties.precise) : undefined
-        if (target) {
+        const target = studio ? data.features.find((f) => f.properties.slug === studio) : undefined
+        if (target?.properties.precise) {
           m.jumpTo({ center: target.geometry.coordinates, zoom: 15 })
           popup(target.geometry.coordinates, pointHtml(target.properties as MapProps & { f: unknown }))
+        } else if (target) {
+          // Town-level studios have no own point: show the town centre and say why.
+          const p = target.properties as MapProps
+          m.jumpTo({ center: target.geometry.coordinates, zoom: 11 })
+          popup(
+            target.geometry.coordinates,
+            `<div class="map-pop"><b><a href="/vyrobnyky/${esc(p.slug)}">${esc(p.name)}</a></b><div>${esc(p.type)} · ${esc(p.city)}</div><div>Точна адреса не вказана — показано центр населеного пункту</div></div>`,
+          )
         }
       })
     })()

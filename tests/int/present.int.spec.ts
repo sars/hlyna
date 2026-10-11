@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest'
 
-import { cleanAddress, cleanPublic, dedupeTexts, firstAddress, inCity, stripPersonal } from '@/lib/present'
+import { cleanAddress, cleanPublic, dedupeTexts, firstAddress, inCity, isDomainLike, noteIsFresh, stripPersonal } from '@/lib/present'
 
 describe('present: public text cleaners', () => {
   it('removes research notes from public text', () => {
@@ -34,5 +34,31 @@ describe('present: public text cleaners', () => {
   it('Ukrainian locative for cities', () => {
     expect(inCity('Київ')).toBe('у Києві')
     expect(inCity('')).toBe('')
+  })
+})
+
+
+describe('isDomainLike', () => {
+  it('flags domains and URLs, keeps names', () => {
+    expect(isDomainLike('dobraglina.com.ua')).toBe(true)
+    expect(isDomainLike('glinka.zp.ua__pologi')).toBe(true)
+    expect(isDomainLike('bigme.ua')).toBe(true)
+    expect(isDomainLike('Добра Глина')).toBe(false)
+    expect(isDomainLike('helgapottery_ua')).toBe(false)
+  })
+})
+
+describe('noteIsFresh', () => {
+  const now = Date.UTC(2026, 9, 12)
+  it('uses the latest month-year in the note', () => {
+    expect(noteIsFresh('У жовтні 2026 року студія…', null, now)).toBe(true)
+    expect(noteIsFresh('У серпні 2025 року анонсувала…', null, now)).toBe(false)
+    expect(noteIsFresh('У серпні 2025 року… У жовтні 2026 року…', null, now)).toBe(true)
+    expect(noteIsFresh('Улітку 2025 року бренд…', null, now)).toBe(false)
+  })
+  it('falls back to the last post date', () => {
+    expect(noteIsFresh('Без дати', '2026-09-01', now)).toBe(true)
+    expect(noteIsFresh('Без дати', '2025-12-01', now)).toBe(false)
+    expect(noteIsFresh('Без дати', null, now)).toBe(true)
   })
 })

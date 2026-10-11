@@ -18,7 +18,7 @@ import { ogImage } from '@/utilities/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
-import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isExhibitingOnly, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
+import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isDomainLike, isExhibitingOnly, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
 import { amountsIn, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
@@ -64,7 +64,7 @@ export default async function StudioPage({ params }: Args) {
   const name = cleanName(s.name)
   // A bare Instagram handle already shown in «Коротко» is not an alternative name.
   const handle = igHandle(s.instagram).toLowerCase()
-  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name && t.replace(/^@/, '').toLowerCase() !== handle)
+  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name && !isDomainLike(t) && t.replace(/^@/, '').toLowerCase() !== handle)
   // On the page, skip variants already visible in the heading («Ґроно (Grono)» → only grono.shop is new).
   const shownAlt = altNames.filter((t) => !name.toLowerCase().includes(t.toLowerCase()))
   const city = s.cityDoc
@@ -93,7 +93,7 @@ export default async function StudioPage({ params }: Args) {
   const priceRange = span ? (span.min === span.max ? `${span.min} UAH` : `${span.min}–${span.max} UAH`) : ''
   const priceGroups = groupPrices(prices)
   const description = stripPersonal(s.publicDescription || s.description || '')
-  const recentNote = stripPersonal(s.recentNote || '')
+  const recentNote = noteIsFresh(s.recentNote || '', s.activity?.lastPostDate) ? stripPersonal(s.recentNote || '') : ''
   const monthYear = (d?: string | null) => (d ? new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(d)).filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ') : '')
   const lastPost = monthYear(s.activity?.lastPostDate)
   const igPosts = (s.activity?.instagramPosts ?? []).map((x) => x.url)

@@ -271,3 +271,25 @@ export function staleNote(s: { activity?: { lastPostDate?: string | null } | nul
   const parts = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(t))
   return `останній пост — ${parts.filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ')}`
 }
+
+// Domains and web addresses are not names: «dobraglina.com.ua» or «bigme.ua» shouldn't show as «Також відомі як».
+export const isDomainLike = (t: string) => /\.(com|ua|net|org|shop|store)(\.|_|$)|^https?:|^www\./i.test(t.trim())
+
+const MONTH_STEMS: [RegExp, number][] = [
+  [/січн/i, 1], [/лют/i, 2], [/берез/i, 3], [/квіт/i, 4], [/травн/i, 5], [/червн/i, 6], [/липн/i, 7], [/серпн/i, 8],
+  [/верес/i, 9], [/жовтн/i, 10], [/листопад/i, 11], [/грудн/i, 12], [/зим/i, 1], [/весн/i, 4], [/літ/i, 7], [/осен/i, 10],
+]
+
+// «Що нового» is news: hide it once it is older than about six months. The note's own latest «<місяць> <рік>» counts;
+// without a date in the text, the date of the studio's last Instagram post does.
+export function noteIsFresh(note: string, lastPostDate?: string | null, now = Date.now()): boolean {
+  let newest = 0
+  for (const m of note.matchAll(/(?:(\p{L}+)\s+)?(20\d\d)(?=\s*(?:року|р\.|\b))/gu)) {
+    const year = Number(m[2])
+    const month = m[1] ? MONTH_STEMS.find(([re]) => re.test(m[1]!))?.[1] ?? 12 : 12
+    newest = Math.max(newest, Date.UTC(year, month - 1, 28))
+  }
+  if (!newest && lastPostDate) newest = new Date(lastPostDate).getTime()
+  if (!newest) return true
+  return now - newest < 183 * 24 * 3600 * 1000
+}
