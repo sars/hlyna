@@ -1,3 +1,6 @@
+import { notFound } from 'next/navigation'
+
+import { appBackend } from '@/lib/backend'
 import type { Metadata } from 'next'
 
 import { t } from '@/components/panel/lib/i18n'
@@ -9,6 +12,8 @@ export const metadata: Metadata = { title: 'Пароль' }
 export const dynamic = 'force-dynamic'
 
 export default async function SetPasswordPage({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
+  // The panel only exists once the site runs on the new stack (DATA_BACKEND=app); before the cutover it is a 404.
+  if (!appBackend()) notFound()
   const token = (await searchParams).token ?? ''
   const invite = token ? await inviteDetails(token) : null
   const ok = invite && invite.role !== 'owner'

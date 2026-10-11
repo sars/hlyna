@@ -1,3 +1,6 @@
+import { notFound } from 'next/navigation'
+
+import { appBackend } from '@/lib/backend'
 import type { Metadata } from 'next'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
@@ -13,6 +16,8 @@ export const metadata: Metadata = { title: 'Вхід' }
 export const dynamic = 'force-dynamic'
 
 export default async function SignInPage() {
+  // The panel only exists once the site runs on the new stack (DATA_BACKEND=app); before the cutover it is a 404.
+  if (!appBackend()) notFound()
   const me = await currentUser(await headers())
   if (me && isStaff(me.role)) redirect('/panel')
   return (
