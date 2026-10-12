@@ -26,8 +26,15 @@
     {
       "idx": 3,
       "version": "7",
+      "when": 1791813061671,
+      "tag": "0003_studio_type_legacy",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
       "when": 1791816665007,
-      "tag": "0003_studio_short_name",
+      "tag": "0004_studio_short_name",
       "breakpoints": true
     }
   ]

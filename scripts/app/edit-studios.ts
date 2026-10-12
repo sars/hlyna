@@ -1,6 +1,6 @@
 // Studio field edits through the panel's editor (version check, revision, slug history with 301, audit):
 //   EDITS=path pnpm exec tsx scripts/app/edit-studios.ts   (PROD=1 for production, DRY=1 to preview)
-//   [{ "slug": "…", "set"?: { "name"?, "shortName"?, "slug"?, "address"?, "summary"?, "publicDescription"?, "recentNote"? },
+//   [{ "slug": "…", "set"?: { "name"?, "shortName"?, "slug"?, "type"? (one of STUDIO_TYPES), "address"?, "summary"?, "publicDescription"?, "recentNote"? },
 //      "replace"?: [["from", "to"], …] }]   — replace runs over name, address, summary, publicDescription, recentNote.
 import fs from 'node:fs'
 import { eq } from 'drizzle-orm'
@@ -8,15 +8,16 @@ import { eq } from 'drizzle-orm'
 import { guard, revalidateSite } from './_guard'
 import { db, pool } from '../../src/server/db'
 import { studios } from '../../src/server/db/schema/catalog'
+import { STUDIO_TYPES } from '../../src/shared/options'
 import { getStudioForEdit, saveStudio, toEditForm } from '../../src/server/services/studioEditor'
 import { finishRun, scriptActor, startRun } from '../../src/server/services/imports/runs'
 
-type Field = 'name' | 'shortName' | 'slug' | 'address' | 'summary' | 'publicDescription' | 'recentNote'
+type Field = 'name' | 'shortName' | 'slug' | 'type' | 'address' | 'summary' | 'publicDescription' | 'recentNote'
 type Edit = { slug: string; set?: Partial<Record<Field, string>>; replace?: [string, string][] }
 
 const { dry } = guard('edit-studios')
 const edits = JSON.parse(fs.readFileSync(process.env.EDITS || '/tmp/hlyna-edits.json', 'utf8')) as Edit[]
-const TEXT: Field[] = ['name', 'address', 'summary', 'publicDescription', 'recentNote']
+const TEXT: Exclude<Field, 'slug' | 'type'>[] = ['name', 'address', 'summary', 'publicDescription', 'recentNote']
 const actor = scriptActor('edit-studios')
 const run = dry ? 0 : await startRun(db, 'edit-studios', `${edits.length} edits`)
 let saved = 0
@@ -31,8 +32,9 @@ for (const e of edits) {
     const v = form[f]
     if (typeof v === 'string') form[f] = (e.replace ?? []).reduce((acc, [a, b]) => acc.split(a).join(b), v)
   }
+  if (e.set?.type && !(STUDIO_TYPES as readonly string[]).includes(e.set.type)) throw new Error(`${e.slug}: unknown type ${e.set.type} (one of ${STUDIO_TYPES.join(', ')})`)
   Object.assign(form, e.set ?? {})
-  const changed = (['slug', 'shortName', ...TEXT] as Field[]).filter((f) => form[f] !== toEditForm(s)[f])
+  const changed = (['slug', 'shortName', 'type', ...TEXT] as Field[]).filter((f) => form[f] !== toEditForm(s)[f])
   console.log(`${e.slug}: ${changed.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f])?.slice(0, 80)} → ${JSON.stringify(form[f])?.slice(0, 80)}`).join('\n  ') || 'no change'}`)
   if (dry || !changed.length) continue
   await saveStudio(db, row.id, form, actor, 'Виправлення (скрипт)')

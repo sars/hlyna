@@ -32,6 +32,20 @@ function towns(features: Feature[]): FC {
   }
 }
 
+// Kinds that are not studios: on the map only while their own chip is on.
+const HIDDEN: MapFilter[] = ['shop', 'legacy']
+
+// Ukraine with room around it: the default view, and what a filter falls back to when nothing or too little is left.
+const UA = { w: 22.1, s: 44.3, e: 40.3, n: 52.4 }
+const pad = () => (window.innerWidth < 640 ? 32 : 48)
+const forms = (n: number, f: [string, string, string]) => (n % 10 === 1 && n % 100 !== 11 ? f[0] : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? f[1] : f[2])
+// The number is always of the current category: studios, or shops and galleries, or museums and legacy pages.
+const UNITS: Record<'studio' | 'shop' | 'legacy', [string, string, string]> = {
+  studio: ['студія', 'студії', 'студій'],
+  shop: ['магазин чи галерея', 'магазини й галереї', 'магазинів і галерей'],
+  legacy: ['музей чи місце спадщини', 'музеї й місця спадщини', 'музеїв і місць спадщини'],
+}
+
 export function StudioMap({ filters }: { filters: readonly { key: MapFilter; label: string }[] }) {
   const box = useRef<HTMLDivElement>(null)
   const map = useRef<MlMap | null>(null)
@@ -41,11 +55,15 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
   const [failed, setFailed] = useState(false)
   const [city, setCity] = useState<string | null>(null)
   const popupRef = useRef<{ remove: () => void } | null>(null)
+  const fitted = useRef(false)
 
-  const shown = useMemo(() => (all ?? []).filter((f) => active.every((a) => f.properties.f.includes(a))), [all, active])
+  // Shops, galleries and legacy pages show only when their chip is on; the other chips narrow everything (shops included) as before.
+  const shown = useMemo(() => (all ?? []).filter((f) => HIDDEN.every((k) => active.includes(k) || !f.properties.f.includes(k)) && active.every((a) => f.properties.f.includes(a))), [all, active])
+  const kind: 'studio' | 'shop' | 'legacy' = active.includes('shop') ? 'shop' : active.includes('legacy') ? 'legacy' : 'studio'
+  const total = (all ?? []).filter((f) => (kind === 'studio' ? !HIDDEN.some((k) => f.properties.f.includes(k)) : f.properties.f.includes(kind))).length
   const cityName = city ? all?.find((f) => f.properties.citySlug === city)?.properties.city : undefined
   const inCityShown = city ? shown.filter((f) => f.properties.citySlug === city).length : 0
-  const inCityAll = city ? (all ?? []).filter((f) => f.properties.citySlug === city).length : 0
+  const inCityAll = city ? (all ?? []).filter((f) => f.properties.citySlug === city && HIDDEN.every((k) => active.includes(k) || !f.properties.f.includes(k))).length : 0
 
   // ?misto=<city> zooms to a city and opens its entry in the list below; ?f=wheel,kids restores filters.
   useEffect(() => {
@@ -179,9 +197,24 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
     if (!m || !ready) return
     ;(m.getSource('studios') as GeoJSONSource).setData({ type: 'FeatureCollection', features: shown.filter((f) => f.properties.precise) } as never)
     ;(m.getSource('towns') as GeoJSONSource).setData(towns(shown) as never)
-  }, [shown, ready])
 
-  const toggle = (k: MapFilter) => setActive((a) => (a.includes(k) ? a.filter((x) => x !== k) : [...a, k]))
+    // A filter refits the map to what is left (points far outside Ukraine do not stretch it); no points or none left → the whole
+    // country. The first run leaves the default view alone, and the views of ?misto= and ?studio= (they place the map themselves).
+    const first = !fitted.current
+    fitted.current = true
+    const q = new URLSearchParams(window.location.search)
+    if (first && (q.get('misto') || q.get('studio') || !active.length)) return
+    const pts = shown.map((f) => f.geometry.coordinates).filter(([x, y]) => x >= UA.w - 0.5 && x <= UA.e + 0.5 && y >= UA.s - 0.5 && y <= UA.n + 0.5)
+    const whole = (): [[number, number], [number, number]] => [[UA.w, UA.s], [UA.e, UA.n]]
+    if (!pts.length || !active.length) return void m.fitBounds(whole(), { padding: pad(), duration: first ? 0 : 400 })
+    const xs = pts.map((p) => p[0]), ys = pts.map((p) => p[1])
+    const [x0, x1, y0, y1] = [Math.min(...xs), Math.max(...xs), Math.min(...ys), Math.max(...ys)]
+    if (x0 === x1 && y0 === y1) return void m.easeTo({ center: [x0, y0], zoom: 9, duration: first ? 0 : 400 })
+    m.fitBounds([[x0, y0], [x1, y1]], { padding: pad(), maxZoom: 10, duration: first ? 0 : 400 })
+  }, [shown, ready, active])
+
+  // «Магазини й галереї» and «Музеї й спадщина» are two different kinds: turning one on turns the other off.
+  const toggle = (k: MapFilter) => setActive((a) => (a.includes(k) ? a.filter((x) => x !== k) : [...a.filter((x) => !(HIDDEN.includes(k) && HIDDEN.includes(x))), k]))
 
   return (
     <div className="grid grid-cols-1 gap-3">
@@ -197,8 +230,8 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
           ? 'Мапа не відкрилася в цьому браузері (потрібен WebGL) — нижче той самий перелік за містами.'
           : all
             ? cityName
-              ? `${cityName}: ${inCityShown} з ${inCityAll} · по Україні: ${shown.length} з ${all.length}`
-              : `На мапі: ${shown.length} з ${all.length}`
+              ? `${cityName}: ${inCityShown} з ${inCityAll} · по Україні: ${shown.length} з ${total}`
+              : shown.length < total ? `На мапі: ${shown.length} з ${total}` : `На мапі: ${shown.length} ${forms(shown.length, UNITS[kind])}`
             : 'Завантажуємо мапу…'}
         {active.length > 0 && (
           <button type="button" onClick={() => setActive([])} className="ml-3 cursor-pointer text-cobalt uppercase underline underline-offset-[3px]">

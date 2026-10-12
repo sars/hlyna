@@ -100,6 +100,7 @@ export function localPrices(studios: StudioCard[]) {
 }
 
 export const priceIndex = cache(async function priceIndex() {
+  // Studio prices only: a shop's retail price carries a resale markup, and the pages say «за прайсами студій».
   const studios = (await getAllStudios()).filter((s) => s.type !== 'supplier')
   const { values, sources, years: found } = studioValues(studios)
   const years = found.sort()

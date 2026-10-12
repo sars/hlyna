@@ -7,7 +7,7 @@ import { Block, InfoList } from '@/components/site/Inner'
 import { CityHead } from '@/components/ui/CityHead'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { WavePage } from '@/components/site/WavePage'
-import { getAllStudios } from '@/lib/catalog'
+import { getAllWithShops } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
 import { fillCopy, giftsData, waveCopy, type GiftItem } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
@@ -65,7 +65,7 @@ function Items({ items }: { items: GiftItem[] }) {
 export default async function Page() {
   const p = await load()
   if (!p) notFound()
-  const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
   return (
     <WavePage
       copy={p.copy}

@@ -2,7 +2,7 @@
 import eventsData from '@/content/waveB/events.json'
 import museumsData from '@/content/waveB/museums.json'
 import type { WaveVars } from '@/editorial/copy'
-import { getAllStudios } from '@/lib/catalog'
+import { getAllWithShops } from '@/lib/catalog'
 
 export type EventItem = {
   name: string; kind: string; recurrence: string; dates: string; nextDate: string; city: string; venue: string
@@ -31,7 +31,7 @@ export async function eventsPageData() {
 
 export type MuseumItem = { name: string; city: string; oblast: string; address: string; website: string; what: string; slug?: string }
 export async function museumsPageData() {
-  const known = new Set((await getAllStudios()).map((s) => s.slug))
+  const known = new Set((await getAllWithShops()).map((s) => s.slug))
   const items = (museumsData as MuseumItem[]).map((m) => ({ ...m, slug: m.slug && known.has(m.slug) ? m.slug : undefined }))
   const byCity = new Map<string, MuseumItem[]>()
   for (const m of items) byCity.set(m.city || 'Інші', [...(byCity.get(m.city || 'Інші') ?? []), m])

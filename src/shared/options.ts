@@ -2,7 +2,7 @@
 // Payload cutover, the panel and forms. Labels stay in the Payload collections until then; keep the values in sync
 // with src/collections/{Studios,Requests/options,Claims}.ts (the migration verifier fails on any unknown value).
 
-export const STUDIO_TYPES = ['studio', 'brand', 'maker', 'school', 'shop', 'supplier', 'heritage', 'other'] as const
+export const STUDIO_TYPES = ['studio', 'brand', 'maker', 'school', 'shop', 'supplier', 'heritage', 'legacy', 'other'] as const
 export const STUDIO_STATUSES = ['active', 'unclear', 'closed', 'relocated'] as const
 export const STUDIO_VISIBILITY = ['public', 'hidden'] as const
 export const CONFIDENCE = ['high', 'medium', 'low'] as const

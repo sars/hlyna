@@ -24,7 +24,7 @@ export interface Studio {
         id?: string | null;
       }[]
     | null;
-  type?: ('studio' | 'brand' | 'maker' | 'school' | 'shop' | 'supplier' | 'heritage' | 'other') | null;
+  type?: ('studio' | 'brand' | 'maker' | 'school' | 'shop' | 'supplier' | 'heritage' | 'legacy' | 'other') | null;
   city?: (number | null) | City;
   oblast?: string | null;
   address?: string | null;

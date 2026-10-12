@@ -7,7 +7,7 @@ import { Block, InfoList } from '@/components/site/Inner'
 import { CityHead } from '@/components/ui/CityHead'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { WavePage } from '@/components/site/WavePage'
-import { getAllStudios } from '@/lib/catalog'
+import { getAllWithShops } from '@/lib/catalog'
 import { displayName, firstAddress } from '@/lib/present'
 import { fillCopy, waveCopy, whereToBuyData } from '@/editorial/wave-a'
 import { sitePhotos } from '@/content/photos'
@@ -40,7 +40,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const p = await load()
   if (!p) notFound()
-  const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
   const brandsBySlug = new Map(p.stockists.filter((x) => x.slug).map((x) => [x.slug!, x.brands]))
   return (
     <WavePage

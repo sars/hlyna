@@ -1,5 +1,5 @@
 {
-  "id": "fc7f1465-5ded-4e43-826d-2b7e0fbed5e8",
+  "id": "a6233185-3ab2-42a1-9031-e60b94644a7e",
   "prevId": "047be4c6-bf12-4827-ae4c-5baf54e6fc63",
   "version": "7",
   "dialect": "postgresql",
@@ -489,12 +489,6 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
-        },
-        "short_name": {
-          "name": "short_name",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
         },
         "type": {
           "name": "type",
@@ -2753,6 +2747,7 @@
         "shop",
         "supplier",
         "heritage",
+        "legacy",
         "other"
       ]
     },

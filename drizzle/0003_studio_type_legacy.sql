@@ -1,0 +1,1 @@
+ALTER TYPE "app"."studio_type" ADD VALUE 'legacy' BEFORE 'other';

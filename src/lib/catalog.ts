@@ -17,6 +17,7 @@ export const TYPE_LABEL: Record<string, string> = {
   shop: 'Магазин',
   supplier: 'Постачальник',
   heritage: 'Традиційна майстерня',
+  legacy: 'Спадщина',
   other: 'Інше',
 }
 
@@ -82,8 +83,20 @@ function isUnverified(s: Studio): boolean {
 /** Every published record, including closed and unverified ones (profiles and the sitemap). */
 export const getCatalog = cache(loadStudios)
 
-/** What lists, counts, the map and the price index use: no closed or unverified studios. */
-export const getAllStudios = cache(async () => (await getCatalog()).filter((s) => s.status !== 'closed' && !s.unverified))
+/** Shops, galleries and «Спадщина» (museums, traditions, memory of masters) are in the catalogue but are not studios: lists, counts and search about studios leave them out. */
+export const isStudio = (s: { type?: string | null }) => s.type !== 'shop' && s.type !== 'legacy'
+
+/** Open (not closed, not unverified) records of every kind, shops included: for the pages where shops belong. */
+export const getAllWithShops = cache(async () => (await getCatalog()).filter((s) => s.status !== 'closed' && !s.unverified))
+
+/** What lists, counts, the map and the price index use: open studios and makers, no shops. */
+export const getAllStudios = cache(async () => (await getAllWithShops()).filter(isStudio))
+
+/** Open shops and galleries only. */
+export const getShops = cache(async () => (await getAllWithShops()).filter((s) => s.type === 'shop'))
+
+/** Open museums, traditions and memorial pages only. */
+export const getLegacy = cache(async () => (await getAllWithShops()).filter((s) => s.type === 'legacy'))
 
 export const getStudioBySlug = cache(async (slug: string) => (await getCatalog()).find((s) => s.slug === slug) ?? null)
 

@@ -7,7 +7,7 @@ import { Faq } from '@/components/ui/Faq'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { MoreLink } from '@/components/ui/MoreLink'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import React from 'react'
 
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
@@ -18,8 +18,9 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
-import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
-import { cityStats, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
+import { getAllStudios, getAllWithShops, getLegacy, getShops, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
+import { CityStudioLinks } from '@/components/ui/CityList'
+import { cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { aboutCity, displayName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
 import { localPrices } from '@/lib/priceIndex'
@@ -63,6 +64,8 @@ export default async function CityMakersPage({ params }: Args) {
   const g = await makerCity(citySlug)
   if (!g) {
     await redirectOldCitySlug(citySlug, (c) => `/vyrobnyky/misto/${c}`)
+    const dropped = await droppedCityTarget(citySlug)
+    if (dropped) permanentRedirect(dropped)
     notFound()
   }
   const { city, studios } = g
@@ -74,7 +77,9 @@ export default async function CityMakersPage({ params }: Args) {
   const groups = TYPE_GROUPS.map((t) => ({ ...t, studios: studios.filter((s) => t.types.includes(s.type ?? '')).sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name, 'uk')) })).filter((t) => t.studios.length)
   const counts = groups.map((t) => `${t.title.toLowerCase()} — ${t.studios.length}`).join(', ')
   const content = cityContent(city.slug as string)
-  const known = new Map((await getAllStudios()).map((s) => [s.slug as string, s]))
+  const shops = (await getShops()).filter((s) => s.cityDoc?.slug === city.slug).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+  const legacy = (await getLegacy()).filter((s) => s.cityDoc?.slug === city.slug).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug as string, s]))
   const prices = localPrices(studios)
   const priceWhere = prices.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
 
@@ -177,6 +182,18 @@ export default async function CityMakersPage({ params }: Args) {
             </div>
           </Block>
         ))}
+
+        {shops.length > 0 && (
+          <Block id="shops" title={`Магазини й галереї · ${shops.length}`} note="Де продають і показують кераміку різних майстрів; це не студії, тому окремо від списків вище.">
+            <CityStudioLinks studios={shops.map((s) => ({ id: s.id, name: displayName(s), href: `/vyrobnyky/${s.slug}` }))} />
+          </Block>
+        )}
+
+        {legacy.length > 0 && (
+          <Block id="legacy" title={`Музеї й спадщина · ${legacy.length}`} note="Музеї, осередки традиційної кераміки й пам’ять про майстрів; це не студії, тому окремо від списків вище.">
+            <CityStudioLinks studios={legacy.map((s) => ({ id: s.id, name: displayName(s), href: `/vyrobnyky/${s.slug}` }))} />
+          </Block>
+        )}
 
         {content && <PlaceSeeAlso c={content} known={known} />}
         <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />

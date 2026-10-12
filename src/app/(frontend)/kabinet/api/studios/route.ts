@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { getAllStudios, igHandle } from '@/lib/catalog'
+import { getAllWithShops, igHandle } from '@/lib/catalog'
 
 // Generic words dropped before comparing names, so «Студія кераміки «Осоння»» matches «Osonnya»-free «Осоння».
 const GENERIC = /(?<!\p{L})(студія|студио|майстерня|кераміки|кераміка|гончарна|творча|ceramics|ceramic|studio|pottery)(?!\p{L})/gu
@@ -20,7 +20,7 @@ const handleOf = (s: string) =>
 // ?name=&ig=   new-studio form: is this studio already in the catalogue (name, alternate names or Instagram handle)?
 export async function GET(req: Request) {
   const sp = new URL(req.url).searchParams
-  const all = await getAllStudios()
+  const all = await getAllWithShops()
   const out = (list: typeof all) =>
     NextResponse.json(list.slice(0, 8).map((s) => ({ slug: s.slug, name: s.name, city: s.cityDoc?.name ?? '' })))
 
