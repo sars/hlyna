@@ -3,11 +3,13 @@
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 
-export const kField =
-  'w-full min-w-0 rounded-xl border-[1.5px] border-line bg-cream px-3 py-2.5 text-[15px] text-ink placeholder:text-umber/60'
-export const kLabel = 'grid gap-1 text-[13px] font-semibold text-umber'
-export const kButton = 'justify-self-start rounded-full bg-terra px-5 py-3 font-bold text-cream hover:bg-terra-dark disabled:opacity-60'
-const box = 'grid grid-cols-1 gap-3 rounded-[20px] border border-line bg-card p-[18px]'
+import { Button } from '@/components/ui/Button'
+import { Kicker } from '@/components/ui/Kicker'
+
+// Cabinet forms are on paper: underline controls (`ui-control`), mono caps labels (`ui-flabel`), a ruled box instead of a card.
+export const kField = 'ui-control'
+export const kLabel = 'ui-flabel'
+const box = 'grid grid-cols-1 gap-2 border-t-2 border-ink pt-4'
 
 async function postJson(url: string, body: unknown) {
   const res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) })
@@ -59,14 +61,14 @@ export function ClaimForm({ studio }: { studio: { slug: string; name: string } }
   if (state === 'done')
     return (
       <div className={box} role="status">
-        <p className="font-display m-0 text-sm uppercase">Заявку отримали</p>
+        <Kicker as="p">Заявку отримали</Kicker>
         <p className="m-0">Ми перевіримо, що контакт належить студії (зазвичай за публічним Instagram чи сайтом), і надішлемо посилання, щоб ви встановили пароль. Якщо контакт не збігається, попросимо написати нам з акаунта студії.</p>
       </div>
     )
 
   return (
     <form onSubmit={onSubmit} className={box} noValidate>
-      <p className="font-display m-0 text-sm tracking-wide uppercase">Керувати профілем «{studio.name}»</p>
+      <Kicker as="p">Керувати профілем «{studio.name}»</Kicker>
       <label className={kLabel}>
         Ваше ім’я
         <input name="name" required autoComplete="name" className={kField} />
@@ -84,14 +86,14 @@ export function ClaimForm({ studio }: { studio: { slug: string; name: string } }
               <li key={h.slug}>
                 <button
                   type="button"
-                  className="w-full rounded-lg bg-cream px-3 py-2 text-left text-[14px] font-normal text-ink hover:bg-sand"
+                  className="w-full border-b border-rule px-0 py-2 text-left text-[14px] font-normal text-ink normal-case hover:text-cobalt"
                   onClick={() => {
                     if (others.length < 5 && !others.some((o) => o.slug === h.slug)) setOthers([...others, h])
                     setQ('')
                     setHits([])
                   }}
                 >
-                  {h.name} <span className="text-umber">· {h.city}</span>
+                  {h.name} <span className="text-ink-2">· {h.city}</span>
                 </button>
               </li>
             ))}
@@ -100,9 +102,9 @@ export function ClaimForm({ studio }: { studio: { slug: string; name: string } }
         {others.length > 0 && (
           <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
             {others.map((o) => (
-              <li key={o.slug} className="flex items-center gap-1 rounded-full bg-sand px-3 py-1 text-[13px] text-ink">
+              <li key={o.slug} className="flex items-center gap-1 rounded-btn px-2 py-1 font-mono text-[11px] tracking-[.04em] text-ink uppercase inset-ring-[1.5px] inset-ring-ink">
                 {o.name}
-                <button type="button" aria-label={`Прибрати ${o.name}`} className="font-bold text-umber" onClick={() => setOthers(others.filter((x) => x.slug !== o.slug))}>
+                <button type="button" aria-label={`Прибрати ${o.name}`} className="font-bold text-ink-2" onClick={() => setOthers(others.filter((x) => x.slug !== o.slug))}>
                   ×
                 </button>
               </li>
@@ -110,15 +112,17 @@ export function ClaimForm({ studio }: { studio: { slug: string; name: string } }
           </ul>
         )}
       </div>
-      <label className="flex items-start gap-2 text-sm text-ink">
-        <input type="checkbox" name="represents" required className="mt-0.5 size-4 accent-[var(--color-terra)]" /> Я представляю цю студію
+      <label className="flex items-start gap-2 py-2 text-sm text-ink">
+        <input type="checkbox" name="represents" required className="mt-0.5 size-4 accent-cobalt" /> Я представляю цю студію
       </label>
       <input type="text" name="website2" tabIndex={-1} autoComplete="off" aria-hidden className="hidden" />
-      <button type="submit" disabled={state === 'sending'} className={kButton}>
-        {state === 'sending' ? 'Надсилаємо…' : 'Надіслати заявку'}
-      </button>
-      {error && <p className="m-0 text-sm text-[var(--error)]">{error}</p>}
-      <p className="m-0 text-[12.5px] text-umber">Після перевірки ви зможете самі оновлювати опис, ціни, умови для бізнесу й додавати фото. Профіль безкоштовний.</p>
+      <div className="mt-2">
+        <Button type="submit" disabled={state === 'sending'}>
+          {state === 'sending' ? 'Надсилаємо…' : 'Надіслати заявку'}
+        </Button>
+      </div>
+      {error && <p className="ui-error m-0" role="alert">{error}</p>}
+      <p className="m-0 text-[12.5px] text-ink-2">Після перевірки ви зможете самі оновлювати опис, ціни, умови для бізнесу й додавати фото. Профіль безкоштовний.</p>
     </form>
   )
 }
@@ -159,10 +163,12 @@ export function AuthForm({ mode, token }: { mode: 'login' | 'password'; token?: 
           <input name="password2" type="password" required autoComplete="new-password" className={kField} />
         </label>
       )}
-      <button type="submit" disabled={busy} className={kButton}>
-        {busy ? 'Зачекайте…' : mode === 'login' ? 'Увійти' : 'Зберегти й увійти'}
-      </button>
-      {error && <p className="m-0 text-sm text-[var(--error)]">{error}</p>}
+      <div className="mt-2">
+        <Button type="submit" disabled={busy}>
+          {busy ? 'Зачекайте…' : mode === 'login' ? 'Увійти' : 'Зберегти й увійти'}
+        </Button>
+      </div>
+      {error && <p className="ui-error m-0" role="alert">{error}</p>}
     </form>
   )
 }

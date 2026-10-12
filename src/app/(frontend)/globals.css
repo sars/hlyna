@@ -280,7 +280,7 @@
   .ui-field { display: grid; gap: 3px; align-content: start; padding-block: 7px; min-width: 0; }
   .ui-field > label, .ui-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
   [data-tone='cobalt'] .ui-field > label { opacity: 0.85; }
-  .ui-control { width: 100%; min-width: 0; padding: 6px 0; border: 0; border-bottom: 2px solid var(--color-ink-2); border-radius: 0; background-color: transparent; color: var(--color-ink); font: inherit; font-size: 16px; line-height: 1.4; }
+  .ui-control { width: 100%; min-width: 0; padding: 6px 0; border: 0; border-bottom: 2px solid var(--color-ink-2); border-radius: 0; background-color: transparent; color: var(--color-ink); font-family: var(--font-body); font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; line-height: 1.4; }
   .ui-control::placeholder { color: var(--color-ink-2); opacity: 1; }
   textarea.ui-control { min-height: 56px; resize: vertical; }
   select.ui-control { appearance: none; -webkit-appearance: none; padding-right: 22px; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2315130f' stroke-width='1.6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right center; background-size: 12px; }
@@ -292,6 +292,9 @@
   [data-tone='cobalt'] .ui-control[aria-invalid='true'] { border-bottom-color: var(--color-peach); }
   .ui-error { font-size: 13px; color: var(--color-terracotta-text); }
   [data-tone='cobalt'] .ui-error { color: var(--color-peach); }
+  /* A label that wraps its control (cabinet forms): mono caps title, hint spans in body type. */
+  .ui-flabel { display: grid; gap: 3px; min-width: 0; padding-block: 7px; font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-ink); }
+  .ui-flabel > span { font-family: var(--font-body); font-size: 12.5px; font-weight: 400; letter-spacing: 0; text-transform: none; color: var(--color-ink-2); }
   .ui-hint { font-size: 12.5px; color: var(--color-ink-2); }
   [data-tone='cobalt'] .ui-hint { color: var(--color-on-cobalt-2); }
   .ui-check { display: flex; align-items: center; gap: 8px; padding-block: 12px; font-size: 14px; }
