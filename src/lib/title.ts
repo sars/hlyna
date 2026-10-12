@@ -16,6 +16,15 @@ export function fitTitle(variants: (string | null | undefined | false)[], target
   return { absolute: xs[xs.length - 1] ?? 'Глина' }
 }
 
+// A name that already says what the place is («Студія кераміки …», «Гончарна майстерня …», «… Ceramics»).
+const SAYS_CERAMICS = /керамі|гончар|глин|порцелян|майолік|ceramic|pottery|porcelain|clay/iu
+
+/** «Назва, керамічна студія, Місто · Глина»; the type is left out when the name already says it. */
+export const studioTitle = (name: string, type: string | null | undefined, city: string | null | undefined) => {
+  const what = SAYS_CERAMICS.test(name) ? null : (TYPE_PHRASE[type ?? 'other'] ?? TYPE_PHRASE.other)
+  return fitTitle([[name, what, city].filter(Boolean).join(', '), city && `${name}, ${city}`, name])
+}
+
 /** What a studio is, in title words (every phrase says «кераміка» in some form). */
 export const TYPE_PHRASE: Record<string, string> = {
   studio: 'керамічна студія',

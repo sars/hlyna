@@ -34,7 +34,7 @@ import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
 import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, fullNameIfDifferent, inCity, isDomainLike, isExhibitingOnly, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
-import { fitTitle, TYPE_PHRASE } from '@/lib/title'
+import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
@@ -79,10 +79,9 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const s = await getStudioBySlug(slug)
   if (!s) return {}
   const city = s.cityDoc?.name
-  const what = TYPE_PHRASE[s.type ?? 'other'] ?? TYPE_PHRASE.other
   const name = displayName(s)
   return {
-    title: fitTitle([[name, what, city].filter(Boolean).join(', '), city && `${name}, ${city}`, name]),
+    title: studioTitle(name, s.type, city),
     description: stripPersonal(s.summary || s.publicDescription || s.description || '').slice(0, 160),
     alternates: { canonical: `/vyrobnyky/${s.slug}` },
     openGraph: { images: ogImage({ title: name, kicker: [TYPE_LABEL[s.type ?? 'other'], city].filter(Boolean).join(' · '), sub: cardSummary(s.summary ?? ''), studio: true, makes: productChips(s) }) },
