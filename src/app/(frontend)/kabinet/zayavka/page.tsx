@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Kicker } from '@/components/ui/Kicker'
 import { cx, wrap } from '@/components/ui/layout'
@@ -7,6 +8,8 @@ import React from 'react'
 
 import { ClaimForm } from '@/components/site/KabinetForms.client'
 import { getStudioBySlug } from '@/lib/catalog'
+
+export const metadata: Metadata = { title: 'Заявка на профіль · Кабінет студії · Глина' }
 
 export default async function ClaimPage({ searchParams }: { searchParams: Promise<{ studio?: string }> }) {
   const { studio: slug } = await searchParams

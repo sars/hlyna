@@ -56,7 +56,7 @@ docker compose logs -f caddy          # watch certificates being issued
 curl -I https://hlyna.com.ua          # 200
 curl -I https://hlyna.com             # 301 -> https://hlyna.com.ua/
 ```
-Then open https://hlyna.com.ua/admin and create the first admin user.
+Then issue yourself a panel login link: `USER_ID=<email> BASE=https://hlyna.com.ua PROD=1 DATABASE_URL=<tunnel> pnpm exec tsx scripts/app/invite.ts` (see «Database migrations» for the tunnel) and open it to set the password for `/panel`.
 
 ## 5. Backups (nightly, 14 days)
 ```bash
@@ -72,15 +72,14 @@ Restore: `deploy/restore.sh /var/backups/hlyna/db_<stamp>.dump [/var/backups/hly
 ## 6. Updating the site
 Deploy from the Mac with `bash deploy/push.sh` (below). The image build reads the live database to pre-render
 every page, so a bare `docker compose up -d --build` needs `BUILD_DATABASE_URL` exported first (push.sh sets it:
-`postgres://hlyna:<pw>@<db container IP>:5432/hlyna`); without it the build stops. `deploy/release.sh` predates this
-and the server has no GitHub access, so it is not used.
+`postgres://hlyna:<pw>@<db container IP>:5432/hlyna`); without it the build stops.
 
 ## Database migrations
 - **Schema `app` is managed by Drizzle.** Change `src/server/db/schema/*`, run `pnpm db:generate`, review the generated SQL in `drizzle/`, commit it with the code.
 - **Apply on production before (or together with) the deploy that needs it**, from a clean checkout of `main` on the Mac through the SSH tunnel:
   `ssh -N -L 15432:172.18.0.2:5432 hlyna &` then `DATABASE_URL=postgres://hlyna:<pw>@127.0.0.1:15432/hlyna pnpm db:migrate` (drizzle-kit records applied files in schema `drizzle`). Take a backup first for anything destructive.
 - **Check a migration first** on a fresh prod dump restored locally (`createdb hlyna_migtest`, `pg_restore`, `pnpm db:migrate`).
-- The former Payload tables (schema `public`) were dropped on 2026-10-12; see `docs/replace-payload-cutover.md` for the backup that holds them.
+- The former Payload tables (schema `public`) were dropped on 2026-10-12; see `docs/archive/replace-payload-cutover.md` for the backup that holds them.
 
 ## Everyday commands
 ```bash

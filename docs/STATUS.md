@@ -3,12 +3,12 @@
 Updated 2026-10-12.
 
 ## Now
-- **Redesign (2026-10-12, branch `redesign`, not merged or deployed):** all public pages, cabinet and share cards on the new system (`docs/design/SYSTEM.md`); palette 1A removed; OG card C2 + static `public/og-home.png`; open: review fixes, then merge.
-- **Дизайн головної (2026-10-11):** затверджений шаблон і бриф для впровадження — `docs/design/` (README.md → що робити, history.md → чому так, template/ → еталон). Фавіконка вже замінена в `public/`.
-- Live at https://hlyna.com.ua on the owner's VPS (Docker Compose: app + db + caddy; `deploy/`).
-- Stack: Next.js 16, Postgres schema `app` via Drizzle, Better Auth, admin panel at `/panel`, studio cabinet at `/kabinet`, Telegram bot buttons. Payload CMS was removed on 2026-10-12 (`docs/replace-payload-cutover.md`).
+- **Live** at https://hlyna.com.ua on the owner's VPS (Docker Compose: app + db + caddy; `deploy/`); deploy from the Mac with `bash deploy/push.sh`.
+- **Stack:** Next.js 16, Postgres schema `app` via Drizzle, Better Auth, admin panel at `/panel`, studio cabinet at `/kabinet`, Telegram bot buttons. Payload CMS was removed on 2026-10-12 (`docs/archive/replace-payload-cutover.md`).
+- **Design:** the «реєстр» system is live on every page since 2026-10-12 (`docs/design/SYSTEM.md`; palette 1A gone).
+- **Repo cleanup (2026-10-12):** `docs/reviews/2026-10-12-repo-cleanup-fable.md` — what was removed, what is left for the owner. `pnpm knip` reports dead files, exports and dependencies; keep it clean.
 - Claude Code: `.claude/settings.json` (permissions, guard hook, tsc-on-stop hook), agents `explorer` / `implementer` / `reviewer`.
-- Screenshots: `pnpm shots /route` → `.shots/` (390px + 1280px).
+- Screenshots: `pnpm shots /route` → `.shots/` (390px + 1280px). Page snapshots and diffs: `node scripts/snapshot.mjs`.
 - Writing voice: `docs/voice/`.
 
 ## Next
@@ -25,12 +25,12 @@ Updated 2026-10-12.
 - Lists come from `studios.formats` tags (`pnpm exec tsx scripts/app/tag-studios.ts`, re-run after each import).
 - Photos: `public/images/doc/` (Wikimedia Commons, credits in CREDITS.md, visible caption via `<DocPhoto>` and on OG cards).
 - IndexNow: `deploy/indexnow.sh` runs at the end of `deploy/push.sh`; key file `public/12e1186b0c0ec23ee49b7f8359e536ca.txt`.
-- Production needs, after deploy: the `add_formats` migration (runs on start) and `scripts/tag-studios.ts` against the production DB, otherwise the topic lists are empty.
+- After an import on production: `PROD=1 … pnpm exec tsx scripts/app/tag-studios.ts`, otherwise the topic lists go stale.
 
 ## Review 2 fixes (2026-10-10)
 - Numbers: prices only from the live price index via `src/lib/facts.ts` (`facts().range('group' | 'private' | 'couple' | 'kids' | 'course' | 'cert' | 'corporate' | 'cup' | 'plate' | 'vase' | 'jewelry')`); topic pages with `price.index` quote the same range. Lead times only from `site.lead` (batch 3–8 weeks, logo 4–10, one custom piece 3–6, pick-up after a class 2–4).
 - Research notes never reach pages: `cleanPublic` / `cleanAddress` in `src/lib/present.ts`, applied when the catalogue loads (`src/lib/catalog.ts`).
-- Unverified studios (text doubts activity after 2022, no Instagram post since 2025) and closed ones: profile only, with a note; out of lists, counts, map, price index. `getCatalog()` = everything published, `getAllStudios()` = listed. `scripts/refresh-status.ts` marks «unclear» studios with a 2025+ post as active and prints the unverified list.
+- Unverified studios (text doubts activity after 2022, no Instagram post since 2025) and closed ones: profile only, with a note; out of lists, counts, map, price index. `getCatalog()` = everything published, `getAllStudios()` = listed. The status refresh script of the Payload era was not ported; status changes go through the panel or `scripts/app/set-status.ts`.
 - Display names: `cleanName` drops addresses, marketplace suffixes and spelling variants from headings (variants stay in alternateNames).
 
 ## Next (after P1) — from docs/reviews/2026-10-10-review-2-fable.md

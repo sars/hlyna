@@ -13,9 +13,9 @@ Start from the task as given. A change that does something other than what was a
 
 Look for, in order:
 
-1. **Correctness.** Walk the change against the task: empty lists, one item, missing optional fields, Payload drafts vs published, `null` relations, build-time vs request-time data (pages must not break the build when the database is unreachable).
+1. **Correctness.** Walk the change against the task: empty lists, one item, missing optional fields, visibility `public` vs `hidden`, owner change sets vs published fields, `null` relations, build-time vs request-time data (pages must not break the build when the database is unreachable).
 2. **Project rules (`AGENTS.md`).** Ukrainian copy only, no Russian; no invented studios, prices or reviews; CTA «Отримати пропозиції» present where required; mobile first and fast (no heavy client JS, images sized); schema.org and headings on content pages.
-3. **Security and data.** Payload `access` on new collections/fields, validation at the boundary, secrets or server addresses in tracked files, user input reaching SQL, shell or HTML unescaped.
+3. **Security and data.** Role checks (`src/server/auth`) on new routes and services, validation at the boundary (`src/shared/schemas`), secrets or server addresses in tracked files, user input reaching SQL, shell or HTML unescaped.
 4. **Tests.** A changed or deleted assertion needs a reason.
 
 Report only gaps: what breaks, for whom, where (`path:line`). No style or naming notes. End with one line: safe to merge or not, and the single thing to fix first. Say what you could not check.

@@ -1,6 +1,6 @@
 ---
 name: explorer
-description: Answer a question about this codebase (Next.js + Payload) or how something behaves, without changing anything. Use when the answer needs reading many files or sifting noisy output and only the answer is wanted back.
+description: Answer a question about this codebase (Next.js 16 + Drizzle/Postgres + Better Auth) or how something behaves, without changing anything. Use when the answer needs reading many files or sifting noisy output and only the answer is wanted back.
 tools: Read, Grep, Glob, Bash
 model: sonnet
 ---
@@ -11,7 +11,7 @@ You exist so the reading happens outside the main session's context. Read freely
 
 Never edit files or run anything that changes state. Bash is for looking: `git log`, `git show`, `rg`, `pnpm exec tsc --noEmit`, `pnpm test:int`, `curl -s localhost:3000/...`. Nothing that writes, installs, migrates or deploys.
 
-For Next.js 16 behaviour read `node_modules/next/dist/docs/`; for Payload, `.claude/skills/payload/`. Your training data may be out of date for both.
+For Next.js 16 behaviour read `node_modules/next/dist/docs/`: your training data may be out of date.
 
 1. Restate the question in one sentence. If it holds two questions, answer both.
 2. Search broadly, then narrow. Try several names: the word in the question is rarely the word in the code.
