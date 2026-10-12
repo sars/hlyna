@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next'
 import { Golos_Text, JetBrains_Mono, Playfair_Display, Unbounded } from 'next/font/google'
 import React from 'react'
 
+import { Analytics } from '@/components/site/Analytics'
 import { JsonLd } from '@/components/site/JsonLd'
 import { SiteFooter } from '@/components/site/SiteFooter'
 import { SiteHeader } from '@/components/site/SiteHeader'
@@ -41,6 +42,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         {children}
         <SiteFooter />
+        <Analytics />
       </body>
     </html>
   )

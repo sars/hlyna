@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Checkbox, Field, FieldRow, Input, Select, Textarea } from '@/components/ui/Fields'
 import { Kicker } from '@/components/ui/Kicker'
 import { Note } from '@/components/ui/Note'
+import { track } from '@/utilities/track'
 
 const WHAT = [
   { value: 'tableware', label: 'Посуд для закладу' },
@@ -116,6 +117,8 @@ export function RequestForm({
       const json = (await res.json().catch(() => null)) as { id?: number | null; doc?: { id?: number } } | null
       setRequestId(json?.id ?? json?.doc?.id ?? null)
       setState('done')
+      if (studio) track('studio_signup', { source_page: sourcePage })
+      else track('generate_lead', { request_kind: caseFix ? 'case_fix' : String(body.what ?? ''), source_page: sourcePage })
     } catch {
       setError('Не вдалося надіслати. Спробуйте ще раз за хвилину.')
       setState('error')
