@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Block, InnerCols, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Button } from '@/components/ui/Button'
+import { Epigraph } from '@/components/ui/Epigraph'
+import { Faq } from '@/components/ui/Faq'
+import { Kicker } from '@/components/ui/Kicker'
+import { IndexCell, StudioCells } from '@/components/ui/StudioCell'
 import React from 'react'
 
-import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { mainNav } from '@/content/navigation'
@@ -48,8 +52,7 @@ export default async function BusinessIndex() {
   const cities = groupByCity(all).length
 
   return (
-    <main className={`${container} grid grid-cols-1 items-start gap-10 pt-8 pb-16 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]`}>
-      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
+    <InnerMain>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -63,69 +66,57 @@ export default async function BusinessIndex() {
           })),
         }}
       />
-      <div className="grid grid-cols-1 gap-10">
-        <div className="grid grid-cols-1 gap-4">
-          <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Для бізнесу' }]} />
-          <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Кераміка ручної роботи для бізнесу</h1>
-          <p className="m-0 max-w-[70ch] text-lg">
+      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Для бізнесу' }]}
+        kicker="Для бізнесу"
+        title="Кераміка ручної роботи для бізнесу"
+        lead={
+          <p className="m-0">
             У каталозі — {fmt(all.length)} {pluralUk(all.length, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])} у {fmt(cities)} {pluralUk(cities, ['місті', 'містах', 'містах'])}, які роблять посуд для ресторанів, кав’ярень і готелів, чашки з логотипом і подарунки для команд або проводять корпоративи з ліплення з глини. Партію зазвичай виготовляють {site.lead.batch}; корпоратив коштує {(await facts()).range('corporate')}. {site.model}
           </p>
-          <Updated />
-          <Epigraph lines={verses.business} />
-        </div>
+        }
+        actions={
+          <Button href="#zapyt-forma" variant="cobalt" arrow>
+            Отримати пропозиції
+          </Button>
+        }
+      />
+      <InnerCols aside={<RequestForm sourcePage="/dlya-biznesu" />}>
+        <Epigraph lines={verses.business} />
         {biz.columns.map((c) => (
-          <section key={c.title} className="grid grid-cols-1 gap-3">
-            <p className="kicker m-0">{c.title}</p>
-            <ul className="m-0 grid grid-cols-1 list-none gap-3 p-0 sm:grid-cols-2">
+          <section key={c.title} className="grid gap-2">
+            <Kicker as="p">{c.title}</Kicker>
+            <StudioCells>
               {c.links.map((l) => (
-                <li key={l.href} className="sm:[&:last-child:nth-child(odd)]:col-span-2">
-                  <Link href={l.href} className="grid grid-cols-1 h-full gap-1 rounded-2xl bg-card p-4 text-ink no-underline hover:bg-sand hover:text-ink">
-                    <b>{l.label}</b>
-                    {l.note && <span className="text-sm text-umber">{l.note}</span>}
-                  </Link>
-                </li>
+                <IndexCell key={l.href} href={l.href} title={l.label} text={l.note} cta="Відкрити" />
               ))}
-            </ul>
+            </StudioCells>
           </section>
         ))}
 
-        <section aria-labelledby="top">
-          <SectionHead kicker="Хто працює з бізнесом" title="Студії, з яких варто почати" id="top">
-            <p className="m-0 text-sm text-umber">За відкритими даними: заклади, логотип, корпоративні подарунки. Умови кожна студія підтверджує у відповіді на запит.</p>
-          </SectionHead>
-          <ul className="m-0 grid grid-cols-1 list-none gap-3 p-0 sm:grid-cols-2">
+        <Block id="top" kicker="Хто працює з бізнесом" title="Студії, з яких варто почати" note={<>За відкритими даними: заклади, логотип, корпоративні подарунки. Умови кожна студія підтверджує у відповіді на запит.</>}>
+          <StudioCells>
             {top.map((s) => (
-              <li key={s.id}>
-                <Link href={`/vyrobnyky/${s.slug}`} className="grid grid-cols-1 h-full content-start gap-1.5 rounded-[18px] bg-card p-4 text-ink no-underline hover:bg-sand hover:text-ink">
-                  <span className="text-[12px] font-bold text-umber">{[TYPE_LABEL[s.type ?? 'other'], s.cityDoc?.name].filter(Boolean).join(' · ')}</span>
-                  <span className="text-[16.5px] leading-snug font-semibold">{cleanName(s.name)}</span>
-                  <span className="text-sm text-terra">{what(s)}</span>
-                  {s.summary && <span className="line-clamp-2 text-sm text-umber">{stripPersonal(s.summary)}</span>}
-                </Link>
-              </li>
+              <IndexCell
+                key={s.id}
+                href={`/vyrobnyky/${s.slug}`}
+                kicker={[TYPE_LABEL[s.type ?? 'other'], s.cityDoc?.name].filter(Boolean).join(' · ')}
+                title={cleanName(s.name)}
+                cta="Профіль"
+                text={
+                  <>
+                    <span className="block font-mono text-xs tracking-[.04em] text-terracotta-text uppercase">{what(s)}</span>
+                    {s.summary && <span className="line-clamp-2">{stripPersonal(s.summary)}</span>}
+                  </>
+                }
+              />
             ))}
-          </ul>
-        </section>
+          </StudioCells>
+        </Block>
 
-        <section aria-labelledby="faq">
-          <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-          <div className="grid grid-cols-1 gap-2.5">
-            {faq.map((f, i) => (
-              <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
-                <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">
-                  {f.q}
-                  <span aria-hidden className="font-display text-terra group-open:hidden">+</span>
-                  <span aria-hidden className="font-display hidden text-terra group-open:inline">–</span>
-                </summary>
-                <p className="mt-0 mb-3.5">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </section>
-      </div>
-      <aside className="lg:sticky lg:top-24 lg:self-start">
-        <RequestForm sourcePage="/dlya-biznesu" />
-      </aside>
-    </main>
+        <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />
+      </InnerCols>
+    </InnerMain>
   )
 }

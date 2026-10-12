@@ -159,7 +159,7 @@ export default async function StyleguidePage() {
         <Cap>Дозволені пари (WCAG, §2.1)</Cap>
         <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
           {PAIRS.map(([fg, bg, ratio, where]) => (
-            <div key={fg + bg} className="flex items-center gap-3 px-3.5 py-2.5 shadow-[inset_0_0_0_1px_var(--color-rule)]" style={{ background: `var(--color-${bg})`, color: `var(--color-${fg})` }}>
+            <div key={fg + bg} className="flex items-center gap-3 px-3.5 py-2.5 inset-ring-1 inset-ring-rule" style={{ background: `var(--color-${bg})`, color: `var(--color-${fg})` }}>
               <span className="font-display text-xl font-extrabold">Аа</span>
               <span className="font-mono text-[11px] leading-[1.4] tracking-[.04em] uppercase">{fg} / {bg}<br />{ratio} · {where}</span>
             </div>

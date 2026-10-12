@@ -94,7 +94,7 @@ export function WavePage({
         title={copy.title}
         lead={
           <p className="m-0">
-            <RichText text={copy.lead} known={known} />
+            <RichText text={copy.lead} known={known} bold />
           </p>
         }
         chips={cityLinks}

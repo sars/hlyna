@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Block, InfoList } from '@/components/site/Inner'
+import { BoldFacts, Block, InfoList } from '@/components/site/Inner'
 import { MoreLink } from '@/components/ui/MoreLink'
 import type { PlaceContent } from '@/editorial/places'
 import type { StudioCard } from '@/lib/catalog'
@@ -15,11 +15,12 @@ type Known = Map<string, StudioCard>
 const LINK = /\[([^\]]+)\]\(([^)\s]+)\)/g
 const link = 'underline underline-offset-[3px]'
 
-export function RichText({ text, known }: { text: string; known: Known }) {
+// `bold` sets the numbers (counts, prices, terms) of the plain text in semibold, as in the topic leads.
+export function RichText({ text, known, bold }: { text: string; known: Known; bold?: boolean }) {
   const out: React.ReactNode[] = []
   let last = 0
   for (const m of text.matchAll(LINK)) {
-    out.push(text.slice(last, m.index))
+    out.push(bold ? <BoldFacts key={`t${m.index}`} text={text.slice(last, m.index)} /> : text.slice(last, m.index))
     const [, label, target] = m
     if (target.startsWith('/'))
       out.push(
@@ -36,7 +37,7 @@ export function RichText({ text, known }: { text: string; known: Known }) {
     else out.push(label)
     last = m.index! + m[0].length
   }
-  out.push(text.slice(last))
+  out.push(bold ? <BoldFacts key="tail" text={text.slice(last)} /> : text.slice(last))
   return <>{out}</>
 }
 
