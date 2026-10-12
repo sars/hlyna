@@ -32,6 +32,9 @@ function towns(features: Feature[]): FC {
   }
 }
 
+// Kinds that are not studios: on the map only while their own chip is on.
+const HIDDEN: MapFilter[] = ['shop', 'legacy']
+
 export function StudioMap({ filters }: { filters: readonly { key: MapFilter; label: string }[] }) {
   const box = useRef<HTMLDivElement>(null)
   const map = useRef<MlMap | null>(null)
@@ -42,11 +45,11 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
   const [city, setCity] = useState<string | null>(null)
   const popupRef = useRef<{ remove: () => void } | null>(null)
 
-  // Shops and galleries show only when their chip is on; the other chips narrow everything (shops included) as before.
-  const shown = useMemo(() => (all ?? []).filter((f) => (active.includes('shop') || !f.properties.f.includes('shop')) && active.every((a) => f.properties.f.includes(a))), [all, active])
+  // Shops, galleries and legacy pages show only when their chip is on; the other chips narrow everything (shops included) as before.
+  const shown = useMemo(() => (all ?? []).filter((f) => HIDDEN.every((k) => active.includes(k) || !f.properties.f.includes(k)) && active.every((a) => f.properties.f.includes(a))), [all, active])
   const cityName = city ? all?.find((f) => f.properties.citySlug === city)?.properties.city : undefined
   const inCityShown = city ? shown.filter((f) => f.properties.citySlug === city).length : 0
-  const inCityAll = city ? (all ?? []).filter((f) => f.properties.citySlug === city && (active.includes('shop') || !f.properties.f.includes('shop'))).length : 0
+  const inCityAll = city ? (all ?? []).filter((f) => f.properties.citySlug === city && HIDDEN.every((k) => active.includes(k) || !f.properties.f.includes(k))).length : 0
 
   // ?misto=<city> zooms to a city and opens its entry in the list below; ?f=wheel,kids restores filters.
   useEffect(() => {

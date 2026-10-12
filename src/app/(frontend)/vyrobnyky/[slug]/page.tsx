@@ -266,6 +266,13 @@ export default async function StudioPage({ params }: Args) {
                   Надіслати запит
                 </MoreLink>
               </SideBox>
+            ) : s.type === 'legacy' ? (
+              <SideBox title="Музей, традиція чи пам’ять">
+                <p className="m-0">Це не студія: замовлень і занять тут не приймають. Шукаєте кераміку чи майстер-клас? Надішліть запит — ми підберемо студії, які працюють зараз.</p>
+                <MoreLink href="/zapyt" pad={false} className="py-1.5">
+                  Надіслати запит
+                </MoreLink>
+              </SideBox>
             ) : exhibiting ? (
               <SideBox title="Де побачити роботи">
                 <p className="m-0">
@@ -310,7 +317,7 @@ export default async function StudioPage({ params }: Args) {
         {!precise && !street && !cleanAddress(s.address) && !dormant && receivesVisitors && city && <Note>Працює {inCity(city.name)} — точну адресу уточнюйте у студії.</Note>}
 
         {(products.length > 0 || services.length > 0) && (
-          <Block id="offer" title={exhibiting ? 'Що створює' : 'Що робить і пропонує'}>
+          <Block id="offer" title={s.type === 'legacy' ? 'Що показують і розповідають' : exhibiting ? 'Що створює' : 'Що робить і пропонує'}>
             <div className="grid items-start gap-6 sm:grid-cols-2">
               {products.length > 0 && <ListBlock title="Вироби" items={products} />}
               {services.length > 0 && <ListBlock title="Послуги" items={services} />}

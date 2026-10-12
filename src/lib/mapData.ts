@@ -15,6 +15,7 @@ export const MAP_FILTERS = [
   { key: 'logo', label: 'Логотип' },
   // Off by default: shops and galleries are not studios; the chip adds them to the map.
   { key: 'shop', label: 'Магазини й галереї' },
+  { key: 'legacy', label: 'Музеї й спадщина' },
 ] as const
 export type MapFilter = (typeof MAP_FILTERS)[number]['key']
 
@@ -32,6 +33,7 @@ export type MapProps = {
 export function flags(s: StudioCard): MapFilter[] {
   const out: MapFilter[] = []
   if (s.type === 'shop') out.push('shop')
+  if (s.type === 'legacy') out.push('legacy')
   if (offersMasterClasses(s)) out.push('mk')
   if (hasFormat(s, 'wheel')) out.push('wheel')
   if (hasFormat(s, 'kids')) out.push('kids')

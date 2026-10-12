@@ -235,6 +235,7 @@ const EXHIBIT_ONLY = /виставк|музе|галере|колекці|сим
 // Artists known from exhibitions and museums, with nothing to order or book: no request form,
 // no «умови для закладів», no master-class badge.
 export function isExhibitingOnly(s: Studio): boolean {
+  if (s.type === 'legacy') return true // museums, traditions and memorial pages: nothing to book or order
   if (!['maker', 'heritage', 'other'].includes(s.type ?? '')) return false
   // Technique tags (wheel, painting…) describe the work; only offer tags mean something can be booked or ordered.
   const OFFER = ['kids', 'couples', 'courses', 'certificates', 'corporate-workshop', 'corporate-gifts', 'logo', 'horeca']

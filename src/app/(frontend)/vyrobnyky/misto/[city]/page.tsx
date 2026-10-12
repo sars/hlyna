@@ -18,7 +18,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
-import { getAllStudios, getAllWithShops, getShops, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
+import { getAllStudios, getAllWithShops, getLegacy, getShops, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { CityStudioLinks } from '@/components/ui/CityList'
 import { cityStats, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { aboutCity, cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
@@ -75,6 +75,7 @@ export default async function CityMakersPage({ params }: Args) {
   const counts = groups.map((t) => `${t.title.toLowerCase()} — ${t.studios.length}`).join(', ')
   const content = cityContent(city.slug as string)
   const shops = (await getShops()).filter((s) => s.cityDoc?.slug === city.slug).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+  const legacy = (await getLegacy()).filter((s) => s.cityDoc?.slug === city.slug).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
   const known = new Map((await getAllWithShops()).map((s) => [s.slug as string, s]))
   const prices = localPrices(studios)
   const priceWhere = prices.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
@@ -182,6 +183,12 @@ export default async function CityMakersPage({ params }: Args) {
         {shops.length > 0 && (
           <Block id="shops" title={`Магазини й галереї · ${shops.length}`} note="Де продають і показують кераміку різних майстрів; це не студії, тому окремо від списків вище.">
             <CityStudioLinks studios={shops.map((s) => ({ id: s.id, name: cleanName(s.name), href: `/vyrobnyky/${s.slug}` }))} />
+          </Block>
+        )}
+
+        {legacy.length > 0 && (
+          <Block id="legacy" title={`Музеї й спадщина · ${legacy.length}`} note="Музеї, осередки традиційної кераміки й пам’ять про майстрів; це не студії, тому окремо від списків вище.">
+            <CityStudioLinks studios={legacy.map((s) => ({ id: s.id, name: cleanName(s.name), href: `/vyrobnyky/${s.slug}` }))} />
           </Block>
         )}
 

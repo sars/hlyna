@@ -360,6 +360,7 @@ export const uk = {
   'type.shop': 'Магазин',
   'type.supplier': 'Постачальник',
   'type.heritage': 'Традиційне ремесло',
+  'type.legacy': 'Спадщина (музей, традиція, пам’ять)',
   'type.other': 'Інше',
   'studioStatus.active': 'Працює',
   'studioStatus.unclear': 'Робота не перевірена',
