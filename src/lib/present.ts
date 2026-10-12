@@ -103,10 +103,10 @@ export function publicPrices(s: Studio): PriceLine[] {
     // Prices in dollars or euros come from shops abroad (Etsy, own site for export); say so instead of leaving a bare «43 USD».
     if (/(?<!\p{L})(?:usd|eur)(?!\p{L})|\$|€/iu.test(line.text) && !/грн|₴/.test(line.text))
       line.source = [line.source, /etsy/i.test(line.source ?? '') ? 'ціна для покупців за кордоном' : 'ціна в іноземній валюті, для покупців за кордоном'].filter(Boolean).join('; ')
-    line.text = groupMoney(line.text)
     out.push(line)
   }
-  return out
+  // Separators only on the way out: the duplicate check above compares the plain wording.
+  return out.map((l) => ({ ...l, text: groupMoney(l.text) }))
 }
 
 // Lines about one master class for one person (or a couple): no courses, coworking, products, group totals.
