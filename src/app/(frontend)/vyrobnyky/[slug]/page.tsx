@@ -254,7 +254,7 @@ export default async function StudioPage({ params }: Args) {
       <InnerCols
         aside={
           <>
-            {dormant ? (
+            {dormant && s.type !== 'legacy' ? (
               <SideBox title={s.status === 'closed' ? 'Не працює' : 'Актуальність не підтверджена'}>
                 <p className="m-0">
                   {s.status === 'closed'
