@@ -29,7 +29,7 @@ const warn = (f, m) => {
 
 const dir = path.join(SRC, 'copy')
 const ids = []
-for (const old of fs.readdirSync(OUT).filter((f) => f.endsWith('.json') && f !== 'etsy.json' && f !== 'stockists.json')) fs.unlinkSync(path.join(OUT, old))
+for (const old of fs.readdirSync(OUT).filter((f) => f.endsWith('.json') && f !== 'etsy-shops.json' && f !== 'stockists.json')) fs.unlinkSync(path.join(OUT, old))
 for (const file of fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort() : []) {
   const id = file.replace(/\.json$/, '')
   if (!known.has(id)) {

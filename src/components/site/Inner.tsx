@@ -18,7 +18,7 @@ import type { DocPhoto, SitePhoto } from '@/content/photos'
 
 // Shared skeleton of the inner pages (SYSTEM.md §4.2, §5): TopicPage, WavePage, GuidePage and the wave routes all
 // compose these. Room for the phone request bar is left at the end of the footer (see globals.css), not in <main>.
-export function InnerMain({ children }: { bar?: boolean; children: React.ReactNode }) {
+export function InnerMain({ children }: { children: React.ReactNode }) {
   return <main className={cx(wrap, 'grid w-full grid-cols-[minmax(0,1fr)]')}>{children}</main>
 }
 

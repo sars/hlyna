@@ -2,7 +2,7 @@
 // (Adapted from brocoders/inhouse-ai-starter-kit, MIT: the panel has one locale and one time zone, so the
 // FormatProvider is gone and the settings are constants.)
 
-export type FormatSettings = { locale: string; timeZone: string }
+type FormatSettings = { locale: string; timeZone: string }
 
 const current: FormatSettings = { locale: 'uk-UA', timeZone: 'Europe/Kyiv' }
 
@@ -106,13 +106,6 @@ export function formatNumber(value: number, fractionDigits = 0): string {
   }).format(value);
 }
 
-/** 12,345 → "12K". Axis ticks and tight cells only. */
-export function formatCompact(value: number): string {
-  return numberFormat('compact', {
-    notation: 'compact',
-    maximumFractionDigits: 1,
-  }).format(value);
-}
 
 /**
  * An amount held as a whole number of its smallest unit — cents, grams,
@@ -156,69 +149,15 @@ function currencyDigits(currency: string): number {
   return digits;
 }
 
-/** File sizes, for attachments and the health page's disk line. */
-export function formatBytes(bytes: number): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let size = bytes;
-  let unit = 0;
-  while (size >= 1024 && unit < units.length - 1) {
-    size /= 1024;
-    unit += 1;
-  }
-  return `${numberFormat(unit === 0 ? 'n0' : 'n1', {
-    minimumFractionDigits: unit === 0 ? 0 : 1,
-    maximumFractionDigits: unit === 0 ? 0 : 1,
-  }).format(size)} ${units[unit]}`;
-}
 
-/**
- * The calendar day ("2026-09-22") an instant falls on in the app's time zone,
- * not the browser's and not UTC's. `updatedAt.slice(0, 10)` is the UTC day,
- * which is a different day for part of every day almost everywhere; comparing
- * it with `today()` counts an evening's work in the wrong week.
- */
-export function dayOf(value: string | Date): string {
-  // A calendar day is already its own day; only an instant needs a zone.
-  if (typeof value === 'string' && CALENDAR_DAY.test(value)) return value;
-  const date = toDate(value);
-  if (!date) return '';
-  // `en-CA` for the parts only, so the digits are always ASCII whatever the
-  // app's own locale writes them as.
-  let dayParts = caches.get('day-parts') as Intl.DateTimeFormat | undefined;
-  if (!dayParts) {
-    dayParts = new Intl.DateTimeFormat('en-CA', {
-      timeZone: current.timeZone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-    caches.set('day-parts', dayParts);
-  }
-  const parts = dayParts.formatToParts(date);
-  const part = (type: string) => parts.find((p) => p.type === type)?.value ?? '';
-  return `${part('year')}-${part('month')}-${part('day')}`;
-}
 
-/**
- * Today as a calendar day ("2026-09-22") in the app's time zone, not the
- * browser's. Someone travelling must see the same "today" as the office.
- */
-export function today(at: Date = new Date()): string {
-  return dayOf(at);
-}
 
-/** A calendar day `days` away from another, staying a calendar day throughout. */
-export function shiftDay(day: string, days: number): string {
-  const date = new Date(`${day}T12:00:00Z`);
-  date.setUTCDate(date.getUTCDate() + days);
-  return date.toISOString().slice(0, 10);
-}
 
 function toDate(value: string | Date | null | undefined): Date | null {
   if (!value) return null;
   if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
   // A calendar day has no time of day. Midday UTC is as neutral as an instant
-  // can be, but it is still an instant: formatDate and dayOf never send a
+  // can be, but it is still an instant: formatDate never sends a
   // calendar day through here, and nothing that needs its exact date should.
   const date = CALENDAR_DAY.test(value) ? new Date(`${value}T12:00:00Z`) : new Date(value);
   return Number.isNaN(date.getTime()) ? null : date;

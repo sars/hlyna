@@ -24,7 +24,6 @@ export const docPhotos = {
   wheelBw: { src: '/images/stock/wheel-bw.jpg', width: 960, height: 640, alt: 'Руки гончаря центрують глину на колі, чорно-біле фото', author: 'Quino Al', license: 'CC0', href: 'https://commons.wikimedia.org/wiki/File:Black_and_white_pottery_(Unsplash).jpg', source: 'Unsplash' },
 } satisfies Record<string, DocPhoto>
 
-export type DocPhotoKey = keyof typeof docPhotos
 
 // Photos of the site's own chrome (home page, headers of lists): the owner's archive, no credit line.
 // docs/design/photo-plan.md says which frame goes where; files are cut from the 3000px masters into public/images/site/
@@ -70,4 +69,3 @@ export const sitePhotos = {
 // A photo at the top of an inner page: a Wikimedia/stock photo with its credit, or an archive photo without one.
 export type HeroPhoto = DocPhoto | SitePhoto
 
-export type SitePhotoKey = keyof typeof sitePhotos

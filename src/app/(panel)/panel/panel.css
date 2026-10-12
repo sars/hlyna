@@ -5,9 +5,7 @@
 @source '.';
 @import 'tw-animate-css';
 
-/* Dark mode is an attribute on <html>, not a class, because the inline script
-   in index.html sets it before the first paint and an attribute is the one
-   thing a three-line script can set without knowing anything about React. */
+/* Dark mode is an attribute on <html>, not a class: the inline script in layout.tsx sets it before the first paint. */
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 /* The state variants shadcn's Base UI primitives are written against, inlined
@@ -32,36 +30,9 @@
     @slot;
   }
 }
-@custom-variant data-unchecked {
-  &:where([data-state='unchecked']),
-  &:where([data-unchecked]:not([data-unchecked='false'])) {
-    @slot;
-  }
-}
-@custom-variant data-selected {
-  &:where([data-selected='true']) {
-    @slot;
-  }
-}
 @custom-variant data-disabled {
   &:where([data-disabled='true']),
   &:where([data-disabled]:not([data-disabled='false'])) {
-    @slot;
-  }
-}
-@custom-variant data-active {
-  &:where([data-state='active']),
-  &:where([data-active]:not([data-active='false'])) {
-    @slot;
-  }
-}
-@custom-variant data-horizontal {
-  &:where([data-orientation='horizontal']) {
-    @slot;
-  }
-}
-@custom-variant data-vertical {
-  &:where([data-orientation='vertical']) {
     @slot;
   }
 }
@@ -98,12 +69,6 @@
   --color-border: var(--border);
   --color-input: var(--border);
   --color-ring: var(--primary);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-chart-6: var(--chart-6);
   --font-heading: var(--font-sans);
   --radius: 0.5rem;
   --radius-sm: 0.25rem;
@@ -114,9 +79,8 @@
   --radius-3xl: 1.25rem;
 }
 
-/* The Tremor dashboard's palette: Tailwind blue and gray, emerald and red for
-   deltas, a near-black card at night. Colours live only here — components use
-   the semantic names above and never a raw colour. */
+/* Palette: Tailwind blue and gray, emerald and red for deltas, a near-black card at night. Colours live only
+   here — components use the semantic names above and never a raw colour. */
 :root {
   --background: #f9fafb;
   --foreground: #111827;
@@ -130,12 +94,6 @@
   --positive: #059669;
   --negative: #dc2626;
   --warning: #d97706;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
-  --chart-3: #8b5cf6;
-  --chart-4: #f59e0b;
-  --chart-5: #6b7280;
-  --chart-6: #06b6d4;
   color-scheme: light;
 }
 [data-theme='dark'] {
@@ -151,12 +109,6 @@
   --positive: #34d399;
   --negative: #f87171;
   --warning: #fbbf24;
-  --chart-1: #3b82f6;
-  --chart-2: #10b981;
-  --chart-3: #8b5cf6;
-  --chart-4: #f59e0b;
-  --chart-5: #6b7280;
-  --chart-6: #06b6d4;
   color-scheme: dark;
 }
 
@@ -195,10 +147,6 @@
 
 .tabular-nums {
   font-variant-numeric: tabular-nums;
-}
-.recharts-wrapper:focus,
-.recharts-surface:focus {
-  outline: none;
 }
 @media (prefers-reduced-motion: reduce) {
   *,

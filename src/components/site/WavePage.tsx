@@ -85,7 +85,7 @@ export function WavePage({
   const [first, ...rest] = copy.sections
   const picks = (copy.picks ?? []).map((p) => ({ ...p, studios: p.slugs.map((s) => known.get(s)).filter((s): s is StudioCard => !!s) })).filter((p) => p.studios.length)
   return (
-    <InnerMain bar>
+    <InnerMain>
       {copy.faq.length > 0 && (
         <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: copy.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') } })) }} />
       )}

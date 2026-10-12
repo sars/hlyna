@@ -58,10 +58,6 @@ export async function ownsStudio(db: Db, userId: string, studioId: number): Prom
   return rows.length > 0
 }
 
-export async function ownedStudioIds(db: Db, userId: string): Promise<number[]> {
-  const rows = await db.select({ s: studioOwner.studioId }).from(studioOwner).where(eq(studioOwner.userId, userId)).orderBy(studioOwner.position)
-  return rows.map((r) => r.s)
-}
 
 /**
  * The cabinet: the signed-in owner must manage this studio. Staff (editor/admin) pass too, so we can see a
@@ -74,13 +70,3 @@ export async function requireOwnerOf(auth: Auth, db: Db, headers: Headers, studi
   if (!(await ownsStudio(db, u.id, studioId))) throw new AuthError(403, 'Цей профіль не прив’язаний до вашого кабінету.')
   return u
 }
-
-/** Any owner (or staff) — for /kabinet pages that list the owner's studios. */
-export async function requireOwner(auth: Auth, db: Db, headers: Headers): Promise<SignedInUser> {
-  const u = await currentUser(auth, db, headers)
-  if (!u) throw new AuthError(401, 'Увійдіть у кабінет.')
-  return u
-}
-
-export const authErrorResponse = (e: AuthError) =>
-  Response.json({ error: e.message }, { status: e.status, headers: { 'cache-control': 'no-store' } })

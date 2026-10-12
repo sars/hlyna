@@ -5,7 +5,8 @@
     "tests/**/*.ts",
     ".claude/hooks/*.mjs",
     "src/proxy.ts",
-    "src/app/robots.ts"
+    "src/app/robots.ts",
+    "src/app/**/global-error.tsx"
   ],
   "project": [
     "src/**/*.{ts,tsx}",
@@ -20,5 +21,8 @@
     "tw-animate-css",
     "jsdom"
   ],
-  "ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "ignore": [
+    "src/components/panel/ui/*.tsx"
+  ]
 }

@@ -38,11 +38,15 @@ import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
-import { link } from '@/components/profile/blocks'
 import { redirectOldStudioSlug } from '@/lib/redirects'
 
+const link = (href: string, label: string) => (
+  <a href={href} target="_blank" rel="noopener nofollow" className="break-all">
+    {label}
+  </a>
+)
+
 export const revalidate = 86400
-export const dynamicParams = true
 
 export async function generateStaticParams() {
   try {
@@ -160,7 +164,7 @@ export default async function StudioPage({ params }: Args) {
   const priceBlocks = priceGroups.map(([g, lines]) => ({ g, lines }))
 
   return (
-    <InnerMain bar>
+    <InnerMain>
       <JsonLd
         data={{
           '@context': 'https://schema.org',

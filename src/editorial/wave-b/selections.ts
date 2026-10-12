@@ -1,5 +1,5 @@
 // Wave B selections: contemporary tableware brands, New Year ornaments, who works with business, Etsy shops.
-import etsyShops from '@/content/waveA/etsy.json'
+import etsyShops from '@/content/waveA/etsy-shops.json'
 import type { WaveVars } from '@/editorial/copy'
 import { evidenceLine } from '@/editorial/topics'
 import type { EtsyShop } from '@/editorial/wave-a'

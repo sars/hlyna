@@ -8,7 +8,7 @@ import React from 'react'
 
 import { ldItemList } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
-import { Faq } from '@/components/site/SelectionFaq'
+import { Faq } from '@/components/ui/Faq'
 import { pluralUk } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
 import { kosivOpishne } from '@/editorial/contemporary'
@@ -78,7 +78,7 @@ export default async function KosivOpishne() {
         <Note>
           Дивіться також: <Link href="/dobirky/suchasni-keramisty">сучасні українські керамісти</Link>, <Link href="/vyrobnyky/misto/kosiv">усі профілі з Косова</Link>, <Link href="/vyrobnyky/misto/opishne">з Опішного</Link>.
         </Note>
-        <Faq items={faq} />
+        <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst />
       </div>
     </InnerMain>
   )

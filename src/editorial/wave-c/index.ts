@@ -85,7 +85,6 @@ export async function staffGiftsData() {
 }
 
 export type Offer = { slug: string; what: string; price: string | null; deadline: string | null; date: string; source: string }
-export type Market = { name: string; city: string; dates: string; note: string; source: string }
 export type NewYear = typeof newYearJson
 
 export async function winterData() {

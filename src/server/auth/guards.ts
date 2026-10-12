@@ -11,7 +11,7 @@ import type { StaffRole } from './roles'
 // The app's guards: access.ts bound to the app's Better Auth and database, plus Next helpers that redirect.
 // `server-only` makes a client import of this file a build error.
 
-export { AuthError, authErrorResponse, type SignedInUser } from './access'
+export { AuthError, type SignedInUser } from './access'
 
 export const currentUser = (headers: Headers) => access.currentUser(getAuth(), db, headers)
 export const requireRole = (headers: Headers, role: StaffRole) => access.requireRole(getAuth(), db, headers, role)

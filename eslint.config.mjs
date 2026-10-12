@@ -13,6 +13,7 @@ const eslintConfig = [
       'node_modules/',
       'public/',
       'next-env.d.ts',
+      'experiments/', // local design and photo experiments, not part of the site (gitignored)
     ],
   },
   ...nextCoreWebVitals,

@@ -2,7 +2,7 @@
 // claims, changes, journal; desktop 1280 and phone 390. Screenshots in .shots/panel/.
 import { chromium } from '@playwright/test'
 
-const BASE = process.env.BASE ?? 'http://localhost:3101'
+const BASE = process.env.BASE ?? 'http://localhost:3000'
 const INVITE = process.env.INVITE
 const EMAIL = process.env.EMAIL
 const PASSWORD = 'test-only-password-123'
@@ -28,7 +28,7 @@ async function run(name, viewport, first) {
     await p.waitForURL(`${BASE}/panel`, { timeout: 30000 })
     await p.goto(`${BASE}/panel/vhid`)
     await p.waitForURL(`${BASE}/panel`) // signed-in staff are sent on
-    await p.locator('aside button:has-text("Rodion")').first().click()
+    await p.locator('aside button').first().click() // the user menu (name of the signed-in person)
     await p.click('role=menuitem[name="Вийти"]')
     await p.waitForURL(`${BASE}/panel/vhid`)
   } else {

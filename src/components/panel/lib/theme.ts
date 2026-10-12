@@ -1,8 +1,7 @@
 'use client';
 
-// Light or dark, and remembering which. The choice is applied by the inline
-// script in index.html before the first paint; this is the same decision, made
-// again while the app is running.
+// Light or dark, and remembering which. The inline script in src/app/(panel)/panel/layout.tsx applies the choice
+// before the first paint; this is the same decision, made again while the app is running.
 import { useSyncExternalStore } from 'react';
 
 export type ThemeChoice = 'light' | 'dark' | 'system';

@@ -1,5 +1,5 @@
 // Where to buy contemporary Ukrainian ceramics (/de-kupyty-keramiku): shops, makers selling online, Etsy.
-import etsyShops from '@/content/waveA/etsy.json'
+import etsyShops from '@/content/waveA/etsy-shops.json'
 import stockistShops from '@/content/waveA/stockists.json'
 import type { WaveVars } from '@/editorial/copy'
 import { getAllWithShops, groupByCity } from '@/lib/catalog'

@@ -114,8 +114,6 @@ export async function cityOptions(db: Db) {
 
 // ---------------------------------------------------------------- read for the editor
 
-export type EditorPhoto = { id: number; fileName: string; alt: string | null; width: number | null; height: number | null; thumb: string | null; status: string }
-
 export async function getStudioForEdit(db: Db, id: number) {
   const snap = await snapshotStudio(db, id)
   if (!snap) return null

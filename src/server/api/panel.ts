@@ -232,4 +232,3 @@ app.delete('/users/:id/sessions/:sid', adminOnly, zValidator('param', z.object({
 app.delete('/users/:id/sessions', adminOnly, zValidator('param', uid), async (c) => c.json(await revokeAllSessions(db, c.req.valid('param').id, c.get('actor'))))
 
 export const panelApi = app
-export type PanelApi = typeof app

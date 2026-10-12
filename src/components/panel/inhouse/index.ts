@@ -4,11 +4,9 @@
 // prop rather than writing a second one beside it.
 export { PageHeader } from './page-header'; // title, one line, actions — every screen opens with it
 export { EmptyState } from './empty-state'; // nothing to show, and the one thing to do about it
-export { PagedList } from './paged-list'; // a long list: only visible rows in the document, next page on approach
 export { FilterBar, Field } from './filter-bar'; // a row of labelled controls above a list
 export { Choice, type ChoiceOption } from './choice'; // one value from a short list; replaces a raw Select
 export { KpiCard } from './kpi-card'; // one figure, loud, linking to the records behind it
-export { Amount } from './amount'; // a whole number of the smallest unit, written the way its unit is
 export { StatusBadge, type StatusTone } from './status-badge'; // a state, in a word and a colour that means something
 export { HistoryList, type AuditEvent } from './history-list'; // an audit trail as sentences: who changed what, when
 export { RefreshButton } from './refresh-button'; // re-read everything; desktop only, the phone pulls down

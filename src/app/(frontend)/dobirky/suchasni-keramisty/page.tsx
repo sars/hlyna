@@ -9,7 +9,7 @@ import React from 'react'
 
 import { ldItemList } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
-import { Faq } from '@/components/site/SelectionFaq'
+import { Faq } from '@/components/ui/Faq'
 import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
 import { contemporaryPicks } from '@/editorial/contemporary'
@@ -66,7 +66,7 @@ export default async function Contemporary() {
         <Note>
           Більше — у <Link href="/vyrobnyky/misto">каталозі за містами</Link> і <Link href="/vyrobnyky/vyrib">за виробами</Link>. Окремо: <Link href="/dobirky/kosiv-i-opishne">Косів і Опішне сьогодні</Link>.
         </Note>
-        <Faq items={faq} />
+        <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst />
         <RequestBand path="/dobirky/suchasni-keramisty" tone="ink" />
       </div>
       <MobileRequestBar />

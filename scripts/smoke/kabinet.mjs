@@ -1,17 +1,17 @@
 // Cabinet smoke: invite → set password → cabinet list → edit (text, price, photo)
 // → saved as a change set; sign out, wrong password, sign in; claim form; request form. Desktop 1280 and phone 390.
-// Screenshots in .shots/m3/. Also checks the database after each write.
+// Screenshots in .shots/kabinet/. Also checks the database after each write.
 import { chromium } from '@playwright/test'
 import pg from 'pg'
 import sharp from 'sharp'
 import { writeFileSync, mkdirSync } from 'node:fs'
 
-const BASE = process.env.BASE ?? 'http://localhost:3200'
+const BASE = process.env.BASE ?? 'http://localhost:3000'
 const INVITE = process.env.INVITE
 const DB = new pg.Pool({ connectionString: process.env.DATABASE_URL })
 const PASSWORD = 'test-only-password-123'
 const LOGIN = 'smoke-owner@example.invalid'
-mkdirSync('.shots/m3', { recursive: true })
+mkdirSync('.shots/kabinet', { recursive: true })
 const errors = []
 const q = async (sql, args = []) => (await DB.query(sql, args)).rows
 
@@ -27,7 +27,7 @@ async function page(viewport, tag) {
   p.on('console', (m) => m.type() === 'error' && !/hydrat|Download the React DevTools|status of 401/i.test(m.text()) && errors.push(`${tag} console: ${m.text().slice(0, 200)}`))
   return p
 }
-const shot = (p, n) => p.screenshot({ path: `.shots/m3/${n}.png`, fullPage: true })
+const shot = (p, n) => p.screenshot({ path: `.shots/kabinet/${n}.png`, fullPage: true })
 
 // 1. set password from the invite (desktop)
 const d = await page({ width: 1280, height: 900 }, 'desktop')

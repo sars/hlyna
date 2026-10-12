@@ -4,12 +4,11 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { Block, InfoList } from '@/components/site/Inner'
+import { Makers } from '@/components/site/Makers'
 import { WavePage } from '@/components/site/WavePage'
 import { CityHead } from '@/components/ui/CityHead'
 import { DataTable } from '@/components/ui/DataTable'
 import { FaqItem } from '@/components/ui/Faq'
-import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
-import { MoreLink } from '@/components/ui/MoreLink'
 import { StudioCell, StudioCells } from '@/components/ui/StudioCell'
 import { getAllWithShops, groupByCity, type StudioCard } from '@/lib/catalog'
 import { displayName, firstAddress } from '@/lib/present'
@@ -18,6 +17,7 @@ import { fillCopy } from '@/editorial/wave-a'
 import { makerCities } from '@/lib/makers'
 import { EVENT_KIND, eventEnd, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/editorial/wave-b'
 import { sitePhotos } from '@/content/photos'
+import { site } from '@/content/site'
 import { ogImage, ogPhoto } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
@@ -46,37 +46,7 @@ export async function waveBMetadata(id: WaveBId): Promise<Metadata> {
   }
 }
 
-const COLLAPSE = 12
 
-function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: string; id: string; note?: string }) {
-  if (!studios.length) return null
-  const head = studios.slice(0, COLLAPSE)
-  const tail = studios.slice(COLLAPSE)
-  return (
-    <Block id={id} title={title} note={note}>
-      <div>
-        <MakerRows>
-          {head.map((s) => (
-            <MakerRow key={s.id} s={s} />
-          ))}
-        </MakerRows>
-        {tail.length > 0 && (
-          <details className="group">
-            <MoreLink as="summary">
-              <span className="group-open:hidden">{`Показати ще ${tail.length} →`}</span>
-              <span className="hidden group-open:inline">Згорнути</span>
-            </MoreLink>
-            <MakerRows>
-              {tail.map((s) => (
-                <MakerRow key={s.id} s={s} />
-              ))}
-            </MakerRows>
-          </details>
-        )}
-      </div>
-    </Block>
-  )
-}
 
 function EvidenceList({ items, title, id }: { items: { s: StudioCard; line: string }[]; title: string; id: string }) {
   if (!items.length) return null
@@ -121,7 +91,7 @@ function LiveBlock({ d }: { d: WaveBData }) {
       )
     case 'etsy':
       return (
-        <Block id="shops" title="Магазини з України на Etsy" note="Продажі, відгуки й рейтинг — з вітрини Etsy на момент перевірки (жовтень 2026).">
+        <Block id="shops" title="Магазини з України на Etsy" note={`Продажі, відгуки й рейтинг — з вітрини Etsy на момент перевірки (${site.dataUpdated}).`}>
           <DataTable
             mode="scroll"
             columns={[{ key: 'shop', label: 'Магазин' }, { key: 'sales', label: 'Продажі', numeric: true, align: 'end' }, { key: 'reviews', label: 'Відгуки', numeric: true, align: 'end' }, { key: 'rating', label: 'Рейтинг', numeric: true, align: 'end' }, { key: 'years', label: 'На Etsy' }]}

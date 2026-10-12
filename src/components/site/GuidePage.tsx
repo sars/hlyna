@@ -60,7 +60,7 @@ export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx
   const bar = Boolean(guide.form && !guide.form.studio)
   const request = guide.form ? '#zapyt-forma' : REQUEST_HREF
   return (
-    <InnerMain bar={bar}>
+    <InnerMain>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{

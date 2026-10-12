@@ -136,7 +136,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
       : undefined
 
   return (
-    <InnerMain bar={Boolean(topic.form)}>
+    <InnerMain>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: title, numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, item: ldStudio(s) })) }} />
       <InnerHero
         crumbs={[...topic.parents, ...extraParents, { label: crumb ?? topic.crumb }]}

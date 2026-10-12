@@ -260,7 +260,7 @@
 
   /* Form controls: underline fields, tone from the panel. */
   .ui-field { display: grid; gap: 3px; align-content: start; padding-block: 7px; min-width: 0; }
-  .ui-field > label, .ui-label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
+  .ui-field > label { font-family: var(--font-mono); font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; }
   [data-tone='cobalt'] .ui-field > label { opacity: 0.85; }
   .ui-control { width: 100%; min-width: 0; padding: 6px 0; border: 0; border-bottom: 2px solid var(--color-ink-2); border-radius: 0; background-color: transparent; color: var(--color-ink); font-family: var(--font-body); font-size: 16px; font-weight: 400; letter-spacing: 0; text-transform: none; line-height: 1.4; }
   .ui-control::placeholder { color: var(--color-ink-2); opacity: 1; }

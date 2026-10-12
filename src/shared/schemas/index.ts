@@ -61,7 +61,6 @@ export const requestCreate = z
       ctx.addIssue({ code: 'custom', path: ['contactPhoneOrTelegram'], message: 'Перевірте телефон або Telegram.' })
     if (email && !EMAIL_RE.test(email)) ctx.addIssue({ code: 'custom', path: ['contactEmail'], message: 'Перевірте email.' })
   })
-export type RequestCreate = z.output<typeof requestCreate>
 
 // ---------- «Це ваша студія?» claim (POST /kabinet/api/claim)
 export const claimCreate = z.object({
@@ -72,7 +71,6 @@ export const claimCreate = z.object({
   represents: z.literal(true, { error: 'Підтвердьте, що представляєте студію.' }),
   website2: z.string().max(0).optional().or(z.literal('')),
 })
-export type ClaimCreate = z.output<typeof claimCreate>
 
 // ---------- owner edits in /kabinet: this whitelist IS the permission (nothing else can be written by an owner)
 export const ownerPriceLine = z.object({

@@ -3,7 +3,7 @@
  *   HLYNA_SCRIPT=1 pnpm exec tsx scripts/build-wave-a.ts
  * Reads the published catalogue (same filters as the site) plus research files in UkraineCeramics, writes:
  *   - UkraineCeramics/_site_content/waveA/data/<id>.json and INDEX.json (for writers; nothing invented)
- *   - src/content/waveA/etsy.json, stockists.json (rendered on /de-kupyty-keramiku)
+ *   - src/content/waveA/etsy-shops.json, stockists.json (rendered on /de-kupyty-keramiku)
  * Copy itself is written separately and synced with scripts/sync-wave-a.mjs.
  */
 import fs from 'node:fs'
@@ -179,7 +179,7 @@ const etsy = etsyRaw
     }
   })
   .filter((e) => e.url && /ukrain|україн/i.test(e.location))
-fs.writeFileSync(path.join(REPO_CONTENT, 'etsy.json'), JSON.stringify(etsy, null, 1) + '\n')
+fs.writeFileSync(path.join(REPO_CONTENT, 'etsy-shops.json'), JSON.stringify(etsy, null, 1) + '\n')
 
 const stockRaw = jsonl(path.join(ROOT, '02_brands/entries_stockists.jsonl')).filter((e) => str(e.type) === 'shop' && str(e.city))
 const byName = new Map(all.map((s) => [cleanName(s.name).toLowerCase(), s]))
@@ -201,7 +201,7 @@ fs.writeFileSync(path.join(REPO_CONTENT, 'stockists.json'), JSON.stringify(stock
     url: '/de-kupyty-keramiku',
     h1Suggestion: 'Де купити сучасну українську кераміку',
     count: shops.length,
-    // etsy.json was just rewritten above; the page module read the previous file, so count from the fresh list.
+    // etsy-shops.json was just rewritten above; the page module read the previous file, so count from the fresh list.
     placeholders: { ...w.vars, etsy: etsy.length, etsySales: etsy.reduce((n, e) => n + (e.sales ?? 0), 0) },
     shopsByCity: groups.map((g) => ({ city: g.city.name, shops: g.studios.map((s) => ({ ...studioInfo(s), stockistBrands: stockists.find((x) => x.slug === s.slug)?.brands ?? '' })) })),
     stockistsNotInCatalogue: stockists.filter((x) => !x.slug),

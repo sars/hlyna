@@ -57,7 +57,7 @@ export default async function CasePage({ params }: { params: Params }) {
   const what = caseFormWhat(c)
 
   return (
-    <InnerMain bar>
+    <InnerMain>
       <JsonLd
         data={{
           '@context': 'https://schema.org',

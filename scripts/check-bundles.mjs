@@ -7,7 +7,7 @@ import zlib from 'node:zlib'
 
 const NEXT = path.resolve('.next')
 const FORBIDDEN = [/components[\\/]panel[\\/]/, /@base-ui[\\/]react/, /@tanstack[\\/]react-query/, /@tanstack[\\/]react-virtual/, /better-auth[\\/](react|client)/, /node_modules[\\/]sonner[\\/]/, /node_modules[\\/]hono[\\/]/]
-const PANEL_BUDGET = 200 * 1024 // kit DESIGN.md: first render of the panel ≤ 200 KB (gzip is checked loosely below)
+const PANEL_BUDGET = 200 * 1024 // first render of the panel ≤ 200 KB (gzip is checked loosely below)
 
 function walk(dir, out = []) {
   if (!fs.existsSync(dir)) return out
@@ -44,7 +44,7 @@ for (const m of manifests) {
   // The manifest lists every client module the route renders, keyed by its source path.
   const modules = [...src.matchAll(/"([^"]+\.(?:tsx|ts|jsx|js|mjs))"/g)].map((x) => x[1])
   if (isPanel) {
-    // Panel budget (kit DESIGN.md): the client JS a panel screen loads, gzip, ≤ 200 KB. Lazy chunks (MapLibre) are
+    // Panel budget: the client JS a panel screen loads, gzip, ≤ 200 KB. Lazy chunks (MapLibre) are
     // not in the manifest, so this measures what the first render needs.
     const chunks = [...new Set([...src.matchAll(/static\/chunks\/[^"]+\.js/g)].map((x) => x[0]))]
     const gz = chunks.reduce((n, c) => n + zlib.gzipSync(Buffer.from(read(`/_next/${c}`))).length, 0)

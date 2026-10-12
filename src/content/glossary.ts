@@ -5,4 +5,3 @@ export const glossary = {
   випал: { term: 'випал', def: 'Обробка вогнем у печі: перший випал — без поливи, другий — з поливою.' },
 } satisfies Record<string, { term: string; def: string }>
 
-export type GlossaryKey = keyof typeof glossary

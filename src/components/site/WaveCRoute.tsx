@@ -4,9 +4,8 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { Block, InfoList } from '@/components/site/Inner'
+import { Makers } from '@/components/site/Makers'
 import { WavePage } from '@/components/site/WavePage'
-import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
-import { MoreLink } from '@/components/ui/MoreLink'
 import { isBuilt } from '@/content/navigation'
 import { getAllWithShops, type StudioCard } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
@@ -95,35 +94,6 @@ function Formats({ rows }: { rows: FormatRow[] }) {
   )
 }
 
-function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: string; id: string; note?: string }) {
-  if (!studios.length) return null
-  const head = studios.slice(0, 12)
-  const tail = studios.slice(12)
-  return (
-    <Block id={id} title={title} note={note}>
-      <div>
-        <MakerRows>
-          {head.map((s) => (
-            <MakerRow key={s.id} s={s} />
-          ))}
-        </MakerRows>
-        {tail.length > 0 && (
-          <details className="group">
-            <MoreLink as="summary">
-              <span className="group-open:hidden">{`Показати ще ${tail.length} →`}</span>
-              <span className="hidden group-open:inline">Згорнути</span>
-            </MoreLink>
-            <MakerRows>
-              {tail.map((s) => (
-                <MakerRow key={s.id} s={s} />
-              ))}
-            </MakerRows>
-          </details>
-        )}
-      </div>
-    </Block>
-  )
-}
 
 const studioLink = (s: StudioCard) => (
   <Link href={`/vyrobnyky/${s.slug}`}>{displayName(s)}</Link>
