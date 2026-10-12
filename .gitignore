@@ -24,6 +24,8 @@ node_modules/
 # Screenshots (pnpm shots)
 .shots/
 .snapshots/
+deploy/.indexnow-state.tsv
+deploy/.indexnow-last
 
 # Design and photo experiments (local only)
 experiments/
