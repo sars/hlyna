@@ -94,6 +94,8 @@ Never run `docker compose down -v`: `-v` deletes the database volume.
 ## Deploy from the Mac
 `bash deploy/push.sh` ships the committed HEAD to the VPS (ssh alias `hlyna` in ~/.ssh/config), rebuilds the containers and refreshes all catalogue pages via `/revalidate`. The server has no GitHub access on purpose.
 
+It refuses to deploy a HEAD that lacks `origin/main` or the commit already live (kept in `/opt/hlyna/.deployed-commit`): several sessions deploy from different checkouts, and a deploy replaces the whole server tree. Merge first; `FORCE_DEPLOY=1` is only for a deliberate rollback.
+
 How pages are served: the image is built against the live database, so every page ships as finished HTML with real
 data (the build fails if it sees fewer than 100 studios). Pages re-render only after a write (panel, kabinet,
 scripts call `revalidateTag('studios', 'max')`) or once a day in the background; readers always get ready HTML and
