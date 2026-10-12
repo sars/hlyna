@@ -27,7 +27,7 @@ export default async function Page({ params }: Args) {
   if (!topic) notFound()
   const data = await topicData(topic)
   // No thin pages: fewer than MIN_LIST makers → 404 until the catalogue grows.
-  if (data.ctx.n < MIN_LIST && process.env.BUILD_WITHOUT_DB !== '1') notFound()
+  if (data.ctx.n < MIN_LIST) notFound()
   const slug = topic.path.split('/').pop() as string
   const known = new Map((await getAllStudios()).map((s) => [s.slug as string, s]))
   return <TopicPage topic={topic} data={data} content={productContent(slug)} known={known} />

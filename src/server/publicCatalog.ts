@@ -1,6 +1,6 @@
 // Public catalogue reads: published studios in the record shape the pages render (via legacy.ts), sorted by name,
 // with internal fields (owner text, unapproved quote, consent, sources…) left out.
-import { and, asc, eq, inArray } from 'drizzle-orm'
+import { and, asc, eq, inArray, sql } from 'drizzle-orm'
 
 import type { City, Studio } from '@/types/catalog'
 import { db, schema } from './db'
@@ -11,26 +11,43 @@ const { studios, studioPrices, cities, studioPhotos, media, studioSlugHistory, c
 // Internal fields never shown to anonymous readers.
 const HIDDEN = ['sources', 'consent', 'sourceId', 'confidence', 'photos', 'ownerAbout', 'ownerNews', 'pendingOwnerChanges'] as const
 
-export async function loadPublicCatalog(): Promise<{ studios: Studio[]; cities: City[] }> {
-  const [rows, cityRows] = await Promise.all([
-    db.select().from(studios).where(eq(studios.visibility, 'public')).orderBy(asc(studios.name), asc(studios.id)),
-    db.select().from(cities).orderBy(asc(cities.name), asc(cities.id)),
-  ])
+// Published studios, optionally one shard of them (id % of = index) so a cached part stays small. `order` is the
+// position in the whole catalogue (by name, database collation), so merged shards keep the same order.
+export async function loadPublicStudios(shard?: { index: number; of: number }): Promise<(Studio & { order: number })[]> {
+  const ordered = db.$with('ordered').as(
+    db
+      .select({ id: studios.id, order: sql<number>`row_number() over (order by ${studios.name}, ${studios.id})`.mapWith(Number).as('order') })
+      .from(studios)
+      .where(eq(studios.visibility, 'public')),
+  )
+  const found = await db
+    .with(ordered)
+    .select({ row: studios, order: ordered.order })
+    .from(studios)
+    .innerJoin(ordered, eq(ordered.id, studios.id))
+    .where(shard ? sql`${studios.id} % ${shard.of} = ${shard.index}` : undefined)
+    .orderBy(ordered.order)
+  const rows = found.map((f) => f.row)
+  const orderOf = new Map(found.map((f) => [f.row.id, f.order]))
   const ids = rows.map((r) => r.id)
   const prices = ids.length ? await db.select().from(studioPrices).where(inArray(studioPrices.studioId, ids)) : []
   const byStudio = new Map<number, (typeof prices)[number][]>()
   for (const p of prices) byStudio.set(p.studioId, [...(byStudio.get(p.studioId) ?? []), p])
 
-  const out = rows.map((r) => {
+  return rows.map((r) => {
     const doc = toLegacyStudio(r, byStudio.get(r.id) ?? [], []) as Record<string, unknown>
     for (const k of HIDDEN) delete doc[k]
     // ownerQuote is public only once approved.
     if (!r.ownerQuoteApproved) delete doc.ownerQuote
     // Empty services/products are null (the shape pages were built on).
     for (const k of ['services', 'products'] as const) if (Array.isArray(doc[k]) && !(doc[k] as unknown[]).length) doc[k] = null
-    return doc as unknown as Studio
+    return { ...(doc as unknown as Studio), order: orderOf.get(r.id) as number }
   })
-  return { studios: out, cities: cityRows.map((c) => toLegacyCity(c) as unknown as City) }
+}
+
+export async function loadPublicCities(): Promise<City[]> {
+  const rows = await db.select().from(cities).orderBy(asc(cities.name), asc(cities.id))
+  return rows.map((c) => toLegacyCity(c) as unknown as City)
 }
 
 export type PublicPhoto = { url: string; full: string; alt: string; width: number; height: number }

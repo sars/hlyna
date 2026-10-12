@@ -48,9 +48,12 @@ afterAll(async () => {
 
 describe('public catalogue on schema app', () => {
   it('returns public studios by name, Payload shape, hidden fields removed', async () => {
-    const { studios, cities } = await pc.loadPublicCatalog()
+    const [studios, cities] = await Promise.all([pc.loadPublicStudios(), pc.loadPublicCities()])
     expect(studios.map((x) => x.slug)).toEqual(['a', 'b'])
     expect(cities.map((c) => c.slug)).toEqual(['kyiv'])
+    // Shards split by id and together hold every public studio once.
+    const shards = await Promise.all([0, 1, 2, 3].map((index) => pc.loadPublicStudios({ index, of: 4 })))
+    expect(shards.flat().map((x) => x.slug).sort()).toEqual(['a', 'b'])
     const [alpha, beta] = studios as unknown as Record<string, unknown>[]
     expect(alpha._status).toBe('published')
     expect(alpha.prices).toEqual([

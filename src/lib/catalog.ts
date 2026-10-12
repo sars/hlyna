@@ -4,10 +4,10 @@ import { cache } from 'react'
 import type { City, Studio } from '@/types/catalog'
 import { cleanAddress, cleanPublic } from './present'
 import { wholeAmountsIn } from './money'
-import { loadPublicCatalog, loadPublicPhotos } from '@/server/publicCatalog'
+import { loadPublicCities, loadPublicPhotos, loadPublicStudios } from '@/server/publicCatalog'
 
-// Read-only data layer for public pages. One cached query per request; pages are statically
-// generated and revalidated, so the database is hit rarely.
+// Read-only data layer for public pages. Pages are pre-rendered HTML; they re-render only after a write
+// (revalidateTag('studios')) or the page's daily refresh, and then read the catalogue from the data cache.
 
 export const TYPE_LABEL: Record<string, string> = {
   studio: 'Студія',
@@ -24,19 +24,38 @@ export const TYPE_LABEL: Record<string, string> = {
 // fresher Instagram evidence. Such a studio keeps its profile but is left out of every list, count and map.
 export type StudioCard = Studio & { cityDoc: City | null; unverified?: boolean }
 
-// Studios and cities load separately so the cached entry stays small (Next's data cache limit is 2 MB per entry).
-const loadStudiosRaw = async (): Promise<StudioCard[]> => {
-    // The Docker build has no database: render empty and let /revalidate refill after deploy.
-    if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
-    const { studios, cities } = await loadPublicCatalog()
-    const byId = new Map(cities.map((c) => [c.id, c]))
-    return studios.map((s) => ({ ...publicText(s), unverified: isUnverified(s), cityDoc: byId.get(s.city as number) ?? null }))
+// The data cache holds studios in SHARDS parts (by id) and cities apart, joined per request: Next caps one entry at
+// 2 MB (fixed in Next; over it, production silently stops caching and dev throws), and the whole catalogue was
+// already at 77% in one entry. No timer: entries change only when a write calls revalidateTag('studios').
+const SHARDS = 4
+const TAGS = ['studios']
+// The build reads the database (Dockerfile); fewer studios than this means it read the wrong one or none,
+// and an empty catalogue must never be pre-rendered and shipped.
+const MIN_BUILD_STUDIOS = 100
+
+type CachedStudio = Studio & { unverified: boolean; order: number }
+const loadShard = async (index: number): Promise<CachedStudio[]> =>
+  (await loadPublicStudios({ index, of: SHARDS })).map((s) => ({ ...publicText(s), order: s.order, unverified: isUnverified(s) }))
+
+const joinCatalog = async (shard: (i: number) => Promise<CachedStudio[]>, cityList: () => Promise<City[]>): Promise<StudioCard[]> => {
+  const [parts, cities] = await Promise.all([Promise.all(Array.from({ length: SHARDS }, (_, i) => shard(i))), cityList()])
+  const byId = new Map(cities.map((c) => [c.id, c]))
+  const out = parts
+    .flat()
+    .sort((a, b) => a.order - b.order)
+    .map(({ order: _, ...s }) => ({ ...s, cityDoc: byId.get(s.city as number) ?? null }))
+  if (process.env.NEXT_PHASE === 'phase-production-build' && out.length < MIN_BUILD_STUDIOS)
+    throw new Error(`Build read ${out.length} public studios (expected ≥ ${MIN_BUILD_STUDIOS}): check DATABASE_URL for the build.`)
+  return out
 }
 
 // Scripts (tsx …) have no Next data cache: HLYNA_SCRIPT=1 reads the database directly,
 // so build scripts see exactly what the pages see.
 let scriptLoad: Promise<StudioCard[]> | null = null
-const loadStudios = process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= loadStudiosRaw()) : unstable_cache(loadStudiosRaw, ['studios-all-v7'], { revalidate: 3600, tags: ['studios'] })
+const cachedShard = unstable_cache(loadShard, ['studios-shard-v1'], { revalidate: false, tags: TAGS })
+const cachedCities = unstable_cache(loadPublicCities, ['cities-v1'], { revalidate: false, tags: TAGS })
+const loadStudios =
+  process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= joinCatalog(loadShard, loadPublicCities)) : () => joinCatalog(cachedShard, cachedCities)
 
 // Research annotations stay in the database (the panel shows them) but never reach public pages.
 const cleanList = <T extends { text: string }>(xs?: T[] | null) => (xs ?? []).map((x) => ({ ...x, text: cleanPublic(x.text) })).filter((x) => x.text)
@@ -74,11 +93,10 @@ export type StudioPhoto = { url: string; full: string; alt: string; width: numbe
 // query so the big cached list stays small.
 export const getStudioPhotos = unstable_cache(
   async (id: number): Promise<StudioPhoto[]> => {
-    if (process.env.NEXT_PHASE === 'phase-production-build' && process.env.BUILD_WITHOUT_DB === '1') return []
     return loadPublicPhotos(id)
   },
   ['studio-photos-v2'],
-  { revalidate: 3600, tags: ['studios'] },
+  { revalidate: false, tags: TAGS },
 )
 
 export const texts = (s: Studio) =>

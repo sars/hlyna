@@ -10,6 +10,10 @@ services:
       context: .
       args:
         NEXT_PUBLIC_SERVER_URL: ${NEXT_PUBLIC_SERVER_URL:-https://hlyna.com.ua}
+      # The build pre-renders pages from the database: host network reaches the db container's IP
+      # (no published port), and the URL comes in as a secret (set by deploy/push.sh).
+      network: host
+      secrets: [build_database_url]
     image: hlyna-app:latest
     restart: unless-stopped
     env_file: .env
@@ -87,6 +91,11 @@ services:
       app:
         condition: service_started
     logging: *logging
+
+secrets:
+  # postgres://hlyna:…@<db container IP>:5432/hlyna, exported by deploy/push.sh for `docker compose build`.
+  build_database_url:
+    environment: BUILD_DATABASE_URL
 
 volumes:
   pgdata: # the database; backed up by deploy/backup.sh

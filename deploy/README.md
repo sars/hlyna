@@ -70,10 +70,10 @@ Dumps stay on the same disk. Copy them off the server now and then (e.g. `scp` /
 Restore: `deploy/restore.sh /var/backups/hlyna/db_<stamp>.dump [/var/backups/hlyna/media_<stamp>.tar.gz]`.
 
 ## 6. Updating the site
-```bash
-cd /opt/hlyna && deploy/release.sh    # git pull + build + up -d + health check
-```
-Same thing by hand: `git pull && docker compose up -d --build`.
+Deploy from the Mac with `bash deploy/push.sh` (below). The image build reads the live database to pre-render
+every page, so a bare `docker compose up -d --build` needs `BUILD_DATABASE_URL` exported first (push.sh sets it:
+`postgres://hlyna:<pw>@<db container IP>:5432/hlyna`); without it the build stops. `deploy/release.sh` predates this
+and the server has no GitHub access, so it is not used.
 
 ## Database migrations
 - **Schema `app` is managed by Drizzle.** Change `src/server/db/schema/*`, run `pnpm db:generate`, review the generated SQL in `drizzle/`, commit it with the code.
@@ -93,3 +93,9 @@ Never run `docker compose down -v`: `-v` deletes the database volume.
 
 ## Deploy from the Mac
 `bash deploy/push.sh` ships the committed HEAD to the VPS (ssh alias `hlyna` in ~/.ssh/config), rebuilds the containers and refreshes all catalogue pages via `/revalidate`. The server has no GitHub access on purpose.
+
+How pages are served: the image is built against the live database, so every page ships as finished HTML with real
+data (the build fails if it sees fewer than 100 studios). Pages re-render only after a write (panel, kabinet,
+scripts call `revalidateTag('studios', 'max')`) or once a day in the background; readers always get ready HTML and
+never wait for a render. `POST /revalidate?secret=…` does the same for the whole catalogue; add `&all=1` to drop
+every page's HTML (the next visit to each page then waits for a fresh render).

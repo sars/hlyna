@@ -16,14 +16,13 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 # Inlined into the client bundle at build time, so it is a build arg, not runtime env.
 ARG NEXT_PUBLIC_SERVER_URL=https://hlyna.com.ua
-# Pages that query the database at build time (generateStaticParams) must tolerate
-# it being unreachable: the database container is not on the build network.
-ARG DATABASE_URL=postgres://build:build@127.0.0.1:5432/build
 ENV NEXT_PUBLIC_SERVER_URL=$NEXT_PUBLIC_SERVER_URL \
-    DATABASE_URL=$DATABASE_URL \
-    NEXT_TELEMETRY_DISABLED=1 \
-    BUILD_WITHOUT_DB=1
-RUN pnpm run build
+    NEXT_TELEMETRY_DISABLED=1
+# Pages are pre-rendered from the live database, so the image ships complete HTML. deploy/push.sh passes the
+# db container's address as a build secret (compose.yaml: build_database_url); it is never stored in a layer.
+# The build fails if it sees an empty catalogue (src/lib/catalog.ts, MIN_BUILD_STUDIOS).
+RUN --mount=type=secret,id=build_database_url,required=true \
+    DATABASE_URL="$(cat /run/secrets/build_database_url)" pnpm run build
 
 FROM node:24-alpine AS runner
 WORKDIR /app
