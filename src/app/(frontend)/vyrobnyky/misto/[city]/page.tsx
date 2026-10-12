@@ -7,7 +7,7 @@ import { Faq } from '@/components/ui/Faq'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { MoreLink } from '@/components/ui/MoreLink'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import React from 'react'
 
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
@@ -20,7 +20,7 @@ import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
 import { getAllStudios, getAllWithShops, getLegacy, getShops, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { CityStudioLinks } from '@/components/ui/CityList'
-import { cityStats, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
+import { cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { aboutCity, cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
 import { localPrices } from '@/lib/priceIndex'
@@ -63,6 +63,8 @@ export default async function CityMakersPage({ params }: Args) {
   const g = await makerCity(citySlug)
   if (!g) {
     await redirectOldCitySlug(citySlug, (c) => `/vyrobnyky/misto/${c}`)
+    const dropped = await droppedCityTarget(citySlug)
+    if (dropped) permanentRedirect(dropped)
     notFound()
   }
   const { city, studios } = g
