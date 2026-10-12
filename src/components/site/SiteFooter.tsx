@@ -26,7 +26,7 @@ export function SiteFooter() {
             <p className="m-0 mb-1.5 font-medium tracking-[.08em] text-ink uppercase">{c.title}</p>
             <ul className="m-0 grid list-none p-0">
               {c.links.map((l) => (
-                <li key={l.href + l.label}>
+                <li key={l.href}>
                   <Link href={l.href} className="block py-1.5 text-ink-2 no-underline hover:text-cobalt lg:py-0">
                     {l.label}
                   </Link>

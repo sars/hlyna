@@ -105,7 +105,7 @@ export function MainNav() {
                         <p className="nav-col-title">{c.title}</p>
                         <ul>
                           {c.links.map((l) => (
-                            <li key={l.href + l.label}>
+                            <li key={l.href}>
                               <Link href={l.href}>
                                 {l.label}
                                 {l.note && <small>{l.note}</small>}
@@ -174,7 +174,7 @@ export function MainNav() {
             </summary>
             <ul>
               {s.columns.flatMap((c) => c.links).map((l) => (
-                <li key={l.href + l.label}>
+                <li key={l.href}>
                   <Link href={l.href}>{l.label}</Link>
                 </li>
               ))}
