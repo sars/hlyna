@@ -18,11 +18,23 @@ export function fitTitle(variants: (string | null | undefined | false)[], target
 
 // A name that already says what the place is («Студія кераміки …», «Гончарна майстерня …», «… Ceramics»).
 const SAYS_CERAMICS = /керамі|гончар|глин|порцелян|майолік|ceramic|pottery|porcelain|clay/iu
+// Two or more people («Брати …», «… і …», «Родина …»): the plural reads right.
+const SEVERAL = /^(брати|сестри|родина|сім[’']я)\s|\s(і|та|й)\s/iu
 
-/** «Назва, керамічна студія, Місто · Глина»; the type is left out when the name already says it. */
+const phraseFor = (name: string, type: string | null | undefined): string | null => {
+  if (SAYS_CERAMICS.test(name)) return null
+  if (/музей/iu.test(name)) return 'колекція кераміки'
+  if (type === 'maker' && SEVERAL.test(name)) return 'майстри кераміки'
+  return TYPE_PHRASE[type ?? 'other'] ?? TYPE_PHRASE.other
+}
+
+// «Кераміка Харків, Харків», «Гончарний осередок Дибинці, Дибинці»: the city is already in the name.
+const namesCity = (name: string, city: string) => city.length >= 5 && name.toLowerCase().includes(city.toLowerCase().slice(0, city.length >= 7 ? -2 : -1))
+
+/** «Назва, керамічна студія, Місто · Глина»; the type is left out when the name says it, the city when the name has it. */
 export const studioTitle = (name: string, type: string | null | undefined, city: string | null | undefined) => {
-  const what = SAYS_CERAMICS.test(name) ? null : (TYPE_PHRASE[type ?? 'other'] ?? TYPE_PHRASE.other)
-  return fitTitle([[name, what, city].filter(Boolean).join(', '), city && `${name}, ${city}`, name])
+  const place = city && !namesCity(name, city) ? city : null
+  return fitTitle([[name, phraseFor(name, type), place].filter(Boolean).join(', '), place && `${name}, ${place}`, name])
 }
 
 /** What a studio is, in title words (every phrase says «кераміка» in some form). */
@@ -30,9 +42,10 @@ export const TYPE_PHRASE: Record<string, string> = {
   studio: 'керамічна студія',
   brand: 'керамічний бренд',
   maker: 'майстер кераміки',
-  school: 'школа кераміки',
+  school: 'навчання кераміці',
   shop: 'крамниця кераміки',
   supplier: 'матеріали для кераміки',
   heritage: 'традиційна кераміка',
+  legacy: 'традиційна кераміка',
   other: 'кераміка',
 }
