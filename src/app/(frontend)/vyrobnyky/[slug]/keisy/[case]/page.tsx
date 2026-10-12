@@ -35,7 +35,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     title: c.title,
     description: c.metaDescription,
     alternates: { canonical: casePath(c) },
-    openGraph: { type: 'article', images: ogImage({ title: c.title, kicker: 'Кейс', sub: `${c.studio.name} · ${c.client.name}`.slice(0, 120), pattern: c.slug }) },
+    openGraph: { type: 'article', images: ogImage({ title: c.title, kicker: 'Кейс', sub: `${c.studio.name} · ${c.client.name}` }) },
   }
 }
 

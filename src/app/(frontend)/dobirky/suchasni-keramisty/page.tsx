@@ -21,7 +21,7 @@ export const metadata: Metadata = {
   title: 'Сучасні українські керамісти 2026: бренди, авторки й автори, студії',
   description: 'Добірка сучасної української кераміки за відкритими даними: бренди посуду й декору, авторська скульптура, прикраси, студії з власними колекціями. З містами й посиланнями на профілі.',
   alternates: { canonical: '/dobirky/suchasni-keramisty' },
-  openGraph: { images: ogImage({ title: 'Сучасні українські керамісти', kicker: 'Добірка', img: 'glazed-bottles', credit: 'Фото: Jessica Ruscello, CC0' }) },
+  openGraph: { images: ogImage({ title: 'Сучасні українські керамісти', kicker: 'Добірка', img: 'stock-glazed-bottles' }) },
 }
 
 export default async function Contemporary() {

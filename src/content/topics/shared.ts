@@ -35,7 +35,9 @@ export type Topic = {
   lead: (c: TopicCtx) => string
   verse: string[]
   photo?: HeroPhoto
-  ogImg: string
+  ogImg?: string // site JPEG for the share card when it differs from the page photo
+  ogTitle?: string // share-card title when the h1 carries a year
+  ogSub: string // stable one-line description for the share card (no counts, prices or years)
   lists: TopicList[]
   evidence: RegExp
   // unit: only lines matching it count toward the «from–to» range (e.g. per person); unitLabel follows the range.

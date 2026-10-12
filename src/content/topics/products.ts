@@ -19,7 +19,6 @@ type ProductCfg = {
   priceRe?: RegExp
   verse?: string[]
   photo?: HeroPhoto
-  ogImg: string
   items: [string, string][]
   faq: { q: string; a: string }[]
   related: { label: string; href: string }[]
@@ -37,12 +36,12 @@ function productTopic(p: ProductCfg): Topic {
     crumb: p.crumb,
     kicker: 'Українська кераміка ручної роботи',
     h1: p.h1,
+    ogSub: 'Де купити, як замовити, на що зважати',
     metaTitle: (c) => `${p.crumb} ручної роботи: ${makers(c.n)} в Україні${c.min ? ', ціни 2026' : ''}`,
     metaDescription: (c) => `${p.crumb} з кераміки від українських майстрів: ${makers(c.n)} ${where(c)}${priceRange(c) ? `, ціни здебільшого ${priceRange(c)}` : ''}. Де купити, як замовити, на що зважати.`,
     lead: (c) => `У каталозі — ${makers(c.n)} ${where(c)}, які роблять ${p.what}.${priceRange(c) ? ` У прайсах майстрів такий виріб коштує здебільшого ${priceRange(c)}.` : ''} Купують зазвичай напряму: через Instagram, власний сайт чи Etsy майстра; посилання — у профілях.`,
     verse: p.verse ?? [],
     photo: p.photo,
-    ogImg: p.ogImg,
     lists: [{ title: `Хто робить: ${p.crumb.toLowerCase()}`, formats: [], match: (s) => p.re.test(productText(s)) && !isExhibitingOnly(s), types: MAKERS, byCity: true }],
     evidence: p.re,
     price: { re: p.priceRe ?? p.re, exclude: p.priceExclude ? new RegExp(`${CLASS_PRICE_SETS.source}|${p.priceExclude.source}`, 'iu') : CLASS_PRICE_SETS, index: p.index, title: 'Ціни в прайсах майстрів', note: p.priceNote ?? 'Роздрібні ціни з сайтів, Instagram і маркетплейсів майстрів; ціна залежить від розміру, поливи й розпису.' },
@@ -67,7 +66,6 @@ export const productTopics: Record<string, Topic> = {
     re: PRODUCT_RE.plates,
     verse: verses.tableware,
     photo: docPhotos.barCups,
-    ogImg: 'doc-bar-cups',
     items: [
       ['Для щоденного вжитку', 'Питайте про харчову поливу без свинцю і про посудомийку: щільний черепок витримує миття, пористий — гірше.'],
       ['Кожна трохи інша', 'Ручні тарілки з однієї серії відрізняються відтінком і краєм. Для сервізу попросіть зробити всі в одній партії.'],
@@ -93,7 +91,6 @@ export const productTopics: Record<string, Topic> = {
     h1: 'Чашки і кухлі ручної роботи від українських майстрів',
     re: CUPS,
     verse: verses.cups,
-    ogImg: 'teal-mug',
     items: [
       ['Об’єм', 'Еспресо — 60–90 мл, звичайна чашка — 250–350 мл, великий кухоль — 400 мл і більше. Майстри вказують об’єм у прайсі.'],
       ['Ручка і вага', 'Ручну чашку варто потримати: товщина стінок і форма ручки сильно відрізняються від майстра до майстра.'],
@@ -119,7 +116,6 @@ export const productTopics: Record<string, Topic> = {
     priceRe: /(?<!\p{L})ваз(?!елін)|кашпо|вазон|свічник|статуетк|фігурк/iu,
     verse: verses.vases,
     photo: docPhotos.terracotta,
-    ogImg: 'terracotta',
     items: [
       ['Чи тримає воду', 'Не кожна керамічна ваза водонепроникна: теракоту без поливи зсередини краще використовувати для сухоцвітів.'],
       ['Розмір і вага', 'Великі вази й вазони важкі; уточніть вагу й спосіб доставки.'],
@@ -140,7 +136,6 @@ export const productTopics: Record<string, Topic> = {
     what: 'керамічні світильники, лампи й абажури',
     h1: 'Керамічні світильники ручної роботи',
     re: PRODUCT_RE.lamps,
-    ogImg: 'lamps',
     items: [
       ['Електрика', 'Спитайте, чи світильник продається з патроном і дротом, і під яку лампу він розрахований.'],
       ['Світло крізь кераміку', 'Перфорація і тонка порцеляна дають візерунок світла; щільна кераміка світить лише вниз чи вгору.'],
@@ -160,7 +155,6 @@ export const productTopics: Record<string, Topic> = {
     what: 'сережки, кулони, брошки, намиста та інші прикраси з кераміки й порцеляни',
     h1: 'Прикраси з кераміки й порцеляни від українських майстрів',
     re: PRODUCT_RE.jewelry,
-    ogImg: 'jewelry',
     items: [
       ['Фурнітура', 'Спитайте, з якого металу застібки й вушка: для чутливої шкіри краще срібло чи медична сталь.'],
       ['Вага', 'Порцелянові сережки легші, ніж здаються; великі керамічні кулони — відчутні.'],
@@ -179,7 +173,6 @@ export const productTopics: Record<string, Topic> = {
     what: 'плитку, кахлі, панно й мозаїку ручної роботи',
     h1: 'Плитка, кахлі й панно ручної роботи',
     re: PRODUCT_RE.tiles,
-    ogImg: 'terracotta',
     items: [
       ['Для чого', 'Кухонний фартух, камін, ванна чи панно на стіну — для підлоги й вулиці потрібна морозостійка плитка.'],
       ['Партія і запас', 'Ручна плитка з різних партій відрізняється відтінком; беріть усю кількість одразу і 5–10% запасу.'],

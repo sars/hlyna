@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 
 import type { Guide } from '@/content/guides'
 import { site } from '@/content/site'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
 
 export type GuidePrice = { range: string; median: string; n: number; rangeNum: string; medianNum: string }
@@ -44,17 +44,14 @@ export async function guideCtx(): Promise<GuideCtx> {
 /** «здебільшого 700–1 900 грн» or a neutral fallback when the index has too few studios. */
 export const priceText = (ctx: GuideCtx, key: string, fallback = 'за прайсом студії') => (ctx.price[key] ? `здебільшого ${ctx.price[key]!.range}` : fallback)
 
-/** Open Graph metadata for a guide: share card with its photo (or the tile pattern). */
+/** Open Graph metadata for a guide: share card with the page photo. */
 export function guideMetadata(g: Guide): Metadata {
-  // Archive photos (no credit) are not OG sources yet (step 8): such guides keep the tile pattern.
-  const photo = g.photo && 'author' in g.photo ? g.photo : null
-  const img = photo ? (photo.src.startsWith('/images/doc/') ? 'doc-' : '') + photo.src.split('/').pop()!.replace(/\.jpg$/, '') : undefined
   return {
     title: g.title,
     description: g.description,
     alternates: { canonical: g.path },
     openGraph: {
-      images: ogImage({ title: g.h1, kicker: g.kicker, ...(photo ? { img, credit: `Фото: ${photo.author}, ${photo.license}` } : { pattern: g.slug }) }),
+      images: ogImage({ title: g.h1, kicker: g.kicker, sub: g.description, ...ogPhoto(g.photo) }),
     },
   }
 }

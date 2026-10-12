@@ -15,7 +15,8 @@ import { site } from '@/content/site'
 import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, hasFormat, pluralUk, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from '@/lib/catalog'
 import { cleanName, stripPersonal } from '@/lib/present'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { sitePhotos } from '@/content/photos'
 import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
@@ -24,7 +25,7 @@ export const metadata: Metadata = {
   title: 'Кераміка ручної роботи для бізнесу: посуд для закладів, подарунки, корпоративи',
   description: 'Посуд для ресторанів, кав’ярень і готелів, чашки з логотипом, корпоративні подарунки й корпоративи з ліплення з глини від українських студій. Терміни, ціни, хто працює з бізнесом. Один запит — пропозиції від кількох студій.',
   alternates: { canonical: '/dlya-biznesu' },
-  openGraph: { images: ogImage({ title: 'Кераміка ручної роботи для бізнесу', kicker: 'Для бізнесу', sub: 'Посуд для закладів, чашки з логотипом, подарунки, корпоративи', img: 'restaurant-table' }) },
+  openGraph: { images: ogImage({ title: 'Кераміка ручної роботи для бізнесу', kicker: 'Для бізнесу', sub: 'Посуд для закладів, чашки з логотипом, подарунки, корпоративи', ...ogPhoto(sitePhotos.bizCafes) }) },
 }
 
 const faqFor = (corporate: string) => [

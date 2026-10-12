@@ -1,13 +1,12 @@
 import type { Metadata } from 'next'
 
 import { topics, type Topic, type TopicCtx } from '@/content/topics'
-import { docPhotos, type DocPhoto } from '@/content/photos'
-import { ogImage } from '@/utilities/ogImage'
-import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
+import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, type StudioCard } from '@/lib/catalog'
 import { facts } from '@/lib/facts'
 
 import { isExhibitingOnly, publicPrices, splitSource } from '@/lib/present'
-import { amountsIn, fmt, fromTo, near, spanOf } from '@/lib/money'
+import { amountsIn, fromTo, near, spanOf } from '@/lib/money'
 
 // A museum or museum shop is listed on class pages only if its own services name a class it runs.
 const museumOnly = (s: StudioCard) =>
@@ -34,12 +33,6 @@ const eligible = (topic: Topic, l: Topic['lists'][number], s: StudioCard) =>
   (l.match ? l.match(s) : l.formats.some((f) => hasFormat(s, f))) &&
   (!l.filter || l.filter(s)) &&
   (topic.section === 'mk' || topic.section === 'cert' ? offersMasterClasses(s) && !museumOnly(s) && !isExhibitingOnly(s) : true)
-
-// The OG card still uses the topic's older stock/Wikimedia image (ogImg) until the OG step; its credit comes from the registry.
-const ogCredit = (img: string) => {
-  const p = (docPhotos as Record<string, DocPhoto>)[img.replace(/^doc-/, '').replace(/-(\w)/g, (_, c: string) => c.toUpperCase())]
-  return p ? `Фото: ${p.author}, ${p.license}` : undefined
-}
 
 export async function topicData(topic: Topic, citySlug?: string): Promise<TopicData> {
   const studios = (await getAllStudios()).filter((s) => !citySlug || s.cityDoc?.slug === citySlug)
@@ -113,19 +106,14 @@ export function evidenceLine(s: StudioCard, re: RegExp): string {
   return clip(sentence ?? s.summary ?? best ?? '')
 }
 
-export function topicMetadata(topic: Topic, data: TopicData, over: { title?: string; path?: string; h1?: string; coa?: string } = {}): Metadata {
+export function topicMetadata(topic: Topic, data: TopicData, over: { title?: string; path?: string; h1?: string } = {}): Metadata {
   const { ctx } = data
   return {
     title: over.title ?? topic.metaTitle(ctx),
     description: topic.metaDescription(ctx),
     alternates: { canonical: over.path ?? topic.path },
     openGraph: {
-      images: ogImage({
-        title: over.h1 ?? topic.h1,
-        kicker: topic.kicker,
-        sub: ctx.min && ctx.max ? `${ctx.n} ${topic.section === 'mk' || topic.section === 'cert' ? pluralUk(ctx.n, ['місце', 'місця', 'місць']) : pluralUk(ctx.n, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])} · від ${fmt(ctx.min)} грн` : undefined,
-        ...(over.coa ? { coa: over.coa, pattern: over.coa } : topic.photo ? { img: topic.ogImg, credit: 'author' in topic.photo ? `Фото: ${topic.photo.author}, ${topic.photo.license}` : ogCredit(topic.ogImg) } : { pattern: topic.ogImg }),
-      }),
+      images: ogImage({ title: over.h1 ?? topic.ogTitle ?? topic.h1, kicker: topic.kicker, sub: topic.ogSub, ...(topic.ogImg ? { img: topic.ogImg } : ogPhoto(topic.photo)) }),
     },
   }
 }

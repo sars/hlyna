@@ -31,6 +31,7 @@ import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
+import { productChips } from '@/lib/products'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
 import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isDomainLike, isExhibitingOnly, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
 import { amountsIn, typicalRange } from '@/lib/money'
@@ -52,6 +53,17 @@ export async function generateStaticParams() {
 
 type Args = { params: Promise<{ slug: string }> }
 
+// Share card: the first sentences of the summary that fit the label (the card clips at 140 characters).
+const cardSummary = (text: string) => {
+  const out: string[] = []
+  for (const part of stripPersonal(text).split(/(?<=[.!?])\s+/)) {
+    if (out.join(' ').length + part.length > 140 && out.length) break
+    out.push(part)
+    if (out.join(' ').length >= 60) break
+  }
+  return out.join(' ')
+}
+
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const s = await getStudioBySlug(slug)
@@ -63,7 +75,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: `${name}${city ? ` — ${what}, ${city}` : ''}`,
     description: stripPersonal(s.summary || s.publicDescription || s.description || '').slice(0, 160),
     alternates: { canonical: `/vyrobnyky/${s.slug}` },
-    openGraph: { images: ogImage({ title: name, kicker: [TYPE_LABEL[s.type ?? 'other'], city].filter(Boolean).join(' · '), sub: stripPersonal(s.summary ?? '') }) },
+    openGraph: { images: ogImage({ title: name, kicker: [TYPE_LABEL[s.type ?? 'other'], city].filter(Boolean).join(' · '), sub: cardSummary(s.summary ?? ''), studio: true, makes: productChips(s) }) },
   }
 }
 

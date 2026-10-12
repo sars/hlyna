@@ -32,7 +32,7 @@ export async function generateMetadata({ params }: Args) {
   const { city } = await params
   const p = await load(city)
   if (!p) return {}
-  return topicMetadata(topic, p.data, { title: `Сертифікат на гончарство: ${p.name} — ${p.data.ctx.n} ${pluralUk(p.data.ctx.n, ['місце', 'місця', 'місць'])}, ціни 2026`, path: p.path, h1: p.h1, coa: city })
+  return topicMetadata(topic, p.data, { title: `Сертифікат на гончарство: ${p.name} — ${p.data.ctx.n} ${pluralUk(p.data.ctx.n, ['місце', 'місця', 'місць'])}, ціни 2026`, path: p.path, h1: p.h1 })
 }
 
 export default async function Page({ params }: Args) {

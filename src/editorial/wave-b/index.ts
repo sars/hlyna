@@ -28,16 +28,16 @@ export type WaveBId =
   | 'pratsyuyut-z-biznesom'
 
 type Section = 'dobirky' | 'hayidy' | null
-export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: string; kicker: string; form: string; pattern: string }> = {
-  'brendy-posudu': { path: '/dobirky/brendy-posudu', section: 'dobirky', crumb: 'Бренди посуду', kicker: 'Добірки', form: 'tableware', pattern: 'brands' },
-  etsy: { path: '/dobirky/etsy', section: 'dobirky', crumb: 'Кераміка на Etsy', kicker: 'Добірки', form: 'other', pattern: 'etsy' },
-  podiyi: { path: '/podiyi', section: null, crumb: 'Ярмарки й події', kicker: 'Події', form: 'other', pattern: 'events' },
-  'muzei-keramiky': { path: '/muzei-keramiky', section: null, crumb: 'Музеї й галереї', kicker: 'Де подивитися', form: 'other', pattern: 'museums' },
-  'yalynkovi-prykrasy': { path: '/dobirky/yalynkovi-prykrasy', section: 'dobirky', crumb: 'Ялинкові прикраси', kicker: 'Добірки', form: 'corporate-gifts', pattern: 'newyear' },
-  'vydy-keramiky': { path: '/hayidy/vydy-keramiky', section: 'hayidy', crumb: 'Види кераміки', kicker: 'Гайди', form: 'tableware', pattern: 'materials' },
-  'dohliad-za-keramikoyu': { path: '/hayidy/dohliad-za-keramikoyu', section: 'hayidy', crumb: 'Догляд за керамікою', kicker: 'Гайди', form: 'tableware', pattern: 'care' },
-  'chornodymlena-i-molochena': { path: '/hayidy/chornodymlena-i-molochena', section: 'hayidy', crumb: 'Чорнодимлена й молочена', kicker: 'Гайди', form: 'other', pattern: 'smoke' },
-  'pratsyuyut-z-biznesom': { path: '/dobirky/pratsyuyut-z-biznesom', section: 'dobirky', crumb: 'Хто працює з бізнесом', kicker: 'Добірки', form: 'tableware', pattern: 'business' },
+export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: string; kicker: string; form: string }> = {
+  'brendy-posudu': { path: '/dobirky/brendy-posudu', section: 'dobirky', crumb: 'Бренди посуду', kicker: 'Добірки', form: 'tableware' },
+  etsy: { path: '/dobirky/etsy', section: 'dobirky', crumb: 'Кераміка на Etsy', kicker: 'Добірки', form: 'other' },
+  podiyi: { path: '/podiyi', section: null, crumb: 'Ярмарки й події', kicker: 'Події', form: 'other' },
+  'muzei-keramiky': { path: '/muzei-keramiky', section: null, crumb: 'Музеї й галереї', kicker: 'Де подивитися', form: 'other' },
+  'yalynkovi-prykrasy': { path: '/dobirky/yalynkovi-prykrasy', section: 'dobirky', crumb: 'Ялинкові прикраси', kicker: 'Добірки', form: 'corporate-gifts' },
+  'vydy-keramiky': { path: '/hayidy/vydy-keramiky', section: 'hayidy', crumb: 'Види кераміки', kicker: 'Гайди', form: 'tableware' },
+  'dohliad-za-keramikoyu': { path: '/hayidy/dohliad-za-keramikoyu', section: 'hayidy', crumb: 'Догляд за керамікою', kicker: 'Гайди', form: 'tableware' },
+  'chornodymlena-i-molochena': { path: '/hayidy/chornodymlena-i-molochena', section: 'hayidy', crumb: 'Чорнодимлена й молочена', kicker: 'Гайди', form: 'other' },
+  'pratsyuyut-z-biznesom': { path: '/dobirky/pratsyuyut-z-biznesom', section: 'dobirky', crumb: 'Хто працює з бізнесом', kicker: 'Добірки', form: 'tableware' },
 }
 export const WAVE_B_IDS = Object.keys(WAVE_B) as WaveBId[]
 

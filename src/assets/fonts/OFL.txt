@@ -1,1 +1,1 @@
-Unbounded and Raleway are licensed under the SIL Open Font License 1.1 (https://openfontlicense.org). Downloaded from Google Fonts.
+Unbounded, Golos Text and JetBrains Mono are licensed under the SIL Open Font License 1.1 (https://openfontlicense.org). The static TTF files come from Google Fonts (fonts.gstatic.com) and are used only by the share-card route (src/app/(frontend)/og/route.tsx); the site itself loads the same families through next/font.

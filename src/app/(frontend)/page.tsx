@@ -31,7 +31,6 @@ import { site } from '@/content/site'
 import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { facts } from '@/lib/facts'
-import { ogImage } from '@/utilities/ogImage'
 
 export const revalidate = 86400
 
@@ -40,7 +39,8 @@ export const metadata: Metadata = {
   description:
     'Посуд і подарунки ручної роботи від українських студій для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови й ціни та надішліть один запит кільком студіям. Майстер-класи з кераміки по всій Україні.',
   alternates: { canonical: '/' },
-  openGraph: { images: ogImage({ title: 'Посуд і подарунки ручної роботи від українських студій', kicker: 'Українська кераміка', sub: 'Для ресторанів, кав’ярень, готелів і компаній. Один запит — кілька пропозицій', img: 'restaurant-table' }) },
+  // Static card (public/og-home.png): the wheel photo with the big label; see the comment in src/app/(frontend)/og/route.tsx.
+  openGraph: { images: [{ url: '/og-home.png', width: 1200, height: 630 }] },
 }
 
 const nf = (n: number) => n.toLocaleString('uk-UA')

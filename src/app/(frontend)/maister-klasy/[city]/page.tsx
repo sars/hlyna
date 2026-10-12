@@ -89,7 +89,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: `Майстер-класи з кераміки ${inCity(g.city.name)}: ${places(n)} і ціни 2026`,
     description: `${places(n)} ${inCity(g.city.name)}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття коштує ${priceText(r)}` : ''}. Формати, адреси, сертифікати.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
-    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи · 2026', sub: r ? `${places(n)}, ${priceText(r)}` : places(n), pattern: g.city.slug as string, coa: g.city.slug as string }) },
+    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи', sub: 'Гончарне коло, ліплення і розпис: студії, адреси, формати й сертифікати', img: 'og-318-1' }) },
   }
 }
 

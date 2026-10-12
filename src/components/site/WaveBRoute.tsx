@@ -18,7 +18,7 @@ import { fillCopy } from '@/editorial/wave-a'
 import { makerCities } from '@/lib/makers'
 import { EVENT_KIND, eventEnd, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/editorial/wave-b'
 import { sitePhotos } from '@/content/photos'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
 
 // Wave B page: reviewed copy (src/content/waveB) around a live block that differs per page.
@@ -31,6 +31,9 @@ async function load(id: WaveBId) {
   return { data, copy: fillCopy(raw, data.vars) }
 }
 
+// The page photo is also the share-card photo.
+const pagePhoto = (id: WaveBId) => (id === 'vydy-keramiky' ? sitePhotos.guideVydy : undefined)
+
 export async function waveBMetadata(id: WaveBId): Promise<Metadata> {
   const p = await load(id)
   if (!p) return {}
@@ -39,7 +42,7 @@ export async function waveBMetadata(id: WaveBId): Promise<Metadata> {
     title: p.copy.title,
     description: p.copy.metaDescription,
     alternates: { canonical: meta.path },
-    openGraph: { images: ogImage({ title: p.copy.title, kicker: meta.kicker, pattern: meta.pattern }) },
+    openGraph: { images: ogImage({ title: p.copy.title, kicker: meta.kicker, ...ogPhoto(pagePhoto(id)) }) },
   }
 }
 
@@ -243,7 +246,7 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
     ? groupByCity(studios).filter((g) => g.studios.length >= 2 && makerSlugs.has(g.city.slug)).map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}` }))
     : []
   return (
-    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={studios} cityLinks={cityLinks} photo={id === 'vydy-keramiky' ? sitePhotos.guideVydy : undefined} related={(RELATED[id] ?? []).filter((r) => r.href !== meta.path)}>
+    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={studios} cityLinks={cityLinks} photo={pagePhoto(id)} related={(RELATED[id] ?? []).filter((r) => r.href !== meta.path)}>
       <LiveBlock d={p.data} />
     </WavePage>
   )

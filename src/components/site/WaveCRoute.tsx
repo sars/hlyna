@@ -13,7 +13,7 @@ import { cleanName } from '@/lib/present'
 import { fillCopy } from '@/editorial/wave-a'
 import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/editorial/wave-c'
 import { sitePhotos } from '@/content/photos'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/utilities/ogImage'
 
 // Wave C page: reviewed copy (src/content/waveC) around structured blocks rendered from JSON
 // (the formats comparison, the season calendar, studio offers), so the copy never restates a table.
@@ -25,6 +25,9 @@ async function load(id: WaveCId) {
   return { data, copy: fillCopy(raw, data.vars) }
 }
 
+// The page photo is also the share-card photo.
+const pagePhoto = (id: WaveCId) => (id === 'novyi-rik-i-rizdvo' ? sitePhotos.bizNewYear : undefined)
+
 export async function waveCMetadata(id: WaveCId): Promise<Metadata> {
   const p = await load(id)
   if (!p) return {}
@@ -33,7 +36,7 @@ export async function waveCMetadata(id: WaveCId): Promise<Metadata> {
     title: p.copy.title,
     description: p.copy.metaDescription,
     alternates: { canonical: meta.path },
-    openGraph: { images: ogImage({ title: p.copy.title, kicker: meta.kicker, pattern: meta.pattern }) },
+    openGraph: { images: ogImage({ title: p.copy.title, kicker: meta.kicker, ...ogPhoto(pagePhoto(id)) }) },
   }
 }
 
@@ -206,7 +209,7 @@ export async function WaveCRoute({ id }: { id: WaveCId }) {
   const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
   const crumbs = [{ label: 'Головна', href: '/' }, ...(meta.section === 'biz' ? [{ label: 'Для бізнесу', href: '/dlya-biznesu' }] : []), { label: meta.crumb }]
   return (
-    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={waveCStudios(p.data)} photo={id === 'novyi-rik-i-rizdvo' ? sitePhotos.bizNewYear : undefined} related={RELATED[id].filter((r) => r.href !== meta.path && isBuilt(r.href))}>
+    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={waveCStudios(p.data)} photo={pagePhoto(id)} related={RELATED[id].filter((r) => r.href !== meta.path && isBuilt(r.href))}>
       <LiveBlock d={p.data} />
     </WavePage>
   )

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   title: 'Добірки української кераміки: сучасні керамісти, Косів і Опішне',
   description: 'Редакційні добірки за відкритими даними: сучасні українські бренди й автори кераміки, гончарні осередки Косова й Опішного сьогодні.',
   alternates: { canonical: '/dobirky' },
-  openGraph: { images: ogImage({ title: 'Добірки української кераміки', kicker: 'Добірки', pattern: 'dobirky' }) },
+  openGraph: { images: ogImage({ title: 'Добірки української кераміки', kicker: 'Добірки' }) },
 }
 
 const items = [

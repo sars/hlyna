@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: 'Кераміка ручної роботи за виробами: посуд, чашки, вази, світильники, прикраси, плитка',
   description: 'Українські майстри і студії кераміки за тим, що вони роблять: тарілки й миски, чашки, вази й декор, світильники, прикраси, плитка й панно. Кількість майстрів і ціни з прайсів.',
   alternates: { canonical: '/vyrobnyky/vyrib' },
-  openGraph: { images: ogImage({ title: 'Кераміка ручної роботи за виробами', kicker: 'Виробники', sub: 'Посуд, чашки, вази, світильники, прикраси, плитка', img: 'glazed-bottles' }) },
+  openGraph: { images: ogImage({ title: 'Кераміка ручної роботи за виробами', kicker: 'Виробники', sub: 'Посуд, чашки, вази, світильники, прикраси, плитка', img: 'stock-glazed-bottles' }) },
 }
 
 export default async function ProductsIndex() {

@@ -30,7 +30,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: p.copy.title,
     description: p.copy.metaDescription,
     alternates: { canonical: PATH },
-    openGraph: { images: ogImage({ title: p.copy.title, kicker: 'Майстер-класи', sub: p.vars.priceRange ? String(p.vars.priceRange) : undefined, pattern: 'party' }) },
+    openGraph: { images: ogImage({ title: p.copy.title, kicker: 'Майстер-класи' }) },
   }
 }
 

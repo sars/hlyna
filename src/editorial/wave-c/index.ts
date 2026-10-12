@@ -18,10 +18,10 @@ export const waveCCopy = (id: string): WaveCopy | null => (copies as Record<stri
 
 export type WaveCId = 'richnytsya-kompaniyi' | 'podarunky-spivrobitnykam' | 'novyi-rik-i-rizdvo'
 type Section = 'biz' | null
-export const WAVE_C: Record<WaveCId, { path: string; section: Section; crumb: string; kicker: string; form: string; pattern: string }> = {
-  'richnytsya-kompaniyi': { path: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi', section: 'biz', crumb: 'Річниця компанії', kicker: 'Для бізнесу', form: 'corporate-workshop', pattern: 'anniversary' },
-  'podarunky-spivrobitnykam': { path: '/dlya-biznesu/podarunky-spivrobitnykam', section: 'biz', crumb: 'Подарунки співробітникам', kicker: 'Для бізнесу', form: 'corporate-gifts', pattern: 'staffgifts' },
-  'novyi-rik-i-rizdvo': { path: '/novyi-rik-i-rizdvo', section: null, crumb: 'Новий рік і Різдво', kicker: 'Сезон 2026/27', form: 'corporate-gifts', pattern: 'winter' },
+export const WAVE_C: Record<WaveCId, { path: string; section: Section; crumb: string; kicker: string; form: string }> = {
+  'richnytsya-kompaniyi': { path: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi', section: 'biz', crumb: 'Річниця компанії', kicker: 'Для бізнесу', form: 'corporate-workshop' },
+  'podarunky-spivrobitnykam': { path: '/dlya-biznesu/podarunky-spivrobitnykam', section: 'biz', crumb: 'Подарунки співробітникам', kicker: 'Для бізнесу', form: 'corporate-gifts' },
+  'novyi-rik-i-rizdvo': { path: '/novyi-rik-i-rizdvo', section: null, crumb: 'Новий рік і Різдво', kicker: 'Сезон 2026/27', form: 'corporate-gifts' },
 }
 export const WAVE_C_IDS = Object.keys(WAVE_C) as WaveCId[]
 

@@ -2,122 +2,149 @@ import type React from 'react'
 import { ImageResponse } from 'next/og'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
+import sharp from 'sharp'
 
-// Share card for any page: /og?title=…&kicker=…&sub=…  (1200×630, design 1A).
-// Used in each page's Open Graph metadata; messengers and search show it when a link is shared.
+// Share card for any page, 1200×630, composition C2 «Етикетка» (docs/design/SYSTEM.md §7): a photo fills the card,
+// a paper label with a cobalt bar carries the text, a paper tab with the mark and ГЛИНА hangs from the top edge.
+// studio=1: no photo; an ink field with the studio's name as the subject. No years, no counts or prices: the card
+// stays true for as long as the page lives. big=1 only renders the static home card:
+//   curl 'http://localhost:3000/og?title=…&kicker=…&sub=…&img=og-331-wide-1&big=1' -o public/og-home.png
 export const runtime = 'nodejs'
 
+const dir = path.join(process.cwd(), 'src/assets/fonts')
+const font = (name: string, family: string, weight: 400 | 800) =>
+  readFile(path.join(dir, name)).then((data) => ({ name: family, data, weight, style: 'normal' as const }))
 const fonts = Promise.all([
-  readFile(path.join(process.cwd(), 'src/assets/fonts/Unbounded-Bold.ttf')),
-  readFile(path.join(process.cwd(), 'src/assets/fonts/Raleway-Medium.ttf')),
+  font('Unbounded-ExtraBold.ttf', 'Unbounded', 800),
+  font('GolosText-Regular.ttf', 'Golos Text', 400),
+  font('JetBrainsMono-Regular.ttf', 'JetBrains Mono', 400),
 ])
+const DISPLAY = 'Unbounded' // static TTF from github.com/googlefonts/unbounded: overlaps already removed (Satori fills overlapping contours with holes)
+const BODY = 'Golos Text'
+const MONO = 'JetBrains Mono'
 
-const C = { clay: '#f3e7da', card: '#fbf3ea', ink: '#2a2018', umber: '#6c5243', terra: '#b4683f', cobalt: '#2a4fa8', ochre: '#d9a441' }
+const C = { paper: '#efe9de', ink: '#15130f', ink2: '#4e483f', cobalt: '#1d3ec6', mark: '#b4532e', clayText: '#a84a27', peach: '#ffd9a8', hair: 'rgba(21,19,15,.2)' }
+const DEFAULT_PHOTO = 'og-331-wide-1'
+
+// SYSTEM.md §7.4: a card never shows a year. The year goes with the words that lead into it («сезон 2026/27», «в 2026 році»).
+const noYears = (s: string) =>
+  s
+    .replace(/\s*[·—–-]?\s*(?:(?:у|в|на|сезон)\s+)?\b(?:19|20)\d{2}(?:\/\d{2})?\b(?:\s+(?:року|році|рік|р\.))?/giu, '')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s*[:,·—–-]\s*$/, '')
+    .trim()
+
+const param = (u: URL, k: string, max: number) => noYears((u.searchParams.get(k) || '').slice(0, max))
+
+// img=<name> → public/images/site/<name>.jpg; doc-<name> → public/images/doc; stock-<name> → public/images/stock.
+async function photo(img: string) {
+  const [dirName, file] = img.startsWith('doc-') ? ['doc', img.slice(4)] : img.startsWith('stock-') ? ['stock', img.slice(6)] : ['site', img]
+  const buf = await readFile(path.join(process.cwd(), 'public/images', dirName, `${file}.jpg`)).catch(() => null)
+  return buf ? `data:image/jpeg;base64,${buf.toString('base64')}` : null
+}
+
+function Mark({ size, fill }: { size: number; fill: string }) {
+  return (
+    <svg viewBox="0 0 64 64" width={size} height={size} fill={fill}>
+      <path fillRule="evenodd" d="M32 17 A21 21 0 1 1 31.99 17 Z M32 27.2 A10.8 10.8 0 1 0 32.01 27.2 Z" />
+      <path d="M23.3 4 H40.7 L35.7 18 H28.3 Z" />
+      <rect x="23.5" y="59" width="17" height="3.6" />
+    </svg>
+  )
+}
+
+const mono = (size: number, spacing: number, color: string): React.CSSProperties => ({ fontFamily: MONO, fontSize: size, letterSpacing: spacing, color })
+const display = (size: number, color: string, spacing = 0): React.CSSProperties => ({ fontFamily: DISPLAY, fontWeight: 800, fontSize: size, letterSpacing: spacing, color, textTransform: 'uppercase' })
+
+// 48px up to 28 characters, 42px up to 44, then 36px.
+const titleSize = (t: string) => (t.length <= 28 ? 48 : t.length <= 44 ? 42 : 36)
+
+// Largest size at which the name fits in two lines (about 0.85em per capital letter, 1088px of room) and its
+// longest word fits on a line; a longer word is broken anywhere at the smallest size.
+function nameSize(name: string) {
+  const word = Math.max(...name.split(/\s+/).map((w) => w.length))
+  for (const s of [120, 92, 68, 56, 46]) if (Math.ceil((name.length * 0.85 * s) / 1088) <= 2 && word * 0.85 * s <= 1088) return s
+  return 40
+}
+
+const Label = ({ width, children }: { width: number; children: React.ReactNode }) => (
+  <div style={{ position: 'absolute', left: 48, bottom: 48, width, display: 'flex', flexDirection: 'column', background: C.paper, borderLeft: `12px solid ${C.cobalt}`, padding: '32px 40px 28px' }}>{children}</div>
+)
+
+const Foot = ({ children }: { children: React.ReactNode }) => (
+  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 18, paddingTop: 12, borderTop: `1px solid ${C.hair}`, ...mono(15, 0.9, C.ink2) }}>{children}</div>
+)
 
 export async function GET(req: Request) {
   const u = new URL(req.url)
-  const title = (u.searchParams.get('title') || 'Українська кераміка ручної роботи').slice(0, 90)
-  const kicker = (u.searchParams.get('kicker') || '').slice(0, 60)
-  const sub = (u.searchParams.get('sub') || '').slice(0, 140)
-  const img = (u.searchParams.get('img') || '').replace(/[^a-z0-9-]/g, '')
-  // img=<name> → public/images/stock/<name>.jpg; img=doc-<name> → public/images/doc/<name>.jpg (Commons photos)
-  const imgPath = img.startsWith('doc-') ? path.join(process.cwd(), 'public/images/doc', `${img.slice(4)}.jpg`) : path.join(process.cwd(), 'public/images/stock', `${img}.jpg`)
-  const photo = img ? `data:image/jpeg;base64,${(await readFile(imgPath).catch(() => Buffer.from(''))).toString('base64')}` : ''
-  const seed = (u.searchParams.get('pattern') || '').slice(0, 40)
-  const credit = (u.searchParams.get('credit') || '').slice(0, 80) // photo author + license (CC BY-SA needs it)
-  // City coat of arms (public/images/coa/<slug>.png, from Wikimedia Commons); falls back to the mosaic.
-  const coaSlug = (u.searchParams.get('coa') || '').replace(/[^a-z0-9-]/g, '')
-  const coaBuf = coaSlug ? await readFile(path.join(process.cwd(), 'public/images/coa', `${coaSlug}.png`)).catch(() => null) : null
-  const coa = coaBuf && coaBuf.length > 10000 ? `data:image/png;base64,${coaBuf.toString('base64')}` : ''
-  const [unbounded, raleway] = await fonts
-  const band = Array.from({ length: 30 }, (_, i) => [C.terra, C.cobalt, C.ochre][i % 3])
-  const size = (img || u.searchParams.get('pattern') || coaSlug ? 0.82 : 1) * (title.length > 60 ? 50 : title.length > 36 ? 60 : 72)
+  const title = param(u, 'title', 90) || 'Українська кераміка ручної роботи'
+  const kicker = param(u, 'kicker', 60)
+  const sub = param(u, 'sub', 140)
+  const studio = u.searchParams.get('studio') === '1'
+  const big = u.searchParams.get('big') === '1'
+  const makes = (u.searchParams.get('makes') || '').split('|').map((m) => noYears(m.slice(0, 24))).filter(Boolean).slice(0, 4)
+  // Only CC BY and CC BY-SA photos carry a credit; the archive and CC0 photos do not.
+  const credit = (u.searchParams.get('credit') || '').slice(0, 80)
+  const img = (u.searchParams.get('img') || DEFAULT_PHOTO).replace(/[^a-z0-9-]/g, '')
+  const src = studio ? null : (await photo(img)) ?? (await photo(DEFAULT_PHOTO))
+  const left = img.includes('wide') // wide crops keep the subject on the left, under the label's reach
+  const tab = big ? { pad: '18px 26px 20px', mark: 56, gap: 16, text: 44 } : { pad: '12px 18px 14px', mark: 30, gap: 10, text: 22 }
 
-  return new ImageResponse(
-    (
-      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', background: C.clay, fontFamily: 'Raleway' }}>
-        <div style={{ display: 'flex', height: 18 }}>
-          {band.map((c, i) => (
-            <div key={i} style={{ width: 34, height: 18, marginRight: 6, background: c }} />
-          ))}
-        </div>
-        <div style={{ display: 'flex', flex: 1 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, padding: photo || seed || coa ? '52px 48px 44px 64px' : '56px 72px 48px', justifyContent: 'space-between' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
-            {kicker && <div style={{ fontFamily: 'Unbounded', fontSize: 22, letterSpacing: 3, color: C.terra, textTransform: 'uppercase' }}>{kicker}</div>}
-            <div style={{ fontFamily: 'Unbounded', fontSize: size, lineHeight: 1.05, color: C.ink, textTransform: 'uppercase' }}>{title}</div>
-            {sub && <div style={{ fontSize: 30, lineHeight: 1.35, color: C.umber, maxWidth: 1000 }}>{sub}</div>}
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <div style={{ display: 'flex', fontFamily: 'Unbounded', fontSize: 34, color: C.cobalt }}>
-              глина
-            </div>
-            <div style={{ display: 'flex', fontSize: 26, color: C.umber }}>hlyna.com.ua</div>
-          </div>
-        </div>
-        {coa && !photo && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 420, height: 548, margin: '32px 32px 32px 0', background: C.card, borderRadius: 36 }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={coa} alt="" style={{ maxWidth: 330, maxHeight: 440, objectFit: 'contain' }} />
-          </div>
-        )}
-        {seed && !photo && !coa && (
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 420, height: 548, margin: '32px 32px 32px 0', background: C.card, borderRadius: 36 }}>
-            <ShieldMosaic seed={seed} />
-          </div>
-        )}
-        {photo && (
-          <div style={{ display: 'flex', position: 'relative', width: 420, height: 548, margin: '32px 32px 32px 0' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={photo} width={420} height={548} alt="" style={{ width: 420, height: 548, objectFit: 'cover', borderRadius: 36 }} />
-            {credit && <div style={{ position: 'absolute', left: 18, bottom: 16, display: 'flex', padding: '4px 10px', borderRadius: 10, background: 'rgba(42,32,24,.62)', color: '#fbf3ea', fontSize: 15 }}>{credit}</div>}
-          </div>
-        )}
-        </div>
+  const body = studio ? (
+    <>
+      <div style={{ position: 'absolute', left: 56, top: 56, width: 1088, display: 'flex', flexDirection: 'column' }}>
+        {kicker && <div style={{ ...mono(17, 1.36, C.peach), textTransform: 'uppercase', marginBottom: 16 }}>{kicker}</div>}
+        <div style={{ ...display(nameSize(title), C.paper), lineHeight: 0.96, wordBreak: nameSize(title) === 40 ? 'break-all' : 'normal' }}>{title}</div>
       </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-      fonts: [
-        { name: 'Unbounded', data: unbounded, weight: 700, style: 'normal' },
-        { name: 'Raleway', data: raleway, weight: 500, style: 'normal' },
-      ],
-      headers: { 'Cache-Control': 'public, max-age=86400, s-maxage=604800' },
-    },
+      <Label width={840}>
+        {sub && <div style={{ fontFamily: BODY, fontSize: 21, lineHeight: 1.3, color: C.ink2 }}>{sub}</div>}
+        {makes.length > 0 && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', marginTop: 12 }}>
+            {makes.map((m, i) => (
+              <div key={m} style={{ ...mono(14, 0.56, C.ink2), textTransform: 'uppercase', paddingRight: 14, marginRight: 14, borderRight: i < makes.length - 1 ? '1px solid rgba(21,19,15,.25)' : 'none' }}>
+                {m}
+              </div>
+            ))}
+          </div>
+        )}
+        <Foot>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
+            <Mark size={22} fill={C.mark} />
+            <div style={{ ...display(16, C.ink, 0.32), marginLeft: 8 }}>Глина</div>
+            <div style={{ ...mono(14, 0.84, C.ink2), marginLeft: 14 }}>hlyna.com.ua</div>
+          </div>
+          <div>Профіль у каталозі студій</div>
+        </Foot>
+      </Label>
+    </>
+  ) : (
+    <>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src!} alt="" width={1200} height={630} style={{ position: 'absolute', left: 0, top: 0, width: 1200, height: 630, objectFit: 'cover', objectPosition: left ? '0% 50%' : '50% 50%' }} />
+      <div style={{ position: 'absolute', left: 48, top: 0, display: 'flex', alignItems: 'center', background: C.paper, padding: tab.pad }}>
+        <Mark size={tab.mark} fill={C.mark} />
+        <div style={{ ...display(tab.text, C.ink, tab.text * 0.02), marginLeft: tab.gap }}>Глина</div>
+      </div>
+      <Label width={760}>
+        {kicker && <div style={{ ...mono(17, 1.36, C.clayText), textTransform: 'uppercase' }}>{kicker}</div>}
+        <div style={{ ...display(big ? 42 : titleSize(title), C.ink), lineHeight: 1.04, marginTop: 12 }}>{title}</div>
+        {sub && <div style={{ fontFamily: BODY, fontSize: 21, lineHeight: 1.3, color: C.ink2, marginTop: 14 }}>{sub}</div>}
+        <Foot>
+          <div>hlyna.com.ua</div>
+          <div>Каталог студій і майстрів</div>
+        </Foot>
+      </Label>
+      {credit && <div style={{ position: 'absolute', right: 48, bottom: 48, display: 'flex', background: C.paper, padding: '4px 10px', ...mono(13, 0.4, C.ink2) }}>{credit}</div>}
+    </>
   )
-}
 
-// Fallback "coat of arms": a heater shield filled with the city's own ceramic-tile mosaic.
-// Deterministic pseudo-random sequence per city, so a city's card never changes between renders.
-function seeded(seed: string) {
-  let h = 0
-  for (const ch of seed) h = (h * 31 + ch.charCodeAt(0)) >>> 0
-  return () => ((h = (h * 1103515245 + 12345) >>> 0) % 1000) / 1000
-}
-
-function ShieldMosaic({ seed }: { seed: string }) {
-  const rnd = seeded(seed)
-  const colors = [C.terra, C.cobalt, C.ochre, '#5f7e6a']
-  const shield = 'M12 12 H318 V228 C318 318 250 382 165 412 C80 382 12 318 12 228 Z'
-  const tiles: React.ReactNode[] = []
-  for (let r = 0; r < 7; r++)
-    for (let c = 0; c < 5; c++) {
-      const x = 12 + c * 61.2, y = 12 + r * 61, fill = colors[Math.floor(rnd() * colors.length)], k = Math.floor(rnd() * 3)
-      tiles.push(<rect key={`b${r}${c}`} x={x} y={y} width={61.2} height={61} fill="#f6ead9" stroke="#e1c7ae" strokeWidth={2} />)
-      tiles.push(
-        k === 0 ? <circle key={`s${r}${c}`} cx={x + 30.6} cy={y + 30.5} r={18} fill={fill} />
-        : k === 1 ? <path key={`s${r}${c}`} d={`M${x + 12} ${y + 22} H${x + 49} A18.5 18.5 0 0 1 ${x + 12} ${y + 22} Z`} fill={fill} />
-        : <rect key={`s${r}${c}`} x={x + 13} y={y + 13} width={35} height={35} rx={8} fill={fill} />,
-      )
-    }
-  return (
-    <svg width={330} height={424} viewBox="0 0 330 424">
-      <defs>
-        <clipPath id="shield"><path d={shield} /></clipPath>
-      </defs>
-      <g clipPath="url(#shield)">{tiles}</g>
-      <path d={shield} fill="none" stroke={C.ochre} strokeWidth={10} />
-    </svg>
-  )
+  const png = await new ImageResponse(<div style={{ width: '100%', height: '100%', display: 'flex', position: 'relative', background: C.ink, color: C.ink }}>{body}</div>, {
+    width: 1200,
+    height: 630,
+    fonts: await fonts,
+  }).arrayBuffer()
+  // Satori only writes PNG, which is 700+ KB with a photo underneath; messengers take JPEG at about a seventh of that.
+  // big=1 (the static home card, rendered once) stays PNG, palette-reduced.
+  const out = big ? await sharp(Buffer.from(png)).png({ palette: true, quality: 85, effort: 10 }).toBuffer() : await sharp(Buffer.from(png)).jpeg({ quality: 82, mozjpeg: true }).toBuffer()
+  return new Response(new Uint8Array(out), { headers: { 'Content-Type': big ? 'image/png' : 'image/jpeg', 'Cache-Control': 'public, max-age=86400, s-maxage=604800' } })
 }

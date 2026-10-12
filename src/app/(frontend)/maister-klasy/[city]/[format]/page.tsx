@@ -48,7 +48,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: p.copy.title,
     description: p.copy.metaDescription,
     alternates: { canonical: path },
-    openGraph: { images: ogImage({ title: p.copy.title, kicker: FORMAT_PAGES[format as FormatSlug].label, sub: p.vars.priceRange ? `${p.vars.places} · ${p.vars.priceRange}` : String(p.vars.places), coa: city, pattern: city }) },
+    openGraph: { images: ogImage({ title: p.copy.title, kicker: FORMAT_PAGES[format as FormatSlug].label }) },
   }
 }
 

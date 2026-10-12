@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   title: 'Косів і Опішне сьогодні: сучасні майстри, студії й де купити кераміку',
   description: 'Хто працює з глиною в Косові й Опішному зараз: майстри, родинні майстерні, бренди, студії з майстер-класами, крамниці, музеї й школи. З посиланнями на профілі.',
   alternates: { canonical: '/dobirky/kosiv-i-opishne' },
-  openGraph: { images: ogImage({ title: 'Косів і Опішне сьогодні', kicker: 'Добірка', pattern: 'kosiv-i-opishne' }) },
+  openGraph: { images: ogImage({ title: 'Косів і Опішне сьогодні', kicker: 'Добірка' }) },
 }
 
 const many = (n: number) => `${n} ${pluralUk(n, ['майстер, бренд чи студія', 'майстри, бренди й студії', 'майстрів, брендів і студій'])}`

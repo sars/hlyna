@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: 'Кераміка ручної роботи за містами України: студії, бренди, майстри',
   description: 'Українські керамічні студії, бренди й майстри за містами: Київ, Львів, Одеса, Харків, Дніпро, Косів, Опішне та інші. Скільки їх у кожному місті, хто проводить майстер-класи й працює із закладами.',
   alternates: { canonical: '/vyrobnyky/misto' },
-  openGraph: { images: ogImage({ title: 'Кераміка ручної роботи за містами', kicker: 'Виробники', sub: 'Студії, бренди й майстри по всій Україні', pattern: 'misto' }) },
+  openGraph: { images: ogImage({ title: 'Кераміка ручної роботи за містами', kicker: 'Виробники', sub: 'Студії, бренди й майстри по всій Україні' }) },
 }
 
 export default async function CitiesIndex() {

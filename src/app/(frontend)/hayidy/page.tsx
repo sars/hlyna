@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: 'Гайди про кераміку ручної роботи: замовлення партії, харчова безпечність, майстер-класи',
   description: 'Практичні гайди: як замовити партію посуду чи подарунків у студії, що спитати про поливу й посудомийку, як дозамовити той самий посуд і як обрати майстер-клас.',
   alternates: { canonical: '/hayidy' },
-  openGraph: { images: ogImage({ title: 'Гайди про кераміку ручної роботи', kicker: 'Гайди', pattern: 'hayidy' }) },
+  openGraph: { images: ogImage({ title: 'Гайди про кераміку ручної роботи', kicker: 'Гайди' }) },
 }
 
 const more = [

@@ -7,7 +7,7 @@ const defaultOpenGraph: Metadata['openGraph'] = {
     'Каталог українських керамічних студій і майстрів. Посуд і подарунки ручної роботи для бізнесу, майстер-класи та сертифікати.',
   images: [
     {
-      url: `${getServerSideURL()}/og-default.jpg`,
+      url: `${getServerSideURL()}/og-home.png`,
       width: 1200,
       height: 630,
     },

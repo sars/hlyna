@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: `Кераміка ручної роботи ${inCity(g.city.name)}: ${who(g.studios.length)}`,
     description: (cityContent(g.city.slug as string)?.lead || `Керамічні студії, бренди й майстри ${inCity(g.city.name)}: ${who(g.studios.length)} — посуд, декор, майстер-класи, замовлення для закладів і компаній.`).replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').slice(0, 300),
     alternates: { canonical: `/vyrobnyky/misto/${g.city.slug}` },
-    openGraph: { images: ogImage({ title: `Кераміка ручної роботи: ${g.city.name}`, kicker: 'Виробники', sub: who(g.studios.length), pattern: g.city.slug as string, coa: g.city.slug as string }) },
+    openGraph: { images: ogImage({ title: `Кераміка ручної роботи: ${g.city.name}`, kicker: 'Виробники', sub: 'Студії, бренди й майстри: посуд, декор, майстер-класи, замовлення для закладів і компаній', img: 'og-318-1' }) },
   }
 }
 
