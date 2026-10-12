@@ -27,8 +27,15 @@ hlyna.com.ua {
 		max_size 25MB
 	}
 
+	# Access log in the caddy_data volume, so it outlives container restarts: ~90 days, gzipped when rolled.
+	# It is the only record of crawlers and LLM bots (GA sees only browsers). Read it with
+	# `docker compose exec caddy sh -c 'zcat -f /data/access/hlyna*.log*'`.
 	log {
-		output stdout
+		output file /data/access/hlyna.log {
+			roll_size 50MiB
+			roll_keep 60
+			roll_keep_for 2160h
+		}
 		format json
 	}
 
