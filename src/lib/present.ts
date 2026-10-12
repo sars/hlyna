@@ -166,6 +166,18 @@ export function oblastLabel(c?: Pick<City, 'oblast' | 'name'> | null): string {
 
 const PROFILE_HOSTS = /(?:^|\.)(instagram\.com|facebook\.com|etsy\.com|tiktok\.com|youtube\.com|pinterest\.com|behance\.net|t\.me)$/i
 
+// A link field (instagram, website, facebook) as an absolute http(s) URL, or null when it holds a research note, a name
+// or a bare handle: in an href those resolve against the page, and crawlers then request /vyrobnyky/<note>.
+export function webUrl(v: string | null | undefined): string | null {
+  const s = v?.trim()
+  if (!s || !/^https?:\/\/\S+$/i.test(s)) return null
+  try {
+    return new URL(s).hostname.includes('.') ? s : null
+  } catch {
+    return null
+  }
+}
+
 // sameAs must hold clean URLs of the entity's own profiles, not booking pages or articles.
 export function profileUrls(s: Studio): string[] {
   const own = (() => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cleanAddress, cleanPublic, dedupeTexts, firstAddress, inCity, isDomainLike, noteIsFresh, stripPersonal } from '@/lib/present'
+import { cleanAddress, cleanPublic, dedupeTexts, firstAddress, inCity, isDomainLike, noteIsFresh, stripPersonal, webUrl } from '@/lib/present'
 
 describe('present: public text cleaners', () => {
   it('removes research notes from public text', () => {
@@ -44,6 +44,20 @@ describe('isDomainLike', () => {
     expect(isDomainLike('bigme.ua')).toBe(true)
     expect(isDomainLike('Добра Глина')).toBe(false)
     expect(isDomainLike('helgapottery_ua')).toBe(false)
+  })
+})
+
+describe('webUrl', () => {
+  it('keeps absolute http(s) URLs, drops notes, names and bare handles', () => {
+    expect(webUrl('https://www.instagram.com/saga.pottery/')).toBe('https://www.instagram.com/saga.pottery/')
+    expect(webUrl(' http://example.com.ua ')).toBe('http://example.com.ua')
+    expect(webUrl('@mykolasvitaylo (ймовірно)')).toBeNull()
+    expect(webUrl('Восьма Комора')).toBeNull()
+    expect(webUrl('chichka.in.ua')).toBeNull()
+    expect(webUrl('http://гончар.укр (xn--80af4adm4b.xn--j1amh)')).toBeNull()
+    expect(webUrl('https://localhost')).toBeNull()
+    expect(webUrl('')).toBeNull()
+    expect(webUrl(null)).toBeNull()
   })
 })
 

@@ -2,6 +2,7 @@
 // nested groups and `{text}[]` lists, so pages and lib/* never see Drizzle rows.
 import type { InferSelectModel } from 'drizzle-orm'
 
+import { webUrl } from '../lib/present'
 import type { cities, studioPrices, studios } from './db/schema'
 
 type StudioRow = InferSelectModel<typeof studios>
@@ -45,9 +46,10 @@ export function toPublicStudio(s: StudioRow, prices: PriceRow[]) {
     services: texts(s.services),
     products: texts(s.products),
     prices: [...prices].sort((a, b) => a.position - b.position).map((p) => ({ text: p.text, source: p.source, date: p.dateText })),
-    instagram: s.instagram,
-    website: s.website,
-    facebook: s.facebook,
+    // Only real URLs reach an href; a note or a name in these fields stays in the panel.
+    instagram: webUrl(s.instagram),
+    website: webUrl(s.website),
+    facebook: webUrl(s.facebook),
     phone: s.phone,
     email: s.email,
     otherLinks: urls(s.otherLinks),
