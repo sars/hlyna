@@ -18,7 +18,7 @@ export function InstagramPosts({ urls, handle }: { urls: string[]; handle?: stri
   }, [show])
 
   return (
-    <div ref={ref} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <div ref={ref} className="grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-2">
       {urls.map((u) => (
         <Post key={u} url={u} handle={handle} show={show} />
       ))}
@@ -47,12 +47,13 @@ function Post({ url, handle, show }: { url: string; handle?: string; show: boole
   const code = url.match(/\/(p|reel)\/([\w-]+)/)
   if (!code) return null
   return (
-    <div className="overflow-hidden border border-rule bg-paper-2">
+    <div className="overflow-hidden border-y border-rule">
       {!height && (
         <a href={url} target="_blank" rel="noopener nofollow" className="flex items-center justify-between gap-3 px-4 py-3.5 text-[15px] text-ink no-underline hover:text-cobalt">
           <span>
             <span className="block font-display text-[15px] leading-[1.2] font-semibold">{code[1] === 'reel' ? 'Відео' : 'Пост'} в Instagram</span>
             {handle && <span className="mt-0.5 block font-mono text-xs text-ink-2">@{handle}</span>}
+            {show && <span className="mt-0.5 block font-mono text-[11.5px] tracking-[.04em] text-ink-2">Завантаження з Instagram…</span>}
           </span>
           <span aria-hidden className="font-mono text-sm text-cobalt">→</span>
         </a>

@@ -8,9 +8,12 @@ import { site } from '@/content/site'
 import { DataTable } from '@/components/ui/DataTable'
 import { nobreak } from '@/components/ui/NoBreak'
 import { QuoteBlock } from '@/components/ui/QuoteBlock'
-import { StudioList } from '@/components/site/TopicPage'
+import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
-import { getAllStudios, MIN_LIST } from '@/lib/catalog'
+import { MK_CHIPS } from '@/lib/mkChips'
+import { getAllStudios, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/lib/catalog'
+import { studioPrice } from '@/lib/priceIndex'
+import { fmt, roundNice } from '@/lib/money'
 import { cleanName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
@@ -63,6 +66,17 @@ export default async function Page({ params }: Args) {
   const f = FORMAT_PAGES[format as FormatSlug]
   const path = `/maister-klasy/${city}/${format}`
   const others = (Object.keys(FORMAT_PAGES) as FormatSlug[]).filter((x) => x !== format)
+  // Price of one class from each studio's own price list: per couple on the «для двох» page, else per person.
+  const key = format === 'dlya-dvokh' ? 'couple' : 'group'
+  const unit = key === 'couple' ? 'за двох' : 'з особи'
+  const priced = p.data.all.map((s) => ({ s, v: studioPrice(s, key) }))
+  const values = priced.flatMap((x) => (x.v ? [x.v] : []))
+  const n = p.data.all.length
+  const strip = [
+    { value: fmt(n), label: pluralUk(n, ['місце', 'місця', 'місць']) },
+    ...(values.length ? [{ value: Math.min(...values) === Math.max(...values) ? fmt(Math.min(...values)) : `${fmt(Math.min(...values))}–${fmt(Math.max(...values))}`, label: `грн ${key === 'couple' ? 'за двох' : 'з особи'} за прайсами` }] : []),
+    { value: fmt(values.length), label: pluralUk(values.length, ['студія', 'студії', 'студій']) + ' з ціною в прайсі' },
+  ]
   return (
     <WavePage
       copy={p.copy}
@@ -73,14 +87,20 @@ export default async function Page({ params }: Args) {
       form="master-class"
       city={p.place}
       studios={p.data.all}
+      strip={values.length ? strip : undefined}
+      cityLinks={others.map((x) => ({ label: FORMAT_PAGES[x].label, href: topicsPath(x) }))}
+      chipsLabel="Інші формати:"
       related={[
         { label: `Усі майстер-класи ${p.vars.inCity}`, href: `/maister-klasy/${city}` },
         { label: `${f.label}: усі міста`, href: p.topic.path },
-        ...others.map((x) => ({ label: FORMAT_PAGES[x].label, href: topicsPath(x) })),
       ]}
     >
       <Block id="list" title={`Де ${f.short === 'курси' ? 'пройти курс' : 'записатися'} ${p.vars.inCity}`} note={<>Список за відкритими даними студій (сайти, Instagram, сервіси сертифікатів). Умови кожна студія підтверджує сама.</>}>
-        <StudioList studios={p.data.all} re={p.topic.evidence} />
+        <MakerRows>
+          {[...priced].sort((a, b) => Number(!!b.v) - Number(!!a.v) || a.s.name.localeCompare(b.s.name, 'uk')).map(({ s, v }) => (
+            <MakerRow key={s.id} s={s} typeLabel={TYPE_LABEL[s.type ?? 'other']} showAbout={false} chips={MK_CHIPS.filter(([fm]) => hasFormat(s, fm)).map(([, label]) => ({ label, tone: 'ink' as const }))} price={v ? { value: `${fmt(roundNice(v))} грн`, unit } : undefined} />
+          ))}
+        </MakerRows>
       </Block>
       {p.data.examples.length > 0 && (
         <Block id="prices" kicker="Ціни" title={p.topic.price.title} note={p.topic.price.note}>

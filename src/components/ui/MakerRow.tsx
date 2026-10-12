@@ -27,7 +27,7 @@ export function MakerRow({ s, price, chips: chipsProp, typeLabel, showAbout = tr
   ].map((label) => ({ label, tone: label === 'майстер-класи' ? ('cobalt' as const) : ('ink' as const) }))
   return (
     <li>
-      <Link href={`/vyrobnyky/${s.slug}`} className="font-display text-base leading-[1.2] font-semibold text-ink no-underline hover:text-cobalt">
+      <Link href={`/vyrobnyky/${s.slug}`} className="font-display text-base leading-[1.2] font-semibold text-ink no-underline after:absolute after:inset-0 after:content-[''] hover:text-cobalt">
         {cleanName(s.name)}
       </Link>
       {(typeLabel || addr || s.instagram) && (
@@ -35,7 +35,7 @@ export function MakerRow({ s, price, chips: chipsProp, typeLabel, showAbout = tr
           {[typeLabel, addr].filter(Boolean).join(' · ')}
           {(typeLabel || addr) && s.instagram ? ' · ' : ''}
           {s.instagram && (
-            <a href={s.instagram} target="_blank" rel="noopener nofollow" className="text-ink-2 underline underline-offset-[3px]">
+            <a href={s.instagram} target="_blank" rel="noopener nofollow" className="relative z-[1] text-ink-2 underline underline-offset-[3px]">
               @{igHandle(s.instagram)}
             </a>
           )}

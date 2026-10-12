@@ -41,6 +41,7 @@ export function RequestForm({
   defaultCity = '',
   forStudio = false,
   cityNames,
+  studioName,
 }: {
   sourcePage: string
   compact?: boolean
@@ -48,6 +49,8 @@ export function RequestForm({
   defaultCity?: string
   forStudio?: boolean
   cityNames?: Record<string, string>
+  /** On a studio's own page: the heading names the studio (the request still goes through sourcePage). */
+  studioName?: string
 }) {
   const uid = useId()
   const [state, setState] = useState<'idle' | 'sending' | 'done' | 'error'>('idle')
@@ -284,9 +287,9 @@ export function RequestForm({
 
   return (
     <form id="zapyt-forma" data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={panel} noValidate>
-      <Kicker>Запит · безкоштовно</Kicker>
-      <h2 id={`${uid}-h`} className="m-0 mt-1.5 mb-2 font-display text-[19px] leading-[1.15] font-semibold sm:text-xl">
-        Опишіть, що потрібно — відповідять 3–5 студій
+      <Kicker>{studioName ? 'Швидкий запит · безкоштовно' : 'Запит · безкоштовно'}</Kicker>
+      <h2 id={`${uid}-h`} className="m-0 mt-1.5 mb-2 font-display text-[19px] leading-[1.15] font-semibold [overflow-wrap:anywhere] sm:text-xl">
+        {studioName ? `Запит ${studioName} і ще 2–4 студіям` : 'Опишіть, що потрібно — відповідять 3–5 студій'}
       </h2>
       <Field label="Що потрібно" htmlFor={`${uid}-what`}>
         <Select id={`${uid}-what`} name="what" value={what} onChange={(e) => setWhat(e.target.value)}>

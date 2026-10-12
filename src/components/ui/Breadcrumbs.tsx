@@ -19,7 +19,9 @@ export function Breadcrumbs({ items, modified }: { items: { label: string; href?
                   {it.label}
                 </Link>
               ) : (
-                <span aria-current="page">{it.label}</span>
+                <span aria-current="page" title={it.label.length > 40 ? it.label : undefined} className="[overflow-wrap:anywhere]">
+                  {it.label.length > 40 ? `${it.label.slice(0, 39).trimEnd()}…` : it.label}
+                </span>
               )}
             </li>
           ))}

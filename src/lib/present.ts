@@ -152,6 +152,13 @@ export const LOCATIVE: Record<string, string> = {
   Городенка: 'у Городенці', Трускавець: 'у Трускавці', Вишгород: 'у Вишгороді', Васильків: 'у Василькові', Яремче: 'у Яремчі',
   Канів: 'у Каневі', Переяслав: 'у Переяславі', Лубни: 'у Лубнах', Чугуїв: 'у Чугуєві', Соснівка: 'у Соснівці', Кути: 'у Кутах',
 }
+/** «про Одесу», «про Вінницю»: the accusative of a settlement name, word by word (feminine -а/-ія/-ия/-ця/-ня), else unchanged. */
+export const aboutCity = (name: string) =>
+  name
+    .split(' ')
+    .map((w) => (/(ія|ия|ця|ня)$/u.test(w) ? `${w.slice(0, -1)}ю` : /а$/u.test(w) ? `${w.slice(0, -1)}у` : w))
+    .join(' ')
+
 export const inCity = (name?: string | null) => (name ? LOCATIVE[name] ?? `у м. ${name}` : '')
 
 // Admin labels like «м. Київ (спецстатус)» or a bare «Вінницька» → readable region names.

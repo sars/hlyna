@@ -171,14 +171,14 @@ export default async function StudioPage({ params }: Args) {
         }}
       />
 
-      <div className="grid items-start gap-[clamp(20px,3vw,40px)] border-b-2 border-ink pt-hero pb-[clamp(24px,3vw,40px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+      <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-[clamp(20px,3vw,40px)] border-b-2 border-ink pt-hero pb-[clamp(24px,3vw,40px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <div className="grid min-w-0 gap-3.5">
           <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityHref ? [{ label: city.name, href: cityHref }] : []), { label: name }]} modified={s.updatedAt} />
           <Kicker>
             {typeLabel}
             {city ? ` · ${city.name}` : ''}
           </Kicker>
-          <h1 className="m-0 font-display text-h1 break-words" style={{ letterSpacing: 0 }}>
+          <h1 className={`m-0 font-display text-h1 [overflow-wrap:anywhere] ${name.length > 60 ? 'max-md:text-[24px] max-md:leading-[1.15]' : ''}`} style={{ letterSpacing: 0 }}>
             {name}
           </h1>
           {s.ownerVerified && <p className="m-0 text-sm font-semibold text-ink-2">✓ Профіль підтверджено студією</p>}
@@ -226,7 +226,7 @@ export default async function StudioPage({ params }: Args) {
 
       {photos.length > 0 && (
         <section aria-label="Фото студії" className="grid gap-2 pt-[clamp(24px,3vw,40px)]">
-          <Image src={photos[0].url} alt={photos[0].alt} width={photos[0].width} height={photos[0].height} priority sizes="(min-width:1200px) 760px, 100vw" className="aspect-[3/2] w-full max-w-[760px] object-cover" />
+          <Image src={photos[0].url} alt={photos[0].alt} width={photos[0].width} height={photos[0].height} sizes="(min-width:1200px) 760px, 100vw" className="aspect-[3/2] w-full max-w-[760px] object-cover" />
           {photos.length > 1 && (
             <ul className="m-0 grid max-w-[760px] list-none grid-cols-3 gap-2 p-0 sm:grid-cols-5">
               {photos.slice(1).map((p) => (
@@ -267,8 +267,19 @@ export default async function StudioPage({ params }: Args) {
                 </MoreLink>
               </SideBox>
             ) : (
-              <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} />
+              <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} studioName={name} />
             )}
+            <SideBox title="Власникам">
+              {s.ownerVerified ? (
+                <p className="m-0">
+                  <b>Ви представляєте цю студію?</b> Оновлюйте профіль у кабінеті. <Link href="/kabinet">Увійти →</Link>
+                </p>
+              ) : (
+                <p className="m-0">
+                  <b>Це ваша студія?</b> Керуйте профілем: фото, ціни, умови для бізнесу — безкоштовно. <Link href={`/kabinet/zayavka?studio=${s.slug}`}>Керувати профілем →</Link>
+                </p>
+              )}
+            </SideBox>
           </>
         }
       >
@@ -307,8 +318,10 @@ export default async function StudioPage({ params }: Args) {
                   <PriceList items={lines.slice(0, 6).map((p) => ({ text: p.text, source: p.source }))} />
                   {lines.length > 6 && (
                     <details className="group">
-                      <MoreLink as="summary" pad={false} className="py-1.5 text-cobalt">
-                        <span className="group-open:hidden">Ще {lines.length - 6}</span>
+                      <MoreLink as="summary" arrow={false}>
+                        <span className="group-open:hidden">
+                          Ще {lines.length - 6} <span aria-hidden>→</span>
+                        </span>
                         <span className="hidden group-open:inline">Згорнути</span>
                       </MoreLink>
                       <PriceList items={lines.slice(6).map((p) => ({ text: p.text, source: p.source }))} />
@@ -362,17 +375,6 @@ export default async function StudioPage({ params }: Args) {
             </StudioCells>
           </Block>
         )}
-        <SideBox title="Власникам">
-          {s.ownerVerified ? (
-            <p className="m-0">
-              <b>Ви представляєте цю студію?</b> Оновлюйте профіль у кабінеті. <Link href="/kabinet">Увійти →</Link>
-            </p>
-          ) : (
-            <p className="m-0">
-              <b>Це ваша студія?</b> Керуйте профілем: фото, ціни, умови для бізнесу — безкоштовно. <Link href={`/kabinet/zayavka?studio=${s.slug}`}>Керувати профілем →</Link>
-            </p>
-          )}
-        </SideBox>
       </InnerCols>
       <MobileRequestBar />
     </InnerMain>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { InnerHero, InnerMain } from '@/components/site/Inner'
+import { HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { IndexCell, StudioCells } from '@/components/ui/StudioCell'
 import React from 'react'
 
@@ -36,14 +37,17 @@ export default async function Selections() {
             Редакційні добірки української кераміки ручної роботи за відкритими даними студій і майстрів. Не рейтинг і не реклама.
           </p>
         }
+        actions={<HeroRequest path="/dobirky" />}
       />
-      <div className="pt-[clamp(24px,3vw,40px)]">
+      <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
         <StudioCells>
           {list.map((x) => (
             <IndexCell key={x.href} href={x.href} title={x.title} text={x.note} cta="Відкрити" />
           ))}
         </StudioCells>
+        <RequestBand path="/dobirky" tone="ink" />
       </div>
+      <MobileRequestBar />
     </InnerMain>
   )
 }

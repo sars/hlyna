@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Block, HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { CityList, SmallCities } from '@/components/ui/CityList'
 import { Chip } from '@/components/ui/Chip'
 import { ChipGroup } from '@/components/ui/ChipGroup'
@@ -25,7 +26,7 @@ export default async function MasterClassesIndex() {
   const big = groups.filter((g) => g.studios.length >= MIN_LIST)
   const small = groups.filter((g) => g.studios.length < MIN_LIST)
   const total = groups.reduce((n, g) => n + g.studios.length, 0)
-  const gr = scopeSpan(groups.flatMap((g) => g.studios), 'group')
+  const gr = f.get('group') // the same p10–p90 range as the lead
   const facts_ = gr ? { value: `${fmt(gr.min)}–${fmt(gr.max)}`, label: 'грн разовий майстер-клас з особи' } : null
 
   return (
@@ -44,6 +45,7 @@ export default async function MasterClassesIndex() {
           { value: fmt(groups.length), label: pluralUk(groups.length, ['місто чи село', 'міста й села', 'міст і сіл']) },
           ...(facts_ ? [facts_] : []),
         ]}
+        actions={<HeroRequest path="/maister-klasy" />}
       />
       <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
         <Block id="formats" title="Формати">
@@ -57,6 +59,7 @@ export default async function MasterClassesIndex() {
               ))}
           </ChipGroup>
         </Block>
+        <RequestBand path="/maister-klasy" tone="cobalt" />
         <Block id="cities" title="Міста">
           <CityList
             items={big.map((g) => {
@@ -70,7 +73,9 @@ export default async function MasterClassesIndex() {
             <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: s.name, href: `/vyrobnyky/${s.slug}` })) }))} />
           </Block>
         )}
+        <RequestBand path="/maister-klasy" tone="ink" />
       </div>
+      <MobileRequestBar />
     </InnerMain>
   )
 }

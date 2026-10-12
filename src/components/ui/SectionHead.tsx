@@ -10,7 +10,7 @@ export function SectionHead({ title, id, kicker, note, more, level = 2, variant 
   const H = level === 3 ? 'h3' : 'h2'
   const poster = variant === 'poster'
   return (
-    <div className={cx('grid items-end gap-x-6 border-b-2 border-ink md:grid-cols-[minmax(0,1fr)_auto]', poster ? 'gap-y-2 pb-[18px]' : 'mb-[18px] gap-y-1.5 pb-3', className)}>
+    <div className={cx('ui-head grid items-end gap-x-6 border-b-2 border-ink md:grid-cols-[minmax(0,1fr)_auto]', poster ? 'gap-y-2 pb-[18px]' : 'mb-[18px] gap-y-1.5 pb-3', className)}>
       <div className={cx('grid', poster ? 'gap-2' : 'gap-1.5')}>
         {kicker && <Kicker className={poster ? 'mb-1.5' : undefined}>{kicker}</Kicker>}
         <H id={id} className={cx('m-0 font-display uppercase', poster ? 'text-h2-poster' : 'text-h2')}>

@@ -6,9 +6,8 @@ import { ChipGroup } from '@/components/ui/ChipGroup'
 import { CtaBand } from '@/components/ui/CtaBand'
 import { Epigraph } from '@/components/ui/Epigraph'
 import { Faq } from '@/components/ui/Faq'
-import { Kicker } from '@/components/ui/Kicker'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
-import { Panel } from '@/components/ui/Panel'
+import { SideBox } from '@/components/ui/SideBox'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
@@ -26,6 +25,7 @@ import { pickVerse } from '@/content/verses'
 import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
+import { MK_CHIPS as CHIPS } from '@/lib/mkChips'
 import { cityContent } from '@/editorial/places'
 import { certificateCities } from '@/editorial/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/editorial/wave-a'
@@ -56,16 +56,6 @@ const places = (n: number) => `${fmt(n)} ${pluralUk(n, ['місце', 'місц�
 const priceText = (r: Span | null) => r?.text ?? ''
 
 // Format chips per studio (from tags), in the order people choose by.
-const CHIPS: [Format, string][] = [
-  ['wheel', 'гончарне коло'],
-  ['handbuilding', 'ліплення'],
-  ['painting', 'розпис'],
-  ['couples', 'для двох'],
-  ['kids', 'для дітей'],
-  ['courses', 'курси'],
-  ['certificates', 'сертифікати'],
-  ['corporate-workshop', 'корпоративи'],
-]
 // Tag → wave A format slug (/maister-klasy/<city>/<slug>).
 const SLUG_OF: Partial<Record<Format, FormatSlug>> = { wheel: 'honcharne-kolo', handbuilding: 'lipennya', painting: 'rozpys', couples: 'dlya-dvokh', kids: 'dlya-ditey', courses: 'kursy' }
 const FORMAT_PAGES: [Format, string, string][] = [
@@ -199,14 +189,11 @@ export default async function CityMasterClassesPage({ params }: Args) {
         aside={
           <>
             <RequestForm sourcePage={`/maister-klasy/${city.slug}`} defaultWhat="master-class" defaultCity={city.name} />
-            <Panel tone="cobalt">
-              <Kicker as="p">Для команди</Kicker>
-              <p className="m-0 mt-1.5 text-[15px] leading-normal">
-                <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny" className="text-paper">
-                  Корпоратив з ліплення з глини: у студії або в офісі, {f.range('corporate')}. →
-                </Link>
+            <SideBox title="Для команди">
+              <p className="m-0">
+                <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny">Корпоратив з ліплення з глини: у студії або в офісі, {f.range('corporate')}. →</Link>
               </p>
-            </Panel>
+            </SideBox>
           </>
         }
       >
@@ -216,7 +203,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           <MakerRows>
             {sorted.map((st) => {
               const from = minClass(st)
-              return <MakerRow key={st.id} s={st} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(roundNice(from))} грн` } : undefined} />
+              return <MakerRow key={st.id} s={st} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(roundNice(from))} грн`, unit: 'з особи' } : undefined} />
             })}
           </MakerRows>
         </Block>

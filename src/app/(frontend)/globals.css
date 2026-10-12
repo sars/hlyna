@@ -211,7 +211,7 @@
   .ui-table td + td, .ui-table th + th { padding-left: 14px; }
   .ui-table [data-end] { text-align: right; }
   .ui-table [data-numeric] { font-variant-numeric: tabular-nums; }
-  .ui-table td[data-mono] { max-width: 12em; font-family: var(--font-mono); font-size: 12px; line-height: 22.5px; color: var(--color-ink-2); overflow-wrap: anywhere; }
+  .ui-table td[data-mono] { min-width: 9ch; max-width: 12em; font-family: var(--font-mono); font-size: 12px; line-height: 22.5px; color: var(--color-ink-2); overflow-wrap: break-word; }
   .ui-table-scroll [data-numeric] + [data-mono], .ui-table-scroll th[data-end] + th:not([data-end]) { padding-left: 24px; }
   .ui-table a { color: var(--color-cobalt); text-decoration: underline; text-underline-offset: 3px; }
   .ui-table-scroll { overflow-x: auto; }
@@ -238,8 +238,12 @@
   .ui-faq summary::-webkit-details-marker { display: none; }
   .ui-faq summary:hover { color: var(--color-cobalt); }
   .ui-faq-pm { font-family: var(--font-mono); font-size: 18px; color: var(--color-cobalt); }
-  .ui-faq details[open] .ui-faq-pm::before { content: '–'; }
-  .ui-faq details:not([open]) .ui-faq-pm::before { content: '+'; }
+  details[open] > summary > .ui-faq-pm::before { content: '–'; }
+  details:not([open]) > summary > .ui-faq-pm::before { content: '+'; }
+  /* A folding city (map list) or «Показати ще»: summary with +/–, 44px tall. */
+  .ui-fold summary { list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 10px; min-height: 44px; padding: 12px 0; }
+  .ui-fold summary::-webkit-details-marker { display: none; }
+  .ui-fold summary:hover { color: var(--color-cobalt); }
   .ui-faq details > div { margin: 0 0 18px; max-width: 62ch; color: var(--color-ink-2); }
 
   /* Glossary term: dotted terracotta underline and a CSS-only tooltip (the definition also stands in the page text). */
@@ -289,6 +293,7 @@
     .ui-cells { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .ui-cells > li:nth-child(odd) > a { border-right: 1px solid var(--color-rule); padding-right: 18px; }
     .ui-cells > li:nth-child(even) > a { padding-left: 18px; }
+    .ui-cells > li:nth-child(odd):last-child > a { border-right: 0; padding-right: 0; }
   }
   .ui-rows { margin: 0; padding: 0; list-style: none; }
   .ui-rows > li > a { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 16px; align-items: start; padding: 13px 0; border-bottom: 1px solid var(--color-rule); color: var(--color-ink); text-decoration: none; }
@@ -302,7 +307,7 @@
     .ui-rows .ui-line, .ui-rows .ui-stale, .ui-rows .ui-name { grid-column: 2; }
   }
   .ui-makers { display: grid; margin: 0; padding: 0; list-style: none; border-top: 2px solid var(--color-ink); }
-  .ui-makers > li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 18px; padding: 14px 0; border-bottom: 1px solid var(--color-rule); }
+  .ui-makers > li { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 18px; padding: 14px 0; border-bottom: 1px solid var(--color-rule); }
   .ui-makers > li > * { grid-column: 1; }
   .ui-makers > li > .ui-price { grid-column: 2; grid-row: 1 / 6; align-self: start; text-align: right; white-space: nowrap; }
   @media (max-width: 39.99rem) {
@@ -436,6 +441,12 @@
 
 /* A page that ends with a full-bleed dark panel (home) lets the footer rule butt against it. */
 @layer utilities {
+  /* A list right under a SectionHead (which has its own 2px rule) takes that rule as its top rule. */
+  .ui-head + .ui-toprule,
+  .ui-head + div > .ui-toprule:first-child,
+  .ui-head + div > .ui-table-scroll:first-child > .ui-toprule {
+    border-top-width: 0;
+  }
   main:has([data-flush-footer]) ~ footer {
     margin-top: 0;
   }

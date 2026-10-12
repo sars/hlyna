@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Block, HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { Chip } from '@/components/ui/Chip'
 import { ChipGroup } from '@/components/ui/ChipGroup'
 import { DataTable } from '@/components/ui/DataTable'
@@ -8,6 +9,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { JsonLd } from '@/components/site/JsonLd'
+import { sitePhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import { pluralUk } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
@@ -85,6 +87,8 @@ export default async function PricesPage() {
           { value: fmt(stats.length), label: 'категорій цін' },
           { value: fmt(cities.length), label: 'міст з ціною майстер-класу' },
         ]}
+        actions={<HeroRequest path="/tsiny-2026" />}
+        photo={sitePhotos.market}
       />
       <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
         <Block id="table" kicker="Зведена таблиця" title="Скільки коштує" note={<>«Здебільшого» — від 10-го до 90-го перцентиля цін студій; медіана — середина вибірки. Кожна студія рахується один раз.</>}>
@@ -95,7 +99,7 @@ export default async function PricesPage() {
               <div key={key} className="grid gap-2">
                 <h3 className="m-0 font-display text-[17px] leading-[1.15] font-semibold">{title}</h3>
                 <DataTable
-                  mode="scroll"
+                  mode="stack"
                   columns={[{ key: 'what', label: 'Що', width: '44%' }, { key: 'median', label: 'Медіана', numeric: true, width: '18%' }, { key: 'range', label: 'Здебільшого', numeric: true, width: '24%' }, { key: 'n', label: 'Студій', numeric: true, align: 'end', width: '14%' }]}
                   rows={rows.map((s) => ({
                     what: (
@@ -116,11 +120,13 @@ export default async function PricesPage() {
           })}
         </Block>
 
+        <RequestBand path="/tsiny-2026" tone="cobalt" />
+
         {cities.length > 0 && (
           <section id="maister-klasy" aria-labelledby="cities">
             <Block id="cities" kicker="За містами" title="Разовий майстер-клас за містами" note={<>Медіана ціни з особи в містах, де ціну публікують щонайменше три студії.</>}>
               <DataTable
-                mode="scroll"
+                mode="stack"
                 columns={[{ key: 'city', label: 'Місто', width: '44%' }, { key: 'median', label: 'Медіана', numeric: true, width: '18%' }, { key: 'range', label: 'Від–до', numeric: true, width: '24%' }, { key: 'n', label: 'Студій', numeric: true, align: 'end', width: '14%' }]}
                 rows={cities.map((x) => ({
                   city: <Link href={`/maister-klasy/${x.slug}`}>{x.name}</Link>,
@@ -177,7 +183,9 @@ export default async function PricesPage() {
             </Chip>
           ))}
         </ChipGroup>
+        <RequestBand path="/tsiny-2026" tone="ink" />
       </div>
+      <MobileRequestBar />
     </InnerMain>
   )
 }

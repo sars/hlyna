@@ -1,10 +1,11 @@
 import type { Metadata } from 'next'
-import { InnerHero, InnerMain } from '@/components/site/Inner'
+import { Block, HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { CityHead } from '@/components/ui/CityHead'
-import Link from 'next/link'
+import { CityStudioLinks, SmallCities } from '@/components/ui/CityList'
 import React from 'react'
 
-import { getAllStudios, groupByCity, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
@@ -19,6 +20,8 @@ export default async function MakersIndex() {
   const studios = await getAllStudios()
   const groups = groupByCity(studios)
   const classes = studios.filter(offersMasterClasses).length
+  const big = groups.filter((g) => g.studios.length >= MIN_LIST)
+  const small = groups.filter((g) => g.studios.length < MIN_LIST)
   return (
     <InnerMain>
       <InnerHero
@@ -35,23 +38,28 @@ export default async function MakersIndex() {
           { value: fmt(groups.length), label: 'міст і сіл' },
           { value: fmt(classes), label: 'місць з майстер-класами' },
         ]}
+        chips={big.slice(0, 16).map((g) => ({ label: g.city.name, href: `#c-${g.city.slug}`, count: g.studios.length }))}
+        moreChip={small.length > 0 ? { label: 'Усі міста й села', href: '#more' } : undefined}
+        actions={<HeroRequest path="/vyrobnyky" />}
       />
       <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
-        {groups.map((g) => (
-          <section key={g.city.slug} aria-labelledby={`c-${g.city.slug}`}>
-            <CityHead id={`c-${g.city.slug}`} name={g.city.name} count={g.studios.length} level={2} />
-            <ul className="m-0 mt-2 grid list-none grid-cols-1 gap-x-6 gap-y-1.5 p-0 sm:grid-cols-2 lg:grid-cols-3">
-              {g.studios.map((s) => (
-                <li key={s.id} className="border-b border-rule py-1.5 text-[15px] leading-[1.35]">
-                  <Link href={`/vyrobnyky/${s.slug}`} className="text-ink no-underline hover:text-cobalt">
-                    {s.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </section>
+        {big.map((g, i) => (
+          <React.Fragment key={g.city.slug}>
+            <section aria-labelledby={`c-${g.city.slug}`}>
+              <CityHead id={`c-${g.city.slug}`} name={g.city.name} count={g.studios.length} level={2} />
+              <CityStudioLinks studios={g.studios.map((s) => ({ id: s.id, name: s.name, href: `/vyrobnyky/${s.slug}` }))} />
+            </section>
+            {i === 3 && <RequestBand path="/vyrobnyky" tone="cobalt" />}
+          </React.Fragment>
         ))}
+        {small.length > 0 && (
+          <Block id="more" title="Ще міста і села">
+            <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: s.name, href: `/vyrobnyky/${s.slug}` })) }))} />
+          </Block>
+        )}
+        <RequestBand path="/vyrobnyky" tone="ink" />
       </div>
+      <MobileRequestBar />
     </InnerMain>
   )
 }

@@ -63,6 +63,8 @@ export function WavePage({
   children,
   related = [],
   cityLinks = [],
+  chipsLabel,
+  strip,
   photo,
 }: {
   copy: WaveCopy
@@ -76,6 +78,8 @@ export function WavePage({
   children: React.ReactNode
   related?: { label: string; href: string }[]
   cityLinks?: { label: string; href: string; count?: number }[]
+  chipsLabel?: string
+  strip?: { value: string; label: string }[]
   photo?: HeroPhoto
 }) {
   const [first, ...rest] = copy.sections
@@ -98,6 +102,8 @@ export function WavePage({
           </p>
         }
         chips={cityLinks}
+        chipsLabel={chipsLabel}
+        strip={strip}
         photo={photo}
         actions={
           <Button href="#zapyt-forma" variant="cobalt" arrow>
@@ -147,7 +153,7 @@ export function WavePage({
 
         {copy.sources.length > 0 && (
           <details className="font-mono text-xs text-ink-2">
-            <summary className="cursor-pointer">Джерела</summary>
+            <summary className="cursor-pointer py-3">Джерела</summary>
             <ul className="mt-2 mb-0 grid list-none gap-1 p-0">
               {copy.sources.map((s) => (
                 <li key={s} className="break-all">

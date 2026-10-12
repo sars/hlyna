@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Block, HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { CityList, SmallCities } from '@/components/ui/CityList'
 import React from 'react'
 
@@ -37,6 +38,7 @@ export default async function CitiesIndex() {
             У каталозі — {fmt(total)} {pluralUk(total, ['студія, бренд чи майстер', 'студії, бренди й майстри', 'студій, брендів і майстрів'])} у {fmt(all.length)} {pluralUk(all.length, ['місті й селі', 'містах і селах', 'містах і селах'])} України. Найбільше — у Києві й Львові; окремі осередки кераміки — Косів, Опішне, Ужгород.
           </p>
         }
+        actions={<HeroRequest path="/vyrobnyky/misto" />}
       />
       <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
         <Block id="cities" title="Міста">
@@ -47,12 +49,15 @@ export default async function CitiesIndex() {
             })}
           />
         </Block>
+        <RequestBand path="/vyrobnyky/misto" tone="cobalt" />
         {small.length > 0 && (
           <Block id="more" title="Ще міста і села">
             <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: cleanName(s.name), href: `/vyrobnyky/${s.slug}` })) }))} />
           </Block>
         )}
+        <RequestBand path="/vyrobnyky/misto" tone="ink" />
       </div>
+      <MobileRequestBar />
     </InnerMain>
   )
 }

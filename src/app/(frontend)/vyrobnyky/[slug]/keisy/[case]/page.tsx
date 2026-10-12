@@ -1,7 +1,9 @@
 import type { Metadata } from 'next'
 import { Block, InnerCols, InnerMain, Related } from '@/components/site/Inner'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
+import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
+import { CtaBand } from '@/components/ui/CtaBand'
 import { Facts } from '@/components/ui/Facts'
 import { Kicker } from '@/components/ui/Kicker'
 import { NumberedList } from '@/components/ui/NumberedList'
@@ -94,10 +96,15 @@ export default async function CasePage({ params }: { params: Params }) {
           <Link href={`/zapyt?vid=keys&slug=${encodeURIComponent(`${c.studio.slug}/keisy/${caseShort(c)}`)}`}>Попросити зняти або виправити</Link>
         </p>
         <p className="m-0 max-w-read text-lead">{c.lead}</p>
+        <div className="flex flex-wrap gap-2.5">
+          <Button href="#zapyt-forma" variant="cobalt" arrow>
+            Отримати пропозиції
+          </Button>
+        </div>
         <Updated />
       </div>
 
-      <InnerCols aside={<RequestForm sourcePage={casePath(c)} defaultWhat={what} />}>
+      <InnerCols aside={<RequestForm sourcePage={casePath(c)} defaultWhat={what} studioName={studioName} />}>
         <Block id="facts" title="Що відомо">
           <Facts
             rows={[
@@ -121,6 +128,7 @@ export default async function CasePage({ params }: { params: Params }) {
             ]}
           />
         </Block>
+        <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
 
         {c.sections.map((sec, i) => (
           <Block key={sec.heading} id={`s${i}`} title={sec.heading}>
@@ -163,6 +171,7 @@ export default async function CasePage({ params }: { params: Params }) {
         </Block>
 
         <Related items={[...(studio ? [{ label: `Профіль: ${studioName}`, href: `/vyrobnyky/${studio.slug}` }] : []), ...related.map((t) => ({ label: RELATED_LABEL[t], href: t }))]} />
+        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
       </InnerCols>
       <MobileRequestBar />
     </InnerMain>

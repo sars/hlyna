@@ -58,7 +58,7 @@ export function PlaceStory({ c, known, title, id = 'scene' }: { c: PlaceContent;
         ))}
         {more.length > 0 && (
           <details className="group grid">
-            <MoreLink as="summary" pad={false} className="justify-self-start py-1 text-cobalt group-open:hidden">
+            <MoreLink as="summary" className="justify-self-start text-cobalt group-open:hidden">
               Читати далі
             </MoreLink>
             <div className="grid gap-3">
@@ -120,7 +120,7 @@ export function PlaceSources({ c }: { c: PlaceContent }) {
   if (!c.sources.length) return null
   return (
     <details className="font-mono text-xs text-ink-2">
-      <summary className="cursor-pointer">Джерела ({c.sources.length})</summary>
+      <summary className="cursor-pointer py-3">Джерела ({c.sources.length})</summary>
       <ul className="mt-2 mb-0 grid list-none gap-1 p-0">
         {c.sources.map((u) => (
           <li key={u} className="break-all">

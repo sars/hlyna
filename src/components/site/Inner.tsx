@@ -2,6 +2,8 @@ import Image from 'next/image'
 import React from 'react'
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
+import { Button } from '@/components/ui/Button'
+import { CtaBand } from '@/components/ui/CtaBand'
 import { Chip } from '@/components/ui/Chip'
 import { ChipGroup } from '@/components/ui/ChipGroup'
 import { FactStrip } from '@/components/ui/FactStrip'
@@ -11,12 +13,31 @@ import { cx, wrap } from '@/components/ui/layout'
 import { SectionHead } from '@/components/ui/SectionHead'
 import { Updated } from '@/components/ui/Updated'
 import { nobreak } from '@/components/ui/NoBreak'
+import { requestHrefFor } from '@/content/navigation'
 import type { DocPhoto, SitePhoto } from '@/content/photos'
 
 // Shared skeleton of the inner pages (SYSTEM.md §4.2, §5): TopicPage, WavePage, GuidePage and the wave routes all
 // compose these. Room for the phone request bar is left at the end of the footer (see globals.css), not in <main>.
 export function InnerMain({ children }: { bar?: boolean; children: React.ReactNode }) {
-  return <main className={cx(wrap, 'grid w-full')}>{children}</main>
+  return <main className={cx(wrap, 'grid w-full grid-cols-[minmax(0,1fr)]')}>{children}</main>
+}
+
+// The request, as the AGENTS.md rule asks: in the hero (`HeroRequest`), after the first answer (`RequestBand cobalt`) and at the end
+// (`RequestBand ink`). For pages without their own form: it opens /zapyt with the page's kind of request and city.
+export function HeroRequest({ path }: { path: string }) {
+  return (
+    <Button href={requestHrefFor(path)} variant="cobalt" arrow>
+      Отримати пропозиції
+    </Button>
+  )
+}
+export function RequestBand({ path, tone }: { path: string; tone: 'cobalt' | 'ink' }) {
+  const cta = { label: 'Отримати пропозиції', href: requestHrefFor(path) }
+  return tone === 'cobalt' ? (
+    <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={cta} />
+  ) : (
+    <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={cta} />
+  )
 }
 
 // Numbers in a lead (counts, prices, terms) in semibold, ranges kept on one line; the text itself is unchanged.
@@ -71,6 +92,7 @@ export function InnerHero({
   lead,
   strip,
   chips,
+  chipsLabel = 'У містах:',
   moreChip,
   actions,
   photo,
@@ -82,6 +104,7 @@ export function InnerHero({
   lead: React.ReactNode
   strip?: { value: string; label: string }[]
   chips?: { label: string; href: string; count?: number }[]
+  chipsLabel?: string
   moreChip?: { label: string; href: string }
   actions?: React.ReactNode
   photo?: DocPhoto | SitePhoto
@@ -95,7 +118,7 @@ export function InnerHero({
         <div className="grid max-w-read gap-3 text-lead">{lead}</div>
         {strip && strip.length >= 3 && <FactStrip items={strip} />}
         {chips && chips.length > 0 && (
-          <ChipGroup as="nav" label="У містах:" aria-label="У містах">
+          <ChipGroup as="nav" label={chipsLabel} aria-label={chipsLabel.replace(/:$/, '')}>
             {chips.map((l, i) => (
               <Chip key={l.href} href={l.href} count={l.count} className={i >= 8 ? 'max-sm:hidden' : undefined}>
                 {l.label}

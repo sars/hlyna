@@ -20,7 +20,7 @@ import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
 import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { cityStats, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
-import { cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
+import { aboutCity, cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
 import { localPrices } from '@/lib/priceIndex'
 import { certificateCities } from '@/editorial/topics'
@@ -123,6 +123,7 @@ export default async function CityMakersPage({ params }: Args) {
           </>
         }
         strip={st.classes && st.venues ? [{ value: fmt(studios.length), label: pluralUk(studios.length, ['профіль', 'профілі', 'профілів']) }, { value: fmt(st.classes), label: pluralUk(st.classes, ['місце', 'місця', 'місць']) + ' з майстер-класами' }, { value: fmt(st.venues), label: 'працюють із закладами' }] : undefined}
+        chipsLabel={`Ще про ${aboutCity(city.name)}:`}
         chips={[...(mkPage ? [{ label: `Майстер-класи: ${city.name} →`, href: `/maister-klasy/${city.slug}` }] : []), ...(certPage ? [{ label: `Сертифікати: ${city.name} →`, href: `/sertyfikaty/${city.slug}` }] : []), { label: 'Показати на мапі →', href: `/mapa?misto=${city.slug}` }]}
         actions={
           <Button href="#zapyt-forma" variant="cobalt" arrow>
@@ -137,7 +138,7 @@ export default async function CityMakersPage({ params }: Args) {
         {prices.length > 0 && (
           <Block id="prices" kicker="Ціни" title={`Ціни ${where}`} note={<>З прайсів студій цього міста: одна ціна на студію, від найнижчої до найвищої. Порівняння з усією Україною — на сторінці <Link href="/tsiny-2026">«Ціни 2026»</Link>.</>}>
             <DataTable
-              columns={[{ key: 'what', label: 'Що' }, { key: 'text', label: 'Ціни', numeric: true }, { key: 'median', label: 'Медіана', numeric: true }, { key: 'n', label: 'Студій', numeric: true }]}
+              columns={[{ key: 'what', label: 'Що' }, { key: 'text', label: 'Ціни', numeric: true }, { key: 'median', label: 'Медіана', numeric: true, align: 'end' }, { key: 'n', label: 'Студій', numeric: true, align: 'end' }]}
               rows={prices.map((p) => ({
                 what: (
                   <>

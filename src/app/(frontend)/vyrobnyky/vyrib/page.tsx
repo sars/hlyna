@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Block, HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { IndexCell, StudioCells } from '@/components/ui/StudioCell'
 import { ChipGroup } from '@/components/ui/ChipGroup'
 import { Chip } from '@/components/ui/Chip'
@@ -36,6 +37,7 @@ export default async function ProductsIndex() {
             Що роблять українські майстри і студії кераміки — від тарілок і чашок до світильників і плитки. Біля кожного виробу — скільки майстрів його роблять і за скільки він найчастіше продається в їхніх прайсах.
           </p>
         }
+        actions={<HeroRequest path="/vyrobnyky/vyrib" />}
       />
       <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
         <Block id="list" title="Вироби">
@@ -51,7 +53,7 @@ export default async function ProductsIndex() {
                     {fmt(d.ctx.n)} {pluralUk(d.ctx.n, ['майстер чи студія', 'майстри й студії', 'майстрів і студій'])} у {fmt(d.ctx.cities)} {pluralUk(d.ctx.cities, ['місті', 'містах', 'містах'])}
                     {d.ctx.min && d.ctx.max ? (
                       <span className="mt-1 block font-semibold text-cobalt">
-                        здебільшого {fmt(d.ctx.min)}–{fmt(d.ctx.max)} грн
+                        здебільшого {d.ctx.min === d.ctx.max ? fmt(d.ctx.min) : `${fmt(d.ctx.min)}–${fmt(d.ctx.max)}`} грн
                       </span>
                     ) : null}
                   </>
@@ -60,6 +62,7 @@ export default async function ProductsIndex() {
             ))}
           </StudioCells>
         </Block>
+        <RequestBand path="/vyrobnyky/vyrib" tone="cobalt" />
         <ChipGroup as="nav" label="Також" aria-label="Також">
           {[['Виробники за містами', '/vyrobnyky/misto'], ['Ціни 2026', '/tsiny-2026'], ['Посуд для ресторанів', '/dlya-biznesu/posud-dlya-restoraniv'], ['Корпоративні подарунки', '/dlya-biznesu/korporatyvni-podarunky']].map(([l, h]) => (
             <Chip key={h} href={h}>
@@ -67,7 +70,9 @@ export default async function ProductsIndex() {
             </Chip>
           ))}
         </ChipGroup>
+        <RequestBand path="/vyrobnyky/vyrib" tone="ink" />
       </div>
+      <MobileRequestBar />
     </InnerMain>
   )
 }

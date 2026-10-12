@@ -1,5 +1,7 @@
 import type { Metadata } from 'next'
-import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Block, HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
+import { CityFold, CityStudioLinks } from '@/components/ui/CityList'
 import { FaqItem } from '@/components/ui/Faq'
 import Link from 'next/link'
 import React from 'react'
@@ -49,28 +51,18 @@ export default async function MapPage() {
           { value: fmt(groups.length), label: 'міст і сіл' },
           { value: fmt(precise), label: 'з точною адресою' },
         ]}
+        actions={<HeroRequest path="/mapa" />}
       />
       <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
         <StudioMap filters={MAP_FILTERS} />
+        <RequestBand path="/mapa" tone="cobalt" />
 
         <Block id="list" title="Усі студії за містами" note={<>Той самий перелік без мапи. {all.length > placed.length ? `${fmt(all.length - placed.length)} ще без координат — їх можна знайти в каталозі.` : ''}</>}>
-          <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="ui-toprule border-t-2 border-ink">
             {groups.map((g) => (
-              <details key={g.city.slug} id={`misto-${g.city.slug}`} open={g.studios.length <= 3} className="group">
-                <summary className="cursor-pointer list-none font-display text-[15px] font-semibold">
-                  {g.city.name} <span className="text-sm text-terracotta-text">{g.studios.length}</span>
-                </summary>
-                <ul className="mt-1.5 mb-0 grid list-none gap-1 p-0 text-[15px]">
-                  {g.studios.map((s) => (
-                    <li key={s.id}>
-                      <Link href={`/vyrobnyky/${s.slug}`} className="text-cobalt underline underline-offset-[3px]">
-                        {cleanName(s.name)}
-                      </Link>{' '}
-                      <span className="font-mono text-[11px] tracking-[.04em] text-ink-2 uppercase">{TYPE_LABEL[s.type ?? 'other']}</span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
+              <CityFold key={g.city.slug} id={`misto-${g.city.slug}`} name={g.city.name} count={g.studios.length} open={g.studios.length <= 3}>
+                <CityStudioLinks note studios={g.studios.map((s) => ({ id: s.id, name: cleanName(s.name), href: `/vyrobnyky/${s.slug}`, note: TYPE_LABEL[s.type ?? 'other'] }))} />
+              </CityFold>
             ))}
           </div>
         </Block>
@@ -84,7 +76,9 @@ export default async function MapPage() {
             ))}
           </div>
         </Block>
+        <RequestBand path="/mapa" tone="ink" />
       </div>
+      <MobileRequestBar />
     </InnerMain>
   )
 }
