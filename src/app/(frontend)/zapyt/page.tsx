@@ -40,7 +40,7 @@ export default async function RequestPage({ searchParams }: { searchParams: Sear
   const dash = "before:text-terracotta-text before:content-['—_']"
   const crumb = vid === 'keys' ? 'Виправити або зняти кейс' : studio ? 'Додати або оновити студію' : 'Запит студіям'
   return (
-    <main className={cx(wrap, 'pt-hero pb-section')}>
+    <main className={cx(wrap, 'pt-hero')}>
       <div className="grid max-w-narrow gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: crumb }]} />
         {vid === 'keys' ? (
@@ -54,10 +54,6 @@ export default async function RequestPage({ searchParams }: { searchParams: Sear
             <Kicker>Для студій і майстрів</Kicker>
             <h1 className="m-0 font-display text-h1">Додати або оновити студію</h1>
             <p className="m-0 text-lead">Профіль у каталозі безкоштовний. Напишіть назву, місто, Instagram чи сайт і що додати або виправити: адресу, ціни, формати, умови для бізнесу. Ми перевіримо й оновимо профіль, фото показуємо лише з вашої згоди.</p>
-            <ul className="m-0 grid list-none gap-1.5 p-0">
-              <li className={dash}>Місця в каталозі не продаються: порядок не залежить від оплати.</li>
-              <li className={dash}>{site.model}</li>
-            </ul>
           </>
         ) : (
           <>
@@ -66,20 +62,36 @@ export default async function RequestPage({ searchParams }: { searchParams: Sear
             <p className="m-0 text-lead">
               Опишіть, що потрібно: посуд для закладу, чашки з логотипом, подарунки для команди, корпоратив з ліплення з глини чи майстер-клас. Ми передамо запит студіям, які роблять саме таке, і вони відповідатимуть вам напряму.
             </p>
-            <ul className="m-0 grid list-none gap-1.5 p-0">
-              <li className={dash}>Шукаєте подарунок, майстер-клас для двох чи дитяче свято? Ця форма теж для вас: оберіть «Майстер-клас» або «Інше», вкажіть місто й дату.</li>
-              <li className={dash}>Терміни виготовлення партії — переважно {site.lead.batch}.</li>
-              <li className={dash}>{site.model}</li>
-              <li id="dlya-studiy" className={dash}>
-                Студія чи майстер? <Link href="/zapyt?vid=studiya">Додайте або оновіть профіль</Link> — це безкоштовно.
-              </li>
-            </ul>
           </>
         )}
         <Updated />
         <div className="pt-2">
           <RequestForm sourcePage={studio ? '/zapyt?vid=studiya' : '/zapyt'} forStudio={studio} cityNames={cityNames} />
         </div>
+        {vid !== 'keys' && (
+          <section aria-labelledby="next" className="grid gap-3 pt-4">
+            <h2 id="next" className="m-0 border-b-2 border-ink pb-2 font-display text-[17px] leading-[1.15] font-semibold">
+              Що далі
+            </h2>
+            <ul className="m-0 grid list-none gap-1.5 p-0">
+              {studio ? (
+                <>
+                  <li className={dash}>Місця в каталозі не продаються: порядок не залежить від оплати.</li>
+                  <li className={dash}>{site.model}</li>
+                </>
+              ) : (
+                <>
+                  <li className={dash}>Шукаєте подарунок, майстер-клас для двох чи дитяче свято? Ця форма теж для вас: оберіть «Майстер-клас» або «Інше», вкажіть місто й дату.</li>
+                  <li className={dash}>Терміни виготовлення партії — переважно {site.lead.batch}.</li>
+                  <li className={dash}>{site.model}</li>
+                  <li id="dlya-studiy" className={dash}>
+                    Студія чи майстер? <Link href="/zapyt?vid=studiya">Додайте або оновіть профіль</Link> — це безкоштовно.
+                  </li>
+                </>
+              )}
+            </ul>
+          </section>
+        )}
       </div>
     </main>
   )

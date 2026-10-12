@@ -236,7 +236,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
 
         <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst />
         <Related items={topic.related} />
-        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={{ label: 'Отримати пропозиції', href: request }} />
+        <CtaBand tone="ink" {...(topic.form ? { className: 'max-lg:hidden' } : {})} title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: request }} />
         {place && <PlaceSources c={place} />}
       </InnerCols>
       {topic.form && <MobileRequestBar />}

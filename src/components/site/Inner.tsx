@@ -36,7 +36,7 @@ export function RequestBand({ path, tone }: { path: string; tone: 'cobalt' | 'in
   return tone === 'cobalt' ? (
     <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={cta} />
   ) : (
-    <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={cta} />
+    <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника: ціни встановлюють студії." cta={cta} />
   )
 }
 
@@ -131,7 +131,11 @@ export function InnerHero({
             )}
           </ChipGroup>
         )}
-        {actions && <div className="flex flex-wrap gap-2.5">{actions}</div>}
+        {actions && (
+          <div data-hero-cta="" className="flex flex-wrap gap-2.5">
+            {actions}
+          </div>
+        )}
         <Updated />
       </div>
       {photo && <HeroPhoto photo={photo} priority />}

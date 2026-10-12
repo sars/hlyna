@@ -14,7 +14,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
   if (slug && !studio) notFound()
   if (!studio)
     return (
-      <main className={cx(wrap, 'grid gap-4 pt-hero pb-section')}>
+      <main className={cx(wrap, 'grid gap-4 pt-hero')}>
         <div className="grid max-w-narrow gap-4">
           <Kicker>Кабінет студії</Kicker>
           <h1 className="m-0 font-display text-h1">Керувати профілем студії</h1>
@@ -25,7 +25,7 @@ export default async function ClaimPage({ searchParams }: { searchParams: Promis
       </main>
     )
   return (
-    <main className={cx(wrap, 'grid gap-4 pt-hero pb-section')}>
+    <main className={cx(wrap, 'grid gap-4 pt-hero')}>
       <div className="grid max-w-narrow gap-4">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: studio.name, href: `/vyrobnyky/${studio.slug}` }, { label: 'Керувати профілем' }]} />
         <h1 className="m-0 font-display text-h1">Це ваша студія?</h1>

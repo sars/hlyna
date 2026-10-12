@@ -11,7 +11,7 @@ export default async function Kabinet() {
   if (!owner) redirect('/kabinet/vhid')
   const studios = owner.studios
   return (
-    <main className={cx(wrap, 'grid gap-4 pt-hero pb-section')}>
+    <main className={cx(wrap, 'grid gap-4 pt-hero')}>
       <div className="grid max-w-narrow gap-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div className="grid gap-1.5">

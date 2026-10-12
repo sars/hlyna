@@ -13,7 +13,7 @@ export default async function EditStudio({ params }: { params: Promise<{ slug: s
   if (!found) notFound()
   const { initial } = found
   return (
-    <main className={cx(wrap, 'grid gap-4 pt-hero pb-section')}>
+    <main className={cx(wrap, 'grid gap-4 pt-hero')}>
       <div className="grid max-w-[860px] gap-4">
         <p className="m-0 text-sm">
           <Link href="/kabinet">← Кабінет</Link>

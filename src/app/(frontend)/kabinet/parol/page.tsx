@@ -7,7 +7,7 @@ import { AuthForm } from '@/components/site/KabinetForms.client'
 export default async function SetPassword({ searchParams }: { searchParams: Promise<{ token?: string }> }) {
   const { token } = await searchParams
   return (
-    <main className={cx(wrap, 'grid gap-4 pt-hero pb-section')}>
+    <main className={cx(wrap, 'grid gap-4 pt-hero')}>
       <div className="grid max-w-narrow gap-4">
         <Kicker>Кабінет студії</Kicker>
         <h1 className="m-0 font-display text-h1">Пароль до кабінету студії</h1>

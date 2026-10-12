@@ -116,7 +116,7 @@ export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx
           <FaqRich items={faq.map((f) => ({ q: f.q, a: f.a }))} />
         </Block>
         <Related items={guide.related} />
-        <CtaBand tone="ink" title={guide.form?.studio ? 'Додайте студію — профіль безкоштовний' : 'Опишіть, що потрібно, — студії відповідуть напряму'} text={guide.form?.studio ? 'Студія платить 5% лише з замовлень, що відбулися.' : 'Безкоштовно для замовника. Студії відповідають напряму.'} cta={{ label: guide.form?.studio ? 'Додати студію' : 'Отримати пропозиції', href: request }} />
+        <CtaBand tone="ink" className={guide.form ? 'max-lg:hidden' : undefined} title={guide.form?.studio ? 'Додайте студію — профіль безкоштовний' : 'Опишіть, що потрібно, — студії відповідуть напряму'} text={guide.form?.studio ? 'Студія платить 5% лише з замовлень, що відбулися.' : 'Безкоштовно для замовника: ціни встановлюють студії.'} cta={{ label: guide.form?.studio ? 'Додати студію' : 'Отримати пропозиції', href: request }} />
       </InnerCols>
       {bar && <MobileRequestBar />}
     </InnerMain>

@@ -3,6 +3,7 @@ import React from 'react'
 
 import { hasFormat, igHandle, offersMasterClasses, worksWithVenues, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress, isExhibitingOnly, staleNote, stripPersonal } from '@/lib/present'
+import { groupMoney } from '@/lib/money'
 import { productChips } from '@/lib/products'
 
 import { Chip } from './Chip'
@@ -16,7 +17,7 @@ export function MakerRows({ children }: { children: React.ReactNode }) {
 export function MakerRow({ s, price, chips: chipsProp, typeLabel, showAbout = true }: { s: StudioCard; price?: { value: string; unit?: string }; chips?: { label: string; tone?: 'ink' | 'cobalt' }[]; typeLabel?: string; showAbout?: boolean }) {
   const addr = firstAddress(s.address)
   const stale = staleNote(s)
-  const about = showAbout ? stripPersonal(s.summary ?? '') : ''
+  const about = showAbout ? groupMoney(stripPersonal(s.summary ?? '')) : ''
   const chips = chipsProp ?? [
     
     ...(isExhibitingOnly(s) ? ['виставки'] : []),
@@ -55,7 +56,7 @@ export function MakerRow({ s, price, chips: chipsProp, typeLabel, showAbout = tr
       {price && (
         <span className="ui-price font-display text-[17px] leading-[1.2] font-semibold text-cobalt tabular-nums">
           {price.value}
-          {price.unit && <small className="block font-mono text-[10.5px] font-normal tracking-[.06em] text-ink-2 uppercase">{price.unit}</small>}
+          {price.unit && <small className="block font-mono text-[10.5px] font-normal tracking-[.04em] text-ink-2">{price.unit}</small>}
         </span>
       )}
     </li>
