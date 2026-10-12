@@ -5,7 +5,7 @@ import { BoldFacts, Block, InfoList } from '@/components/site/Inner'
 import { MoreLink } from '@/components/ui/MoreLink'
 import type { PlaceContent } from '@/editorial/places'
 import type { StudioCard } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 
 // Editorial blocks for city and product pages. Studio links are checked against the published catalogue:
 // a slug that isn't published renders as plain text, never as a broken link.
@@ -89,7 +89,7 @@ export function PlacePicks({ c, known, title = 'Куди піти для чог�
               <React.Fragment key={s.id}>
                 {i > 0 && ', '}
                 <Link href={`/vyrobnyky/${s.slug}`} className="text-cobalt underline underline-offset-[3px]">
-                  {cleanName(s.name)}
+                  {displayName(s)}
                 </Link>
               </React.Fragment>
             )),

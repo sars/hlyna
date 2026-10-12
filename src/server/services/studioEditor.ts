@@ -140,6 +140,7 @@ export function toEditForm(s: NonNullable<Awaited<ReturnType<typeof getStudioFor
   const r = s.row
   return {
     name: r.name,
+    shortName: r.shortName,
     slug: r.slug,
     type: r.type,
     status: r.status,
@@ -188,7 +189,7 @@ export function toEditForm(s: NonNullable<Awaited<ReturnType<typeof getStudioFor
 // ---------------------------------------------------------------- save
 
 const ROW_FIELDS = [
-  'name', 'slug', 'type', 'status', 'visibility', 'confidence', 'cityId', 'oblast', 'address', 'geoLat', 'geoLng', 'geoPrecision',
+  'name', 'shortName', 'slug', 'type', 'status', 'visibility', 'confidence', 'cityId', 'oblast', 'address', 'geoLat', 'geoLng', 'geoPrecision',
   'summary', 'publicDescription', 'recentNote', 'descriptionInternal', 'ownerQuoteApproved', 'instagram', 'website', 'facebook',
   'phone', 'email', 'b2bMinOrder', 'b2bLeadTime', 'b2bFoodSafe', 'b2bDishwasherSafe', 'b2bWorksWithHoreca', 'b2bWorksWithCorporate',
   'consentPhotos', 'consentRequests', 'consentNotes', 'alternateNames', 'formats', 'services', 'products', 'salesChannels',
@@ -208,6 +209,7 @@ export function normalizeSnapshot(raw: unknown): StudioSnapshot {
   const texts = (xs: unknown) => (Array.isArray(xs) ? xs.map((x) => (typeof x === 'string' ? x : x?.text ?? x?.url)).filter(Boolean) : [])
   const row = {
     name: v.name ?? null,
+    shortName: v.shortName ?? null,
     slug: v.slug ?? null,
     type: v.type ?? null,
     status: v.status ?? null,

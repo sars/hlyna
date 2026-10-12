@@ -8,7 +8,7 @@ import { CityHead } from '@/components/ui/CityHead'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
-import { cleanName, firstAddress } from '@/lib/present'
+import { displayName, firstAddress } from '@/lib/present'
 import { fillCopy, waveCopy, whereToBuyData } from '@/editorial/wave-a'
 import { sitePhotos } from '@/content/photos'
 import { ogImage } from '@/utilities/ogImage'
@@ -65,7 +65,7 @@ export default async function Page() {
             <CityHead id={`misto-${g.city.slug}`} name={g.city.name} />
             <InfoList
               columns={2}
-              items={g.studios.map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>, lines: [firstAddress(s.address) || null, brandsBySlug.get(s.slug!) || null] }))}
+              items={g.studios.map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{displayName(s)}</Link>, lines: [firstAddress(s.address) || null, brandsBySlug.get(s.slug!) || null] }))}
             />
           </div>
         ))}
@@ -94,7 +94,7 @@ export default async function Page() {
             <MoreLink as="summary">{`Показати ${p.online.length} →`}</MoreLink>
             <InfoList
               columns={2}
-              items={p.online.slice(0, 200).map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>, lines: [s.cityDoc?.name ?? null] }))}
+              items={p.online.slice(0, 200).map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{displayName(s)}</Link>, lines: [s.cityDoc?.name ?? null] }))}
             />
           </details>
         </Block>

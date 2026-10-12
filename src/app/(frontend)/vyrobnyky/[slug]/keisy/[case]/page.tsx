@@ -20,7 +20,7 @@ import { site } from '@/content/site'
 import { CASE_LABEL, CASES, FIRST_PUBLISHED, caseByShort, caseFor, caseFormWhat, casePath, caseShort, dateUk, RELATED_LABEL, studioLdId } from '@/editorial/cases'
 import { redirectOldStudioSlug } from '@/lib/redirects'
 import { getStudioBySlug } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { ogImage } from '@/utilities/ogImage'
 
 export const revalidate = 86400
@@ -50,7 +50,7 @@ export default async function CasePage({ params }: { params: Params }) {
     notFound()
   }
   const studio = c.studio.slug ? await getStudioBySlug(c.studio.slug) : null
-  const studioName = studio ? cleanName(studio.name) : c.studio.name
+  const studioName = studio ? displayName(studio) : c.studio.name
   const handle = c.embeds.length ? (c.embeds[0].match(/instagram\.com\/([^/]+)\/(?:p|reel)\//)?.[1] ?? undefined) : undefined
   const label = CASE_LABEL[c.status] ?? c.status
   const related = (c.related.topics ?? []).filter((t) => RELATED_LABEL[t])

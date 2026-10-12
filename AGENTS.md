@@ -10,6 +10,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 ## Rules for every page
 - **Request first:** «Отримати пропозиції» visible at the top, after the answer and at the end.
 - **LLM-ready:** first 2–3 sentences are plain facts with numbers and a date; then a table; then details; then FAQ. schema.org JSON-LD (`src/components/site/JsonLd.tsx`), clean headings, «Оновлено» date. No thin pages: list pages need ≥3 real entries.
+- **Titles:** key words first, comma-separated, then « · Глина» (layout template); target ≤ 70 characters, brand dropped first (`fitTitle` in `src/lib/title.ts`); hand-written titles ≤ 62. Details and lists go to the description, not the title. Studios show `displayName(s)` (short name, `src/lib/present.ts`); slugs come from the short name. `node scripts/check-links.mjs` warns over 70 and fails over 100 or on shared titles.
 - **Design:** `docs/design/SYSTEM.md` is the single source for tokens, type, components and page templates; new primitives go there and into `/dev/styleguide`; never reintroduce palette 1A.
 - **Honest:** only collected data; never invent studios, prices, cases, reviews. Say the model openly but briefly (`site.model` in `src/content/site.ts`). Don't publish the legal entity.
 - **Flexible wording:** no site-wide «від 30 штук»; minimum order lives in profiles. «Корпоратив з ліплення з глини».

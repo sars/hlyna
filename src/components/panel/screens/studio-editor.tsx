@@ -210,6 +210,9 @@ export function StudioEditor({
           <FormField id="name" label={t('editor.name')} error={err('name')}>
             <Input id="name" value={form.name} onChange={(e) => set('name', e.target.value)} className="h-9" aria-invalid={Boolean(err('name'))} />
           </FormField>
+          <FormField id="shortName" label={t('editor.shortName')} hint={t('editor.shortNameHint')} error={err('shortName')}>
+            <Input id="shortName" value={form.shortName ?? ''} onChange={(e) => set('shortName', e.target.value || null)} maxLength={40} className="h-9" aria-invalid={Boolean(err('shortName'))} />
+          </FormField>
           <FormField id="slug" label={t('editor.slug')} hint={t('editor.slugHint')} error={err('slug')}>
             <Input id="slug" value={form.slug} onChange={(e) => set('slug', e.target.value.trim().toLowerCase())} className="h-9 font-mono" aria-invalid={Boolean(err('slug'))} />
           </FormField>

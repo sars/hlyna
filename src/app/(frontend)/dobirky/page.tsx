@@ -8,7 +8,7 @@ import { liveWaveBPages } from '@/editorial/wave-b'
 import { ogImage } from '@/utilities/ogImage'
 
 export const metadata: Metadata = {
-  title: 'Добірки української кераміки: сучасні керамісти, Косів і Опішне',
+  title: 'Добірки української кераміки: керамісти, Косів, Опішне',
   description: 'Редакційні добірки за відкритими даними: сучасні українські бренди й автори кераміки, гончарні осередки Косова й Опішного сьогодні.',
   alternates: { canonical: '/dobirky' },
   openGraph: { images: ogImage({ title: 'Добірки української кераміки', kicker: 'Добірки' }) },

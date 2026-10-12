@@ -7,7 +7,7 @@ import { Block, InfoList } from '@/components/site/Inner'
 import { CityHead } from '@/components/ui/CityHead'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
-import { cleanName, firstAddress } from '@/lib/present'
+import { displayName, firstAddress } from '@/lib/present'
 import { fillCopy, liveFormatCityPages, partyData, partyLines, waveCopy } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
 
@@ -65,7 +65,7 @@ export default async function Page() {
               items={g.studios.map((s) => {
                 const l = partyLines(s)
                 const line = l.prices[0]?.text ?? l.services[0]
-                return { title: <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>, lines: [line || null, firstAddress(s.address) || null] }
+                return { title: <Link href={`/vyrobnyky/${s.slug}`}>{displayName(s)}</Link>, lines: [line || null, firstAddress(s.address) || null] }
               })}
             />
           </div>

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { TYPE_LABEL, type StudioCard } from '@/lib/catalog'
 import { groupMoney } from '@/lib/money'
-import { cleanName, staleNote, stripPersonal } from '@/lib/present'
+import { displayName, staleNote, stripPersonal } from '@/lib/present'
 
 export function StudioRows({ children }: { children: React.ReactNode }) {
   return <ul className="ui-rows">{children}</ul>
@@ -21,7 +21,7 @@ export function StudioRow({ s, line, showCity }: { s: StudioCard; line?: string;
           {type}
           {showCity && s.cityDoc ? ` · ${s.cityDoc.name}` : ''}
         </span>
-        <span className="ui-name font-display text-[15.5px] leading-[1.2] font-semibold">{cleanName(s.name)}</span>
+        <span className="ui-name font-display text-[15.5px] leading-[1.2] font-semibold">{displayName(s)}</span>
         {text && <span className="ui-line line-clamp-2 text-sm leading-normal text-ink-2 [overflow-wrap:anywhere]">{text}</span>}
         {stale && <span className="ui-stale font-mono text-[11.5px] text-terracotta-text">{stale}</span>}
         <span aria-hidden className="ui-go font-mono text-sm text-cobalt">→</span>

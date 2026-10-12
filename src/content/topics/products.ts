@@ -37,7 +37,7 @@ function productTopic(p: ProductCfg): Topic {
     kicker: 'Українська кераміка ручної роботи',
     h1: p.h1,
     ogSub: 'Де купити, як замовити, на що зважати',
-    metaTitle: (c) => `${p.crumb} ручної роботи: ${makers(c.n)} в Україні${c.min ? ', ціни 2026' : ''}`,
+    metaTitle: (c) => `${p.crumb} ручної роботи: ${makers(c.n)}${c.min ? ', ціни 2026' : ''}`,
     metaDescription: (c) => `${p.crumb} з кераміки від українських майстрів: ${makers(c.n)} ${where(c)}${priceRange(c) ? `, ціни здебільшого ${priceRange(c)}` : ''}. Де купити, як замовити, на що зважати.`,
     lead: (c) => `У каталозі — ${makers(c.n)} ${where(c)}, які роблять ${p.what}.${priceRange(c) ? ` У прайсах майстрів такий виріб коштує здебільшого ${priceRange(c)}.` : ''} Купують зазвичай напряму: через Instagram, власний сайт чи Etsy майстра; посилання — у профілях.`,
     verse: p.verse ?? [],

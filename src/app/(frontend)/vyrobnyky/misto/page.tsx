@@ -7,7 +7,7 @@ import React from 'react'
 import { JsonLd } from '@/components/site/JsonLd'
 import { site } from '@/content/site'
 import { getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { cityStats, makerCities } from '@/lib/makers'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
@@ -15,7 +15,7 @@ import { fmt } from '@/lib/money'
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Кераміка ручної роботи за містами України: студії, бренди, майстри',
+  title: 'Кераміка ручної роботи за містами України: студії й майстри',
   description: 'Українські керамічні студії, бренди й майстри за містами: Київ, Львів, Одеса, Харків, Дніпро, Косів, Опішне та інші. Скільки їх у кожному місті, хто проводить майстер-класи й працює із закладами.',
   alternates: { canonical: '/vyrobnyky/misto' },
   openGraph: { images: ogImage({ title: 'Кераміка ручної роботи за містами', kicker: 'Виробники', sub: 'Студії, бренди й майстри по всій Україні' }) },
@@ -52,7 +52,7 @@ export default async function CitiesIndex() {
         <RequestBand path="/vyrobnyky/misto" tone="cobalt" />
         {small.length > 0 && (
           <Block id="more" title="Ще міста і села">
-            <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: cleanName(s.name), href: `/vyrobnyky/${s.slug}` })) }))} />
+            <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: displayName(s), href: `/vyrobnyky/${s.slug}` })) }))} />
           </Block>
         )}
         <RequestBand path="/vyrobnyky/misto" tone="ink" />

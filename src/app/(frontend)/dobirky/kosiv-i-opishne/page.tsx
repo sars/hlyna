@@ -10,14 +10,14 @@ import { ldItemList } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
 import { Faq } from '@/components/site/SelectionFaq'
 import { pluralUk } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { kosivOpishne } from '@/editorial/contemporary'
 import { ogImage } from '@/utilities/ogImage'
 
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Косів і Опішне сьогодні: сучасні майстри, студії й де купити кераміку',
+  title: 'Косів і Опішне сьогодні: майстри, студії, де купити',
   description: 'Хто працює з глиною в Косові й Опішному зараз: майстри, родинні майстерні, бренди, студії з майстер-класами, крамниці, музеї й школи. З посиланнями на профілі.',
   alternates: { canonical: '/dobirky/kosiv-i-opishne' },
   openGraph: { images: ogImage({ title: 'Косів і Опішне сьогодні', kicker: 'Добірка' }) },
@@ -66,7 +66,7 @@ export default async function KosivOpishne() {
                   {p.places.map((s) => (
                     <li key={s.id} className="before:text-terracotta-text before:content-['—_']">
                       <Link href={`/vyrobnyky/${s.slug}`} className="text-ink underline underline-offset-[3px] hover:text-cobalt">
-                        {cleanName(s.name)}
+                        {displayName(s)}
                       </Link>
                     </li>
                   ))}

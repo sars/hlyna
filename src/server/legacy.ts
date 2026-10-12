@@ -30,6 +30,7 @@ export function toLegacyStudio(s: StudioRow, prices: PriceRow[], photoIds: numbe
   return {
     id: s.id,
     name: s.name,
+    shortName: s.shortName,
     alternateNames: texts(s.alternateNames),
     type: s.type,
     city: s.cityId,

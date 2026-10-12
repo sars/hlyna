@@ -1,0 +1,1 @@
+ALTER TABLE "app"."studios" ADD COLUMN "short_name" text;

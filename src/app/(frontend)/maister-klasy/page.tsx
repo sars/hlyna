@@ -15,7 +15,7 @@ import { fmt } from '@/lib/money'
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Майстер-класи з кераміки в Україні: студії за містами і ціни 2026',
+  title: 'Майстер-класи з кераміки в Україні: міста і ціни 2026',
   description: `Де спробувати гончарство і ліплення з глини: студії по всій Україні, ціни, сертифікати, формати для двох, для дітей і для команди.`,
   alternates: { canonical: '/maister-klasy' },
 }

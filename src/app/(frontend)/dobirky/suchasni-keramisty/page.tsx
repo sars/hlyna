@@ -18,7 +18,7 @@ import { ogImage } from '@/utilities/ogImage'
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Сучасні українські керамісти 2026: бренди, авторки й автори, студії',
+  title: 'Сучасні українські керамісти 2026: бренди й студії',
   description: 'Добірка сучасної української кераміки за відкритими даними: бренди посуду й декору, авторська скульптура, прикраси, студії з власними колекціями. З містами й посиланнями на профілі.',
   alternates: { canonical: '/dobirky/suchasni-keramisty' },
   openGraph: { images: ogImage({ title: 'Сучасні українські керамісти', kicker: 'Добірка', img: 'stock-glazed-bottles' }) },

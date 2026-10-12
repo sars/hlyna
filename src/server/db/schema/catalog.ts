@@ -57,6 +57,8 @@ export const studios = app.table(
     id: serial('id').primaryKey(),
     slug: text('slug').notNull(),
     name: text('name').notNull(),
+    // How people call the studio, for titles, slugs, cards and the H1 (≤ 40 chars); null when `name` already is.
+    shortName: text('short_name'),
     type: studioType('type'),
     status: studioStatus('status'),
     visibility: studioVisibility('visibility').notNull().default('hidden'),

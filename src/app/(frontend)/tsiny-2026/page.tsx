@@ -12,7 +12,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { sitePhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import { pluralUk } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { priceIndex, type CategoryStats } from '@/lib/priceIndex'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
@@ -27,7 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const { stats } = await priceIndex()
   const g = stats.find((s) => s.cat.key === 'group')
   return {
-    title: 'Ціни на кераміку ручної роботи і майстер-класи в Україні — 2026',
+    title: 'Ціни на кераміку ручної роботи і майстер-класи 2026',
     description: `Скільки коштують майстер-класи з кераміки, сертифікати, корпоративи, чашки й тарілки ручної роботи в Україні в 2026 році${g ? `: майстер-клас — здебільшого ${span(g)} з особи` : ''}. Медіани й діапазони за прайсами студій, за містами.`,
     alternates: { canonical: '/tsiny-2026' },
     openGraph: { images: ogImage({ title: 'Ціни на кераміку і майстер-класи 2026', kicker: 'Індекс цін', sub: 'Медіани й діапазони за прайсами студій, за містами' }) },
@@ -150,7 +150,7 @@ export default async function PricesPage() {
                   {s.examples.map((e) => (
                     <li key={e.studio.id + e.text} className="border-b border-rule py-2">
                       <Link href={`/vyrobnyky/${e.studio.slug}`} className="text-cobalt underline underline-offset-[3px]">
-                        {cleanName(e.studio.name)}
+                        {displayName(e.studio)}
                       </Link>
                       {e.studio.cityDoc && <span className="text-ink-2"> · {e.studio.cityDoc.name}</span>}: {e.text}
                       {e.source && <span className="font-mono text-[11.5px] text-ink-2"> ({e.source})</span>}

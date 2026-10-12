@@ -8,7 +8,7 @@ import { CityHead } from '@/components/ui/CityHead'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { fillCopy, giftsData, waveCopy, type GiftItem } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
 
@@ -40,7 +40,7 @@ function Items({ items }: { items: GiftItem[] }) {
   const rows = (list: GiftItem[]) => (
     <InfoList
       items={list.map((it) => ({
-        title: <Link href={`/vyrobnyky/${it.studio.slug}`}>{cleanName(it.studio.name)}</Link>,
+        title: <Link href={`/vyrobnyky/${it.studio.slug}`}>{displayName(it.studio)}</Link>,
         kicker: it.studio.cityDoc?.name,
         lines: [<span key="t">{it.text}{it.source && <span className="font-mono text-[11.5px]"> ({it.source})</span>}</span>],
       }))}

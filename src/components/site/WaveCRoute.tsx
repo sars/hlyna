@@ -9,7 +9,7 @@ import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { isBuilt } from '@/content/navigation'
 import { getAllStudios, type StudioCard } from '@/lib/catalog'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { fillCopy } from '@/editorial/wave-a'
 import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/editorial/wave-c'
 import { sitePhotos } from '@/content/photos'
@@ -126,7 +126,7 @@ function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: st
 }
 
 const studioLink = (s: StudioCard) => (
-  <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>
+  <Link href={`/vyrobnyky/${s.slug}`}>{displayName(s)}</Link>
 )
 
 function LiveBlock({ d }: { d: WaveCData }) {

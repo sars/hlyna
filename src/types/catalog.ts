@@ -12,6 +12,10 @@ export interface Studio {
   id: number;
   name: string;
   /**
+   * How people call the studio (titles, slugs, cards, H1); null when `name` already is. Use displayName(s).
+   */
+  shortName?: string | null;
+  /**
    * Лише відомі варіанти: латиницею/кирилицею, Instagram, колишні назви. Заповнює scripts/alt-names.ts; не вигадувати.
    */
   alternateNames?:

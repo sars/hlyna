@@ -22,6 +22,13 @@
       "when": 1791721394736,
       "tag": "0002_panel_cities_locative",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791816665007,
+      "tag": "0003_studio_short_name",
+      "breakpoints": true
     }
   ]
 }

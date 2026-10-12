@@ -10,7 +10,7 @@ import { liveWaveBPages } from '@/editorial/wave-b'
 import { ogImage } from '@/utilities/ogImage'
 
 export const metadata: Metadata = {
-  title: 'Гайди про кераміку ручної роботи: замовлення партії, харчова безпечність, майстер-класи',
+  title: 'Гайди про кераміку: замовлення, безпечність, майстер-класи',
   description: 'Практичні гайди: як замовити партію посуду чи подарунків у студії, що спитати про поливу й посудомийку, як дозамовити той самий посуд і як обрати майстер-клас.',
   alternates: { canonical: '/hayidy' },
   openGraph: { images: ogImage({ title: 'Гайди про кераміку ручної роботи', kicker: 'Гайди' }) },

@@ -20,12 +20,13 @@ import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
 import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { cityStats, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
-import { aboutCity, cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
+import { aboutCity, displayName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
 import { localPrices } from '@/lib/priceIndex'
 import { certificateCities } from '@/editorial/topics'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
+import { fitTitle } from '@/lib/title'
 import { redirectOldCitySlug } from '@/lib/redirects'
 
 export const revalidate = 86400
@@ -50,7 +51,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const g = await makerCity((await params).city)
   if (!g) return {}
   return {
-    title: `Кераміка ручної роботи ${inCity(g.city.name)}: ${who(g.studios.length)}`,
+    title: fitTitle([`Кераміка ручної роботи ${inCity(g.city.name)}: ${fmt(g.studios.length)} ${pluralUk(g.studios.length, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])}`]),
     description: (cityContent(g.city.slug as string)?.lead || `Керамічні студії, бренди й майстри ${inCity(g.city.name)}: ${who(g.studios.length)} — посуд, декор, майстер-класи, замовлення для закладів і компаній.`).replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').slice(0, 300),
     alternates: { canonical: `/vyrobnyky/misto/${g.city.slug}` },
     openGraph: { images: ogImage({ title: `Кераміка ручної роботи: ${g.city.name}`, kicker: 'Виробники', sub: 'Студії, бренди й майстри: посуд, декор, майстер-класи, замовлення для закладів і компаній', img: 'og-318-1' }) },
@@ -98,7 +99,7 @@ export default async function CityMakersPage({ params }: Args) {
             position: i + 1,
             item: {
               '@type': s.type === 'maker' ? 'Person' : 'LocalBusiness',
-              name: cleanName(s.name),
+              name: displayName(s),
               url: `${site.url}/vyrobnyky/${s.slug}`,
               ...(s.type === 'maker' ? {} : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(firstAddress(s.address) ? { streetAddress: firstAddress(s.address) } : {}) } }),
             },

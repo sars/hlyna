@@ -7,11 +7,12 @@ import React from 'react'
 
 import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { fmt } from '@/lib/money'
+import { displayName } from '@/lib/present'
 
 export const revalidate = 86400
 
 export const metadata: Metadata = {
-  title: 'Українські керамічні студії, майстри і бренди: каталог за містами',
+  title: 'Українські керамічні студії, майстри і бренди за містами',
   description: 'Каталог українських керамічних студій, майстрів і брендів за містами: що роблять, ціни, де продають, контакти.',
   alternates: { canonical: '/vyrobnyky' },
 }
@@ -47,7 +48,7 @@ export default async function MakersIndex() {
           <React.Fragment key={g.city.slug}>
             <section aria-labelledby={`c-${g.city.slug}`}>
               <CityHead id={`c-${g.city.slug}`} name={g.city.name} count={g.studios.length} level={2} />
-              <CityStudioLinks studios={g.studios.map((s) => ({ id: s.id, name: s.name, href: `/vyrobnyky/${s.slug}` }))} />
+              <CityStudioLinks studios={g.studios.map((s) => ({ id: s.id, name: displayName(s), href: `/vyrobnyky/${s.slug}` }))} />
             </section>
             {i === 3 && <RequestBand path="/vyrobnyky" tone="cobalt" />}
           </React.Fragment>

@@ -14,7 +14,7 @@ import type { WaveCopy } from '@/editorial/wave-a'
 import { latestUpdate } from '@/lib/catalog'
 import type { StudioCard } from '@/lib/catalog'
 import { ldItemList } from '@/lib/ld'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 
 // Wave A page layout: written copy around a live data block. Order: lead → first section → live data
 // (lists, prices) → other sections → picks → FAQ → sources. Studio links in copy are [Name](slug),
@@ -131,7 +131,7 @@ export function WavePage({
                     <React.Fragment key={s.id}>
                       {i > 0 && ', '}
                       <Link href={`/vyrobnyky/${s.slug}`} className="text-cobalt underline underline-offset-[3px]">
-                        {cleanName(s.name)}
+                        {displayName(s)}
                       </Link>
                     </React.Fragment>
                   )),

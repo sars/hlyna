@@ -28,7 +28,7 @@ import { fixPriceRef, mergeFaq, type PlaceContent } from '@/editorial/places'
 import { groupByCity, latestUpdate, MIN_LIST, pluralUk, type StudioCard } from '@/lib/catalog'
 import { ldStudio } from '@/lib/ld'
 import { fmt } from '@/lib/money'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { MobileRequestBar } from './MobileRequestBar.client'
 
 const SHOW = 12
@@ -77,7 +77,7 @@ export function StudioList({ studios, re, byCity, showCity = true }: { studios: 
       {small.length > 0 && (
         <section>
           <CityHead id="misto-small" name={big.length ? 'Ще міста і села' : 'Міста і села'} />
-          <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: cleanName(s.name), href: `/vyrobnyky/${s.slug}` })) }))} />
+          <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: displayName(s), href: `/vyrobnyky/${s.slug}` })) }))} />
         </section>
       )}
     </div>
@@ -214,7 +214,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
               <DataTable
                 caption="Приклади з прайсів студій"
                 columns={[{ key: 'studio', label: 'Студія' }, { key: 'city', label: 'Місто' }, { key: 'price', label: 'З прайсу' }, { key: 'src', label: 'Джерело', mono: true }]}
-                rows={examples.map((e) => ({ studio: <Link href={`/vyrobnyky/${e.studio.slug}`}>{cleanName(e.studio.name)}</Link>, city: e.studio.cityDoc?.name ?? '', price: nobreak(e.text), src: e.source ?? '' }))}
+                rows={examples.map((e) => ({ studio: <Link href={`/vyrobnyky/${e.studio.slug}`}>{displayName(e.studio)}</Link>, city: e.studio.cityDoc?.name ?? '', price: nobreak(e.text), src: e.source ?? '' }))}
               />
               <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: request }} />
             </>

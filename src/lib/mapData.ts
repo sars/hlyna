@@ -1,5 +1,5 @@
 import { getAllStudios, hasFormat, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from './catalog'
-import { cleanName, firstAddress } from './present'
+import { displayName, firstAddress } from './present'
 
 // Studios for /mapa: one GeoJSON point per geocoded studio. Filter flags are precomputed here so the
 // map script stays small. Settlement-precision points sit on the town centre and are grouped there.
@@ -55,7 +55,7 @@ export async function studiosGeoJSON() {
       geometry: { type: 'Point' as const, coordinates: [Math.round(s.geo!.lng! * 1e5) / 1e5, Math.round(s.geo!.lat! * 1e5) / 1e5] },
       properties: {
         slug: s.slug ?? '',
-        name: cleanName(s.name),
+        name: displayName(s),
         type: TYPE_LABEL[s.type ?? 'other'],
         address: s.geo?.precision === 'settlement' ? '' : firstAddress(s.address),
         city: s.cityDoc?.name ?? '',

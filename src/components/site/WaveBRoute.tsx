@@ -12,7 +12,7 @@ import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { StudioCell, StudioCells } from '@/components/ui/StudioCell'
 import { getAllStudios, groupByCity, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress } from '@/lib/present'
+import { displayName, firstAddress } from '@/lib/present'
 import { evidenceLine } from '@/editorial/topics'
 import { fillCopy } from '@/editorial/wave-a'
 import { makerCities } from '@/lib/makers'
@@ -186,7 +186,7 @@ function LiveBlock({ d }: { d: WaveBData }) {
                     {g.studios.slice(0, 40).map((s) => (
                       <li key={s.id} className="text-[15px]">
                         <Link href={`/vyrobnyky/${s.slug}`} className="text-cobalt underline underline-offset-[3px]">
-                          {cleanName(s.name)}
+                          {displayName(s)}
                         </Link>
                         {s.cityDoc && <span className="text-ink-2"> · {s.cityDoc.name}</span>}
                       </li>

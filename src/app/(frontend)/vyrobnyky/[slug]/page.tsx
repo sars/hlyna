@@ -33,7 +33,8 @@ import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
-import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isDomainLike, isExhibitingOnly, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
+import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, fullNameIfDifferent, inCity, isDomainLike, isExhibitingOnly, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
+import { fitTitle, TYPE_PHRASE } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
@@ -78,10 +79,10 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const s = await getStudioBySlug(slug)
   if (!s) return {}
   const city = s.cityDoc?.name
-  const what = TYPE_LABEL[s.type ?? 'other']?.toLowerCase() ?? 'майстерня'
-  const name = cleanName(s.name)
+  const what = TYPE_PHRASE[s.type ?? 'other'] ?? TYPE_PHRASE.other
+  const name = displayName(s)
   return {
-    title: `${name}${city ? ` — ${what}, ${city}` : ''}`,
+    title: fitTitle([[name, what, city].filter(Boolean).join(', '), city && `${name}, ${city}`, name]),
     description: stripPersonal(s.summary || s.publicDescription || s.description || '').slice(0, 160),
     alternates: { canonical: `/vyrobnyky/${s.slug}` },
     openGraph: { images: ogImage({ title: name, kicker: [TYPE_LABEL[s.type ?? 'other'], city].filter(Boolean).join(' · '), sub: cardSummary(s.summary ?? ''), studio: true, makes: productChips(s) }) },
@@ -96,12 +97,14 @@ export default async function StudioPage({ params }: Args) {
     notFound()
   }
 
-  const name = cleanName(s.name)
+  const name = displayName(s)
+  // The full name goes under the H1 and into schema.org alternateName only when it says more than the short one.
+  const fullName = fullNameIfDifferent(s)
   // A bare Instagram handle already shown in «Коротко» is not an alternative name.
   const handle = igHandle(s.instagram).toLowerCase()
-  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name && !isDomainLike(t) && t.replace(/^@/, '').toLowerCase() !== handle)
-  // On the page, skip variants already visible in the heading («Ґроно (Grono)» → only grono.shop is new).
-  const shownAlt = altNames.filter((t) => !name.toLowerCase().includes(t.toLowerCase()))
+  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name && t !== fullName && !isDomainLike(t) && t.replace(/^@/, '').toLowerCase() !== handle)
+  // On the page, skip variants already visible in the heading or the full name («Ґроно (Grono)» → only grono.shop is new).
+  const shownAlt = altNames.filter((t) => ![name, fullName ?? ''].some((n) => n.toLowerCase().includes(t.toLowerCase())))
   const city = s.cityDoc
   const typeLabel = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   const exhibiting = isExhibitingOnly(s)
@@ -173,7 +176,7 @@ export default async function StudioPage({ params }: Args) {
               : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(street ? { streetAddress: street } : {}) } }
             : {}),
           ...(precise && !isPersonMaker(s) && !dormant ? { geo: { '@type': 'GeoCoordinates', latitude: geo!.lat, longitude: geo!.lng } } : {}),
-          ...(altNames.length ? { alternateName: altNames } : {}),
+          ...(fullName || altNames.length ? { alternateName: [...(fullName ? [fullName] : []), ...altNames] } : {}),
           ...(profileUrls(s).length ? { sameAs: profileUrls(s) } : {}),
           ...(priceRange && s.type !== 'maker' && !dormant ? { priceRange } : {}),
           ...(photos.length ? { image: photos.map((p) => `${site.url}${p.url}`) } : {}),
@@ -190,6 +193,7 @@ export default async function StudioPage({ params }: Args) {
           <h1 className={`m-0 font-display text-h1 [overflow-wrap:anywhere] ${name.length > 60 ? 'max-md:text-[24px] max-md:leading-[1.15]' : ''}`} style={{ letterSpacing: 0 }}>
             {name}
           </h1>
+          {fullName && <p className="m-0 text-sm break-words text-ink-2">{fullName}</p>}
           {s.ownerVerified && <p className="m-0 text-sm font-semibold text-ink-2">✓ Профіль підтверджено студією</p>}
           {shownAlt.length > 0 && <p className="m-0 text-sm break-words text-ink-2">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}
           <div className="grid max-w-read gap-3 text-body">

@@ -3,7 +3,7 @@ import React from 'react'
 
 import { TYPE_LABEL, type StudioCard } from '@/lib/catalog'
 import { groupMoney } from '@/lib/money'
-import { cleanName, staleNote, stripPersonal } from '@/lib/present'
+import { displayName, staleNote, stripPersonal } from '@/lib/present'
 
 // The grid that holds StudioCell / IndexCell items: a 2px rule on top, two columns from sm.
 export function StudioCells({ children }: { children: React.ReactNode }) {
@@ -22,7 +22,7 @@ export function StudioCell({ s, showCity = true, line }: { s: StudioCard; showCi
           {type}
           {showCity && s.cityDoc ? ` · ${s.cityDoc.name}` : ''}
         </span>
-        <span className="ui-name font-display text-base leading-[1.2] font-semibold">{cleanName(s.name)}</span>
+        <span className="ui-name font-display text-base leading-[1.2] font-semibold">{displayName(s)}</span>
         {text && <span className="line-clamp-3 text-sm leading-normal text-ink-2 [overflow-wrap:anywhere]">{text}</span>}
         {stale && <span className="font-mono text-[11.5px] text-terracotta-text">{stale}</span>}
         <span className="pt-1 font-mono text-xs tracking-[.06em] text-cobalt uppercase">Профіль →</span>

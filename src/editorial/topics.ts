@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { topics, type Topic, type TopicCtx } from '@/content/topics'
 import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { fitTitle } from '@/lib/title'
 import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, type StudioCard } from '@/lib/catalog'
 import { facts } from '@/lib/facts'
 
@@ -115,7 +116,7 @@ export function evidenceLine(s: StudioCard, re: RegExp): string {
 export function topicMetadata(topic: Topic, data: TopicData, over: { title?: string; path?: string; h1?: string } = {}): Metadata {
   const { ctx } = data
   return {
-    title: over.title ?? topic.metaTitle(ctx),
+    title: fitTitle([over.title ?? topic.metaTitle(ctx)]),
     description: topic.metaDescription(ctx),
     alternates: { canonical: over.path ?? topic.path },
     openGraph: {

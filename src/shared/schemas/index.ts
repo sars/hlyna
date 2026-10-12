@@ -119,6 +119,12 @@ export const OWNER_FIELDS = Object.keys(ownerStudioEdit.shape) as (keyof OwnerSt
 export const priceLine = z.object({ text: z.string().trim().min(1).max(300), source: z.string().trim().max(120).nullish(), dateText: z.string().trim().max(60).nullish() })
 export const studioEdit = z.object({
   name: z.string().trim().min(1, 'Назва обовʼязкова.').max(200),
+  shortName: z
+    .string()
+    .trim()
+    .max(40, 'Коротка назва — до 40 символів.')
+    .nullish()
+    .transform((v) => v || null),
   slug: z
     .string()
     .trim()

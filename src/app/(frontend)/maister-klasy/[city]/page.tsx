@@ -23,13 +23,14 @@ import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
 import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
+import { displayName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { MK_CHIPS as CHIPS } from '@/lib/mkChips'
 import { cityContent } from '@/editorial/places'
 import { certificateCities } from '@/editorial/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/editorial/wave-a'
 import { fmt, roundNice, type Span } from '@/lib/money'
+import { fitTitle } from '@/lib/title'
 import { redirectOldCitySlug } from '@/lib/redirects'
 
 export const revalidate = 86400
@@ -76,7 +77,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const r = scopeSpan(g.studios, 'group')
   const n = g.studios.length
   return {
-    title: `Майстер-класи з кераміки ${inCity(g.city.name)}: ${places(n)} і ціни 2026`,
+    title: fitTitle([`Майстер-класи з кераміки ${inCity(g.city.name)}: ${places(n)} і ціни 2026`, `Майстер-класи з кераміки ${inCity(g.city.name)}: ${places(n)}`]),
     description: `${places(n)} ${inCity(g.city.name)}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття коштує ${priceText(r)}` : ''}. Формати, адреси, сертифікати.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
     openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи', sub: 'Гончарне коло, ліплення і розпис: студії, адреси, формати й сертифікати', img: 'og-318-1' }) },
@@ -144,7 +145,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
             position: i + 1,
             item: {
               '@type': 'LocalBusiness',
-              name: cleanName(s.name),
+              name: displayName(s),
               url: `${site.url}/vyrobnyky/${s.slug}`,
               address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(firstAddress(s.address) ? { streetAddress: firstAddress(s.address) } : {}) },
             },

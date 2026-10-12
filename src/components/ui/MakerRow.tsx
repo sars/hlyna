@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { hasFormat, igHandle, offersMasterClasses, worksWithVenues, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, isExhibitingOnly, staleNote, stripPersonal } from '@/lib/present'
+import { displayName, firstAddress, isExhibitingOnly, staleNote, stripPersonal } from '@/lib/present'
 import { groupMoney } from '@/lib/money'
 import { productChips } from '@/lib/products'
 
@@ -29,7 +29,7 @@ export function MakerRow({ s, price, chips: chipsProp, typeLabel, showAbout = tr
   return (
     <li>
       <Link href={`/vyrobnyky/${s.slug}`} className="font-display text-base leading-[1.2] font-semibold text-ink no-underline after:absolute after:inset-0 after:content-[''] hover:text-cobalt">
-        {cleanName(s.name)}
+        {displayName(s)}
       </Link>
       {(typeLabel || addr || s.instagram) && (
         <span className="font-mono text-xs leading-[1.5] text-ink-2 [overflow-wrap:anywhere]">

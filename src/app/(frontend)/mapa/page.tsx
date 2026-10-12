@@ -11,14 +11,14 @@ import { StudioMap } from '@/components/site/StudioMap.client'
 import { site } from '@/content/site'
 import { groupByCity, pluralUk, TYPE_LABEL } from '@/lib/catalog'
 import { MAP_FILTERS, mapStudios } from '@/lib/mapData'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
 
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Мапа керамічних студій України: майстер-класи, гончарне коло, посуд на замовлення',
+  title: 'Мапа керамічних студій України: майстер-класи і посуд',
   description: 'Інтерактивна мапа українських керамічних студій, брендів і майстрів: де пройти майстер-клас, спробувати гончарне коло, купити сертифікат чи замовити посуд для закладу. Фільтри за форматами.',
   alternates: { canonical: '/mapa' },
   openGraph: { images: ogImage({ title: 'Мапа керамічних студій України', kicker: 'Мапа', sub: 'Майстер-класи, гончарне коло, посуд на замовлення' }) },
@@ -61,7 +61,7 @@ export default async function MapPage() {
           <div className="ui-toprule border-t-2 border-ink">
             {groups.map((g) => (
               <CityFold key={g.city.slug} id={`misto-${g.city.slug}`} name={g.city.name} count={g.studios.length} open={g.studios.length <= 3}>
-                <CityStudioLinks note studios={g.studios.map((s) => ({ id: s.id, name: cleanName(s.name), href: `/vyrobnyky/${s.slug}`, note: TYPE_LABEL[s.type ?? 'other'] }))} />
+                <CityStudioLinks note studios={g.studios.map((s) => ({ id: s.id, name: displayName(s), href: `/vyrobnyky/${s.slug}`, note: TYPE_LABEL[s.type ?? 'other'] }))} />
               </CityFold>
             ))}
           </div>

@@ -13,7 +13,7 @@ import { WavePage } from '@/components/site/WavePage'
 import { MK_CHIPS } from '@/lib/mkChips'
 import { getAllStudios, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/lib/catalog'
 import { fmt, roundNice } from '@/lib/money'
-import { cleanName } from '@/lib/present'
+import { displayName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
 import { redirectOldCitySlug } from '@/lib/redirects'
@@ -117,7 +117,7 @@ export default async function Page({ params }: Args) {
           )}
           <DataTable
             columns={[{ key: 'studio', label: 'Студія' }, { key: 'price', label: 'З прайсу' }, { key: 'src', label: 'Джерело', mono: true }]}
-            rows={p.data.examples.map((e) => ({ studio: <Link href={`/vyrobnyky/${e.studio.slug}`}>{cleanName(e.studio.name)}</Link>, price: nobreak(e.text), src: e.source ?? '' }))}
+            rows={p.data.examples.map((e) => ({ studio: <Link href={`/vyrobnyky/${e.studio.slug}`}>{displayName(e.studio)}</Link>, price: nobreak(e.text), src: e.source ?? '' }))}
           />
         </Block>
       )}

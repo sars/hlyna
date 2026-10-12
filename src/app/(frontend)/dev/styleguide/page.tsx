@@ -46,7 +46,7 @@ import { verses } from '@/content/verses'
 import { getAllStudios, getStudioBySlug, groupByCity, hryvniaAmounts, offersMasterClasses, type StudioCard } from '@/lib/catalog'
 import { facts } from '@/lib/facts'
 import { fmt } from '@/lib/money'
-import { cleanName, firstAddress, inCity, publicPrices } from '@/lib/present'
+import { displayName, firstAddress, inCity, publicPrices } from '@/lib/present'
 import { priceIndex, studioPrice } from '@/lib/priceIndex'
 
 // Living reference of the design system (docs/design/SYSTEM.md §8): real components with real data. Local only.
@@ -105,7 +105,7 @@ export default async function StyleguidePage() {
   const mkStudios = all.filter(offersMasterClasses)
   const byCity = groupByCity(all)
   const cityItems = byCity.slice(0, 8).map((g) => ({ name: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}`, count: g.studios.length }))
-  const small = byCity.filter((g) => g.studios.length < 3).slice(0, 4).map((g) => ({ name: g.city.name, studios: g.studios.slice(0, 3).map((s) => ({ name: cleanName(s.name), href: `/vyrobnyky/${s.slug}` })) }))
+  const small = byCity.filter((g) => g.studios.length < 3).slice(0, 4).map((g) => ({ name: g.city.name, studios: g.studios.slice(0, 3).map((s) => ({ name: displayName(s), href: `/vyrobnyky/${s.slug}` })) }))
   const group = f.get('group')
   const priced = idx.stats.find((x) => x.cat.key === 'group')
   const prices = saga ? publicPrices(saga).slice(0, 4) : []
@@ -243,7 +243,7 @@ export default async function StyleguidePage() {
             <Kicker tone="terracotta">Гайд · кікер терракоти</Kicker>
           </div>
         </div>
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: saga ? cleanName(saga.name) : 'Студія' }]} />
+        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: saga ? displayName(saga) : 'Студія' }]} />
         <Updated />
       </Block>
 
@@ -296,7 +296,7 @@ export default async function StyleguidePage() {
             <DataTable
               caption="Приклади з прайсів: разовий майстер-клас"
               columns={[{ key: 'studio', label: 'Студія' }, { key: 'city', label: 'Місто' }, { key: 'price', label: 'З прайсу' }, { key: 'src', label: 'Джерело', mono: true }]}
-              rows={priced.examples.map((e) => ({ studio: <a href={`/vyrobnyky/${e.studio.slug}`}>{cleanName(e.studio.name)}</a>, city: e.studio.cityDoc?.name ?? '', price: e.text, src: e.source ?? 'сайт студії' }))}
+              rows={priced.examples.map((e) => ({ studio: <a href={`/vyrobnyky/${e.studio.slug}`}>{displayName(e.studio)}</a>, city: e.studio.cityDoc?.name ?? '', price: e.text, src: e.source ?? 'сайт студії' }))}
             />
             <DataTable
               mode="scroll"
