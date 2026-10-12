@@ -2,48 +2,18 @@ import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
-const __filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(__filename)
-
-const NEXT_PUBLIC_SERVER_URL = process.env.VERCEL_PROJECT_PRODUCTION_URL
-  ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-  : process.env.__NEXT_PRIVATE_ORIGIN || 'http://localhost:3000'
+const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const nextConfig: NextConfig = {
   // Self-hosted in Docker (see Dockerfile / deploy/README.md).
   output: 'standalone',
   images: {
-    localPatterns: [
-      {
-        pathname: '/media/**',
-      },
-      {
-        pathname: '/images/**',
-      },
-    ],
+    // Uploaded photos (/media, served by Caddy from the media volume) and the site's own photos (/images).
+    localPatterns: [{ pathname: '/media/**' }, { pathname: '/images/**' }],
     qualities: [75, 100],
     formats: ['image/avif', 'image/webp'],
-    remotePatterns: [
-      ...[NEXT_PUBLIC_SERVER_URL /* 'https://example.com' */].map((item) => {
-        const url = new URL(item)
-
-        return {
-          hostname: url.hostname,
-          protocol: url.protocol.replace(':', '') as 'http' | 'https',
-        }
-      }),
-    ],
   },
-  webpack: (webpackConfig) => {
-    webpackConfig.resolve.extensionAlias = {
-      '.cjs': ['.cts', '.cjs'],
-      '.js': ['.ts', '.tsx', '.js', '.jsx'],
-      '.mjs': ['.mts', '.mjs'],
-    }
-
-    return webpackConfig
-  },
-  // The Payload admin is gone; old bookmarks land on the panel.
+  // The former CMS admin lived at /admin; old bookmarks land on the panel.
   async redirects() {
     return [
       { source: '/admin', destination: '/panel', statusCode: 301 },
@@ -51,9 +21,8 @@ const nextConfig: NextConfig = {
     ]
   },
   reactStrictMode: true,
-  turbopack: {
-    root: path.resolve(dirname),
-  },
+  // Several lockfiles live under ~/Claude; pin the workspace root so Turbopack does not guess.
+  turbopack: { root: path.resolve(dirname) },
 }
 
 export default nextConfig

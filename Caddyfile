@@ -20,7 +20,7 @@ hlyna.com.ua {
 	header Strict-Transport-Security "max-age=31536000; includeSubDomains"
 
 	# Fingerprinted / immutable assets.
-	@immutable path /_next/static/* /fonts/*
+	@immutable path /_next/static/*
 	header @immutable >Cache-Control "public, max-age=31536000, immutable"
 
 	request_body {

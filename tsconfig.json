@@ -25,9 +25,6 @@
       }
     ],
     "paths": {
-      "react": [
-        "./node_modules/@types/react"
-      ],
       "@/*": [
         "./src/*"
       ]
@@ -37,9 +34,7 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "redirects.js",
     "next-env.d.ts",
-    "next.config.js",
     "next-sitemap.config.cjs",
     ".next/dev/types/**/*.ts"
   ],

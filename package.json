@@ -1,18 +1,15 @@
 {
   "name": "hlyna",
   "version": "1.0.0",
+  "private": true,
   "description": "hlyna.com.ua — catalogue of contemporary Ukrainian handmade ceramics",
-  "license": "MIT",
   "type": "module",
   "scripts": {
     "build": "node -e \"require('fs').rmSync('.next/cache/fetch-cache', { recursive: true, force: true })\" && cross-env NODE_OPTIONS=--no-deprecation next build",
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
-    "dev:prod": "cross-env NODE_OPTIONS=--no-deprecation rm -rf .next && pnpm build && pnpm start",
-    "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
-    "reinstall": "cross-env NODE_OPTIONS=--no-deprecation rm -rf node_modules && rm pnpm-lock.yaml && pnpm --ignore-workspace install",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
     "test": "pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
@@ -74,12 +71,5 @@
   "engines": {
     "node": ">=20.18.1",
     "pnpm": "^9 || ^10 || ^11"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "sharp",
-      "esbuild",
-      "unrs-resolver"
-    ]
   }
 }

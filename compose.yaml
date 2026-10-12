@@ -31,8 +31,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    # node fetch, not wget/curl: nothing extra in the image. Switch to
-    # /api/health once that route exists.
+    # node fetch, not wget/curl: nothing extra in the image.
     healthcheck:
       test:
         - CMD
