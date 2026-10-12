@@ -1,5 +1,3 @@
-import { getServerSideSitemap } from 'next-sitemap'
-
 import { guides } from '@/content/guides'
 import { site } from '@/content/site'
 import { topicList } from '@/content/topics'
@@ -13,6 +11,10 @@ export const revalidate = 3600
 
 const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/vyrobnyky/misto', '/vyrobnyky/vyrib', '/dlya-biznesu', '/tsiny-2026', '/hayidy', '/dlya-studiy', '/pro-nas', '/dobirky', '/dobirky/suchasni-keramisty', '/dobirky/kosiv-i-opishne', '/mapa', '/llms.txt']
 
+const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;')
+const urlset = (urls: { loc: string; lastmod: string }[]) =>
+  `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map((u) => `<url><loc>${esc(u.loc)}</loc><lastmod>${u.lastmod}</lastmod></url>`).join('\n')}\n</urlset>\n`
+
 export async function GET() {
   const studios = await getAllStudios()
   // lastmod = when the data behind the page last changed, not the build time: the newest studio update for
@@ -21,7 +23,7 @@ export async function GET() {
   const now = latest(studios)
   const content = site.contentUpdated
   const cities = groupByCity(studios.filter(offersMasterClasses)).filter((g) => g.studios.length >= MIN_LIST)
-  return getServerSideSitemap([
+  const xml = urlset([
     ...HUBS.map((p) => ({ loc: site.url + p, lastmod: now })),
     ...topicList.map((t) => ({ loc: site.url + t.path, lastmod: now })),
     ...guides.map((g) => ({ loc: site.url + g.path, lastmod: content })),
@@ -31,4 +33,5 @@ export async function GET() {
     ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: latest(g.studios) })),
     ...(await getCatalog()).map((s) => ({ loc: `${site.url}/vyrobnyky/${s.slug}`, lastmod: s.updatedAt || content })),
   ])
+  return new Response(xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } })
 }

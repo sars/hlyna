@@ -1,4 +1,3 @@
-// @vitest-environment node
 // Fixes from the 2026-10-12 panel review: the approval link stays reachable, approvals and accepted owner changes
 // refresh the public pages, forwarding to studios forwards the request, the journal speaks in names.
 import { sql } from 'drizzle-orm'

@@ -1,4 +1,3 @@
-// @vitest-environment node
 // Milestone 3 services against a real Postgres (schema `app`): public forms, the owner cabinet (change sets, pending
 // photos), ported import scripts, rate limits. Uses PANEL_TEST_DATABASE_URL (default hlyna_apptest).
 import { mkdtempSync } from 'node:fs'

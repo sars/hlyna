@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { describe, expect, it } from 'vitest'
 
 import { claimCreate, ownerStudioEdit, requestCreate, studioEdit } from '../../src/shared/schemas'

@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 // Kabinet edits: no session → 401; a studio the owner doesn't own → 403 (from the service), before anything is saved.

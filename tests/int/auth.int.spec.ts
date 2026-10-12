@@ -1,4 +1,3 @@
-// @vitest-environment node
 // Better Auth for /panel and /kabinet against a real Postgres (schema `app` from drizzle/).
 // Uses AUTH_TEST_DATABASE_URL, default postgres://localhost/hlyna_apptest; every test starts from empty auth tables.
 import { createHash, randomBytes, scryptSync } from 'node:crypto'

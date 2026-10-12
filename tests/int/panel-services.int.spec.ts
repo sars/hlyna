@@ -1,4 +1,3 @@
-// @vitest-environment node
 // Panel services against a real Postgres (schema `app`): requests, claims, owner change sets, audit log,
 // revisions, and the Telegram button handlers that share them. Uses PANEL_TEST_DATABASE_URL (default hlyna_apptest).
 import { eq, sql } from 'drizzle-orm'

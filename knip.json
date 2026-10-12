@@ -1,0 +1,24 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "scripts/**/*.{mjs,ts}",
+    "tests/**/*.ts",
+    ".claude/hooks/*.mjs",
+    "src/proxy.ts",
+    "src/app/robots.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.{mjs,ts}"
+  ],
+  "ignoreDependencies": [
+    "cross-env",
+    "prettier",
+    "tsx",
+    "@types/pg",
+    "tailwindcss",
+    "tw-animate-css",
+    "jsdom"
+  ],
+  "ignoreExportsUsedInFile": true
+}

@@ -1,4 +1,3 @@
-// @vitest-environment node
 // Panel milestone 2 services against a real Postgres (schema `app`): studio editor (save, version conflict,
 // slug history, revisions and restore), cities (rename keeps the old slug), media (sharp sizes, EXIF gone,
 // delete only when unused), users (invites, roles, deactivate, owner studios, sessions).

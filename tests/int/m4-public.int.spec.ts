@@ -1,4 +1,3 @@
-// @vitest-environment node
 // The public catalogue read from schema `app`: record shape and order the pages expect, hidden fields left out,
 // photos only with consent, old slugs resolved for 301s.
 // Uses PANEL_TEST_DATABASE_URL (default hlyna_apptest).

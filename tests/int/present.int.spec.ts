@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { describe, expect, it } from 'vitest'
 
 import { cleanAddress, cleanPublic, dedupeTexts, firstAddress, inCity, isDomainLike, noteIsFresh, stripPersonal } from '@/lib/present'

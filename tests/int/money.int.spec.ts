@@ -1,4 +1,3 @@
-// @vitest-environment node
 import { describe, expect, it } from 'vitest'
 
 import { amountsIn, fromTo, median, near, priceIn, quantile, range, roundNice, spanOf, typicalRange, wholeAmountsIn } from '@/lib/money'

@@ -1,4 +1,2 @@
-// Any setup scripts you might need go here
-
-// Load .env files
+// Loads .env (DATABASE_URL and friends) before any test module runs.
 import 'dotenv/config'
