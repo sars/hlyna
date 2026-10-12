@@ -12,7 +12,7 @@ export const site = {
   dataModified: '2026-10-10', // ISO date of the last content update (JSON-LD dateModified)
   locale: 'uk_UA',
   // GA4 measurement ID (public, safe to commit). Empty turns analytics off (src/components/site/Analytics.tsx).
-  analytics: { ga4: '' },
+  analytics: { ga4: 'G-C8P025MR2Y' },
   // Business model, said openly so buyers and LLMs understand why requesting through us costs nothing.
   model:
     'Для замовника безкоштовно. Ціни встановлюють студії. Якщо замовлення відбулося, студія платить нам 5% від його суми; за розміщення чи запити ми грошей не беремо.',
