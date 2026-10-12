@@ -2,7 +2,7 @@
 // keeps everything; these functions decide what a visitor (and an LLM) sees.
 import type { City, Studio } from '@/types/catalog'
 
-import { amountsIn } from './money'
+import { amountsIn, groupMoney } from './money'
 
 // ---------- text lists ----------
 
@@ -64,6 +64,7 @@ export function cleanPublic(text?: string | null): string {
     .trim()
 }
 
+
 // ---------- prices ----------
 
 // "… — 1750 грн (сайт, 2026)" → body + source hint. Old (≤2022) and internal lines are dropped.
@@ -102,6 +103,7 @@ export function publicPrices(s: Studio): PriceLine[] {
     // Prices in dollars or euros come from shops abroad (Etsy, own site for export); say so instead of leaving a bare «43 USD».
     if (/(?<!\p{L})(?:usd|eur)(?!\p{L})|\$|€/iu.test(line.text) && !/грн|₴/.test(line.text))
       line.source = [line.source, /etsy/i.test(line.source ?? '') ? 'ціна для покупців за кордоном' : 'ціна в іноземній валюті, для покупців за кордоном'].filter(Boolean).join('; ')
+    line.text = groupMoney(line.text)
     out.push(line)
   }
   return out

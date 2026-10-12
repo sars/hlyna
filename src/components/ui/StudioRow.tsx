@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { TYPE_LABEL, type StudioCard } from '@/lib/catalog'
+import { groupMoney } from '@/lib/money'
 import { cleanName, staleNote, stripPersonal } from '@/lib/present'
 
 export function StudioRows({ children }: { children: React.ReactNode }) {
@@ -11,7 +12,7 @@ export function StudioRows({ children }: { children: React.ReactNode }) {
 // A studio in a topic list: type, name, and the line of evidence for that topic (what the studio itself says).
 export function StudioRow({ s, line, showCity }: { s: StudioCard; line?: string; showCity?: boolean }) {
   const stale = staleNote(s)
-  const text = stripPersonal(line ?? '')
+  const text = groupMoney(stripPersonal(line ?? ''))
   const type = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   return (
     <li>

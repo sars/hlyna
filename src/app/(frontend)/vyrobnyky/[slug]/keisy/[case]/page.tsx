@@ -96,7 +96,7 @@ export default async function CasePage({ params }: { params: Params }) {
           <Link href={`/zapyt?vid=keys&slug=${encodeURIComponent(`${c.studio.slug}/keisy/${caseShort(c)}`)}`}>Попросити зняти або виправити</Link>
         </p>
         <p className="m-0 max-w-read text-lead">{c.lead}</p>
-        <div className="flex flex-wrap gap-2.5">
+        <div data-hero-cta="" className="flex flex-wrap gap-2.5">
           <Button href="#zapyt-forma" variant="cobalt" arrow>
             Отримати пропозиції
           </Button>
@@ -105,7 +105,7 @@ export default async function CasePage({ params }: { params: Params }) {
       </div>
 
       <InnerCols aside={<RequestForm sourcePage={casePath(c)} defaultWhat={what} studioName={studioName} />}>
-        <Block id="facts" title="Що відомо">
+        <Block id="facts" title="Коротко">
           <Facts
             rows={[
               [
@@ -144,7 +144,7 @@ export default async function CasePage({ params }: { params: Params }) {
 
         {c.askStudio.length > 0 && (
           <Block id="ask" kicker="Для схожого замовлення" title="Що спитати в студії">
-            <NumberedList items={c.askStudio.map((q) => ({ title: q }))} />
+            <NumberedList plainTitle items={c.askStudio.map((q) => ({ title: q }))} />
           </Block>
         )}
 
@@ -171,7 +171,7 @@ export default async function CasePage({ params }: { params: Params }) {
         </Block>
 
         <Related items={[...(studio ? [{ label: `Профіль: ${studioName}`, href: `/vyrobnyky/${studio.slug}` }] : []), ...related.map((t) => ({ label: RELATED_LABEL[t], href: t }))]} />
-        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="ink" className="max-lg:hidden" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
       </InnerCols>
       <MobileRequestBar />
     </InnerMain>

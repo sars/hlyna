@@ -34,7 +34,7 @@ import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
 import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress, isDomainLike, isExhibitingOnly, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
-import { amountsIn, typicalRange } from '@/lib/money'
+import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
 import { link } from '@/components/profile/blocks'
@@ -52,6 +52,15 @@ export async function generateStaticParams() {
 }
 
 type Args = { params: Promise<{ slug: string }> }
+
+// «Сайт» row: the host only (the link keeps the full address).
+const siteHost = (u: string) => {
+  try {
+    return new URL(/^https?:\/\//.test(u) ? u : `https://${u}`).hostname.replace(/^www\./, '')
+  } catch {
+    return u.replace(/^https?:\/\//, '').replace(/\/$/, '')
+  }
+}
 
 // Share card: the first sentences of the summary that fit the label (the card clips at 140 characters).
 const cardSummary = (text: string) => {
@@ -111,8 +120,8 @@ export default async function StudioPage({ params }: Args) {
   const b2b = s.b2b ?? {}
   const hasB2bData = Boolean(b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length)
   const channels = dedupeTexts((s.salesChannels ?? []).map((x) => x.text)).slice(0, 6)
-  const products = dedupeTexts((s.products ?? []).map((x) => cleanPublic(x.text)))
-  const services = dedupeTexts((s.services ?? []).map((x) => cleanPublic(x.text)))
+  const products = dedupeTexts((s.products ?? []).map((x) => groupMoney(cleanPublic(x.text))))
+  const services = dedupeTexts((s.services ?? []).map((x) => groupMoney(cleanPublic(x.text))))
   const prices = publicPrices(s)
   // schema.org priceRange from the studio's own hryvnia prices (typical span, not extremes).
   const span = typicalRange(prices.filter((p) => !p.year || p.year >= 2025 || !prices.some((x) => (x.year ?? 0) >= 2025)).flatMap((p) => amountsIn(p.text)))
@@ -129,7 +138,7 @@ export default async function StudioPage({ params }: Args) {
     ...(cleanAddress(s.address) ? [['Адреса', cleanAddress(s.address)] as [string, React.ReactNode]] : []),
     ...(s.instagram ? [['Instagram', link(s.instagram, '@' + igHandle(s.instagram))] as [string, React.ReactNode]] : []),
     ...(lastPost ? [['Останній пост', lastPost] as [string, React.ReactNode]] : []),
-    ...(s.website ? [['Сайт', link(s.website, s.website.replace(/^https?:\/\//, '').replace(/\/$/, ''))] as [string, React.ReactNode]] : []),
+    ...(s.website ? [['Сайт', link(s.website, siteHost(s.website))] as [string, React.ReactNode]] : []),
     ...(s.facebook ? [['Facebook', link(s.facebook, 'сторінка')] as [string, React.ReactNode]] : []),
     ...(channels.length && !exhibiting ? [['Де продає', channels.join(' · ')] as [string, React.ReactNode]] : []),
   ]
@@ -186,7 +195,7 @@ export default async function StudioPage({ params }: Args) {
           <div className="grid max-w-read gap-3 text-body">
             {description.split(/\n{2,}/).map((para, i) => (
               <p key={i} className="m-0">
-                {para}
+                {groupMoney(para)}
               </p>
             ))}
             {s.ownerQuote && s.ownerQuoteApproved && <QuoteBlock>Студія про себе: «{s.ownerQuote}»</QuoteBlock>}
@@ -206,7 +215,7 @@ export default async function StudioPage({ params }: Args) {
             </ChipGroup>
           )}
           {showForm && (
-            <div className="flex flex-wrap gap-2.5">
+            <div data-hero-cta="" className="flex flex-wrap gap-2.5">
               <Button href="#zapyt-forma" variant="cobalt" arrow>
                 Запит цій студії
               </Button>
@@ -298,7 +307,7 @@ export default async function StudioPage({ params }: Args) {
             </p>
           </Block>
         )}
-        {!precise && !dormant && receivesVisitors && city && <Note>Працює {inCity(city.name)} — точну адресу уточнюйте у студії.</Note>}
+        {!precise && !street && !cleanAddress(s.address) && !dormant && receivesVisitors && city && <Note>Працює {inCity(city.name)} — точну адресу уточнюйте у студії.</Note>}
 
         {(products.length > 0 || services.length > 0) && (
           <Block id="offer" title={exhibiting ? 'Що створює' : 'Що робить і пропонує'}>

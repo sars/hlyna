@@ -12,7 +12,6 @@ import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
 import { MK_CHIPS } from '@/lib/mkChips'
 import { getAllStudios, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/lib/catalog'
-import { studioPrice } from '@/lib/priceIndex'
 import { fmt, roundNice } from '@/lib/money'
 import { cleanName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
@@ -42,6 +41,9 @@ async function load(city: string, format: string) {
   return { ...d, copy: fillCopy(raw, d.vars) }
 }
 
+// Card title: the format without the word the kicker already says («Майстер-класи для дітей» → «Для дітей»).
+const ogTitle = (label: string) => label.replace(/^Майстер-класи\s+/iu, '').replace(/^./u, (c) => c.toUpperCase())
+
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { city, format } = await params
   const p = await load(city, format)
@@ -51,7 +53,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title: p.copy.title,
     description: p.copy.metaDescription,
     alternates: { canonical: path },
-    openGraph: { images: ogImage({ title: p.copy.title, kicker: FORMAT_PAGES[format as FormatSlug].label }) },
+    openGraph: { images: ogImage({ title: ogTitle(FORMAT_PAGES[format as FormatSlug].label), kicker: `Майстер-класи · ${p.place}`, sub: 'Студії, адреси, формати й сертифікати' }) },
   }
 }
 
@@ -66,16 +68,17 @@ export default async function Page({ params }: Args) {
   const f = FORMAT_PAGES[format as FormatSlug]
   const path = `/maister-klasy/${city}/${format}`
   const others = (Object.keys(FORMAT_PAGES) as FormatSlug[]).filter((x) => x !== format)
-  // Price of one class from each studio's own price list: per couple on the «для двох» page, else per person.
-  const key = format === 'dlya-dvokh' ? 'couple' : 'group'
-  const unit = key === 'couple' ? 'за двох' : 'з особи'
-  const priced = p.data.all.map((s) => ({ s, v: studioPrice(s, key) }))
-  const values = priced.flatMap((x) => (x.v ? [x.v] : []))
+  // The price of each row is the studio's own price for THIS format (the value the lead's range is made of), never
+  // a price of another format from the same studio.
+  const unit = format === 'dlya-dvokh' ? 'за двох' : format === 'kursy' ? undefined : 'з особи'
+  const priced = p.data.all.map((s) => ({ s, v: p.data.priceOf.get(s.id) ?? null }))
   const n = p.data.all.length
+  const np = p.data.priceOf.size
+  const { min, max } = p.data.ctx
   const strip = [
     { value: fmt(n), label: pluralUk(n, ['місце', 'місця', 'місць']) },
-    ...(values.length ? [{ value: Math.min(...values) === Math.max(...values) ? fmt(Math.min(...values)) : `${fmt(Math.min(...values))}–${fmt(Math.max(...values))}`, label: `грн ${key === 'couple' ? 'за двох' : 'з особи'} за прайсами` }] : []),
-    { value: fmt(values.length), label: pluralUk(values.length, ['студія', 'студії', 'студій']) + ' з ціною в прайсі' },
+    ...(min && max ? [{ value: min === max ? fmt(min) : `${fmt(min)}–${fmt(max)}`, label: `грн ${unit ?? ''} за прайсами`.replace('  ', ' ') }] : []),
+    { value: fmt(np), label: pluralUk(np, ['студія', 'студії', 'студій']) + ' з ціною в прайсі' },
   ]
   return (
     <WavePage
@@ -87,7 +90,7 @@ export default async function Page({ params }: Args) {
       form="master-class"
       city={p.place}
       studios={p.data.all}
-      strip={values.length ? strip : undefined}
+      strip={min && max && np ? strip : undefined}
       cityLinks={others.map((x) => ({ label: FORMAT_PAGES[x].label, href: topicsPath(x) }))}
       chipsLabel="Інші формати:"
       related={[

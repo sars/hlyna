@@ -2,7 +2,7 @@
 import { productText } from '@/lib/products'
 import { site } from '../site'
 import { verses } from '../verses'
-import { docPhotos, sitePhotos } from '../photos'
+import { sitePhotos } from '../photos'
 import { BIZ, CLASS_PRICE, CLASS_PRICE_SETS, CUPS, DECOR, MAKERS, makesTableware, priceRange, studios, type Topic, where, WORKSHOP } from './shared'
 
 export const businessTopics: Record<string, Topic> = {
@@ -190,7 +190,7 @@ export const businessTopics: Record<string, Topic> = {
     metaDescription: (c) => `Українські керамічні студії, які роблять тарілки, миски й посуд для подачі на замовлення: ${studios(c.n)} ${where(c)}. Зразки, харчова полива, дозамовлення, терміни ${site.lead.batch}. Один запит — пропозиції від кількох студій.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять посуд для ресторанів, кафе й готелів або приймають замовлення на серії тарілок, мисок і піал. Партію зазвичай виготовляють ${site.lead.batch}; мінімальна кількість залежить від студії.${priceRange(c) ? ` Тарілки й миски в роздрібних прайсах коштують здебільшого ${priceRange(c)} за штуку.` : ''}`,
     verse: verses.horeca,
-    photo: docPhotos.restaurantTable,
+    photo: sitePhotos.cardVenues,
     ogImg: 'og-508-wide-1', // owner's choice for restaurants (frame 508); the page itself keeps its photo
     lists: [{ title: 'Студії, які працюють із закладами', formats: ['horeca'], types: ['studio', 'brand', 'maker'], filter: (s) => makesTableware(s), byCity: true }],
     evidence: /ресторан|заклад|horeca|хорека|шеф|подач|тарілк|миск|піал|на замовлення|парті/iu,

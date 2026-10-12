@@ -19,7 +19,7 @@ const DONATION = /донат|благодійн|зсу|на військо/iu
 
 export type TopicListData = { title: string; note?: string; byCity?: boolean; studios: StudioCard[] }
 export type PriceExample = { studio: StudioCard; text: string; source?: string }
-export type TopicData = { lists: TopicListData[]; all: StudioCard[]; ctx: TopicCtx; examples: PriceExample[]; amounts: number[] }
+export type TopicData = { lists: TopicListData[]; all: StudioCard[]; ctx: TopicCtx; examples: PriceExample[]; amounts: number[]; priceOf: Map<number, number> }
 
 const medianOf = (xs: number[]) => (xs.length ? [...xs].sort((a, b) => a - b)[Math.floor(xs.length / 2)] : undefined)
 
@@ -50,6 +50,7 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
   const kidsPage = /дит/.test(topic.price.re.source)
   const amounts: number[] = []
   const perStudio: number[] = []
+  const priceOf = new Map<number, number>() // each studio's own value in the page's terms (the one the range is made of)
   for (const s of all) {
     const lines = publicPrices(s).filter((p) => topic.price.re.test(p.text) && !topic.price.exclude?.test(p.text) && amountsIn(p.text).length)
     // The range uses only lines in the page's unit (e.g. per person for corporate events).
@@ -68,7 +69,11 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     const pick = near(topic.price.re)
     const own = usable.map((p) => pick(p.text)).filter((v): v is number => v !== null && v >= 150 && v <= 20000)
     amounts.push(...own)
-    if (own.length) perStudio.push([...own].sort((a, b) => a - b)[Math.floor(own.length / 2)])
+    if (own.length) {
+      const mid = [...own].sort((a, b) => a - b)[Math.floor(own.length / 2)]
+      perStudio.push(mid)
+      priceOf.set(s.id, mid)
+    }
     // Prefer an example in the page's unit; recent lines first.
     const best = [...lines].sort((a, b) => Number(!!topic.price.unit?.test(b.text)) - Number(!!topic.price.unit?.test(a.text)) || (b.year ?? 0) - (a.year ?? 0))[0]
     if (best) examples.push({ studio: s, text: best.text, source: best.source })
@@ -85,6 +90,7 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     all,
     examples: examples.slice(0, 8),
     amounts,
+    priceOf,
     ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
   }
 }

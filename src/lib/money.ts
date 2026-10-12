@@ -4,6 +4,10 @@
 /** «1 200» with a Ukrainian thousands separator. */
 export const fmt = (n: number) => n.toLocaleString('uk-UA')
 
+/** Thousands separators in hryvnia amounts written without them («31894 грн» → «31 894 грн», non-breaking), text otherwise unchanged. */
+export const groupMoney = (t: string) =>
+  t.replace(/\d[\d\s.,–—-]*?\s*(?:грн|₴)/g, (seg) => seg.replace(/(?<![\d.,])\d{4,}(?!\d)/g, (d) => d.replace(/\B(?=(?:\d{3})+(?!\d))/g, '\u00a0')))
+
 /** Min, max and the upper-middle value of a set of numbers (null when empty). */
 export function range(nums: number[]) {
   if (!nums.length) return null
