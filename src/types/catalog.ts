@@ -1,13 +1,9 @@
-// Shapes of the public catalogue records (studios, cities, media), as the site has always rendered them.
-// Originally generated from the Payload collections; kept by hand since the move to the app schema
-// (src/server/db/schema) — src/server/legacy.ts maps database rows into these shapes.
+// Shapes of the public catalogue records (studios, cities) as the pages render them: nested groups (geo, b2b,
+// activity, consent) and `{text}[]` lists. src/server/publicShape.ts maps database rows (src/server/db/schema) into
+// them; value lists come from src/shared/options.ts.
+import type { Confidence, GeoPrecision, StudioFormat, StudioStatus, StudioType } from '@/shared/options'
 
-/**
- * Студії, бренди й майстри. Фільтри списку: місто, тип, згода на запити (consent.requests), робота з HoReCa (b2b.worksWithHoreca).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "studios".
- */
+/** Студії, бренди й майстри. Фільтри списку: місто, тип, згода на запити (consent.requests), робота з HoReCa (b2b.worksWithHoreca). */
 export interface Studio {
   id: number;
   name: string;
@@ -24,7 +20,7 @@ export interface Studio {
         id?: string | null;
       }[]
     | null;
-  type?: ('studio' | 'brand' | 'maker' | 'school' | 'shop' | 'supplier' | 'heritage' | 'legacy' | 'other') | null;
+  type?: StudioType | null;
   city?: (number | null) | City;
   oblast?: string | null;
   address?: string | null;
@@ -34,7 +30,7 @@ export interface Studio {
   geo?: {
     lat?: number | null;
     lng?: number | null;
-    precision?: ('address' | 'street' | 'settlement') | null;
+    precision?: GeoPrecision | null;
     geocodedAt?: string | null;
     source?: string | null;
   };
@@ -58,22 +54,7 @@ export interface Studio {
   /**
    * Фільтри для сторінок «Гончарне коло», «Для дітей», «Чашки з логотипом» тощо.
    */
-  formats?:
-    | (
-        | 'wheel'
-        | 'handbuilding'
-        | 'painting'
-        | 'kids'
-        | 'couples'
-        | 'courses'
-        | 'certificates'
-        | 'corporate-workshop'
-        | 'corporate-gifts'
-        | 'logo'
-        | 'horeca'
-        | 'new-year'
-      )[]
-    | null;
+  formats?: StudioFormat[] | null;
   services?:
     | {
         text: string;
@@ -97,7 +78,6 @@ export interface Studio {
         id?: string | null;
       }[]
     | null;
-  photos?: (number | Media)[] | null;
   instagram?: string | null;
   website?: string | null;
   facebook?: string | null;
@@ -157,15 +137,11 @@ export interface Studio {
    */
   ownerVerified?: boolean | null;
   /**
-   * Власник зберіг чернетку в кабінеті. Перегляньте її й натисніть «Опублікувати» — позначка зніметься сама.
-   */
-  pendingOwnerChanges?: boolean | null;
-  /**
    * Генерується з назви, якщо порожній
    */
   slug?: string | null;
-  status?: ('active' | 'unclear' | 'closed' | 'relocated') | null;
-  confidence?: ('high' | 'medium' | 'low') | null;
+  status?: StudioStatus | null;
+  confidence?: Confidence | null;
   sources?:
     | {
         url: string;
@@ -178,13 +154,8 @@ export interface Studio {
   sourceId?: string | null;
   updatedAt: string;
   createdAt: string;
-  _status?: ('draft' | 'published') | null;
 }
 
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "cities".
- */
 export interface City {
   id: number;
   name: string;
@@ -193,101 +164,4 @@ export interface City {
    */
   slug?: string | null;
   oblast?: string | null;
-  population?: number | null;
-  isOver100k?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
-}
-
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: number;
-  alt?: string | null;
-  caption?: {
-    root: {
-      type: string;
-      children: {
-        type: any;
-        version: number;
-        [k: string]: unknown;
-      }[];
-      direction: ('ltr' | 'rtl') | null;
-      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
-      indent: number;
-      version: number;
-    };
-    [k: string]: unknown;
-  } | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    square?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    small?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    medium?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    large?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    xlarge?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-    og?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
 }

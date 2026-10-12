@@ -24,6 +24,8 @@ import { studioEdit } from '../../shared/schemas'
 import { hasStaffRole } from '../auth/roles'
 import { eq } from 'drizzle-orm'
 import { media as mediaTable } from '../db/schema/catalog'
+import { site } from '@/content/site'
+import { SLUG_RE } from '@/shared/options'
 
 // /api/panel/* — the panel's writes and pickers. Reads for screens happen in server components. Every route except
 // set-password requires staff (requireRole) and a same-origin request; every write goes through a service that
@@ -164,7 +166,7 @@ app.post(
 
 const cityBody = z.object({
   name: z.string().trim().min(1).max(120),
-  slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Лише латиниця, цифри й дефіси.').max(120),
+  slug: z.string().trim().regex(SLUG_RE, 'Лише латиниця, цифри й дефіси.').max(120),
   oblast: z.string().trim().max(120).nullable(),
   locative: z.string().trim().max(120).nullable(),
   population: z.number().int().nonnegative().nullable(),
@@ -203,7 +205,7 @@ const adminOnly = async (c: Context<Env>, next: () => Promise<void>) => {
   if (!hasStaffRole(c.get('user').role, 'admin')) return c.json({ error: 'Лише для адміністратора.' }, 403)
   await next()
 }
-const SITE = () => (process.env.NEXT_PUBLIC_SERVER_URL || 'https://hlyna.com.ua').replace(/\/$/, '')
+const SITE = () => site.url
 const uid = z.object({ id: z.string().min(1).max(100) })
 
 app.post('/users/staff', adminOnly, zValidator('json', z.object({ name: z.string().trim().min(1).max(120), email: z.string().trim().email().max(254), role: z.enum(['admin', 'editor']) })), async (c) =>

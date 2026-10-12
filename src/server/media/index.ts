@@ -10,15 +10,15 @@ import { audit, type Actor } from '../services/audit'
 import { NotFound } from '../services/requests'
 import { Invalid } from '../services/studioEditor'
 
-// Photos: one file in, the same seven sizes Payload made (so existing pages and srcsets keep working), EXIF and GPS
-// gone (sharp writes no metadata unless asked; orientation is applied first). Files live on the media volume with
-// Payload's naming: `<name>.<ext>` and `<name>-<w>x<h>.<ext>`. Caddy serves them at /media/* after the cutover.
+// Photos: one file in, seven sizes out (pages and srcsets rely on them), EXIF and GPS gone (sharp writes no metadata
+// unless asked; orientation is applied first). Files live on the media volume as `<name>.<ext>` and
+// `<name>-<w>x<h>.<ext>`; Caddy serves them at /media/*.
 
 export const MEDIA_DIR = () => process.env.MEDIA_DIR ?? path.resolve(process.cwd(), 'public/media')
 export const MAX_BYTES = 8 * 1024 * 1024
 const ACCEPT = new Set(['jpeg', 'png', 'webp'])
 
-// Same names and sizes as src/collections/Media.ts (Payload): width-only sizes keep the aspect ratio.
+// Width-only sizes keep the aspect ratio. Existing files were made with exactly these names and sizes: don't rename.
 export const SIZES = [
   { name: 'thumbnail', width: 300 },
   { name: 'square', width: 500, height: 500 },
@@ -151,14 +151,6 @@ export async function listMedia(db: Db, f: { filter?: 'unused' | 'pending' | 'us
 }
 
 /** Which profiles show a photo. */
-export async function mediaUsage(db: Db, id: number) {
-  return db
-    .select({ id: studios.id, name: studios.name, slug: studios.slug })
-    .from(studioPhotos)
-    .innerJoin(studios, eq(studios.id, studioPhotos.studioId))
-    .where(eq(studioPhotos.mediaId, id))
-}
-
 export async function updateMedia(db: Db, id: number, patch: { alt?: string; caption?: string | null }, actor: Actor) {
   const [cur] = await db.select().from(media).where(eq(media.id, id)).limit(1)
   if (!cur) throw new NotFound('Фото не знайдено.')
@@ -171,6 +163,15 @@ export async function updateMedia(db: Db, id: number, patch: { alt?: string; cap
   await db.update(media).set({ ...next, updatedAt: sql`now()`, updatedBy: actor.id }).where(eq(media.id, id))
   await audit(db, actor, 'media', id, 'update', changes)
   return { changes }
+}
+
+/** Studios whose profile shows this photo. */
+function mediaUsage(db: Db, id: number) {
+  return db
+    .select({ id: studios.id, name: studios.name, slug: studios.slug })
+    .from(studioPhotos)
+    .innerJoin(studios, eq(studios.id, studioPhotos.studioId))
+    .where(eq(studioPhotos.mediaId, id))
 }
 
 /** Deletes a photo and all its sizes — only when no profile shows it. */

@@ -15,7 +15,7 @@ import { site } from '@/content/site'
 import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, hasFormat, pluralUk, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from '@/lib/catalog'
 import { displayName, stripPersonal } from '@/lib/present'
-import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/lib/ogImage'
 import { sitePhotos } from '@/content/photos'
 import { fmt } from '@/lib/money'
 

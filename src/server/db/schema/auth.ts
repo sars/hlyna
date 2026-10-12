@@ -5,7 +5,7 @@ import { studios } from './catalog'
 
 // Better Auth core tables (user, session, account, verification, rate_limit) with the username plugin columns,
 // shaped as `@better-auth/cli generate` produces them for the Drizzle adapter, in schema `app`.
-// Phase 2 wires Better Auth to these tables; extra columns below are ours (role, lockout, owner login display).
+// Extra columns below are ours (role, lockout, owner login display).
 const ts = (name: string) => timestamp(name, { withTimezone: true, mode: 'date' })
 
 export const user = app.table('user', {
@@ -26,7 +26,7 @@ export const user = app.table('user', {
   failedLogins: integer('failed_logins').notNull().default(0),
   lockUntil: ts('lock_until'),
   lastLoginAt: ts('last_login_at'),
-  legacyId: text('legacy_id').unique(), // 'owner:<id>' / 'admin:<id>' from Payload, for the migration verifier
+  legacyId: text('legacy_id').unique(), // 'owner:<id>' / 'admin:<id>' of the account before the 2026-10-12 migration; no longer written
 })
 
 export const session = app.table(
@@ -61,7 +61,7 @@ export const account = app.table(
     accessTokenExpiresAt: ts('access_token_expires_at'),
     refreshTokenExpiresAt: ts('refresh_token_expires_at'),
     scope: text('scope'),
-    password: text('password'), // owners keep their scrypt$salt$key hash (custom hash/verify in phase 2)
+    password: text('password'), // owners keep their scrypt$salt$key hash (custom hash/verify in src/server/auth)
     createdAt: ts('created_at').notNull().defaultNow(),
     updatedAt: ts('updated_at').notNull().defaultNow(),
   },

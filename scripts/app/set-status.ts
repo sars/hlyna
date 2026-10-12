@@ -1,5 +1,5 @@
 // Show or hide studios: SLUGS=a,b STATUS=public|hidden pnpm tsx scripts/app/set-status.ts (PROD=1 for production).
-// STATUS=published/draft (the Payload words) are accepted too.
+// STATUS=published/draft (older wording) are accepted too.
 import { guard, revalidateSite } from './_guard'
 import { db, pool } from '../../src/server/db'
 import { finishRun, scriptActor, startRun } from '../../src/server/services/imports/runs'

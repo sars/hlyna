@@ -15,7 +15,7 @@ import { getAllWithShops, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/li
 import { fmt, roundNice } from '@/lib/money'
 import { displayName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 import { redirectOldCitySlug } from '@/lib/redirects'
 
 // One master-class format in one city (e.g. /maister-klasy/kyiv/honcharne-kolo). Exists only where the

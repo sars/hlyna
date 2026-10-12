@@ -1,9 +1,12 @@
 // Every import script on the new stack starts here.
-//  • It talks to Postgres through Drizzle only: no Payload, so a script can never apply a schema migration
-//    (Payload once tried to run a pending migration on production because a script booted it).
+//  • It talks to Postgres through Drizzle only, so a script can never apply a schema migration by accident.
 //  • It refuses to touch production unless PROD=1 is set explicitly. «Production» = NODE_ENV=production, the SSH
 //    tunnel port we use for prod (15432), the compose service host «db», or HLYNA_ENV=prod.
 import 'dotenv/config'
+import path from 'node:path'
+
+/** The research folder (AGENTS.md: `../UkraineCeramics`); RESEARCH_DIR overrides. */
+export const RESEARCH_DIR = process.env.RESEARCH_DIR ?? path.resolve(process.cwd(), '../UkraineCeramics')
 
 const url = process.env.DATABASE_URL ?? ''
 export const isProdTarget = () =>

@@ -3,13 +3,13 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { guard, revalidateSite } from './_guard'
+import { guard, RESEARCH_DIR, revalidateSite } from './_guard'
 import { db, pool } from '../../src/server/db'
 import { finishRun, scriptActor, startRun } from '../../src/server/services/imports/runs'
 import { fillAlternateNames, handleOf } from '../../src/server/services/imports/altNames'
 
 const { dry } = guard('alt-names')
-const ROOT = process.env.RESEARCH_DIR || '/Users/rodik/Claude/UkraineCeramics'
+const ROOT = RESEARCH_DIR
 const byHandle = new Map<string, Set<string>>()
 function walk(dir: string) {
   for (const e of fs.readdirSync(dir, { withFileTypes: true })) {

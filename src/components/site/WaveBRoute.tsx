@@ -18,7 +18,7 @@ import { fillCopy } from '@/editorial/wave-a'
 import { makerCities } from '@/lib/makers'
 import { EVENT_KIND, eventEnd, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/editorial/wave-b'
 import { sitePhotos } from '@/content/photos'
-import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
 // Wave B page: reviewed copy (src/content/waveB) around a live block that differs per page.

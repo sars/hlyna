@@ -9,7 +9,7 @@ import { site } from '@/content/site'
 import { getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
 import { cityStats, makerCities } from '@/lib/makers'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
 export const revalidate = 86400

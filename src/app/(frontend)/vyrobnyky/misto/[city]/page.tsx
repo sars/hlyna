@@ -25,7 +25,7 @@ import { aboutCity, displayName, firstAddress, inCity, oblastLabel } from '@/lib
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
 import { localPrices } from '@/lib/priceIndex'
 import { certificateCities } from '@/editorial/topics'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 import { fitTitle } from '@/lib/title'
 import { redirectOldCitySlug } from '@/lib/redirects'

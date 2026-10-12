@@ -10,6 +10,7 @@ import { revalidateStudios } from '../revalidate'
 import { audit, type Actor } from './audit'
 import { NotFound } from './requests'
 import { patchStudio } from './studios'
+import { site } from '@/content/site'
 
 // Profile claims: a person says «це моя студія». Approving creates (or extends) the owner's account, marks the
 // studios as confirmed and issues a one-time set-password link that we forward by hand. Panel and Telegram share this.
@@ -64,7 +65,7 @@ export async function getClaim(db: Db, id: number) {
   return { ...c, studios: st, existingOwners: owners, owner }
 }
 
-const SITE = () => (process.env.NEXT_PUBLIC_SERVER_URL || 'https://hlyna.com.ua').replace(/\/$/, '')
+const SITE = () => site.url
 
 /** The message we forward to the studio after approval (same text in the panel and in Telegram). */
 export function studioWelcomeMessage(link: string) {

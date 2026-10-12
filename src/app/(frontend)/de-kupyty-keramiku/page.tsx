@@ -11,7 +11,7 @@ import { getAllWithShops } from '@/lib/catalog'
 import { displayName, firstAddress } from '@/lib/present'
 import { fillCopy, waveCopy, whereToBuyData } from '@/editorial/wave-a'
 import { sitePhotos } from '@/content/photos'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 // Where to buy contemporary Ukrainian ceramics: shops and galleries by city, makers' own online shops, Etsy.
 export const revalidate = 86400

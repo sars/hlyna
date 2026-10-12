@@ -7,7 +7,7 @@ import type { Auth } from './index'
 import { hasStaffRole, isStaff, type StaffRole } from './roles'
 
 // Who is signed in, and may they do this? Framework-free: route handlers, server components, Hono middleware
-// (phase 3) and tests all call these with request headers. guards.ts binds them to the app's auth and db.
+// and tests all call these with request headers. guards.ts binds them to the app's auth and db.
 
 export type SignedInUser = {
   id: string

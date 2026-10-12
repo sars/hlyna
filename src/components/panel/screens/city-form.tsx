@@ -10,22 +10,22 @@ import { t } from '@/components/panel/lib/i18n'
 import { Button } from '@/components/panel/ui/button'
 import { Checkbox } from '@/components/panel/ui/checkbox'
 import { Input } from '@/components/panel/ui/input'
+import { SLUG_RE } from '@/shared/options'
 
 export type CityValue = { name: string; slug: string; oblast: string | null; locative: string | null; population: number | null; isOver100k: boolean | null }
 
-const SLUG = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 /** One city: create (id absent) or edit. A slug change is allowed; the old slug keeps redirecting. */
 export function CityForm({ id, initial }: { id?: number; initial: CityValue }) {
   const router = useRouter()
   const [v, setV] = useState<CityValue>(initial)
   const [busy, setBusy] = useState(false)
-  const slugError = v.slug && !SLUG.test(v.slug) ? t('editor.slugHint') : undefined
+  const slugError = v.slug && !SLUG_RE.test(v.slug) ? t('editor.slugHint') : undefined
   const set = <K extends keyof CityValue>(k: K, val: CityValue[K]) => setV((x) => ({ ...x, [k]: val }))
 
   async function submit(e: React.FormEvent) {
     e.preventDefault()
-    if (!v.name.trim() || !SLUG.test(v.slug)) return
+    if (!v.name.trim() || !SLUG_RE.test(v.slug)) return
     setBusy(true)
     try {
       if (id) {

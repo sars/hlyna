@@ -46,7 +46,7 @@ afterAll(async () => {
 })
 
 describe('public catalogue on schema app', () => {
-  it('returns public studios by name, Payload shape, hidden fields removed', async () => {
+  it('returns public studios by name, record shape, hidden fields removed', async () => {
     const [studios, cities] = await Promise.all([pc.loadPublicStudios(), pc.loadPublicCities()])
     expect(studios.map((x) => x.slug)).toEqual(['a', 'b'])
     expect(cities.map((c) => c.slug)).toEqual(['kyiv'])
@@ -54,15 +54,15 @@ describe('public catalogue on schema app', () => {
     const shards = await Promise.all([0, 1, 2, 3].map((index) => pc.loadPublicStudios({ index, of: 4 })))
     expect(shards.flat().map((x) => x.slug).sort()).toEqual(['a', 'b'])
     const [alpha, beta] = studios as unknown as Record<string, unknown>[]
-    expect(alpha._status).toBe('published')
+    expect(alpha).not.toHaveProperty('_status')
     expect(alpha.prices).toEqual([
       { text: 'перша — 1 грн', source: 'сайт', date: '2026' },
       { text: 'друга — 2 грн', source: null, date: null },
     ])
     expect(alpha.ownerQuote).toBe('схвалено')
     expect(beta.ownerQuote).toBeUndefined()
-    for (const k of ['ownerAbout', 'ownerNews', 'consent', 'sources', 'sourceId', 'confidence', 'photos', 'pendingOwnerChanges']) expect(beta).not.toHaveProperty(k)
-    expect(beta.services).toBeNull() // Payload: empty localized array → null
+    for (const k of ['ownerAbout', 'ownerNews', 'consent', 'sources', 'sourceId', 'confidence', 'photos', 'pendingOwnerChanges', '_status']) expect(beta).not.toHaveProperty(k)
+    expect(beta.services).toBeNull() // an empty list reads as null (the shape the pages were built on)
     expect(alpha.services).toEqual([{ text: 'МК' }])
   })
 

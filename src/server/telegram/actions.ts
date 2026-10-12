@@ -4,15 +4,15 @@ import { approveClaim, rejectClaim, studioWelcomeMessage } from '../services/cla
 import { applyChangeSet, getChangeSet, pendingChangeSetOf } from '../services/changeSets'
 import { NotFound, setRequestStatus } from '../services/requests'
 import type { RequestStatus } from '../../shared/options'
+import { site } from '../../content/site'
+import type { TgKeyboard } from './tg'
+
+export type { TgButton, TgKeyboard } from './tg'
 
 // What a Telegram button does, as plain functions over the same services the panel uses. The webhook route only
 // parses updates and edits messages; tests call these directly.
 
-export type TgButton = { text: string; callback_data?: string; url?: string }
-export type TgKeyboard = TgButton[][]
-
-export const siteUrl = () => (process.env.NEXT_PUBLIC_SERVER_URL || 'https://hlyna.com.ua').replace(/\/$/, '')
-export const panelUrl = (path: string) => `${siteUrl()}/panel${path}`
+export const panelUrl = (path: string) => `${site.url}/panel${path}`
 
 /** What to show after a tap: a short toast, an optional new status line + keyboard for the original message, extra messages. */
 export type TapResult = { answer: string; mark?: { line: string; keyboard: TgKeyboard }; say?: { text: string; keyboard?: TgKeyboard }[] }
@@ -91,7 +91,7 @@ export async function tapPublishOwnerChanges(db: Db, studioId: number, withoutTe
       ],
     }
   const r = await applyChangeSet(db, csId, withoutText ? 'all-but-text' : 'all', actor)
-  return { answer: r.already ? 'Вже розглянуто' : 'Опубліковано', mark: { line: 'Опубліковано', keyboard: [[{ text: '👀 Профіль', url: `${siteUrl()}/vyrobnyky/${cs!.studio.slug}` }]] } }
+  return { answer: r.already ? 'Вже розглянуто' : 'Опубліковано', mark: { line: 'Опубліковано', keyboard: [[{ text: '👀 Профіль', url: `${site.url}/vyrobnyky/${cs!.studio.slug}` }]] } }
 }
 
 export async function tapRequestStatus(db: Db, id: number, action: string, actor: Actor): Promise<TapResult> {

@@ -13,7 +13,7 @@ import { Faq } from '@/components/site/SelectionFaq'
 import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
 import { contemporaryPicks } from '@/editorial/contemporary'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 export const revalidate = 86400
 

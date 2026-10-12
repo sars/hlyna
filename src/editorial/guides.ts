@@ -6,7 +6,7 @@ import type { Metadata } from 'next'
 
 import type { Guide } from '@/content/guides'
 import { site } from '@/content/site'
-import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
 export type GuidePrice = { range: string; median: string; n: number; rangeNum: string; medianNum: string }

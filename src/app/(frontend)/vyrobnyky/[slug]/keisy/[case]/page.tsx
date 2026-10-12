@@ -21,7 +21,7 @@ import { CASE_LABEL, CASES, FIRST_PUBLISHED, caseByShort, caseFor, caseFormWhat,
 import { redirectOldStudioSlug } from '@/lib/redirects'
 import { getStudioBySlug } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 export const revalidate = 86400
 

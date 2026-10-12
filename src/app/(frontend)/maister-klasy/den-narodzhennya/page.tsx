@@ -9,7 +9,7 @@ import { WavePage } from '@/components/site/WavePage'
 import { getAllWithShops } from '@/lib/catalog'
 import { displayName, firstAddress } from '@/lib/present'
 import { fillCopy, liveFormatCityPages, partyData, partyLines, waveCopy } from '@/editorial/wave-a'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 // Birthdays and parties in a clay studio (kids' birthdays, hen parties, renting the studio for a group).
 export const revalidate = 86400

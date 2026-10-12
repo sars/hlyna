@@ -1,6 +1,5 @@
-// Value lists shared by the database schema (src/server/db), Zod schemas (src/shared/schemas) and, after the
-// Payload cutover, the panel and forms. Labels stay in the Payload collections until then; keep the values in sync
-// with src/collections/{Studios,Requests/options,Claims}.ts (the migration verifier fails on any unknown value).
+// Value lists shared by the database schema (src/server/db), the Zod schemas (src/shared/schemas), the catalogue
+// types (src/types/catalog.ts), the panel and the forms. The enums in Postgres are built from these arrays.
 
 export const STUDIO_TYPES = ['studio', 'brand', 'maker', 'school', 'shop', 'supplier', 'heritage', 'legacy', 'other'] as const
 export const STUDIO_STATUSES = ['active', 'unclear', 'closed', 'relocated'] as const
@@ -31,6 +30,9 @@ export const USER_ROLES = ['admin', 'editor', 'owner'] as const
 export const MEDIA_STATUS = ['active', 'pending', 'orphan'] as const
 
 export type StudioType = (typeof STUDIO_TYPES)[number]
+export type StudioStatus = (typeof STUDIO_STATUSES)[number]
+export type Confidence = (typeof CONFIDENCE)[number]
+export type GeoPrecision = (typeof GEO_PRECISION)[number]
 export type StudioFormat = (typeof STUDIO_FORMATS)[number]
 export type RequestWhat = (typeof REQUEST_WHAT)[number]
 export type RequestStatus = (typeof REQUEST_STATUS)[number]
@@ -45,3 +47,8 @@ export const REQUEST_WHAT_LABEL: Record<RequestWhat, string> = {
   other: 'Інше',
   studio: 'Студія: додати / оновити профіль',
 }
+
+/** Studio and city slugs: Latin letters, digits and single hyphens (the panel, the schemas and the editor agree). */
+export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
+/** Photos an owner may attach to a profile (cabinet form and the service that applies the change). */
+export const MAX_OWNER_PHOTOS = 10

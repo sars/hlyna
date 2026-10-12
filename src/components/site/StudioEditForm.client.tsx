@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 import { Kicker } from '@/components/ui/Kicker'
 
 import { kField, kLabel } from './KabinetForms.client'
+import { MAX_OWNER_PHOTOS } from '@/shared/options'
 
 export type EditInitial = {
   slug: string
@@ -28,7 +29,6 @@ export type EditInitial = {
   pending: boolean
 }
 
-const MAX_PHOTOS = 10
 const section = 'grid grid-cols-1 gap-2 border-t-2 border-ink pt-4'
 const split = (s: string) => s.split('\n').map((x) => x.trim()).filter(Boolean)
 
@@ -204,7 +204,7 @@ export function StudioEditForm({ initial }: { initial: EditInitial }) {
       </section>
 
       <section className={section}>
-        <Kicker as="p">Фото ({total} з {MAX_PHOTOS})</Kicker>
+        <Kicker as="p">Фото ({total} з {MAX_OWNER_PHOTOS})</Kicker>
         <p className="m-0 text-sm text-ink-2">Ваші роботи, студія, заняття. Перше фото стане головним у профілі. Завантажуючи фото, ви дозволяєте показувати їх на сайті з підписом студії.</p>
         <ul className="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:grid-cols-4">
           {initial.photos
@@ -229,7 +229,7 @@ export function StudioEditForm({ initial }: { initial: EditInitial }) {
             </li>
           ))}
         </ul>
-        {total < MAX_PHOTOS && (
+        {total < MAX_OWNER_PHOTOS && (
           <label className={kLabel}>
             Додати фото (JPG, PNG або WebP, до 8 МБ)
             <input
@@ -238,7 +238,7 @@ export function StudioEditForm({ initial }: { initial: EditInitial }) {
               multiple
               className="text-sm"
               onChange={(e) => {
-                const files = [...(e.target.files ?? [])].slice(0, MAX_PHOTOS - total)
+                const files = [...(e.target.files ?? [])].slice(0, MAX_OWNER_PHOTOS - total)
                 setNewFiles([...newFiles, ...files.map((file) => ({ file, alt: '', preview: URL.createObjectURL(file) }))])
                 e.target.value = ''
               }}

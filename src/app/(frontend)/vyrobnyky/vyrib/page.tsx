@@ -11,7 +11,7 @@ import { site } from '@/content/site'
 import { productTopics } from '@/content/topics'
 import { MIN_LIST, pluralUk } from '@/lib/catalog'
 import { topicData } from '@/editorial/topics'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
 export const revalidate = 86400

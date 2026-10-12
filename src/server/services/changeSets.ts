@@ -53,7 +53,7 @@ function normB2b(v: unknown): B2b {
   }
 }
 
-/** Accepts both today's kabinet shape and the legacy keys migrated from Payload drafts. */
+/** Accepts both today's kabinet shape and the keys of change sets migrated in 2026-10 (nested `consent.photos` etc.). */
 export function normalizeProposed(p: Record<string, unknown>): Partial<Record<FieldKey, unknown>> {
   const out: Partial<Record<FieldKey, unknown>> = {}
   const has = (k: string) => Object.prototype.hasOwnProperty.call(p, k)

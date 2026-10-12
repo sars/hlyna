@@ -16,4 +16,3 @@ export const isEmailLogin = (login: string) => login.includes('@')
 
 export const SYNTHETIC_EMAIL_DOMAIN = 'owners.hlyna.invalid'
 export const syntheticEmail = (userId: string) => `${userId}@${SYNTHETIC_EMAIL_DOMAIN}`
-export const isSyntheticEmail = (email: string) => email.endsWith(`@${SYNTHETIC_EMAIL_DOMAIN}`)

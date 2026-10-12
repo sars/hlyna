@@ -5,7 +5,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { site } from '@/content/site'
 
 // Breadcrumbs plus the page's BreadcrumbList and WebPage JSON-LD (dateModified: newest data behind the page when the caller
-// knows it, else the editorial content date). Same markup contract as the old Bits.Breadcrumbs.
+// knows it, else the editorial content date).
 export function Breadcrumbs({ items, modified }: { items: { label: string; href?: string }[]; modified?: string | null }) {
   return (
     <>

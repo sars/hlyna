@@ -12,7 +12,7 @@ import { Faq } from '@/components/site/SelectionFaq'
 import { pluralUk } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
 import { kosivOpishne } from '@/editorial/contemporary'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 export const revalidate = 86400
 

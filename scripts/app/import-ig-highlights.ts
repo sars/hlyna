@@ -1,15 +1,16 @@
 // Facts from pinned Instagram highlights → studios (new stack). DRY=1 to preview, PROD=1 for production.
 //   pnpm tsx scripts/app/import-ig-highlights.ts
 import fs from 'node:fs'
+import path from 'node:path'
 
-import { guard, revalidateSite } from './_guard'
+import { guard, RESEARCH_DIR, revalidateSite } from './_guard'
 import { db, pool } from '../../src/server/db'
 import { finishRun, scriptActor, startRun } from '../../src/server/services/imports/runs'
 import { importHighlights, type HlRow } from '../../src/server/services/imports/instagram'
 
 const { dry } = guard('import-ig-highlights')
-const FILE = process.env.HL_EXTRACT || '/Users/rodik/Claude/UkraineCeramics/09_instagram/posts_scan/hl_extract.jsonl'
-const HISTORY = process.env.PRICE_HISTORY || '/Users/rodik/Claude/UkraineCeramics/16_prices/price_history.jsonl'
+const FILE = process.env.HL_EXTRACT || path.join(RESEARCH_DIR, '09_instagram/posts_scan/hl_extract.jsonl')
+const HISTORY = process.env.PRICE_HISTORY || path.join(RESEARCH_DIR, '16_prices/price_history.jsonl')
 const rows = new Map<string, HlRow>()
 for (const l of fs.readFileSync(FILE, 'utf8').split('\n')) if (l.trim()) { const x = JSON.parse(l) as HlRow; rows.set(x.slug, x) }
 const run = dry ? null : await startRun(db, 'import-ig-highlights')

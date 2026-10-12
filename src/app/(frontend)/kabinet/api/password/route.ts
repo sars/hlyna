@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-import { kabinetAuthResponse } from '@/lib/kabinetAuthResponse'
+import { kabinetAuthResponse } from '@/server/auth/kabinet-response'
 import { setPasswordAndSignIn } from '@/server/auth/kabinet-adapter'
 
 // One-time link from an approved claim: the owner picks a login (email or phone) and a password, then is signed in.

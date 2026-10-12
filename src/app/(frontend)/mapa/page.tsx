@@ -12,7 +12,7 @@ import { site } from '@/content/site'
 import { groupByCity, pluralUk, TYPE_LABEL } from '@/lib/catalog'
 import { MAP_FILTERS, mapStudios } from '@/lib/mapData'
 import { displayName } from '@/lib/present'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
 export const revalidate = 3600

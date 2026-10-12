@@ -1,22 +1,22 @@
 import { and, asc, eq, inArray, sql } from 'drizzle-orm'
 
 import type { Db } from '../db'
-import { studioOwner, user } from '../db/schema/auth'
+import { studioOwner } from '../db/schema/auth'
 import { media, studioPhotos, studioPrices, studios } from '../db/schema/catalog'
 import { changeSets } from '../db/schema/history'
 import { mediaUrl, uploadImage } from '../media'
 import { ownerEditKeyboard } from '../telegram/actions'
-import { tg } from '../../lib/telegram'
+import { tg } from '../telegram/tg'
 import { ownerStudioEdit, type OwnerStudioEdit } from '../../shared/schemas'
 import { audit, type Actor } from './audit'
 import { normalizeProposed } from './changeSets'
 import { Invalid } from './studioEditor'
+import { MAX_OWNER_PHOTOS } from '../../shared/options'
 
 // The studio owner's cabinet on the new stack. Owners never write to studios: every save becomes (or updates) the
 // studio's one pending change set, field by field, and new photos are stored as «pending» media until we accept them.
 // The form an owner sees shows their pending proposal on top of the published data, so they continue where they left off.
 
-export const MAX_PHOTOS = 10
 const MAX_FILE = 8 * 1024 * 1024
 const IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/webp'])
 
@@ -146,12 +146,12 @@ export async function submitOwnerEdit(
   const [open] = await db.select().from(changeSets).where(and(eq(changeSets.studioId, s.id), eq(changeSets.status, 'pending'))).limit(1)
   const openPhotos = open ? ((normalizeProposed(open.proposed as Record<string, unknown>).photos as number[] | undefined) ?? currentPhotos) : currentPhotos
 
-  // Photos: keep what the owner kept (from the published or the pending set), then new uploads, at most MAX_PHOTOS.
+  // Photos: keep what the owner kept (from the published or the pending set), then new uploads, at most MAX_OWNER_PHOTOS.
   const keep = new Set(d.keepPhotos)
   const photoIds = [...new Set([...currentPhotos, ...openPhotos])].filter((id) => keep.has(id))
   const newMediaIds: number[] = []
   for (const [i, f] of input.photos.entries()) {
-    if (photoIds.length >= MAX_PHOTOS) break
+    if (photoIds.length >= MAX_OWNER_PHOTOS) break
     if (!IMAGE_TYPES.has(f.mime) || f.bytes.length > MAX_FILE) throw new Invalid(`Фото «${f.fileName}»: лише JPG, PNG або WebP до 8 МБ.`)
     if (!f.alt.trim()) throw new Invalid(`Додайте короткий опис до фото «${f.fileName}».`)
     const up = await uploadImage(db, { bytes: f.bytes, fileName: `${s.slug}-${i}`, alt: `${f.alt.trim().slice(0, 200)} — ${s.name}`, studioSlug: s.slug, status: 'pending' }, actor)
@@ -220,9 +220,3 @@ export async function submitOwnerEdit(
 }
 
 export class Forbidden extends Error {}
-
-/** Owner name for messages (the user row is the source of truth). */
-export async function userName(db: Db, userId: string) {
-  const [u] = await db.select({ name: user.name }).from(user).where(eq(user.id, userId)).limit(1)
-  return u?.name ?? ''
-}

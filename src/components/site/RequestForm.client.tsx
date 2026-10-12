@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Checkbox, Field, FieldRow, Input, Select, Textarea } from '@/components/ui/Fields'
 import { Kicker } from '@/components/ui/Kicker'
 import { Note } from '@/components/ui/Note'
-import { track } from '@/utilities/track'
+import { track } from '@/lib/track'
 
 const WHAT = [
   { value: 'tableware', label: 'Посуд для закладу' },
@@ -30,7 +30,7 @@ const KIND: Record<string, { qty: string; qtyPh: string; date: string; datePh: s
 }
 
 
-// Posts to Payload's REST API (collection `requests`, public create). `website2` is a honeypot.
+// Posts to /api/zapyt (src/server/services/publicForms.ts). `website2` is a honeypot.
 // defaultWhat / defaultCity come from the page (a master-class city page asks about a master class in that city).
 // /zapyt?vid=studiya (or forStudio, on /dlya-studiy) opens the form for studios that want to add or update their profile.
 // /zapyt?what=<kind>&misto=<city slug> (set by the header button from the page the visitor came from) pre-fills the form.

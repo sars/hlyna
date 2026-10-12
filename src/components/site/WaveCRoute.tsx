@@ -13,7 +13,7 @@ import { displayName } from '@/lib/present'
 import { fillCopy } from '@/editorial/wave-a'
 import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/editorial/wave-c'
 import { sitePhotos } from '@/content/photos'
-import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/lib/ogImage'
 
 // Wave C page: reviewed copy (src/content/waveC) around structured blocks rendered from JSON
 // (the formats comparison, the season calendar, studio offers), so the copy never restates a table.

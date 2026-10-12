@@ -1,15 +1,15 @@
-// Public catalogue reads: published studios in the record shape the pages render (via legacy.ts), sorted by name,
+// Public catalogue reads: published studios in the record shape the pages render (publicShape.ts), sorted by name,
 // with internal fields (owner text, unapproved quote, consent, sources…) left out.
 import { and, asc, eq, inArray, sql } from 'drizzle-orm'
 
 import type { City, Studio } from '@/types/catalog'
 import { db, schema } from './db'
-import { toLegacyCity, toLegacyStudio } from './legacy'
+import { toPublicCity, toPublicStudio } from './publicShape'
 
 const { studios, studioPrices, cities, studioPhotos, media, studioSlugHistory, citySlugHistory } = schema
 
 // Internal fields never shown to anonymous readers.
-const HIDDEN = ['sources', 'consent', 'sourceId', 'confidence', 'photos', 'ownerAbout', 'ownerNews', 'pendingOwnerChanges'] as const
+const HIDDEN = ['sources', 'consent', 'sourceId', 'confidence', 'ownerAbout', 'ownerNews'] as const
 
 // Published studios, optionally one shard of them (id % of = index) so a cached part stays small. `order` is the
 // position in the whole catalogue (by name, database collation), so merged shards keep the same order.
@@ -35,7 +35,7 @@ export async function loadPublicStudios(shard?: { index: number; of: number }): 
   for (const p of prices) byStudio.set(p.studioId, [...(byStudio.get(p.studioId) ?? []), p])
 
   return rows.map((r) => {
-    const doc = toLegacyStudio(r, byStudio.get(r.id) ?? [], []) as Record<string, unknown>
+    const doc = toPublicStudio(r, byStudio.get(r.id) ?? []) as Record<string, unknown>
     for (const k of HIDDEN) delete doc[k]
     // ownerQuote is public only once approved.
     if (!r.ownerQuoteApproved) delete doc.ownerQuote
@@ -47,7 +47,7 @@ export async function loadPublicStudios(shard?: { index: number; of: number }): 
 
 export async function loadPublicCities(): Promise<City[]> {
   const rows = await db.select().from(cities).orderBy(asc(cities.name), asc(cities.id))
-  return rows.map((c) => toLegacyCity(c) as unknown as City)
+  return rows.map((c) => toPublicCity(c) as unknown as City)
 }
 
 export type PublicPhoto = { url: string; full: string; alt: string; width: number; height: number }

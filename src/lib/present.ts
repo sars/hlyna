@@ -109,16 +109,6 @@ export function publicPrices(s: Studio): PriceLine[] {
   return out.map((l) => ({ ...l, text: groupMoney(l.text) }))
 }
 
-// Lines about one master class for one person (or a couple): no courses, coworking, products, group totals.
-const CLASS_WORDS = /(?<!\p{L})мк(?!\p{L})|майстер-клас|заняття|урок|гончарств|ліплен|ліпк|розпис|гончарн\p{L}* (?:кол|круг)|побачен|для двох/iu
-const NOT_SINGLE = /курс|абонемент|(?:[3-9]|\d{2,})\s*занять|місяц|коворк|оренд|випал\s+\d|глина\s+\d|\/\s*год|за годину оренди|сертифікат|usd|eur|\$|€|корпоратив|тімбілд|груп[аиу]?\s+до|за групу|для групи|виїзн|день народжен|свят/iu
-
-export function singleClassAmounts(s: Studio): number[] {
-  return publicPrices(s)
-    .filter((p) => CLASS_WORDS.test(p.text) && !NOT_SINGLE.test(p.text))
-    .flatMap((p) => amountsIn(p.text))
-}
-
 // ---------- people and places ----------
 
 // Birth years and similar personal details are not business information (CLAUDE.md → privacy).

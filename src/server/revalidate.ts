@@ -1,5 +1,5 @@
 // Refresh the public pages after a write. The site caches catalogue reads under the `studios` tag (src/lib/catalog.ts)
-// and pre-renders profile and city pages; after the cutover the same tag covers the new data layer. Outside Next
+// and pre-renders profile and city pages. Outside Next
 // (scripts, tests) there is no cache to refresh, so errors are swallowed — scripts call POST /revalidate at the end.
 
 export async function revalidateCatalog(paths: string[] = []) {

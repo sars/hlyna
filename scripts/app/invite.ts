@@ -1,5 +1,5 @@
-// One-time set-password link for a user (staff → /panel/parol, owner → /kabinet/parol). After cutover the Payload admin
-// account needs one of these. Prints the link; send it yourself. PROD=1 for production.
+// One-time set-password link for a user (staff → /panel/parol, owner → /kabinet/parol). Prints the link; send it
+// yourself. PROD=1 for production.
 //   USER_ID=<user id | email | login> BASE=https://hlyna.com.ua pnpm tsx scripts/app/invite.ts
 import { eq, or } from 'drizzle-orm'
 

@@ -70,7 +70,7 @@ export async function getUser(db: Db, id: string) {
 }
 
 /** The message we forward with a link (Ukrainian, ready to paste into Instagram or Telegram). */
-export function inviteMessage(role: UserRole, name: string, link: string, studioNames: string[], baseUrl = 'https://hlyna.com.ua') {
+function inviteMessage(role: UserRole, name: string, link: string, studioNames: string[], baseUrl = 'https://hlyna.com.ua') {
   const site = baseUrl.replace(/\/$/, '')
   if (role === 'owner')
     return [

@@ -1,4 +1,4 @@
-import { kabinetAuthResponse } from '@/lib/kabinetAuthResponse'
+import { kabinetAuthResponse } from '@/server/auth/kabinet-response'
 import { signInOwner } from '@/server/auth/kabinet-adapter'
 
 export async function POST(req: Request) {

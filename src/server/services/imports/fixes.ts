@@ -2,7 +2,7 @@ import { eq, inArray } from 'drizzle-orm'
 
 import type { Db } from '../../db'
 import { cities, studios } from '../../db/schema/catalog'
-import { slugifyUk } from '../../../utilities/transliterateUk'
+import { slugifyUk } from '../../../lib/transliterateUk'
 import { audit, type Actor } from '../audit'
 import { writeStudio } from './runs'
 

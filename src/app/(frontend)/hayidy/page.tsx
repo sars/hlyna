@@ -7,7 +7,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { guides } from '@/content/guides'
 import { site } from '@/content/site'
 import { liveWaveBPages } from '@/editorial/wave-b'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 export const metadata: Metadata = {
   title: 'Гайди про кераміку: замовлення, безпечність, майстер-класи',

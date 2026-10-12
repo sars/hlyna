@@ -9,7 +9,7 @@ import { importRuns } from '../db/schema/history'
 // job syncs its files to Rodion's Mac (09_instagram/posts_scan); IG_STATUS_DIR points there. In production the server
 // can't see those files: the hourly job must upload a small status JSON (or write import_runs) — see the docs.
 
-export const IG_DIR = () => process.env.IG_STATUS_DIR ?? '/Users/rodik/Claude/UkraineCeramics/09_instagram/posts_scan'
+export const IG_DIR = () => process.env.IG_STATUS_DIR ?? path.resolve(process.cwd(), '../UkraineCeramics/09_instagram/posts_scan')
 
 async function text(file: string) {
   try {

@@ -6,7 +6,7 @@ import { site } from '@/content/site'
 // Only in production builds and only on the live domain: local `pnpm build && pnpm start` sends nothing.
 // No ads: advertising storage and signals are off, so no cookie banner is needed for analytics alone.
 // Page views on client-side navigation come from GA4 enhanced measurement («page changes based on browser history»).
-// Events: `generate_lead` / `studio_signup` from RequestForm (src/utilities/track.ts), `contact_click` below for
+// Events: `generate_lead` / `studio_signup` from RequestForm (src/lib/track.ts), `contact_click` below for
 // phone, email, Telegram, Viber and Instagram links (contacting a studio directly is a lead too).
 export function Analytics() {
   const id = site.analytics.ga4

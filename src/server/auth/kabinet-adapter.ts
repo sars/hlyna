@@ -4,12 +4,10 @@ import { APIError } from 'better-auth/api'
 
 import { db } from '../db'
 import { getAuth } from './index'
-import { ownedStudioIds } from './access'
 import { consumeInvite, findInvite } from './invites'
 import { isEmailLogin } from './login'
 
-// What /kabinet needs from auth, in the shape of today's ownerAuth/kabinet helpers, so phase 3 can swap the
-// cabinet over route by route. Sign-in goes through Better Auth itself (rate limit, lockout hooks, session row,
+// What /kabinet needs from auth. Sign-in goes through Better Auth itself (rate limit, lockout hooks, session row,
 // cookie); these functions only adapt inputs and outputs.
 
 // Errors thrown by our hooks (lockout, switched-off account) arrive as exceptions on the server API;
@@ -45,10 +43,4 @@ export async function setPasswordAndSignIn(opts: { token: string; login: string;
   return isEmailLogin(done.login) && done.role !== 'owner'
     ? signInStaff(done.login, opts.password, opts.headers)
     : signInOwner(done.login, opts.password, opts.headers)
-}
-
-export async function currentOwnerWithStudios(headers: Headers) {
-  const s = await getAuth().api.getSession({ headers })
-  if (!s) return null
-  return { userId: s.user.id, name: s.user.name, studioIds: await ownedStudioIds(db, s.user.id) }
 }

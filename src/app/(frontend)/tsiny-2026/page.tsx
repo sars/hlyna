@@ -14,7 +14,7 @@ import { site } from '@/content/site'
 import { pluralUk } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
 import { priceIndex, type CategoryStats } from '@/lib/priceIndex'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
 export const revalidate = 86400

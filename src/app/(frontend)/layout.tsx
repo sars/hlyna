@@ -7,8 +7,6 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { SiteFooter } from '@/components/site/SiteFooter'
 import { SiteHeader } from '@/components/site/SiteHeader'
 import { site } from '@/content/site'
-import { getServerSideURL } from '@/utilities/getURL'
-import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 
 import './globals.css'
 
@@ -49,10 +47,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(getServerSideURL()),
+  metadataBase: new URL(site.url),
   title: { default: 'Українська кераміка ручної роботи для бізнесу і для себе · Глина', template: '%s · Глина' },
   description: site.description,
-  openGraph: mergeOpenGraph(),
+  // Pages that pass their own openGraph.images replace this card; everything else is inherited.
+  openGraph: { type: 'website', locale: site.locale, siteName: `${site.name} · ${site.domain}`, title: 'Глина — українська кераміка ручної роботи', description: site.description, images: [{ url: `${site.url}/og-home.png`, width: 1200, height: 630 }] },
   twitter: { card: 'summary_large_image' },
 }
 

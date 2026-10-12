@@ -1,8 +1,8 @@
-// Zod schemas shared by forms (client safeParse), the API (Hono zValidator, phase 2+) and scripts.
-// Messages are the same Ukrainian texts the current Payload hooks and /kabinet routes return.
+// Zod schemas shared by forms (client safeParse), the APIs (Hono zValidator, route handlers) and scripts.
+// Messages are the Ukrainian texts the forms show.
 import { z } from 'zod'
 
-import { CLAIM_STATUS, CONFIDENCE, GEO_PRECISION, REQUEST_STATUS, REQUEST_WHAT, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY } from '../options'
+import { CONFIDENCE, GEO_PRECISION, REQUEST_WHAT, SLUG_RE, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY } from '../options'
 
 // ---------- helpers
 /** Trimmed string capped at `max` characters (cap, not reject — the current hooks slice silently). */
@@ -63,7 +63,7 @@ export const requestCreate = z
   })
 export type RequestCreate = z.output<typeof requestCreate>
 
-// ---------- «Це ваша студія?» claim (POST /api/kabinet/claim)
+// ---------- «Це ваша студія?» claim (POST /kabinet/api/claim)
 export const claimCreate = z.object({
   name: capped(120).pipe(z.string().min(1, "Вкажіть ім'я і контакт.")),
   contact: capped(160).pipe(z.string().min(1, "Вкажіть ім'я і контакт.")),
@@ -113,9 +113,8 @@ export const ownerStudioEdit = z.object({
   keepPhotos: z.array(z.coerce.number().int()).default([]),
 })
 export type OwnerStudioEdit = z.output<typeof ownerStudioEdit>
-export const OWNER_FIELDS = Object.keys(ownerStudioEdit.shape) as (keyof OwnerStudioEdit)[]
 
-// ---------- panel: full studio edit (phase 6 uses it; defined now so the schema and the form agree)
+// ---------- panel: full studio edit (the schema and the editor form agree on this)
 export const priceLine = z.object({ text: z.string().trim().min(1).max(300), source: z.string().trim().max(120).nullish(), dateText: z.string().trim().max(60).nullish() })
 export const studioEdit = z.object({
   name: z.string().trim().min(1, 'Назва обовʼязкова.').max(200),
@@ -128,7 +127,7 @@ export const studioEdit = z.object({
   slug: z
     .string()
     .trim()
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Лише латиниця, цифри й дефіси.')
+    .regex(SLUG_RE, 'Лише латиниця, цифри й дефіси.')
     .max(160),
   type: z.enum(STUDIO_TYPES).nullable(),
   status: z.enum(STUDIO_STATUSES).nullable(),
@@ -173,17 +172,3 @@ export const studioEdit = z.object({
   expectedRevision: z.number().int().positive(),
 })
 export type StudioEdit = z.output<typeof studioEdit>
-
-export const cityEdit = z.object({
-  name: z.string().trim().min(1).max(120),
-  slug: z.string().trim().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).max(120),
-  oblast: z.string().trim().max(120).nullable(),
-  population: z.number().int().nonnegative().nullable(),
-  isOver100k: z.boolean().nullable(),
-})
-
-export const requestStatusChange = z.object({ status: z.enum(REQUEST_STATUS), note: z.string().trim().max(2000).optional() })
-export const claimDecision = z.discriminatedUnion('status', [
-  z.object({ status: z.literal(CLAIM_STATUS[1]), linkToOwnerId: z.string().nullish() }),
-  z.object({ status: z.literal(CLAIM_STATUS[2]), rejectReason: z.string().trim().max(1000).optional() }),
-])

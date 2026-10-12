@@ -1,4 +1,4 @@
-import { and, eq, ilike, or, sql, inArray, asc } from 'drizzle-orm'
+import { asc, eq, ilike, or, sql } from 'drizzle-orm'
 
 import { cities, studioPhotos, studioPrices, studios } from '../db/schema/catalog'
 import { studioRevisions } from '../db/schema/history'
@@ -70,14 +70,3 @@ export async function searchStudios(db: Db, q: string, limit = 12) {
     .orderBy(sql`${studios.visibility} = 'public' desc`, asc(studios.name))
     .limit(limit)
 }
-
-export async function studioNames(db: Db, ids: number[]) {
-  if (!ids.length) return []
-  return db
-    .select({ id: studios.id, name: studios.name, slug: studios.slug, city: cities.name })
-    .from(studios)
-    .leftJoin(cities, eq(cities.id, studios.cityId))
-    .where(inArray(studios.id, ids))
-}
-
-export { and }

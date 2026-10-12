@@ -15,8 +15,7 @@ import {
   USER_ROLES,
 } from '../../../shared/options'
 
-// Every table of our own data model lives in the Postgres schema `app`. Payload's tables stay in `public`
-// until the cutover, so drizzle-kit (schemaFilter: ['app']) never sees or touches them.
+// Every table of our own data model lives in the Postgres schema `app` (drizzle-kit: schemaFilter ['app']).
 export const app = pgSchema('app')
 
 export const studioType = app.enum('studio_type', STUDIO_TYPES)

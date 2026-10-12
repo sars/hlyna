@@ -5,7 +5,7 @@ import { IndexCell, StudioCells } from '@/components/ui/StudioCell'
 import React from 'react'
 
 import { liveWaveBPages } from '@/editorial/wave-b'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 export const metadata: Metadata = {
   title: 'Добірки української кераміки: керамісти, Косів, Опішне',

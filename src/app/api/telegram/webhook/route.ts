@@ -1,6 +1,6 @@
 import { timingSafeEqual } from 'node:crypto'
 
-import { tg } from '@/lib/telegram'
+import { tg } from '@/server/telegram/tg'
 import { db } from '@/server/db'
 import type { Actor } from '@/server/services/audit'
 import { handleTap, tapRejectClaim, type TgKeyboard } from '@/server/telegram/actions'

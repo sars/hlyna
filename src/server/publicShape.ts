@@ -1,6 +1,5 @@
-// Map rows of the `app` schema into the record shapes the public pages render (src/types/catalog: `Studio`, `City`).
-// The shapes are the ones the site was built on (inherited from the former Payload collections), so pages and lib/*
-// stay simple: they never see Drizzle rows.
+// Map rows of the `app` schema into the record shapes the public pages render (src/types/catalog: `Studio`, `City`):
+// nested groups and `{text}[]` lists, so pages and lib/* never see Drizzle rows.
 import type { InferSelectModel } from 'drizzle-orm'
 
 import type { cities, studioPrices, studios } from './db/schema'
@@ -13,20 +12,11 @@ const iso = (v: string | null | undefined) => (v ? new Date(v).toISOString() : n
 const texts = (xs: string[] | null | undefined) => (xs ?? []).map((text) => ({ text }))
 const urls = (xs: string[] | null | undefined) => (xs ?? []).map((url) => ({ url }))
 
-export function toLegacyCity(c: CityRow) {
-  return {
-    id: c.id,
-    name: c.name,
-    slug: c.slug,
-    oblast: c.oblast,
-    population: c.population,
-    isOver100k: c.isOver100k,
-    updatedAt: iso(c.updatedAt),
-    createdAt: iso(c.createdAt),
-  }
+export function toPublicCity(c: CityRow) {
+  return { id: c.id, name: c.name, slug: c.slug, oblast: c.oblast }
 }
 
-export function toLegacyStudio(s: StudioRow, prices: PriceRow[], photoIds: number[]) {
+export function toPublicStudio(s: StudioRow, prices: PriceRow[]) {
   return {
     id: s.id,
     name: s.name,
@@ -55,7 +45,6 @@ export function toLegacyStudio(s: StudioRow, prices: PriceRow[], photoIds: numbe
     services: texts(s.services),
     products: texts(s.products),
     prices: [...prices].sort((a, b) => a.position - b.position).map((p) => ({ text: p.text, source: p.source, date: p.dateText })),
-    photos: photoIds,
     instagram: s.instagram,
     website: s.website,
     facebook: s.facebook,
@@ -95,6 +84,5 @@ export function toLegacyStudio(s: StudioRow, prices: PriceRow[], photoIds: numbe
     sourceId: s.sourceId,
     updatedAt: iso(s.updatedAt),
     createdAt: iso(s.createdAt),
-    _status: s.visibility === 'public' ? ('published' as const) : ('draft' as const),
   }
 }

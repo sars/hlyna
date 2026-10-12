@@ -22,6 +22,7 @@ import type { StudioEdit } from '@/shared/schemas'
 import { PriceList, StringList } from './list-editors'
 import { MapPreview } from './map-preview'
 import { PhotoManager, type PhotoItem } from './photo-manager'
+import { SLUG_RE } from '@/shared/options'
 
 type CityOption = { id: number; name: string }
 type Owner = { about: string | null; news: string | null; quote: string | null }
@@ -133,7 +134,7 @@ export function StudioEditor({
     // Quick checks here; the server validates everything with the shared schema (zod stays out of this bundle).
     const local: Record<string, string> = {}
     if (!payload.name.trim()) local.name = 'Назва обовʼязкова.'
-    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(payload.slug)) local.slug = 'Лише латиниця, цифри й дефіси.'
+    if (!SLUG_RE.test(payload.slug)) local.slug = 'Лише латиниця, цифри й дефіси.'
     if (payload.instagramPosts.some((u) => !/^https:\/\/www\.instagram\.com\/(p|reel)\/[\w-]+\/?$/.test(u))) local.instagramPosts = 'Посилання на пост Instagram (p або reel).'
     if (Object.keys(local).length) {
       setErrors(local)

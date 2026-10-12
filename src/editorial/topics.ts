@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 
 import { topics, type Topic, type TopicCtx } from '@/content/topics'
-import { ogImage, ogPhoto } from '@/utilities/ogImage'
+import { ogImage, ogPhoto } from '@/lib/ogImage'
 import { fitTitle } from '@/lib/title'
 import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, type StudioCard } from '@/lib/catalog'
 import { facts } from '@/lib/facts'

@@ -10,7 +10,7 @@ import { WavePage } from '@/components/site/WavePage'
 import { getAllWithShops } from '@/lib/catalog'
 import { displayName } from '@/lib/present'
 import { fillCopy, giftsData, waveCopy, type GiftItem } from '@/editorial/wave-a'
-import { ogImage } from '@/utilities/ogImage'
+import { ogImage } from '@/lib/ogImage'
 
 // Ceramic gifts by budget: every item is a real price line from a studio's price list, linked to the studio.
 export const revalidate = 86400

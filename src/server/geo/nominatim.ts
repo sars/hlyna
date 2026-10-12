@@ -51,8 +51,8 @@ const km = (a: { lat: number; lng: number }, b: { lat: number; lng: number }) =>
   return 12742 * Math.asin(Math.sqrt(d))
 }
 
-/** Cleans an address the way the site writes it: first address only, no notes in brackets, no metro hints. */
-export function cleanAddress(a: string) {
+/** The query sent to the geocoder: first address only, no notes in brackets, no metro hints. */
+function geocodeQuery(a: string) {
   return a
     .split(/;|\s\/\s/)[0]!
     .replace(/\([^)]*\)/g, '')
@@ -69,7 +69,7 @@ export async function geocode(address: string | null, city: string, oblast?: str
   const centre = byName.find(isPlace) ?? (oblast ? (await ask(`${city}, ${oblast}`, 'featuretype=settlement')).find(isPlace) : undefined) ?? byName[0]
   const c = centre ? { lat: Number(centre.lat), lng: Number(centre.lon) } : null
   if (address?.trim()) {
-    const clean = cleanAddress(address)
+    const clean = geocodeQuery(address)
     const withCity = clean.toLowerCase().includes(city.toLowerCase()) ? clean : `${clean}, ${city}`
     // «12/10» and «12а» often aren't in OSM as such: retry with the plain number, then the street alone.
     const plainNumber = withCity.replace(/(\d+)\s*[/\\-]\s*\d+[а-яa-z]?/iu, '$1').replace(/(\d+)[а-яa-z]\b/iu, '$1')

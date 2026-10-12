@@ -1,6 +1,6 @@
 import type { Db } from '../../db'
 import { studios } from '../../db/schema/catalog'
-import { transliterateUk } from '../../../utilities/transliterateUk'
+import { transliterateUk } from '../../../lib/transliterateUk'
 import type { Actor } from '../audit'
 import { studiosWithPendingOwnerChanges, writeStudio } from './runs'
 
