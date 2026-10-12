@@ -10,6 +10,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 ## Rules for every page
 - **Request first:** «Отримати пропозиції» visible at the top, after the answer and at the end.
 - **LLM-ready:** first 2–3 sentences are plain facts with numbers and a date; then a table; then details; then FAQ. schema.org JSON-LD (`src/components/site/JsonLd.tsx`), clean headings, «Оновлено» date. No thin pages: list pages need ≥3 real entries.
+- **Design:** `docs/design/SYSTEM.md` is the single source for tokens, type, components and page templates; new primitives go there and into `/dev/styleguide`; never reintroduce palette 1A.
 - **Honest:** only collected data; never invent studios, prices, cases, reviews. Say the model openly but briefly (`site.model` in `src/content/site.ts`). Don't publish the legal entity.
 - **Flexible wording:** no site-wide «від 30 штук»; minimum order lives in profiles. «Корпоратив з ліплення з глини».
 - **Voice:** `docs/voice/README.md` — factual lead, then at most one short verse epigraph (`Epigraph`, `src/content/verses.ts`), then warm, clear potters' prose. Never explain the verse.
@@ -20,7 +21,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 - **No paid services** without the owner's explicit approval. No GitHub Actions/CI (paid minutes) — checks run locally (Stop hook, `pnpm lint`, `pnpm build`).
 
 ## Stack
-Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Auth (staff in `/panel`, studio owners in `/kabinet`) + Hono for `/api/panel` + Tailwind 4 with design tokens 1A in `src/app/(frontend)/globals.css` (`bg-clay`, `text-cobalt`, `bg-terra`, `text-umber`, `border-line`, `font-display`, utilities `kicker`, `h-display`, `band`). Fonts: Unbounded (headings) + Raleway (body).
+Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Auth (staff in `/panel`, studio owners in `/kabinet`) + Hono for `/api/panel` + Tailwind 4 with tokens by role from `docs/design/SYSTEM.md`, defined in `src/app/(frontend)/globals.css` (`bg-paper`, `text-ink`, `text-ink-2`, `bg-cobalt`, `text-terracotta-text`, `border-rule`, `font-display/body/serif/mono`); primitives in `src/components/ui/`. Fonts: Unbounded + Golos Text preloaded, Playfair Display italic + JetBrains Mono lazy (`next/font`).
 
 ## Where things are
 - `src/content/` — site facts (`site.ts`) and navigation (`navigation.ts`). Copy and menus are edited here, by an LLM.

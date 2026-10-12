@@ -3,6 +3,7 @@
 Updated 2026-10-12.
 
 ## Now
+- **Redesign (2026-10-12, branch `redesign`, not merged or deployed):** all public pages, cabinet and share cards on the new system (`docs/design/SYSTEM.md`); palette 1A removed; OG card C2 + static `public/og-home.png`; open: review fixes, then merge.
 - **Дизайн головної (2026-10-11):** затверджений шаблон і бриф для впровадження — `docs/design/` (README.md → що робити, history.md → чому так, template/ → еталон). Фавіконка вже замінена в `public/`.
 - Live at https://hlyna.com.ua on the owner's VPS (Docker Compose: app + db + caddy; `deploy/`).
 - Stack: Next.js 16, Postgres schema `app` via Drizzle, Better Auth, admin panel at `/panel`, studio cabinet at `/kabinet`, Telegram bot buttons. Payload CMS was removed on 2026-10-12 (`docs/replace-payload-cutover.md`).
@@ -12,7 +13,6 @@ Updated 2026-10-12.
 
 ## Next
 - Collections for studios, master classes, prices, requests; import from `UkraineCeramics/_master/`.
-- Design tokens 1A in Tailwind, component kit, home page.
 - Request form → admin → Telegram notification.
 
 ## Reminders (2026-10-10)
