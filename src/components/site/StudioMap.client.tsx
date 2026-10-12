@@ -87,8 +87,8 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
         container: box.current,
         style: 'https://tiles.openfreemap.org/styles/positron',
         // The whole country with room around it, so Uzhhorod, Lviv and Chernihiv markers are never clipped.
-        bounds: [[22.1, 44.3], [40.3, 52.5]],
-        fitBoundsOptions: { padding: window.innerWidth < 640 ? { top: 28, bottom: 28, left: 12, right: 12 } : 48 },
+        bounds: [[22.1, 44.3], [40.3, 52.4]],
+        fitBoundsOptions: { padding: window.innerWidth < 640 ? 32 : 48 },
         attributionControl: { compact: true, customAttribution: '© OpenStreetMap contributors' },
         cooperativeGestures: window.innerWidth < 640,
         })
