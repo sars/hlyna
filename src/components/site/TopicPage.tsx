@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Block, InnerCols, InnerHero, InnerMain, Related } from '@/components/site/Inner'
+import { BoldFacts, Block, InnerCols, InnerHero, InnerMain, Related } from '@/components/site/Inner'
 import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
@@ -21,6 +21,7 @@ import { QuoteBlock } from '@/components/ui/QuoteBlock'
 import { SideBox } from '@/components/ui/SideBox'
 import { StudioRow, StudioRows } from '@/components/ui/StudioRow'
 import { REQUEST_HREF } from '@/content/navigation'
+import { site } from '@/content/site'
 import type { Topic } from '@/content/topics'
 import { evidenceLine, topicCityLinks, type TopicData } from '@/editorial/topics'
 import { fixPriceRef, mergeFaq, type PlaceContent } from '@/editorial/places'
@@ -38,7 +39,7 @@ function RowFor({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: bool
 
 // Studios of a topic: one flat list with the city on each row, or grouped by city (cities with ≥ MIN_LIST studios get their own
 // heading, the rest go to a short «Ще міста і села» list). Long lists open the rest in a native `details`.
-export function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re: RegExp; byCity?: boolean }) {
+export function StudioList({ studios, re, byCity, showCity = true }: { studios: StudioCard[]; re: RegExp; byCity?: boolean; showCity?: boolean }) {
   const rows = (list: StudioCard[], showCity: boolean) => (
     <StudioRows>
       {list.map((s) => (
@@ -54,14 +55,14 @@ export function StudioList({ studios, re, byCity }: { studios: StudioCard[]; re:
         {rows(list.slice(0, SHOW), showCity)}
         <details className="group">
           <MoreLink as="summary">
-            <span className="group-open:hidden">Показати ще {list.length - SHOW}</span>
+            <span className="group-open:hidden">Показати ще {list.length - SHOW} →</span>
             <span className="hidden group-open:inline">Згорнути</span>
           </MoreLink>
           {rows(list.slice(SHOW), showCity)}
         </details>
       </>
     )
-  if (!byCity) return <div>{withMore(studios, true)}</div>
+  if (!byCity) return <div>{withMore(studios, showCity)}</div>
   const groups = groupByCity(studios)
   const big = groups.filter((g) => g.studios.length >= MIN_LIST)
   const small = groups.filter((g) => g.studios.length < MIN_LIST)
@@ -145,11 +146,14 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
         lead={
           <>
             {place?.lead && <p className="m-0">{place.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
-            <p className="m-0">{topic.lead(ctx)}</p>
+            <p className="m-0">
+              <BoldFacts text={topic.lead(ctx)} />
+            </p>
           </>
         }
         strip={strip}
         chips={cityLinks}
+        moreChip={{ label: 'Усі міста →', href: topic.section === 'mk' || topic.section === 'cert' ? '/maister-klasy' : '/vyrobnyky/misto' }}
         photo={topic.photo}
         actions={
           <>
@@ -203,7 +207,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
           {examples.length ? (
             <>
               {ctx.priceText && (
-                <QuoteBlock>
+                <QuoteBlock source={`Індекс цін «Глини», ${site.dataUpdated}`}>
                   {ctx.min === ctx.max ? 'У прайсах' : 'Найчастіше в прайсах'} — <b className="font-semibold">{nobreak(`${ctx.priceText}${topic.price.unitLabel ? ` ${topic.price.unitLabel}` : ''}`)}</b>.
                 </QuoteBlock>
               )}
@@ -212,7 +216,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
                 columns={[{ key: 'studio', label: 'Студія' }, { key: 'city', label: 'Місто' }, { key: 'price', label: 'З прайсу' }, { key: 'src', label: 'Джерело', mono: true }]}
                 rows={examples.map((e) => ({ studio: <Link href={`/vyrobnyky/${e.studio.slug}`}>{cleanName(e.studio.name)}</Link>, city: e.studio.cityDoc?.name ?? '', price: nobreak(e.text), src: e.source ?? '' }))}
               />
-              <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" cta={{ label: 'Отримати пропозиції', href: request }} />
+              <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: request }} />
             </>
           ) : (
             <p className="m-0">У каталозі цін на цей формат поки немає — уточнюйте в самих студіях{topic.form ? ' або надішліть запит' : ''}.</p>
@@ -223,7 +227,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
           l.studios.length ? (
             <Block key={l.title} id={`list${k}`} title={l.title} note={l.note ?? 'Список за відкритими даними студій (сайти, Instagram, медіа). Умови кожна студія підтверджує сама.'}>
               {k === firstByCity && <CityJump groups={jump} variant="chips" />}
-              <StudioList studios={l.studios} re={topic.evidence} byCity={l.byCity} />
+              <StudioList studios={l.studios} re={topic.evidence} byCity={l.byCity} showCity={!ctx.place} />
             </Block>
           ) : null,
         )}
@@ -232,7 +236,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
 
         <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst />
         <Related items={topic.related} />
-        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" cta={{ label: 'Отримати пропозиції', href: request }} />
+        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={{ label: 'Отримати пропозиції', href: request }} />
         {place && <PlaceSources c={place} />}
       </InnerCols>
       {topic.form && <MobileRequestBar />}

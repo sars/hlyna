@@ -3,7 +3,9 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { SectionHead } from '@/components/site/Bits'
+import { Block, InfoList } from '@/components/site/Inner'
+import { CityHead } from '@/components/ui/CityHead'
+import { MoreLink } from '@/components/ui/MoreLink'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
@@ -35,20 +37,25 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 function Items({ items }: { items: GiftItem[] }) {
-  const row = (it: GiftItem) => (
-    <li key={`${it.studio.id}-${it.text}`} className="rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-      <Link href={`/vyrobnyky/${it.studio.slug}`}>{cleanName(it.studio.name)}</Link>
-      {it.studio.cityDoc && <span className="text-umber"> · {it.studio.cityDoc.name}</span>}: {it.text}
-      {it.source && <span className="text-[12.5px] text-umber"> ({it.source})</span>}
-    </li>
+  const rows = (list: GiftItem[]) => (
+    <InfoList
+      items={list.map((it) => ({
+        title: <Link href={`/vyrobnyky/${it.studio.slug}`}>{cleanName(it.studio.name)}</Link>,
+        kicker: it.studio.cityDoc?.name,
+        lines: [<span key="t">{it.text}{it.source && <span className="font-mono text-[11.5px]"> ({it.source})</span>}</span>],
+      }))}
+    />
   )
   return (
     <>
-      <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0">{items.slice(0, SHOW).map(row)}</ul>
+      {rows(items.slice(0, SHOW))}
       {items.length > SHOW && (
-        <details className="group mt-2">
-          <summary className="cursor-pointer font-bold"><span className="group-open:hidden">Показати ще {items.length - SHOW}</span><span className="hidden group-open:inline">Згорнути</span></summary>
-          <ul className="mt-2 grid list-none grid-cols-1 gap-2 p-0">{items.slice(SHOW).map(row)}</ul>
+        <details className="group">
+          <MoreLink as="summary">
+            <span className="group-open:hidden">Показати ще {items.length - SHOW} →</span>
+            <span className="hidden group-open:inline">Згорнути</span>
+          </MoreLink>
+          {rows(items.slice(SHOW))}
         </details>
       )}
     </>
@@ -74,34 +81,26 @@ export default async function Page() {
         { label: 'Чашки', href: '/vyrobnyky/vyrib/chashky' },
       ]}
     >
-      <section aria-labelledby="budget">
-        <SectionHead kicker="За бюджетом" title="Що є в прайсах студій" id="budget">
-          <p className="m-0 text-sm text-umber">Роздрібні ціни з сайтів, Instagram і маркетплейсів студій; по одному найдешевшому варіанту від студії в кожному діапазоні. Наявність уточнюйте в студії.</p>
-        </SectionHead>
-        <div className="grid grid-cols-1 gap-6">
-          {p.tiers.map((t) =>
-            t.items.length ? (
-              <div key={t.key} id={t.key} className="grid grid-cols-1 gap-2 scroll-mt-24">
-                <h3 className="m-0 text-lg">{t.label}</h3>
-                <Items items={t.items} />
-              </div>
-            ) : null,
-          )}
-        </div>
-      </section>
-      <section aria-labelledby="occasion">
-        <SectionHead kicker="За приводом" title="Ідеї з прайсів під привід" id="occasion" />
-        <div className="grid grid-cols-1 gap-6">
-          {p.occasions.map((o) =>
-            o.items.length ? (
-              <div key={o.key} id={o.key} className="grid grid-cols-1 gap-2 scroll-mt-24">
-                <h3 className="m-0 text-lg">{o.label}</h3>
-                <Items items={o.items} />
-              </div>
-            ) : null,
-          )}
-        </div>
-      </section>
+      <Block id="budget" kicker="За бюджетом" title="Що є в прайсах студій" note={<>Роздрібні ціни з сайтів, Instagram і маркетплейсів студій; по одному найдешевшому варіанту від студії в кожному діапазоні. Наявність уточнюйте в студії.</>}>
+        {p.tiers.map((t) =>
+          t.items.length ? (
+            <div key={t.key}>
+              <CityHead id={t.key} name={t.label} />
+              <Items items={t.items} />
+            </div>
+          ) : null,
+        )}
+      </Block>
+      <Block id="occasion" kicker="За приводом" title="Ідеї з прайсів під привід">
+        {p.occasions.map((o) =>
+          o.items.length ? (
+            <div key={o.key}>
+              <CityHead id={o.key} name={o.label} />
+              <Items items={o.items} />
+            </div>
+          ) : null,
+        )}
+      </Block>
     </WavePage>
   )
 }

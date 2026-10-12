@@ -16,7 +16,6 @@ import { nobreak } from '@/components/ui/NoBreak'
 import { NumberedList } from '@/components/ui/NumberedList'
 import { REQUEST_HREF } from '@/content/navigation'
 import type { Block as GuideBlock, Guide } from '@/content/guides'
-import { docPhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import type { GuideCtx } from '@/editorial/guides'
 
@@ -57,7 +56,7 @@ function BlockView({ b }: { b: GuideBlock }) {
 // Layout for guides (/hayidy/*) and /dlya-studiy: factual lead, optional verse and photo, sections, FAQ, form.
 export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx; parents: { label: string; href?: string }[] }) {
   const faq = guide.faq(ctx)
-  const photo = guide.photo ? docPhotos[guide.photo] : undefined
+  const photo = guide.photo
   const bar = Boolean(guide.form && !guide.form.studio)
   const request = guide.form ? '#zapyt-forma' : REQUEST_HREF
   return (
@@ -117,7 +116,7 @@ export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx
           <FaqRich items={faq.map((f) => ({ q: f.q, a: f.a }))} />
         </Block>
         <Related items={guide.related} />
-        <CtaBand tone="ink" title={guide.form?.studio ? 'Додайте студію — профіль безкоштовний' : 'Опишіть, що потрібно, — студії відповідуть напряму'} cta={{ label: guide.form?.studio ? 'Додати студію' : 'Отримати пропозиції', href: request }} />
+        <CtaBand tone="ink" title={guide.form?.studio ? 'Додайте студію — профіль безкоштовний' : 'Опишіть, що потрібно, — студії відповідуть напряму'} text={guide.form?.studio ? 'Студія платить 5% лише з замовлень, що відбулися.' : 'Безкоштовно для замовника. Студії відповідають напряму.'} cta={{ label: guide.form?.studio ? 'Додати студію' : 'Отримати пропозиції', href: request }} />
       </InnerCols>
       {bar && <MobileRequestBar />}
     </InnerMain>

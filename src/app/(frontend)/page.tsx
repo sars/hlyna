@@ -103,7 +103,7 @@ export default async function HomePage() {
   ]
   const section = 'mt-section'
   return (
-    <main className="pb-20 lg:pb-0">
+    <main>
       {/* Hero: wordmark window, then the statement and the request form. The <h1> follows the decorative wordmark. */}
       <section className={cx(wrap, 'pt-[clamp(14px,2.5vw,32px)]')} aria-labelledby="h1">
         <div className="flex justify-between gap-3 pb-1.5">

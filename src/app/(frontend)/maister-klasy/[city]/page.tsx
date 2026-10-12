@@ -233,7 +233,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
         )}
 
         <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />
-        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
       </InnerCols>
       <MobileRequestBar />
     </InnerMain>

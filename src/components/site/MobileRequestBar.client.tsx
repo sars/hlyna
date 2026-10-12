@@ -27,6 +27,7 @@ export function MobileRequestBar() {
   if (pathname?.startsWith('/zapyt')) return null
   return (
     <div
+      data-request-bar=""
       inert={formVisible}
       aria-hidden={formVisible}
       className={`fixed inset-x-0 bottom-0 z-30 border-t-2 border-ink bg-paper px-gutter pt-2.5 pb-[calc(10px+env(safe-area-inset-bottom,0px))] transition-transform duration-200 lg:hidden ${formVisible ? 'translate-y-full' : ''}`}

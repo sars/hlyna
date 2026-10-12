@@ -126,7 +126,7 @@ export function RequestForm({
 
   if (state === 'done')
     return (
-      <div id={compact ? 'zapyt-forma' : undefined} data-tone="cobalt" role="status" className={`${panel} gap-2.5`}>
+      <div id="zapyt-forma" data-tone="cobalt" role="status" className={`${panel} gap-2.5`}>
         <p className="m-0 font-serif text-xl leading-[1.3] italic">
           {studio ? 'Дані студії отримали' : caseFix ? 'Повідомлення отримали' : 'Запит надіслано'}
           {requestId ? ` · № ${requestId}` : ''}
@@ -153,7 +153,7 @@ export function RequestForm({
 
   if (caseFix && !studio)
     return (
-      <form onSubmit={onSubmit} data-tone="cobalt" className={panel} noValidate>
+      <form id="zapyt-forma" onSubmit={onSubmit} data-tone="cobalt" className={panel} noValidate>
         <Kicker>Виправити або зняти кейс</Kicker>
         <input type="hidden" name="what" value="other" />
         <Field label="Що виправити або чому зняти" htmlFor={`${uid}-d`}>
@@ -179,7 +179,7 @@ export function RequestForm({
 
   if (studio)
     return (
-      <form onSubmit={onSubmit} data-tone="cobalt" className={panel} noValidate>
+      <form id="zapyt-forma" onSubmit={onSubmit} data-tone="cobalt" className={panel} noValidate>
         <Kicker>Додати нову студію</Kicker>
         <p className="m-0 mt-1.5 mb-1 text-[14.5px] leading-[1.45] text-on-cobalt-2">
           Ваша студія вже є в каталозі? Відкрийте її профіль у{' '}
@@ -283,7 +283,7 @@ export function RequestForm({
   }
 
   return (
-    <form data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={panel} noValidate>
+    <form id="zapyt-forma" data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={panel} noValidate>
       <Kicker>Запит · безкоштовно</Kicker>
       <h2 id={`${uid}-h`} className="m-0 mt-1.5 mb-2 font-display text-[19px] leading-[1.15] font-semibold sm:text-xl">
         Опишіть, що потрібно — відповідять 3–5 студій
@@ -327,10 +327,11 @@ export function RequestForm({
       </FieldRow>
       {kind.logo && <Checkbox name="logo" label="Потрібен логотип" />}
       {honeypot}
-      <div className="mt-2.5 flex flex-wrap items-center gap-3.5">
+      <div className="mt-2.5 flex flex-wrap items-center gap-x-3.5 gap-y-2">
         <Button type="submit" disabled={state === 'sending'}>
           {state === 'sending' ? 'Надсилаємо…' : 'Отримати пропозиції'}
         </Button>
+        <small className="font-mono text-[11px] tracking-[.03em] text-on-cobalt-2">Відповідь напряму від студій</small>
       </div>
       {errorLine}
       <p className={`${small} mt-2.5`}>Безкоштовно для замовника. Запит отримають 3–5 студій, які роблять такі вироби. Студії платять нам 5% лише з укладених замовлень.</p>

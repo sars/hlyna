@@ -232,6 +232,7 @@ export const businessTopics: Record<string, Topic> = {
     metaDescription: (c) => `Керамічні чашки для еспресо, капучино й латте, блюдця і піали від українських студій: ${studios(c.n)} ${where(c)}. Об’єми, міцність, дозамовлення, терміни ${site.lead.batch}.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять чашки й посуд для кав’ярень або приймають замовлення від закладів.${priceRange(c) ? ` Чашки в роздрібних прайсах коштують здебільшого ${priceRange(c)}.` : ''} Серію під вашу кав’ярню зазвичай виготовляють ${site.lead.batch}; запас на бій і дозамовлення варто обговорити одразу.`,
     verse: verses.cafe,
+    photo: sitePhotos.bizCafes,
     ogImg: 'doc-bar-cups',
     lists: [
       { title: 'Роблять чашки й працюють із закладами', formats: ['horeca'], types: ['studio', 'brand', 'maker'], filter: (s) => CUPS.test(productText(s)), byCity: true },
@@ -331,6 +332,7 @@ export const businessTopics: Record<string, Topic> = {
     metaDescription: (c) => `Чашки, набори посуду, вази й свічники для команди, клієнтів і партнерів від ${studios(c.n)}: з логотипом або без, з пакуванням. Бюджет на подарунок, терміни ${site.lead.batch}, сертифікати на майстер-клас.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять корпоративні подарунки, персоналізовані вироби або посуд на замовлення для компаній.${priceRange(c) ? ` Окремий подарунок у роздрібних прайсах коштує здебільшого ${priceRange(c)}.` : ''} Партію з логотипом виготовляють ${site.lead.logoDetail}; вироби з наявності й сертифікати на майстер-клас можна отримати за кілька днів.`,
     verse: verses.gifts,
+    photo: sitePhotos.bizGifts,
     ogImg: 'glazed-bottles',
     lists: [
       { title: 'Роблять корпоративні подарунки й персоналізовані вироби', formats: ['corporate-gifts', 'logo'], types: MAKERS },

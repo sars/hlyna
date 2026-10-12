@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { Block } from '@/components/site/Inner'
+import { site } from '@/content/site'
 import { DataTable } from '@/components/ui/DataTable'
 import { nobreak } from '@/components/ui/NoBreak'
 import { QuoteBlock } from '@/components/ui/QuoteBlock'
@@ -84,7 +85,7 @@ export default async function Page({ params }: Args) {
       {p.data.examples.length > 0 && (
         <Block id="prices" kicker="Ціни" title={p.topic.price.title} note={p.topic.price.note}>
           {p.vars.priceRange && (
-            <QuoteBlock>
+            <QuoteBlock source={`Індекс цін «Глини», ${site.dataUpdated}`}>
               Найчастіше в прайсах {p.vars.inCity} — <b className="font-semibold">{nobreak(String(p.vars.priceRange))}</b>.{' '}
               <span className="text-ink-2">
                 Це ціни лише місць із цієї сторінки, по одній на студію; загальну ціну разового майстер-класу в місті дивіться на <Link href={`/maister-klasy/${city}`}>сторінці міста</Link> і в «<Link href="/tsiny-2026">Цінах 2026</Link>».

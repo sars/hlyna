@@ -10,17 +10,42 @@ import { Kicker } from '@/components/ui/Kicker'
 import { cx, wrap } from '@/components/ui/layout'
 import { SectionHead } from '@/components/ui/SectionHead'
 import { Updated } from '@/components/ui/Updated'
+import { nobreak } from '@/components/ui/NoBreak'
 import type { DocPhoto, SitePhoto } from '@/content/photos'
 
 // Shared skeleton of the inner pages (SYSTEM.md §4.2, §5): TopicPage, WavePage, GuidePage and the wave routes all
-// compose these. Pages with a request bar keep a 76px bottom padding so the footer is never covered.
-export function InnerMain({ bar, children }: { bar?: boolean; children: React.ReactNode }) {
-  return <main className={cx(wrap, 'grid w-full', bar ? 'pb-[76px] lg:pb-section' : 'pb-section')}>{children}</main>
+// compose these. Room for the phone request bar is left at the end of the footer (see globals.css), not in <main>.
+export function InnerMain({ children }: { bar?: boolean; children: React.ReactNode }) {
+  return <main className={cx(wrap, 'grid w-full')}>{children}</main>
+}
+
+// Numbers in a lead (counts, prices, terms) in semibold, ranges kept on one line; the text itself is unchanged.
+const NUM = /\d[\d\u00a0 ]*(?:[–-][\d\u00a0 ]*\d)?(?:[.,]\d+)?(?:[\u00a0 ](?:грн|%|студі\p{L}*|міст\p{L}*|місц\p{L}*|тижн\p{L}*|майстр\p{L}*|профіл\p{L}*))?/gu
+export function BoldFacts({ text }: { text: string }) {
+  const out: React.ReactNode[] = []
+  let last = 0
+  for (const m of text.matchAll(NUM)) {
+    const i = m.index ?? 0
+    const raw = m[0].replace(/[\u00a0 ]+$/, '')
+    // a year or a day number is not a fact figure
+    if (/^(19|20)\d\d$/.test(raw) || raw.length < 1) continue
+    if (i > last) out.push(text.slice(last, i))
+    out.push(
+      <b key={i} className="font-semibold">
+        {nobreak(raw)}
+      </b>,
+    )
+    last = i + raw.length
+  }
+  if (!out.length) return <>{text}</>
+  out.push(text.slice(last))
+  return <>{out}</>
 }
 
 // The photo of an inner page: archive photos (SitePhoto) have no caption; Wikimedia and stock photos (DocPhoto) show their credit.
 export function HeroPhoto({ photo, priority }: { photo: DocPhoto | SitePhoto; priority?: boolean }) {
-  const credit = 'author' in photo ? photo : null
+  // Only photos that need a credit (CC BY, CC BY-SA) show one; CC0 and archive photos are credited in CREDITS.md.
+  const credit = 'author' in photo && photo.license !== 'CC0' ? photo : null
   return (
     <figure className="m-0">
       <Image src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} priority={priority} sizes="(min-width:960px) 40vw, 100vw" className="aspect-[16/11] w-full object-cover" />
@@ -46,6 +71,7 @@ export function InnerHero({
   lead,
   strip,
   chips,
+  moreChip,
   actions,
   photo,
 }: {
@@ -55,7 +81,8 @@ export function InnerHero({
   title: string
   lead: React.ReactNode
   strip?: { value: string; label: string }[]
-  chips?: { label: string; href: string }[]
+  chips?: { label: string; href: string; count?: number }[]
+  moreChip?: { label: string; href: string }
   actions?: React.ReactNode
   photo?: DocPhoto | SitePhoto
 }) {
@@ -69,11 +96,16 @@ export function InnerHero({
         {strip && strip.length >= 3 && <FactStrip items={strip} />}
         {chips && chips.length > 0 && (
           <ChipGroup as="nav" label="У містах:" aria-label="У містах">
-            {chips.map((l) => (
-              <Chip key={l.href} href={l.href}>
+            {chips.map((l, i) => (
+              <Chip key={l.href} href={l.href} count={l.count} className={i >= 8 ? 'max-sm:hidden' : undefined}>
                 {l.label}
               </Chip>
             ))}
+            {moreChip && chips.length > 8 && (
+              <Chip href={moreChip.href} className="sm:hidden">
+                {moreChip.label}
+              </Chip>
+            )}
           </ChipGroup>
         )}
         {actions && <div className="flex flex-wrap gap-2.5">{actions}</div>}
@@ -90,7 +122,7 @@ export function InnerCols({ aside, children }: { aside?: React.ReactNode; childr
     <div className={cx('grid items-start gap-[clamp(28px,4vw,56px)] pt-[clamp(24px,3vw,40px)]', aside ? 'lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]' : undefined)}>
       <div className="grid min-w-0 gap-block">{children}</div>
       {aside && (
-        <aside id="zapyt-forma" className="grid min-w-0 gap-[22px] lg:sticky lg:top-[84px] lg:max-h-[calc(100dvh-100px)] lg:self-start lg:overflow-y-auto">
+        <aside className="grid min-w-0 content-start gap-[22px] lg:top-[84px] lg:self-start lg:[@media(min-height:56rem)]:sticky">
           {aside}
         </aside>
       )}
@@ -103,7 +135,7 @@ export function Block({ id, title, kicker, note, children }: { id: string; title
   return (
     <section aria-labelledby={id} className="min-w-0">
       <SectionHead id={id} title={title} kicker={kicker} note={note} />
-      <div className="grid gap-4 [&_.ui-cells]:border-t-0 [&_.ui-makers]:border-t-0">{children}</div>
+      <div className="grid gap-4 [&>.ui-table-scroll:first-child>.ui-table]:border-t-0 [&>.ui-table:first-child]:border-t-0 [&_.ui-cells]:border-t-0 [&_.ui-makers]:border-t-0">{children}</div>
     </section>
   )
 }

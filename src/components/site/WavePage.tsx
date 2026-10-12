@@ -9,6 +9,7 @@ import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { Button } from '@/components/ui/Button'
 import { CtaBand } from '@/components/ui/CtaBand'
 import { Epigraph } from '@/components/ui/Epigraph'
+import type { HeroPhoto } from '@/content/photos'
 import type { WaveCopy } from '@/editorial/wave-a'
 import { latestUpdate } from '@/lib/catalog'
 import type { StudioCard } from '@/lib/catalog'
@@ -62,6 +63,7 @@ export function WavePage({
   children,
   related = [],
   cityLinks = [],
+  photo,
 }: {
   copy: WaveCopy
   known: Known
@@ -73,7 +75,8 @@ export function WavePage({
   studios?: StudioCard[]
   children: React.ReactNode
   related?: { label: string; href: string }[]
-  cityLinks?: { label: string; href: string }[]
+  cityLinks?: { label: string; href: string; count?: number }[]
+  photo?: HeroPhoto
 }) {
   const [first, ...rest] = copy.sections
   const picks = (copy.picks ?? []).map((p) => ({ ...p, studios: p.slugs.map((s) => known.get(s)).filter((s): s is StudioCard => !!s) })).filter((p) => p.studios.length)
@@ -95,6 +98,7 @@ export function WavePage({
           </p>
         }
         chips={cityLinks}
+        photo={photo}
         actions={
           <Button href="#zapyt-forma" variant="cobalt" arrow>
             Отримати пропозиції
@@ -139,7 +143,7 @@ export function WavePage({
         )}
 
         <Related items={related} />
-        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
 
         {copy.sources.length > 0 && (
           <details className="font-mono text-xs text-ink-2">

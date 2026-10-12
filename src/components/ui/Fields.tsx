@@ -18,7 +18,7 @@ export function Field({ label, htmlFor, hint, error, children, className }: { la
 
 // Two fields side by side (quantity and date, phone and email).
 export function FieldRow({ children }: { children: React.ReactNode }) {
-  return <div className="grid grid-cols-2 gap-4">{children}</div>
+  return <div className="grid grid-cols-2 items-end gap-4">{children}</div>
 }
 
 export function Input({ invalid, className, ...rest }: React.InputHTMLAttributes<HTMLInputElement> & Invalid) {

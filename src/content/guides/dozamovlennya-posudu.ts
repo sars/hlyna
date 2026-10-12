@@ -1,4 +1,5 @@
 // Guide /hayidy/dozamovlennya-posudu.
+import { docPhotos } from '../photos'
 import { type Guide } from './shared'
 
 export const reorders: Guide = {
@@ -11,7 +12,7 @@ export const reorders: Guide = {
   short: 'Чому партії відрізняються, еталонний зразок, що записати в договорі, запас на бій.',
   lead: () =>
     'Ручний посуд від партії до партії трохи відрізняється: нова глина, нова партія поливи і місце в печі щоразу дають інший відтінок. Щоб дозамовлення пасувало до першої партії, домовтеся про це до старту: збережіть еталонний зразок, запишіть назви поливи й форми і візьміть запас на бій.',
-  photo: 'handsClay',
+  photo: docPhotos.handsClay,
   sections: [
     {
       id: 'chomu',

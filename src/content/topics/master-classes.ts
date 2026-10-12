@@ -1,7 +1,7 @@
 // Master-class format and certificate topic pages (/maister-klasy/<format>, /sertyfikaty).
 import { fmt } from '@/lib/money'
 import { verses } from '../verses'
-import { docPhotos, sitePhotos } from '../photos'
+import { sitePhotos } from '../photos'
 import { MK, mkCards, places, priceRange, type Topic, where, WORKSHOP } from './shared'
 
 export const masterClassTopics: Record<string, Topic> = {
@@ -58,7 +58,7 @@ export const masterClassTopics: Record<string, Topic> = {
     metaDescription: (c) => `Ліплення з глини, гончарне коло і розпис для дітей: ${places(c.n)} ${where(c)}. З якого віку, скільки триває, ціни, дитячі свята в студії.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, де є дитячі заняття з кераміки: разові майстер-класи, гуртки й дні народження.${priceRange(c) ? ` У прайсах студій дитячі заняття коштують здебільшого ${priceRange(c)}.` : ''} Найчастіше беруть дітей від 4–6 років; малюки ліплять і розписують, старші пробують гончарне коло.`,
     verse: verses.kids,
-    photo: docPhotos.schoolStudio,
+    photo: sitePhotos.mkKids,
     ogImg: 'doc-school-studio',
     lists: [{ title: 'Де є дитячі заняття', formats: ['kids'], types: WORKSHOP, byCity: true }],
     evidence: /дит|діт|від \d+ рок|школяр|день народж|дні народж/iu,

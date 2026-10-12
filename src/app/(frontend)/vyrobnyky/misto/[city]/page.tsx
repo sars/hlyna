@@ -162,7 +162,7 @@ export default async function CityMakersPage({ params }: Args) {
               {t.studios.length > SHOW + 2 && (
                 <details className="group">
                   <MoreLink as="summary">
-                    <span className="group-open:hidden">Показати ще {t.studios.length - SHOW}</span>
+                    <span className="group-open:hidden">Показати ще {t.studios.length - SHOW} →</span>
                     <span className="hidden group-open:inline">Згорнути</span>
                   </MoreLink>
                   <MakerRows>
@@ -178,7 +178,7 @@ export default async function CityMakersPage({ params }: Args) {
 
         {content && <PlaceSeeAlso c={content} known={known} />}
         <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />
-        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника. Студії відповідають напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
         {content && <PlaceSources c={content} />}
       </InnerCols>
       <MobileRequestBar />

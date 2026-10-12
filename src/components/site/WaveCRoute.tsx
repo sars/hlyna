@@ -12,6 +12,7 @@ import { getAllStudios, type StudioCard } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
 import { fillCopy } from '@/editorial/wave-a'
 import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/editorial/wave-c'
+import { sitePhotos } from '@/content/photos'
 import { ogImage } from '@/utilities/ogImage'
 
 // Wave C page: reviewed copy (src/content/waveC) around structured blocks rendered from JSON
@@ -106,7 +107,7 @@ function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: st
         {tail.length > 0 && (
           <details className="group">
             <MoreLink as="summary">
-              <span className="group-open:hidden">{`Показати ще ${tail.length}`}</span>
+              <span className="group-open:hidden">{`Показати ще ${tail.length} →`}</span>
               <span className="hidden group-open:inline">Згорнути</span>
             </MoreLink>
             <MakerRows>
@@ -205,7 +206,7 @@ export async function WaveCRoute({ id }: { id: WaveCId }) {
   const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
   const crumbs = [{ label: 'Головна', href: '/' }, ...(meta.section === 'biz' ? [{ label: 'Для бізнесу', href: '/dlya-biznesu' }] : []), { label: meta.crumb }]
   return (
-    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={waveCStudios(p.data)} related={RELATED[id].filter((r) => r.href !== meta.path && isBuilt(r.href))}>
+    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={waveCStudios(p.data)} photo={id === 'novyi-rik-i-rizdvo' ? sitePhotos.bizNewYear : undefined} related={RELATED[id].filter((r) => r.href !== meta.path && isBuilt(r.href))}>
       <LiveBlock d={p.data} />
     </WavePage>
   )

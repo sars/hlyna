@@ -1,5 +1,5 @@
 // Guide page shape (blocks, sections) and small text helpers shared by the guide configs.
-import type { DocPhotoKey } from '../photos'
+import type { HeroPhoto } from '../photos'
 import { pluralUk } from '@/lib/catalog'
 import { type GuideCtx } from '@/editorial/guides'
 
@@ -22,7 +22,7 @@ export type Guide = {
   short: string // one line for the guide index and llms.txt
   lead: (ctx: GuideCtx) => string
   verse?: string[]
-  photo?: DocPhotoKey
+  photo?: HeroPhoto
   sections: GuideSection[]
   faq: (ctx: GuideCtx) => { q: string; a: string }[]
   related: { label: string; href: string; note?: string }[]

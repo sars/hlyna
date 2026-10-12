@@ -17,6 +17,7 @@ import { evidenceLine } from '@/editorial/topics'
 import { fillCopy } from '@/editorial/wave-a'
 import { makerCities } from '@/lib/makers'
 import { EVENT_KIND, eventEnd, WAVE_B, waveBCopy, waveBData, waveBStudios, type EventItem, type WaveBData, type WaveBId } from '@/editorial/wave-b'
+import { sitePhotos } from '@/content/photos'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
 
@@ -59,7 +60,7 @@ function Makers({ studios, title, id, note }: { studios: StudioCard[]; title: st
         {tail.length > 0 && (
           <details className="group">
             <MoreLink as="summary">
-              <span className="group-open:hidden">{`Показати ще ${tail.length}`}</span>
+              <span className="group-open:hidden">{`Показати ще ${tail.length} →`}</span>
               <span className="hidden group-open:inline">Згорнути</span>
             </MoreLink>
             <MakerRows>
@@ -242,7 +243,7 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
     ? groupByCity(studios).filter((g) => g.studios.length >= 2 && makerSlugs.has(g.city.slug)).map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}` }))
     : []
   return (
-    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={studios} cityLinks={cityLinks} related={(RELATED[id] ?? []).filter((r) => r.href !== meta.path)}>
+    <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={studios} cityLinks={cityLinks} photo={id === 'vydy-keramiky' ? sitePhotos.guideVydy : undefined} related={(RELATED[id] ?? []).filter((r) => r.href !== meta.path)}>
       <LiveBlock d={p.data} />
     </WavePage>
   )

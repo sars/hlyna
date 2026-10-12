@@ -1,4 +1,5 @@
 // Guide /hayidy/yak-obraty-maister-klas.
+import { docPhotos } from '../photos'
 import { priceText } from '@/editorial/guides'
 import { n, inPlaces, type Guide } from './shared'
 
@@ -13,7 +14,7 @@ export const chooseClass: Guide = {
   lead: (c) =>
     `У каталозі ${n(c.mk, ['місце', 'місця', 'місць'])} у ${inPlaces(c.mkCities)}, де проводять майстер-класи з кераміки. Разове заняття коштує ${priceText(c, 'group')} з особи, для двох — ${priceText(c, 'couple')}; триває зазвичай 1,5–3 години. Виріб після випалу забирають здебільшого через 2–4 тижні.`,
   verse: ['Два тижні чекає чашка', 'у темряві печі,', 'щоб вийти до вас', 'дзвінкою.'],
-  photo: 'paintingGroup',
+  photo: docPhotos.paintingGroup,
   sections: [
     {
       id: 'formaty',

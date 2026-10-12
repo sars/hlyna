@@ -5,7 +5,6 @@ import { priceIndex } from '@/lib/priceIndex'
 import type { Metadata } from 'next'
 
 import type { Guide } from '@/content/guides'
-import { docPhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { fmt } from '@/lib/money'
@@ -47,7 +46,8 @@ export const priceText = (ctx: GuideCtx, key: string, fallback = 'за прай�
 
 /** Open Graph metadata for a guide: share card with its photo (or the tile pattern). */
 export function guideMetadata(g: Guide): Metadata {
-  const photo = g.photo ? docPhotos[g.photo] : null
+  // Archive photos (no credit) are not OG sources yet (step 8): such guides keep the tile pattern.
+  const photo = g.photo && 'author' in g.photo ? g.photo : null
   const img = photo ? (photo.src.startsWith('/images/doc/') ? 'doc-' : '') + photo.src.split('/').pop()!.replace(/\.jpg$/, '') : undefined
   return {
     title: g.title,

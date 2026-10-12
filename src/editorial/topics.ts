@@ -139,17 +139,17 @@ export async function certificateCities() {
 
 /** City chips for a whole-Ukraine topic page: its format × city pages, city certificate pages, or the makers
  *  pages of cities with at least MIN_LIST entries on the page. Empty on a city-scoped page. */
-export async function topicCityLinks(topic: Topic, data: TopicData): Promise<{ label: string; href: string }[]> {
+export async function topicCityLinks(topic: Topic, data: TopicData): Promise<{ label: string; href: string; count?: number }[]> {
   if (data.ctx.place) return []
   const format = topic.path.match(/^\/maister-klasy\/([a-z-]+)$/)?.[1]
   if (format) {
     const { liveFormatCityPages } = await import('@/editorial/wave-a')
-    return (await liveFormatCityPages()).filter((p) => p.format === format).sort((a, b) => b.count - a.count).map((p) => ({ label: p.cityName, href: `/maister-klasy/${p.city}/${p.format}` }))
+    return (await liveFormatCityPages()).filter((p) => p.format === format).sort((a, b) => b.count - a.count).map((p) => ({ label: p.cityName, href: `/maister-klasy/${p.city}/${p.format}`, count: p.count }))
   }
   if (topic.path === '/sertyfikaty') return (await certificateCities()).map((c) => ({ label: c.name, href: `/sertyfikaty/${c.slug}` }))
   const { makerCities } = await import('@/lib/makers')
   const withPage = new Set((await makerCities()).map((g) => g.city.slug))
   return groupByCity(data.all)
     .filter((g) => g.studios.length >= MIN_LIST && withPage.has(g.city.slug))
-    .map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}` }))
+    .map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}`, count: g.studios.length }))
 }

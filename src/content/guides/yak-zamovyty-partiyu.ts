@@ -1,4 +1,5 @@
 // Guide /hayidy/yak-zamovyty-partiyu.
+import { sitePhotos } from '../photos'
 import { site } from '../site'
 import { priceText } from '@/editorial/guides'
 import { n, type Guide } from './shared'
@@ -14,7 +15,7 @@ export const orderBatch: Guide = {
   lead: (c) =>
     `Партію посуду чи подарунків українські студії зазвичай роблять за ${c.batch}: формування, сушіння, два випали, пакування. З логотипом — ${c.logo}. У каталозі ${n(c.venues, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])}, які працюють із закладами, і ${c.companies} — з компаніями. Нижче — кроки замовлення, що вказати в брифі й про що домовитися письмово.`,
   verse: ['Сто тарілок однієї форми', 'виходять з печі різними,', 'як хліб з однієї діжі —', 'і всі свої.'],
-  photo: 'wheelBw',
+  photo: sitePhotos.guideGlaze,
   sections: [
     {
       id: 'kroky',

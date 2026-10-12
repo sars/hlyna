@@ -233,13 +233,13 @@
   .ui-table td + td, .ui-table th + th { padding-left: 14px; }
   .ui-table [data-end] { text-align: right; }
   .ui-table [data-numeric] { font-variant-numeric: tabular-nums; }
-  .ui-table td[data-mono] { font-family: var(--font-mono); font-size: 12px; line-height: 22.5px; color: var(--color-ink-2); }
+  .ui-table td[data-mono] { max-width: 12em; font-family: var(--font-mono); font-size: 12px; line-height: 22.5px; color: var(--color-ink-2); overflow-wrap: anywhere; }
   .ui-table-scroll [data-numeric] + [data-mono], .ui-table-scroll th[data-end] + th:not([data-end]) { padding-left: 24px; }
   .ui-table a { color: var(--color-cobalt); text-decoration: underline; text-underline-offset: 3px; }
   .ui-table-scroll { overflow-x: auto; }
   .ui-table-scroll .ui-table { min-width: 640px; }
   @media (min-width: 50rem) {
-    .ui-table td[data-numeric], .ui-table td[data-mono] { white-space: nowrap; }
+    .ui-table td[data-numeric] { white-space: nowrap; }
   }
   @media (max-width: 49.99rem) {
     .ui-table-scroll caption::after { content: ' · прокрутіть вбік'; }
@@ -388,7 +388,7 @@
     .nav-top > a > svg { display: none; }
     .nav-actions .ui-btn { padding-inline: 10px; }
   }
-  @media (min-width: 60rem) {
+  @media (min-width: 65rem) {
     .nav-top { gap: 20px; }
     .nav-actions { gap: 10px; }
     .nav-actions .ui-btn { padding-inline: 1.4em; }
@@ -397,7 +397,7 @@
   }
   .nav-drawer { position: fixed; inset: 0; z-index: 50; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: calc(14px + env(safe-area-inset-top, 0px)) var(--spacing-gutter) 40px; overflow-y: auto; border: 0; background: var(--color-paper); color: var(--color-ink); }
   .nav-drawer::backdrop { background: transparent; }
-  @media (min-width: 60rem) { .nav-drawer { display: none !important; } }
+  @media (min-width: 65rem) { .nav-drawer { display: none !important; } }
   .nav-drawer-top { display: flex; align-items: center; justify-content: space-between; padding-bottom: 12px; border-bottom: 2px solid var(--color-ink); }
   .nav-drawer details { border-bottom: 1px solid var(--color-rule); }
   .nav-drawer summary { display: flex; align-items: center; gap: 10px; padding: 16px 0; list-style: none; cursor: pointer; font-family: var(--font-display); font-size: 15px; font-weight: 600; text-transform: uppercase; }
@@ -429,7 +429,7 @@
     .ui-vessel-win { grid-row: auto; width: 100%; }
     .ui-vessel h3, .ui-vessel small { align-self: auto; }
   }
-  @media (min-width: 60rem) {
+  @media (min-width: 65rem) {
     .ui-vessels { gap: 0; align-items: stretch; border-bottom: 1px solid var(--color-rule); }
     .ui-vessel { grid-template-columns: 170px minmax(0, 1fr); align-items: center; gap: 6px 24px; padding: 24px 24px 24px 0; text-align: left; border-right: 1px solid var(--color-rule); }
     .ui-vessel + .ui-vessel { padding-left: 24px; }
@@ -442,6 +442,15 @@
   }
 
   @media (prefers-reduced-motion: reduce) { .ui-arrow, .ui-pcard img, .ui-vessel img, .nav-caret { transition: none; } }
+}
+
+/* Phone: pages with the fixed request bar keep room for it at the end of the footer (not as padding of <main>). */
+@layer utilities {
+  @media (max-width: 59.99rem) {
+    body:has([data-request-bar]) footer {
+      padding-bottom: calc(44px + 76px + env(safe-area-inset-bottom, 0px));
+    }
+  }
 }
 
 /* A page that ends with a full-bleed dark panel (home) lets the footer rule butt against it. */

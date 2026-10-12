@@ -42,7 +42,7 @@ export function MainNav() {
       if (navRef.current && !navRef.current.contains(e.target as Node)) setOpened((o) => (o.id ? { id: null, path: o.path } : o))
     }
     // Leaving the phone layout with the drawer open would leave the page locked behind an invisible dialog.
-    const mq = window.matchMedia('(min-width: 60rem)')
+    const mq = window.matchMedia('(min-width: 65rem)')
     const onMq = () => mq.matches && dialogRef.current?.open && dialogRef.current.close()
     document.addEventListener('keydown', onKey)
     document.addEventListener('click', onClick)
@@ -140,12 +140,12 @@ export function MainNav() {
       </nav>
 
       <div className="nav-actions">
-        <button type="button" className="ui-btn lg:hidden" data-variant="ghost" data-size="sm" aria-expanded={drawer} aria-controls="mobile-menu" onClick={openDrawer}>
+        <button type="button" className="ui-btn min-[65rem]:hidden" data-variant="ghost" data-size="sm" aria-expanded={drawer} aria-controls="mobile-menu" onClick={openDrawer}>
           Меню
         </button>
         <Button href={request} size="sm" arrow>
-          <span className="hidden lg:inline">Отримати пропозиції</span>
-          <span className="lg:hidden">Запит</span>
+          <span className="hidden min-[65rem]:inline">Отримати пропозиції</span>
+          <span className="min-[65rem]:hidden">Запит</span>
         </Button>
       </div>
 

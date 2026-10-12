@@ -3,11 +3,14 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { SectionHead } from '@/components/site/Bits'
+import { Block, InfoList } from '@/components/site/Inner'
+import { CityHead } from '@/components/ui/CityHead'
+import { MoreLink } from '@/components/ui/MoreLink'
 import { WavePage } from '@/components/site/WavePage'
-import { getAllStudios, type StudioCard } from '@/lib/catalog'
+import { getAllStudios } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
 import { fillCopy, waveCopy, whereToBuyData } from '@/editorial/wave-a'
+import { sitePhotos } from '@/content/photos'
 import { ogImage } from '@/utilities/ogImage'
 
 // Where to buy contemporary Ukrainian ceramics: shops and galleries by city, makers' own online shops, Etsy.
@@ -34,17 +37,6 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 
-function ShopRow({ s, brands }: { s: StudioCard; brands?: string }) {
-  const addr = firstAddress(s.address)
-  return (
-    <li className="grid grid-cols-1 gap-0.5 rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-      <Link href={`/vyrobnyky/${s.slug}`} className="font-bold">{cleanName(s.name)}</Link>
-      {addr && <span className="text-umber">{addr}</span>}
-      {brands && <span className="text-umber">{brands}</span>}
-    </li>
-  )
-}
-
 export default async function Page() {
   const p = await load()
   if (!p) notFound()
@@ -59,6 +51,7 @@ export default async function Page() {
       path={PATH}
       form="other"
       studios={p.shops}
+      photo={sitePhotos.shopShelf}
       related={[
         { label: 'Виробники за містами', href: '/vyrobnyky/misto' },
         { label: 'Вироби', href: '/vyrobnyky/vyrib' },
@@ -66,54 +59,45 @@ export default async function Page() {
         { label: 'Мапа студій', href: '/mapa' },
       ]}
     >
-      <section aria-labelledby="shops">
-        <SectionHead title="Магазини й галереї за містами" id="shops" />
-        <div className="grid grid-cols-1 gap-6">
-          {p.shopCities.map((g) => (
-            <div key={g.city.slug} id={`misto-${g.city.slug}`} className="grid grid-cols-1 gap-2 scroll-mt-24">
-              <h3 className="m-0 text-lg">{g.city.name}</h3>
-              <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
-                {g.studios.map((s) => <ShopRow key={s.id} s={s} brands={brandsBySlug.get(s.slug!)} />)}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Block id="shops" title="Магазини й галереї за містами">
+        {p.shopCities.map((g) => (
+          <div key={g.city.slug}>
+            <CityHead id={`misto-${g.city.slug}`} name={g.city.name} />
+            <InfoList
+              columns={2}
+              items={g.studios.map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>, lines: [firstAddress(s.address) || null, brandsBySlug.get(s.slug!) || null] }))}
+            />
+          </div>
+        ))}
+      </Block>
 
       {p.etsy.length > 0 && (
-        <section aria-labelledby="etsy">
-          <SectionHead title="Українські керамісти на Etsy" id="etsy">
-            <p className="m-0 text-sm text-umber">Магазини з локацією в Україні; кількість продажів і відгуків — з вітрини Etsy на момент перевірки.</p>
-          </SectionHead>
-          <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
-            {p.etsy.map((e) => (
-              <li key={e.url} className="grid grid-cols-1 gap-0.5 rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-                {e.slug && known.has(e.slug) ? <Link href={`/vyrobnyky/${e.slug}`} className="font-bold">{e.name ?? e.shop}</Link> : <b>{e.name ?? e.shop}</b>}
-                <span className="text-umber">
-                  {[e.location, e.sales ? `${e.sales.toLocaleString('uk-UA')} продажів` : '', e.rating ? `рейтинг ${e.rating}` : ''].filter(Boolean).join(' · ')}
-                </span>
-                <a href={e.url} target="_blank" rel="noopener nofollow" className="text-sm">Магазин на Etsy</a>
-              </li>
-            ))}
-          </ul>
-        </section>
+        <Block id="etsy" title="Українські керамісти на Etsy" note={<>Магазини з локацією в Україні; кількість продажів і відгуків — з вітрини Etsy на момент перевірки.</>}>
+          <InfoList
+            columns={2}
+            items={p.etsy.map((e) => ({
+              title: e.slug && known.has(e.slug) ? <Link href={`/vyrobnyky/${e.slug}`}>{e.name ?? e.shop}</Link> : (e.name ?? e.shop),
+              lines: [
+                [e.location, e.sales ? `${e.sales.toLocaleString('uk-UA')} продажів` : '', e.rating ? `рейтинг ${e.rating}` : ''].filter(Boolean).join(' · ') || null,
+                <a key="etsy" href={e.url} target="_blank" rel="noopener nofollow">
+                  Магазин на Etsy
+                </a>,
+              ],
+            }))}
+          />
+        </Block>
       )}
 
       {p.online.length > 0 && (
-        <section aria-labelledby="online">
-          <SectionHead title="Власні онлайн-магазини майстрів і брендів" id="online" />
+        <Block id="online" title="Власні онлайн-магазини майстрів і брендів">
           <details className="group">
-            <summary className="mb-3 cursor-pointer font-bold">{`Показати ${p.online.length}`}</summary>
-            <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
-              {p.online.slice(0, 200).map((s) => (
-                <li key={s.id} className="rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-                  <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>
-                  {s.cityDoc && <span className="text-umber"> · {s.cityDoc.name}</span>}
-                </li>
-              ))}
-            </ul>
+            <MoreLink as="summary">{`Показати ${p.online.length} →`}</MoreLink>
+            <InfoList
+              columns={2}
+              items={p.online.slice(0, 200).map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>, lines: [s.cityDoc?.name ?? null] }))}
+            />
           </details>
-        </section>
+        </Block>
       )}
     </WavePage>
   )

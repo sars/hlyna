@@ -321,7 +321,7 @@ export default async function StudioPage({ params }: Args) {
             ) : (
               <Note>Мінімальну партію, терміни й ціни для бізнесу студія ще не вказала. Надішліть запит — ми передамо його студії разом з іншими, що роблять подібні вироби.</Note>
             )}
-            {showForm && <CtaBand tone="cobalt" title="Надішліть запит цій студії" cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />}
+            {showForm && <CtaBand tone="cobalt" title="Надішліть запит цій студії" text="Безкоштовно для замовника. Студія відповідає напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />}
           </Block>
         )}
 
