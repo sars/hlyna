@@ -80,7 +80,7 @@ export default async function CasePage({ params }: { params: Params }) {
         }}
       />
 
-      <div className="grid max-w-[820px] gap-3.5 border-b-2 border-ink pt-hero pb-[clamp(24px,3vw,40px)]">
+      <div className="grid gap-3.5 border-b-2 border-ink pt-hero pb-[clamp(24px,3vw,40px)]">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: studioName, href: `/vyrobnyky/${c.studio.slug}` }, { label: `Кейс: ${c.title}` }]} modified={c.checked} />
         <Kicker className="break-words">Кейс студії · {c.client.type}</Kicker>
         <h1 className="m-0 font-display text-h1 break-words" style={{ letterSpacing: 0 }}>
