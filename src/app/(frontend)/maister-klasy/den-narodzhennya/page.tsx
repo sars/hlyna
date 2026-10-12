@@ -6,7 +6,7 @@ import React from 'react'
 import { Block, InfoList } from '@/components/site/Inner'
 import { CityHead } from '@/components/ui/CityHead'
 import { WavePage } from '@/components/site/WavePage'
-import { getAllStudios } from '@/lib/catalog'
+import { getAllWithShops } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
 import { fillCopy, liveFormatCityPages, partyData, partyLines, waveCopy } from '@/editorial/wave-a'
 import { ogImage } from '@/utilities/ogImage'
@@ -37,7 +37,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function Page() {
   const p = await load()
   if (!p) notFound()
-  const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
   // Kids' pages by city: where a party usually starts.
   const kidsCities = (await liveFormatCityPages()).filter((x) => x.format === 'dlya-ditey').map((x) => ({ label: x.cityName, href: `/maister-klasy/${x.city}/dlya-ditey` }))
   return (

@@ -1,4 +1,4 @@
-import { getAllStudios, hasFormat, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from './catalog'
+import { getAllStudios, getAllWithShops, hasFormat, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from './catalog'
 import { cleanName, firstAddress } from './present'
 
 // Studios for /mapa: one GeoJSON point per geocoded studio. Filter flags are precomputed here so the
@@ -13,6 +13,8 @@ export const MAP_FILTERS = [
   { key: 'corporate', label: 'Корпоративи' },
   { key: 'horeca', label: 'Посуд для закладів' },
   { key: 'logo', label: 'Логотип' },
+  // Off by default: shops and galleries are not studios; the chip adds them to the map.
+  { key: 'shop', label: 'Магазини й галереї' },
 ] as const
 export type MapFilter = (typeof MAP_FILTERS)[number]['key']
 
@@ -29,6 +31,7 @@ export type MapProps = {
 
 export function flags(s: StudioCard): MapFilter[] {
   const out: MapFilter[] = []
+  if (s.type === 'shop') out.push('shop')
   if (offersMasterClasses(s)) out.push('mk')
   if (hasFormat(s, 'wheel')) out.push('wheel')
   if (hasFormat(s, 'kids')) out.push('kids')
@@ -40,14 +43,14 @@ export function flags(s: StudioCard): MapFilter[] {
   return out
 }
 
-export async function mapStudios() {
-  const all = (await getAllStudios()).filter((s) => s.type !== 'supplier' && s.status !== 'closed')
+export async function mapStudios(withShops = false) {
+  const all = (await (withShops ? getAllWithShops() : getAllStudios())).filter((s) => s.type !== 'supplier' && s.status !== 'closed')
   const placed = all.filter((s) => typeof s.geo?.lat === 'number' && typeof s.geo?.lng === 'number')
   return { all, placed }
 }
 
 export async function studiosGeoJSON() {
-  const { placed } = await mapStudios()
+  const { placed } = await mapStudios(true)
   return {
     type: 'FeatureCollection' as const,
     features: placed.map((s) => ({

@@ -8,7 +8,7 @@ import { copies } from '@/content/waveC'
 import factsData from '@/content/waveC/facts.json'
 import formatsData from '@/content/waveC/formats.json'
 import newYearJson from '@/content/waveC/newyear.json'
-import { getAllStudios, groupByCity, hasFormat, type StudioCard } from '@/lib/catalog'
+import { getAllStudios, getAllWithShops, groupByCity, hasFormat, type StudioCard } from '@/lib/catalog'
 import { facts } from '@/lib/facts'
 import { isExhibitingOnly } from '@/lib/present'
 import { fillCopy, type WaveCopy, type WaveVars } from '@/editorial/copy'
@@ -90,7 +90,7 @@ export type NewYear = typeof newYearJson
 
 export async function winterData() {
   const ny = newYearJson as NewYear
-  const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
   const offers = (ny.offers as Offer[]).map((o) => ({ ...o, studio: known.get(o.slug) })).filter((o): o is Offer & { studio: StudioCard } => !!o.studio)
   const live = await newYearData()
   const offerIds = new Set(offers.map((o) => o.studio.id))

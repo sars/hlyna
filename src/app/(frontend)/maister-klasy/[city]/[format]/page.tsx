@@ -11,7 +11,7 @@ import { QuoteBlock } from '@/components/ui/QuoteBlock'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
 import { MK_CHIPS } from '@/lib/mkChips'
-import { getAllStudios, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/lib/catalog'
+import { getAllWithShops, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/lib/catalog'
 import { fmt, roundNice } from '@/lib/money'
 import { cleanName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
@@ -64,7 +64,7 @@ export default async function Page({ params }: Args) {
     await redirectOldCitySlug(city, (c) => `/maister-klasy/${c}/${format}`)
     notFound()
   }
-  const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
   const f = FORMAT_PAGES[format as FormatSlug]
   const path = `/maister-klasy/${city}/${format}`
   const others = (Object.keys(FORMAT_PAGES) as FormatSlug[]).filter((x) => x !== format)

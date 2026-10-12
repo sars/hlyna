@@ -11,7 +11,7 @@ import { FaqItem } from '@/components/ui/Faq'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { StudioCell, StudioCells } from '@/components/ui/StudioCell'
-import { getAllStudios, groupByCity, type StudioCard } from '@/lib/catalog'
+import { getAllWithShops, groupByCity, type StudioCard } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
 import { evidenceLine } from '@/editorial/topics'
 import { fillCopy } from '@/editorial/wave-a'
@@ -233,7 +233,7 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
   const p = await load(id)
   if (!p) notFound()
   const meta = WAVE_B[id]
-  const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
   const crumbs = [
     { label: 'Головна', href: '/' },
     ...(meta.section === 'dobirky' ? [{ label: 'Добірки', href: '/dobirky' }] : meta.section === 'hayidy' ? [{ label: 'Гайди', href: '/hayidy' }] : []),

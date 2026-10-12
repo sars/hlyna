@@ -8,7 +8,7 @@ import { Kicker } from '@/components/ui/Kicker'
 import { Updated } from '@/components/ui/Updated'
 import { cx, wrap } from '@/components/ui/layout'
 import { site } from '@/content/site'
-import { getAllStudios } from '@/lib/catalog'
+import { getAllWithShops } from '@/lib/catalog'
 
 type Search = Promise<{ vid?: string; what?: string; misto?: string }>
 
@@ -35,7 +35,7 @@ export default async function RequestPage({ searchParams }: { searchParams: Sear
   const { vid } = await searchParams
   const studio = vid === 'studiya'
   const cityNames: Record<string, string> = {}
-  for (const s of await getAllStudios()) if (s.cityDoc?.slug) cityNames[s.cityDoc.slug] = s.cityDoc.name
+  for (const s of await getAllWithShops()) if (s.cityDoc?.slug) cityNames[s.cityDoc.slug] = s.cityDoc.name
 
   const dash = "before:text-terracotta-text before:content-['—_']"
   const crumb = vid === 'keys' ? 'Виправити або зняти кейс' : studio ? 'Додати або оновити студію' : 'Запит студіям'

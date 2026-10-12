@@ -42,10 +42,11 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
   const [city, setCity] = useState<string | null>(null)
   const popupRef = useRef<{ remove: () => void } | null>(null)
 
-  const shown = useMemo(() => (all ?? []).filter((f) => active.every((a) => f.properties.f.includes(a))), [all, active])
+  // Shops and galleries show only when their chip is on; the other chips narrow everything (shops included) as before.
+  const shown = useMemo(() => (all ?? []).filter((f) => (active.includes('shop') || !f.properties.f.includes('shop')) && active.every((a) => f.properties.f.includes(a))), [all, active])
   const cityName = city ? all?.find((f) => f.properties.citySlug === city)?.properties.city : undefined
   const inCityShown = city ? shown.filter((f) => f.properties.citySlug === city).length : 0
-  const inCityAll = city ? (all ?? []).filter((f) => f.properties.citySlug === city).length : 0
+  const inCityAll = city ? (all ?? []).filter((f) => f.properties.citySlug === city && (active.includes('shop') || !f.properties.f.includes('shop'))).length : 0
 
   // ?misto=<city> zooms to a city and opens its entry in the list below; ?f=wheel,kids restores filters.
   useEffect(() => {

@@ -8,7 +8,7 @@ import { WavePage } from '@/components/site/WavePage'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { isBuilt } from '@/content/navigation'
-import { getAllStudios, type StudioCard } from '@/lib/catalog'
+import { getAllWithShops, type StudioCard } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
 import { fillCopy } from '@/editorial/wave-a'
 import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/editorial/wave-c'
@@ -206,7 +206,7 @@ export async function WaveCRoute({ id }: { id: WaveCId }) {
   const p = await load(id)
   if (!p) notFound()
   const meta = WAVE_C[id]
-  const known = new Map((await getAllStudios()).map((s) => [s.slug!, s]))
+  const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
   const crumbs = [{ label: 'Головна', href: '/' }, ...(meta.section === 'biz' ? [{ label: 'Для бізнесу', href: '/dlya-biznesu' }] : []), { label: meta.crumb }]
   return (
     <WavePage copy={p.copy} known={known} kicker={meta.kicker} crumbs={crumbs} path={meta.path} form={meta.form} studios={waveCStudios(p.data)} photo={pagePhoto(id)} related={RELATED[id].filter((r) => r.href !== meta.path && isBuilt(r.href))}>
