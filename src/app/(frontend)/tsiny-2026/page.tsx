@@ -1,8 +1,12 @@
 import type { Metadata } from 'next'
+import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Chip } from '@/components/ui/Chip'
+import { ChipGroup } from '@/components/ui/ChipGroup'
+import { DataTable } from '@/components/ui/DataTable'
+import { Faq } from '@/components/ui/Faq'
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { site } from '@/content/site'
 import { pluralUk } from '@/lib/catalog'
@@ -44,8 +48,9 @@ export default async function PricesPage() {
     { q: 'Як рахуються ці ціни?', a: `З опублікованих прайсів студій (сайти, Instagram, сервіси бронювання й маркетплейси) за ${period} роки. Для кожної студії береться медіана її цін у категорії, тож студія з багатьма рядками прайсу важить як одна. Діапазон — від 10-го до 90-го перцентиля, округлений.` },
   ]
 
+  const priceCell = (v: React.ReactNode) => <span className="font-display font-semibold text-cobalt">{v}</span>
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
+    <InnerMain>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{
@@ -61,151 +66,118 @@ export default async function PricesPage() {
           variableMeasured: stats.map((s) => ({ '@type': 'PropertyValue', name: `${s.cat.label}, ${s.cat.unit}`, unitText: 'UAH', value: s.median, minValue: s.p10, maxValue: s.p90 })),
         }}
       />
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Ціни 2026' }]} />
-        <span className="kicker">Індекс цін · {site.dataUpdated}</span>
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Ціни на кераміку ручної роботи і майстер-класи в Україні — 2026</h1>
-        <p className="m-0 max-w-[75ch] text-lg">
-          За прайсами {studiosN(studios)} з каталогу «Глина»
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Ціни 2026' }]}
+        kicker={`Індекс цін · ${site.dataUpdated}`}
+        title="Ціни на кераміку ручної роботи і майстер-класи в Україні — 2026"
+        lead={
+          <p className="m-0">
+                      За прайсами {studiosN(studios)} з каталогу «Глина»
           {g ? `: разовий майстер-клас з кераміки найчастіше коштує ${span(g)} з особи (медіана ${grn(g.median)})` : ''}
           {p ? `, індивідуальне заняття — ${span(p)}` : ''}
           {c ? `, для двох — ${span(c)} за пару` : ''}
           {corp ? `; корпоратив — ${span(corp)} з особи` : ''}
           {cup ? `; чашка ручної роботи — ${span(cup)}` : ''}. Нижче — усі категорії, ціни за містами й як ми рахуємо.
-        </p>
-        <Updated />
-      </div>
-
-      <section aria-labelledby="table">
-        <SectionHead kicker="Зведена таблиця" title="Скільки коштує" id="table">
-          <p className="m-0 text-sm text-umber">«Здебільшого» — від 10-го до 90-го перцентиля цін студій; медіана — середина вибірки. Кожна студія рахується один раз.</p>
-        </SectionHead>
-        <div className="grid grid-cols-1 gap-6">
+          </p>
+        }
+        strip={[
+          { value: fmt(studios), label: 'студій у вибірці прайсів' },
+          { value: fmt(stats.length), label: 'категорій цін' },
+          { value: fmt(cities.length), label: 'міст з ціною майстер-класу' },
+        ]}
+      />
+      <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
+        <Block id="table" kicker="Зведена таблиця" title="Скільки коштує" note={<>«Здебільшого» — від 10-го до 90-го перцентиля цін студій; медіана — середина вибірки. Кожна студія рахується один раз.</>}>
           {groups.map(([title, key]) => {
             const rows = stats.filter((s) => s.cat.group === key)
             if (!rows.length) return null
             return (
-              <div key={key} className="grid grid-cols-1 gap-2">
-                <h3 className="h-display m-0 text-[17px]">{title}</h3>
-                <div className="overflow-x-auto rounded-2xl bg-card">
-                  <table className="w-full border-collapse text-[14px] sm:text-[15px]">
-                    <thead>
-                      <tr className="text-left text-[12px] tracking-wide text-umber uppercase sm:text-[12.5px]">
-                        <th className="border-b border-line px-3 py-3 sm:px-3.5">Що</th>
-                        <th className="border-b border-line px-3 py-3 sm:px-3.5">Медіана</th>
-                        <th className="border-b border-line px-3 py-3 sm:px-3.5">Здебільшого</th>
-                        <th className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">Студій</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {rows.map((s) => (
-                        <tr key={s.cat.key}>
-                          <td className="border-b border-line px-3 py-3 sm:px-3.5">
-                            <a href={`#${s.cat.key}`} className="font-semibold text-ink no-underline">{s.cat.label}</a> <span className="text-[13px] text-umber">{s.cat.unit}<span className="sm:hidden"> · {s.n} студ.</span></span>
-                          </td>
-                          <td className="border-b border-line px-3 py-3 font-semibold whitespace-nowrap text-terra sm:px-3.5">{grn(s.median)}</td>
-                          <td className="border-b border-line px-3 py-3 sm:px-3.5 sm:whitespace-nowrap">{span(s)}</td>
-                          <td className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">{s.n}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              <div key={key} className="grid gap-2">
+                <h3 className="m-0 font-display text-[17px] leading-[1.15] font-semibold">{title}</h3>
+                <DataTable
+                  mode="scroll"
+                  columns={[{ key: 'what', label: 'Що', width: '44%' }, { key: 'median', label: 'Медіана', numeric: true, width: '18%' }, { key: 'range', label: 'Здебільшого', numeric: true, width: '24%' }, { key: 'n', label: 'Студій', numeric: true, align: 'end', width: '14%' }]}
+                  rows={rows.map((s) => ({
+                    what: (
+                      <>
+                        <a href={`#${s.cat.key}`} className="!text-ink !no-underline">
+                          {s.cat.label}
+                        </a>{' '}
+                        <span className="text-[13px] text-ink-2">{s.cat.unit}</span>
+                      </>
+                    ),
+                    median: priceCell(grn(s.median)),
+                    range: span(s),
+                    n: s.n,
+                  }))}
+                />
               </div>
             )
           })}
-        </div>
-      </section>
+        </Block>
 
-      {cities.length > 0 && (
-        <section aria-labelledby="maister-klasy" id="maister-klasy" className="scroll-mt-24">
-          <SectionHead kicker="За містами" title="Разовий майстер-клас за містами" id="cities">
-            <p className="m-0 text-sm text-umber">Медіана ціни з особи в містах, де ціну публікують щонайменше три студії.</p>
-          </SectionHead>
-          <div className="overflow-x-auto rounded-2xl bg-card">
-            <table className="w-full border-collapse text-[14px] sm:text-[15px]">
-              <thead>
-                <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
-                  <th className="border-b border-line px-3.5 py-3">Місто</th>
-                  <th className="border-b border-line px-3.5 py-3">Медіана</th>
-                  <th className="border-b border-line px-3.5 py-3">Від–до</th>
-                  <th className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">Студій</th>
-                </tr>
-              </thead>
-              <tbody>
-                {cities.map((x) => (
-                  <tr key={x.slug}>
-                    <td className="border-b border-line px-3 py-3 sm:px-3.5"><Link href={`/maister-klasy/${x.slug}`}>{x.name}</Link><span className="text-[13px] text-umber sm:hidden"> · {x.n}</span></td>
-                    <td className="border-b border-line px-3.5 py-3 font-semibold whitespace-nowrap text-terra">{grn(x.median)}</td>
-                    <td className="border-b border-line px-3 py-3 sm:px-3.5 sm:whitespace-nowrap">{x.min === x.max ? grn(x.min) : `${fmt(x.min)}–${grn(x.max)}`}</td>
-                    <td className="hidden border-b border-line px-3.5 py-3 text-right sm:table-cell">{x.n}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+        {cities.length > 0 && (
+          <section id="maister-klasy" aria-labelledby="cities">
+            <Block id="cities" kicker="За містами" title="Разовий майстер-клас за містами" note={<>Медіана ціни з особи в містах, де ціну публікують щонайменше три студії.</>}>
+              <DataTable
+                mode="scroll"
+                columns={[{ key: 'city', label: 'Місто', width: '44%' }, { key: 'median', label: 'Медіана', numeric: true, width: '18%' }, { key: 'range', label: 'Від–до', numeric: true, width: '24%' }, { key: 'n', label: 'Студій', numeric: true, align: 'end', width: '14%' }]}
+                rows={cities.map((x) => ({
+                  city: <Link href={`/maister-klasy/${x.slug}`}>{x.name}</Link>,
+                  median: priceCell(grn(x.median)),
+                  range: x.min === x.max ? grn(x.min) : `${fmt(x.min)}–${grn(x.max)}`,
+                  n: x.n,
+                }))}
+              />
+            </Block>
+          </section>
+        )}
+
+        <Block id="examples" kicker="Приклади" title="Типові рядки з прайсів" note={<>Для кожної категорії — студії, чиї ціни найближчі до медіани.</>}>
+          <div className="grid gap-x-8 gap-y-6 lg:grid-cols-2">
+            {stats.map((s) => (
+              <div key={s.cat.key} id={s.cat.key} className="grid content-start gap-1">
+                <b className="font-display text-[15.5px] leading-[1.2] font-semibold">
+                  {s.cat.label} <span className="font-body font-normal text-ink-2">· медіана {grn(s.median)} {s.cat.unit}</span>
+                </b>
+                <ul className="m-0 grid list-none border-t border-rule p-0 text-[14.5px] leading-normal">
+                  {s.examples.map((e) => (
+                    <li key={e.studio.id + e.text} className="border-b border-rule py-2">
+                      <Link href={`/vyrobnyky/${e.studio.slug}`} className="text-cobalt underline underline-offset-[3px]">
+                        {cleanName(e.studio.name)}
+                      </Link>
+                      {e.studio.cityDoc && <span className="text-ink-2"> · {e.studio.cityDoc.name}</span>}: {e.text}
+                      {e.source && <span className="font-mono text-[11.5px] text-ink-2"> ({e.source})</span>}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
+        </Block>
+
+        <section id="metodolohiya" aria-labelledby="method">
+          <Block id="method" kicker="Методологія" title="Як ми рахуємо">
+            <ul className="m-0 grid max-w-read list-none gap-2 p-0">
+              <li key={0} className="before:text-terracotta-text before:content-['—_']">Джерело — опубліковані прайси студій: сайти, Instagram, сервіси бронювання й подарунків, маркетплейси. Ціни за {period} роки; старші за 2023 рік не враховуємо.</li>
+              <li key={1} className="before:text-terracotta-text before:content-['—_']">Для кожної студії в кожній категорії береться медіана її цін, тож студія з двадцятьма рядками прайсу важить як одна. Категорія показується, коли в ній щонайменше три студії.</li>
+              <li key={2} className="before:text-terracotta-text before:content-['—_']">«Здебільшого» — від 10-го до 90-го перцентиля; крайні значення відкидаємо. Суми округлено до 50 чи 100 грн.</li>
+              <li key={3} className="before:text-terracotta-text before:content-['—_']">Ціни для бізнесу (партії, логотип) студії рахують під замовлення, тому тут — лише роздрібні ціни окремих виробів і корпоративи з особи.</li>
+              <li key={4} className="before:text-terracotta-text before:content-['—_']">Дані оновлюємо щосезону; поточний зріз — {site.dataUpdated}. Ціни встановлюють студії, і вони можуть змінитися — точну ціну підтверджує студія.</li>
+            </ul>
+          </Block>
         </section>
-      )}
 
-      <section aria-labelledby="examples">
-        <SectionHead kicker="Приклади" title="Типові рядки з прайсів" id="examples">
-          <p className="m-0 text-sm text-umber">Для кожної категорії — студії, чиї ціни найближчі до медіани.</p>
-        </SectionHead>
-        <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-          {stats.map((s) => (
-            <div key={s.cat.key} id={s.cat.key} className="grid scroll-mt-24 grid-cols-1 content-start gap-2 rounded-2xl bg-card p-4">
-              <b>
-                {s.cat.label} <span className="font-normal text-umber">· медіана {grn(s.median)} {s.cat.unit}</span>
-              </b>
-              <ul className="m-0 grid list-none grid-cols-1 gap-1.5 p-0 text-[14.5px]">
-                {s.examples.map((e) => (
-                  <li key={e.studio.id + e.text}>
-                    <Link href={`/vyrobnyky/${e.studio.slug}`}>{cleanName(e.studio.name)}</Link>
-                    {e.studio.cityDoc && <span className="text-umber"> · {e.studio.cityDoc.name}</span>}: {e.text}
-                    {e.source && <span className="text-[12.5px] text-umber"> ({e.source})</span>}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
+        <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />
 
-      <section aria-labelledby="metodolohiya" id="metodolohiya" className="scroll-mt-24">
-        <SectionHead kicker="Методологія" title="Як ми рахуємо" id="method" />
-        <ul className="m-0 grid max-w-[75ch] list-disc grid-cols-1 gap-2 pl-5">
-          <li>Джерело — опубліковані прайси студій: сайти, Instagram, сервіси бронювання й подарунків, маркетплейси. Ціни за {period} роки; старші за 2023 рік не враховуємо.</li>
-          <li>Для кожної студії в кожній категорії береться медіана її цін, тож студія з двадцятьма рядками прайсу важить як одна. Категорія показується, коли в ній щонайменше три студії.</li>
-          <li>«Здебільшого» — від 10-го до 90-го перцентиля; крайні значення відкидаємо. Суми округлено до 50 чи 100 грн.</li>
-          <li>Ціни для бізнесу (партії, логотип) студії рахують під замовлення, тому тут — лише роздрібні ціни окремих виробів і корпоративи з особи.</li>
-          <li>Дані оновлюємо щосезону; поточний зріз — {site.dataUpdated}. Ціни встановлюють студії, і вони можуть змінитися — точну ціну підтверджує студія.</li>
-        </ul>
-      </section>
-
-      <section aria-labelledby="faq">
-        <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-        <div className="grid grid-cols-1 gap-2.5">
-          {faq.map((f, i) => (
-            <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
-              <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">
-                {f.q}
-                <span aria-hidden className="font-display text-terra group-open:hidden">+</span>
-                <span aria-hidden className="font-display hidden text-terra group-open:inline">–</span>
-              </summary>
-              <p className="mt-0 mb-3.5">{f.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      <nav aria-label="Схожі сторінки" className="grid grid-cols-1 gap-3">
-        <p className="kicker m-0">Дивіться також</p>
-        <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+        <ChipGroup as="nav" label="Дивіться також" aria-label="Схожі сторінки">
           {[['Майстер-класи за містами', '/maister-klasy'], ['Сертифікати', '/sertyfikaty'], ['Корпоратив з ліплення з глини', '/dlya-biznesu/korporatyv-lipennya-z-hlyny'], ['Чашки з логотипом', '/dlya-biznesu/chashky-z-lohotypom'], ['Вироби', '/vyrobnyky/vyrib']].map(([l, h]) => (
-            <li key={h}><Link href={h} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">{l}</Link></li>
+            <Chip key={h} href={h}>
+              {l}
+            </Chip>
           ))}
-        </ul>
-      </nav>
-    </main>
+        </ChipGroup>
+      </div>
+    </InnerMain>
   )
 }

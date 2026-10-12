@@ -4,6 +4,8 @@ import 'maplibre-gl/dist/maplibre-gl.css'
 import type { GeoJSONSource, Map as MlMap, MapGeoJSONFeature } from 'maplibre-gl'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 
+import { Chip } from '@/components/ui/Chip'
+import { MapFrame } from '@/components/ui/MapFrame'
 import type { MapFilter, MapProps } from '@/lib/mapData'
 
 // Map of studios on /mapa. MapLibre + OpenFreeMap tiles (free, no key). The library is loaded after the
@@ -13,7 +15,8 @@ import type { MapFilter, MapProps } from '@/lib/mapData'
 type Feature = { type: 'Feature'; geometry: { type: 'Point'; coordinates: [number, number] }; properties: MapProps }
 type FC = { type: 'FeatureCollection'; features: Feature[] }
 
-const C = { terra: '#b4683f', cobalt: '#2a4fa8', ochre: '#d9a441', ink: '#2a2018', card: '#fbf3ea' }
+// Marker colours are the design tokens: cobalt = one studio, terracotta = several close together, ink-2 = town centre only.
+const C = { terra: '#b4532e', cobalt: '#1d3ec6', town: '#4e483f', ink: '#15130f', paper: '#efe9de' }
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!)
 
 function towns(features: Feature[]): FC {
@@ -101,8 +104,8 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
         }
         m.addSource('studios', { type: 'geojson', data: { type: 'FeatureCollection', features: [] }, cluster: true, clusterRadius: 42, clusterMaxZoom: 13 })
         m.addSource('towns', { type: 'geojson', data: { type: 'FeatureCollection', features: [] } })
-        m.addLayer({ id: 'towns', type: 'circle', source: 'towns', paint: { 'circle-color': C.ochre, 'circle-radius': ['interpolate', ['linear'], ['get', 'n'], 1, 9, 20, 18], 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } })
-        m.addLayer({ id: 'towns-n', type: 'symbol', source: 'towns', layout: { 'text-field': ['to-string', ['get', 'n']], 'text-size': 12, 'text-font': ['Noto Sans Bold'] }, paint: { 'text-color': C.ink } })
+        m.addLayer({ id: 'towns', type: 'circle', source: 'towns', paint: { 'circle-color': C.town, 'circle-radius': ['interpolate', ['linear'], ['get', 'n'], 1, 9, 20, 18], 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } })
+        m.addLayer({ id: 'towns-n', type: 'symbol', source: 'towns', layout: { 'text-field': ['to-string', ['get', 'n']], 'text-size': 12, 'text-font': ['Noto Sans Bold'] }, paint: { 'text-color': '#fff' } })
         m.addLayer({ id: 'clusters', type: 'circle', source: 'studios', filter: ['has', 'point_count'], paint: { 'circle-color': C.terra, 'circle-radius': ['step', ['get', 'point_count'], 14, 10, 18, 40, 24], 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } })
         m.addLayer({ id: 'clusters-n', type: 'symbol', source: 'studios', filter: ['has', 'point_count'], layout: { 'text-field': ['get', 'point_count_abbreviated'], 'text-size': 12, 'text-font': ['Noto Sans Bold'] }, paint: { 'text-color': '#fff' } })
         m.addLayer({ id: 'points', type: 'circle', source: 'studios', filter: ['!', ['has', 'point_count']], paint: { 'circle-color': C.cobalt, 'circle-radius': 7, 'circle-stroke-width': 2, 'circle-stroke-color': '#fff' } })
@@ -181,20 +184,14 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
 
   return (
     <div className="grid grid-cols-1 gap-3">
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0" role="group" aria-label="Фільтри мапи">
+      <div className="flex flex-wrap gap-2" role="group" aria-label="Фільтри мапи">
         {filters.map((f) => (
-          <button
-            key={f.key}
-            type="button"
-            aria-pressed={active.includes(f.key)}
-            onClick={() => toggle(f.key)}
-            className={`shrink-0 rounded-full border px-3.5 py-1.5 text-sm font-semibold whitespace-nowrap ${active.includes(f.key) ? 'border-cobalt bg-cobalt text-white' : 'border-line bg-card text-ink hover:border-cobalt'}`}
-          >
+          <Chip key={f.key} as="button" active={active.includes(f.key)} onClick={() => toggle(f.key)}>
             {f.label}
-          </button>
+          </Chip>
         ))}
       </div>
-      <p className="m-0 text-sm text-umber" aria-live="polite">
+      <p className="m-0 font-mono text-xs tracking-[.04em] text-ink-2 uppercase" aria-live="polite">
         {failed
           ? 'Мапа не відкрилася в цьому браузері (потрібен WebGL) — нижче той самий перелік за містами.'
           : all
@@ -203,16 +200,18 @@ export function StudioMap({ filters }: { filters: readonly { key: MapFilter; lab
               : `На мапі: ${shown.length} з ${all.length}`
             : 'Завантажуємо мапу…'}
         {active.length > 0 && (
-          <button type="button" onClick={() => setActive([])} className="ml-3 text-cobalt underline">
+          <button type="button" onClick={() => setActive([])} className="ml-3 cursor-pointer text-cobalt uppercase underline underline-offset-[3px]">
             скинути фільтри
           </button>
         )}
       </p>
-      <div ref={box} className="h-[60vh] min-h-[360px] w-full overflow-hidden rounded-2xl border border-line bg-card lg:h-[68vh] lg:max-h-[720px]" />
-      <p className="m-0 text-[13px] text-umber">
-        <span className="mr-3 inline-flex items-center gap-1.5"><span className="inline-block h-3 w-3 rounded-full" style={{ background: C.cobalt }} /> студія за адресою</span>
-        <span className="mr-3 inline-flex items-center gap-1.5"><span className="inline-block h-3 w-3 rounded-full" style={{ background: C.terra }} /> кілька поруч</span>
-        <span className="inline-flex items-center gap-1.5"><span className="inline-block h-3 w-3 rounded-full" style={{ background: C.ochre }} /> адреса невідома — центр міста</span>
+      <MapFrame height="list">
+        <div ref={box} className="h-full w-full" />
+      </MapFrame>
+      <p className="m-0 text-[13px] text-ink-2">
+        <span className="mr-3 inline-flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill={C.cobalt} /></svg> студія за адресою</span>
+        <span className="mr-3 inline-flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill={C.terra} /></svg> кілька поруч</span>
+        <span className="inline-flex items-center gap-1.5"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><circle cx="6" cy="6" r="6" fill={C.town} /></svg> адреса невідома — центр міста</span>
       </p>
     </div>
   )

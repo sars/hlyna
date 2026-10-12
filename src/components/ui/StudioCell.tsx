@@ -31,14 +31,14 @@ export function StudioCell({ s, showCity = true, line }: { s: StudioCard; showCi
 }
 
 // An editorial cell (selections, cases, formats): same ruled grid, a bigger title and a call to action.
-export function IndexCell({ href, kicker, title, text, cta = 'Дивитись' }: { href: string; kicker?: string; title: string; text?: string; cta?: string }) {
+export function IndexCell({ href, kicker, title, text, cta = 'Дивитись' }: { href: string; kicker?: string; title: string; text?: React.ReactNode; cta?: string }) {
   return (
     <li>
       <Link href={href}>
         {kicker && <span className="font-mono text-[11px] tracking-[.06em] text-ink-2 uppercase">{kicker}</span>}
         <span className="ui-name font-display text-[17px] leading-[1.2] font-semibold">{title}</span>
         {text && <span className="text-[15px] leading-normal text-ink-2">{text}</span>}
-        <span className="pt-1 font-mono text-xs tracking-[.06em] text-cobalt uppercase">{cta} →</span>
+        {cta && <span className="pt-1 font-mono text-xs tracking-[.06em] text-cobalt uppercase">{cta} →</span>}
       </Link>
     </li>
   )

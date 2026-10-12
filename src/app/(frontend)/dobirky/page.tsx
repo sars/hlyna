@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { InnerHero, InnerMain } from '@/components/site/Inner'
+import { IndexCell, StudioCells } from '@/components/ui/StudioCell'
 import React from 'react'
 
-import { Breadcrumbs, container, Updated } from '@/components/site/Bits'
 import { liveWaveBPages } from '@/editorial/wave-b'
 import { ogImage } from '@/utilities/ogImage'
 
@@ -26,23 +26,24 @@ export default async function Selections() {
   const extra = (await liveWaveBPages()).filter((p) => p.section === 'dobirky').map((p) => ({ href: p.path, title: p.title, note: p.summary }))
   const list = [...items.slice(0, 2), ...extra, ...items.slice(2)]
   return (
-    <main className={`${container} grid w-full grid-cols-1 gap-8 pt-8 pb-16`}>
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Добірки' }]} />
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Добірки</h1>
-        <p className="m-0 max-w-[70ch] text-lg">Редакційні добірки української кераміки ручної роботи за відкритими даними студій і майстрів. Не рейтинг і не реклама.</p>
-        <Updated />
+    <InnerMain>
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Добірки' }]}
+        kicker="Добірки"
+        title="Добірки"
+        lead={
+          <p className="m-0">
+            Редакційні добірки української кераміки ручної роботи за відкритими даними студій і майстрів. Не рейтинг і не реклама.
+          </p>
+        }
+      />
+      <div className="pt-[clamp(24px,3vw,40px)]">
+        <StudioCells>
+          {list.map((x) => (
+            <IndexCell key={x.href} href={x.href} title={x.title} text={x.note} cta="Відкрити" />
+          ))}
+        </StudioCells>
       </div>
-      <ul className="m-0 grid grid-cols-1 list-none gap-3 p-0 sm:grid-cols-2">
-        {list.map((x) => (
-          <li key={x.href}>
-            <Link href={x.href} className="grid h-full grid-cols-1 content-start gap-1.5 rounded-[18px] bg-card p-5 text-ink no-underline hover:bg-sand hover:text-ink">
-              <b className="text-[17px]">{x.title}</b>
-              <span className="text-[15px] text-umber">{x.note}</span>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </main>
+    </InnerMain>
   )
 }

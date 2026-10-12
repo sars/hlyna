@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { CityList, SmallCities } from '@/components/ui/CityList'
 import React from 'react'
 
-import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { site } from '@/content/site'
 import { getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
@@ -26,50 +26,33 @@ export default async function CitiesIndex() {
   const small = all.filter((g) => !big.some((b) => b.city.slug === g.city.slug))
   const total = all.reduce((n, g) => n + g.studios.length, 0)
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
+    <InnerMain>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Кераміка ручної роботи за містами України', itemListElement: big.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/misto/${g.city.slug}`, name: g.city.name })) }} />
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами' }]} />
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Кераміка ручної роботи за містами</h1>
-        <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі — {fmt(total)} {pluralUk(total, ['студія, бренд чи майстер', 'студії, бренди й майстри', 'студій, брендів і майстрів'])} у {fmt(all.length)} {pluralUk(all.length, ['місті й селі', 'містах і селах', 'містах і селах'])} України. Найбільше — у Києві й Львові; окремі осередки кераміки — Косів, Опішне, Ужгород.
-        </p>
-        <Updated />
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами' }]}
+        kicker="Виробники"
+        title="Кераміка ручної роботи за містами"
+        lead={
+          <p className="m-0">
+            У каталозі — {fmt(total)} {pluralUk(total, ['студія, бренд чи майстер', 'студії, бренди й майстри', 'студій, брендів і майстрів'])} у {fmt(all.length)} {pluralUk(all.length, ['місті й селі', 'містах і селах', 'містах і селах'])} України. Найбільше — у Києві й Львові; окремі осередки кераміки — Косів, Опішне, Ужгород.
+          </p>
+        }
+      />
+      <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
+        <Block id="cities" title="Міста">
+          <CityList
+            items={big.map((g) => {
+              const st = cityStats(g.studios)
+              return { name: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}`, count: g.studios.length, note: st.classes ? `майстер-класи: ${st.classes}` : 'вироби й замовлення' }
+            })}
+          />
+        </Block>
+        {small.length > 0 && (
+          <Block id="more" title="Ще міста і села">
+            <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: cleanName(s.name), href: `/vyrobnyky/${s.slug}` })) }))} />
+          </Block>
+        )}
       </div>
-      <section aria-labelledby="cities">
-        <SectionHead title="Міста" id="cities" />
-        <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2.5 p-0">
-          {big.map((g) => {
-            const st = cityStats(g.studios)
-            return (
-              <li key={g.city.slug}>
-                <Link href={`/vyrobnyky/misto/${g.city.slug}`} className="grid grid-cols-1 gap-0.5 rounded-[14px] bg-card px-3.5 py-3 text-ink no-underline hover:bg-sand hover:text-ink">
-                  <span className="flex justify-between font-semibold">{g.city.name}<span className="text-terra">{g.studios.length}</span></span>
-                  <span className="text-[13px] text-umber">{st.classes ? `майстер-класи: ${st.classes}` : 'вироби й замовлення'}</span>
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      </section>
-      {small.length > 0 && (
-        <section aria-labelledby="more">
-          <SectionHead title="Ще міста і села" id="more" />
-          <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-2.5 p-0 sm:grid-cols-2">
-            {small.map((g) => (
-              <li key={g.city.slug} className="text-[15px] leading-snug">
-                <b>{g.city.name}:</b>{' '}
-                {g.studios.map((s, j) => (
-                  <React.Fragment key={s.id}>
-                    {j > 0 && ', '}
-                    <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>
-                  </React.Fragment>
-                ))}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </main>
+    </InnerMain>
   )
 }

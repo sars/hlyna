@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { CityList, SmallCities } from '@/components/ui/CityList'
+import { Chip } from '@/components/ui/Chip'
+import { ChipGroup } from '@/components/ui/ChipGroup'
 import React from 'react'
 
-import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { facts } from '@/lib/facts'
 import { topicList } from '@/content/topics'
 import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
@@ -23,65 +25,52 @@ export default async function MasterClassesIndex() {
   const big = groups.filter((g) => g.studios.length >= MIN_LIST)
   const small = groups.filter((g) => g.studios.length < MIN_LIST)
   const total = groups.reduce((n, g) => n + g.studios.length, 0)
+  const gr = scopeSpan(groups.flatMap((g) => g.studios), 'group')
+  const facts_ = gr ? { value: `${fmt(gr.min)}–${fmt(gr.max)}`, label: 'грн разовий майстер-клас з особи' } : null
 
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-16`}>
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи' }]} />
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки в Україні</h1>
-        <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі — {fmt(total)} {pluralUk(total, ['місце', 'місця', 'місць'])} у {groups.length} містах і селах, де проводять заняття з гончарства чи ліплення з глини. Разовий майстер-клас коштує {f.range('group')}, індивідуальний — {f.range('private')}. Оберіть місто, щоб побачити студії, ціни й сертифікати.
-        </p>
-        <Updated />
-      </div>
-      <section aria-labelledby="formats">
-        <SectionHead title="Формати" id="formats" />
-        <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-          {topicList
-            .filter((t) => t.section === 'mk' || t.section === 'cert')
-            .map((t) => (
-              <li key={t.path}>
-                <Link href={t.path} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
+    <InnerMain>
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи' }]}
+        kicker="Майстер-класи"
+        title="Майстер-класи з кераміки в Україні"
+        lead={
+          <p className="m-0">
+            У каталозі — {fmt(total)} {pluralUk(total, ['місце', 'місця', 'місць'])} у {groups.length} містах і селах, де проводять заняття з гончарства чи ліплення з глини. Разовий майстер-клас коштує {f.range('group')}, індивідуальний — {f.range('private')}. Оберіть місто, щоб побачити студії, ціни й сертифікати.
+          </p>
+        }
+        strip={[
+          { value: fmt(total), label: pluralUk(total, ['місце', 'місця', 'місць']) + ' з майстер-класами' },
+          { value: fmt(groups.length), label: pluralUk(groups.length, ['місто чи село', 'міста й села', 'міст і сіл']) },
+          ...(facts_ ? [facts_] : []),
+        ]}
+      />
+      <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
+        <Block id="formats" title="Формати">
+          <ChipGroup>
+            {topicList
+              .filter((t) => t.section === 'mk' || t.section === 'cert')
+              .map((t) => (
+                <Chip key={t.path} href={t.path}>
                   {t.crumb}
-                </Link>
-              </li>
-            ))}
-        </ul>
-      </section>
-      <section aria-labelledby="cities">
-        <SectionHead title="Міста" id="cities" />
-        <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(210px,1fr))] gap-2.5 p-0">
-          {big.map((g) => {
-            const r = scopeSpan(g.studios, 'group')
-            return (
-              <li key={g.city.slug}>
-                <Link href={`/maister-klasy/${g.city.slug}`} className="grid grid-cols-1 gap-0.5 rounded-[14px] bg-card px-3.5 py-3 text-ink no-underline hover:bg-sand hover:text-ink">
-                  <span className="flex justify-between font-semibold">{g.city.name}<span className="text-terra">{g.studios.length}</span></span>
-                  <span className="text-[13px] text-umber">{r ? `від ${fmt(r.min)} грн` : 'ціни уточнюються'}</span>
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      </section>
-      {small.length > 0 && (
-        <section aria-labelledby="more">
-          <SectionHead title="Ще міста і села" id="more" />
-          <ul className="m-0 grid grid-cols-1 list-none gap-x-6 gap-y-2.5 p-0 sm:grid-cols-2 lg:grid-cols-3">
-            {small.map((g) => (
-              <li key={g.city.slug} className="text-[15px] leading-snug">
-                <b>{g.city.name}:</b>{' '}
-                {g.studios.map((s, j) => (
-                  <React.Fragment key={s.id}>
-                    {j > 0 && ', '}
-                    <Link href={`/vyrobnyky/${s.slug}`}>{s.name}</Link>
-                  </React.Fragment>
-                ))}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-    </main>
+                </Chip>
+              ))}
+          </ChipGroup>
+        </Block>
+        <Block id="cities" title="Міста">
+          <CityList
+            items={big.map((g) => {
+              const r = scopeSpan(g.studios, 'group')
+              return { name: g.city.name, href: `/maister-klasy/${g.city.slug}`, count: g.studios.length, note: r ? `від ${fmt(r.min)} грн` : 'ціни уточнюються' }
+            })}
+          />
+        </Block>
+        {small.length > 0 && (
+          <Block id="more" title="Ще міста і села">
+            <SmallCities groups={small.map((g) => ({ name: g.city.name, studios: g.studios.map((s) => ({ name: s.name, href: `/vyrobnyky/${s.slug}` })) }))} />
+          </Block>
+        )}
+      </div>
+    </InnerMain>
   )
 }

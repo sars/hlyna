@@ -1,18 +1,32 @@
 import type { Metadata } from 'next'
+import { Block, InnerCols, InnerMain } from '@/components/site/Inner'
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
+import { Button } from '@/components/ui/Button'
+import { Chip } from '@/components/ui/Chip'
+import { ChipGroup } from '@/components/ui/ChipGroup'
+import { CtaBand } from '@/components/ui/CtaBand'
+import { Facts } from '@/components/ui/Facts'
+import { Kicker } from '@/components/ui/Kicker'
+import { ListBlock } from '@/components/ui/ListBlock'
+import { MoreLink } from '@/components/ui/MoreLink'
+import { Note } from '@/components/ui/Note'
+import { PriceList } from '@/components/ui/PriceList'
+import { QuoteBlock } from '@/components/ui/QuoteBlock'
+import { SideBox } from '@/components/ui/SideBox'
+import { IndexCell, StudioCell, StudioCells } from '@/components/ui/StudioCell'
+import { Updated } from '@/components/ui/Updated'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 
-import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import Image from 'next/image'
 
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { InstagramPosts } from '@/components/site/InstagramPosts.client'
 import { ProfileMap } from '@/components/site/ProfileMap.client'
-import { StudioCard } from '@/components/site/StudioCard'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { isPersonMaker } from '@/lib/ld'
@@ -22,7 +36,7 @@ import { cleanAddress, inCity, cleanName, cleanPublic, dedupeTexts, firstAddress
 import { amountsIn, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
-import { link, ListBlock, PriceItem } from '@/components/profile/blocks'
+import { link } from '@/components/profile/blocks'
 import { redirectOldStudioSlug } from '@/lib/redirects'
 
 export const revalidate = 86400
@@ -118,8 +132,12 @@ export default async function StudioPage({ params }: Args) {
   const photos = await getStudioPhotos(s.id)
   const cases = casesForStudio(s.slug)
 
+  const showForm = !dormant && !exhibiting
+  const chips = [...(mk ? ['майстер-класи'] : []), ...(venues ? ['працює із закладами'] : []), ...(companies ? ['корпоративні замовлення'] : [])]
+  const priceBlocks = priceGroups.map(([g, lines]) => ({ g, lines }))
+
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
+    <InnerMain bar>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -140,216 +158,211 @@ export default async function StudioPage({ params }: Args) {
           ...(photos.length ? { image: photos.map((p) => `${site.url}${p.url}`) } : {}),
         }}
       />
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityHref ? [{ label: city.name, href: cityHref }] : []), { label: name }]} modified={s.updatedAt} />
-        <span className="kicker">
-          {typeLabel}
-          {city ? ` · ${city.name}` : ''}
-        </span>
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06] break-words">{name}</h1>
-        {s.ownerVerified && <p className="m-0 -mt-2 text-sm font-semibold text-umber">✓ Профіль підтверджено студією</p>}
-        {shownAlt.length > 0 && <p className="m-0 -mt-2 text-sm break-words text-umber">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}
-        {photos.length > 0 && (
-          <div className="grid grid-cols-1 gap-2">
-            <Image src={photos[0].url} alt={photos[0].alt} width={photos[0].width} height={photos[0].height} priority sizes="(min-width:1200px) 760px, 100vw" className="aspect-[3/2] w-full max-w-[760px] rounded-[22px] object-cover" />
-            {photos.length > 1 && (
-              <ul className="m-0 grid max-w-[760px] list-none grid-cols-3 gap-2 p-0 sm:grid-cols-5">
-                {photos.slice(1).map((p) => (
-                  <li key={p.url}>
-                    <a href={p.full} target="_blank" rel="noopener">
-                      <Image src={p.url} alt={p.alt} width={p.width} height={p.height} loading="lazy" sizes="(min-width:640px) 150px, 33vw" className="aspect-square w-full rounded-xl object-cover" />
-                    </a>
-                  </li>
-                ))}
-              </ul>
+
+      <div className="grid items-start gap-[clamp(20px,3vw,40px)] border-b-2 border-ink pt-hero pb-[clamp(24px,3vw,40px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
+        <div className="grid min-w-0 gap-3.5">
+          <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityHref ? [{ label: city.name, href: cityHref }] : []), { label: name }]} modified={s.updatedAt} />
+          <Kicker>
+            {typeLabel}
+            {city ? ` · ${city.name}` : ''}
+          </Kicker>
+          <h1 className="m-0 font-display text-h1 break-words" style={{ letterSpacing: 0 }}>
+            {name}
+          </h1>
+          {s.ownerVerified && <p className="m-0 text-sm font-semibold text-ink-2">✓ Профіль підтверджено студією</p>}
+          {shownAlt.length > 0 && <p className="m-0 text-sm break-words text-ink-2">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}
+          <div className="grid max-w-read gap-3 text-body">
+            {description.split(/\n{2,}/).map((para, i) => (
+              <p key={i} className="m-0">
+                {para}
+              </p>
+            ))}
+            {s.ownerQuote && s.ownerQuoteApproved && <QuoteBlock>Студія про себе: «{s.ownerQuote}»</QuoteBlock>}
+            {recentNote && (
+              <p className="m-0">
+                <Kicker className="mr-2">Що нового:</Kicker> {recentNote}
+              </p>
             )}
-            <p className="m-0 text-[12.5px] text-umber">Фото: {name}, публікуються зі згоди студії.</p>
           </div>
-        )}
-        <div className="grid grid-cols-1 max-w-[70ch] gap-3 text-lg">
-          {description.split(/\n{2,}/).map((para, i) => (
-            <p key={i} className="m-0">{para}</p>
-          ))}
-          {s.ownerQuote && s.ownerQuoteApproved && (
-            <figure className="m-0 border-l-[3px] border-terra py-1 pl-4">
-              <blockquote className="m-0 text-[17px]">Студія про себе: «{s.ownerQuote}»</blockquote>
-            </figure>
+          {chips.length > 0 && (
+            <ChipGroup>
+              {chips.map((c) => (
+                <Chip key={c} as="span">
+                  {c}
+                </Chip>
+              ))}
+            </ChipGroup>
           )}
-          {recentNote && (
-            <p className="m-0">
-              <span className="kicker mr-2">Що нового:</span>{' '}
-              {recentNote}
-            </p>
+          {showForm && (
+            <div className="flex flex-wrap gap-2.5">
+              <Button href="#zapyt-forma" variant="cobalt" arrow>
+                Запит цій студії
+              </Button>
+            </div>
           )}
+          <Updated />
         </div>
-        {(mk || venues || companies) && (
-          <div className="flex flex-wrap gap-2 text-[13px] font-bold">
-            {mk && <span className="rounded-full bg-sand px-3 py-1 text-umber">майстер-класи</span>}
-            {venues && <span className="rounded-full bg-sand px-3 py-1 text-umber">працює із закладами</span>}
-            {companies && <span className="rounded-full bg-sand px-3 py-1 text-umber">корпоративні замовлення</span>}
+        <section aria-labelledby="facts" className="min-w-0">
+          <Kicker as="p">
+            <span id="facts">Коротко</span>
+          </Kicker>
+          <div className="mt-2">
+            <Facts rows={facts} />
           </div>
-        )}
-        <Updated />
+        </section>
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid grid-cols-1 gap-10">
-          <section aria-labelledby="facts">
-            <SectionHead title="Коротко" id="facts" />
-            <dl className="m-0 grid grid-cols-1 gap-0 rounded-2xl bg-card">
-              {facts.map(([k, v]) => (
-                <div key={k} className="grid grid-cols-1 gap-0.5 border-b border-line px-4 py-3 last:border-b-0 sm:grid-cols-[130px_minmax(0,1fr)] sm:gap-3">
-                  <dt className="text-sm font-semibold text-umber">{k}</dt>
-                  <dd className="m-0 break-words">{v}</dd>
+      {photos.length > 0 && (
+        <section aria-label="Фото студії" className="grid gap-2 pt-[clamp(24px,3vw,40px)]">
+          <Image src={photos[0].url} alt={photos[0].alt} width={photos[0].width} height={photos[0].height} priority sizes="(min-width:1200px) 760px, 100vw" className="aspect-[3/2] w-full max-w-[760px] object-cover" />
+          {photos.length > 1 && (
+            <ul className="m-0 grid max-w-[760px] list-none grid-cols-3 gap-2 p-0 sm:grid-cols-5">
+              {photos.slice(1).map((p) => (
+                <li key={p.url}>
+                  <a href={p.full} target="_blank" rel="noopener">
+                    <Image src={p.url} alt={p.alt} width={p.width} height={p.height} loading="lazy" sizes="(min-width:640px) 150px, 33vw" className="aspect-square w-full object-cover" />
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="m-0 text-[12.5px] text-ink-2">Фото: {name}, публікуються зі згоди студії.</p>
+        </section>
+      )}
+
+      <InnerCols
+        aside={
+          <>
+            {dormant ? (
+              <SideBox title={s.status === 'closed' ? 'Не працює' : 'Актуальність не підтверджена'}>
+                <p className="m-0">
+                  {s.status === 'closed'
+                    ? 'За нашими даними, студія чи майстерня більше не працює. Профіль лишаємо як довідку.'
+                    : 'Актуальність не підтверджена — уточніть перед візитом. Ми не знайшли свіжих оголошень чи постів після 2022 року.'}{' '}
+                  Шукаєте подібне? Надішліть запит — ми підберемо студії, які працюють зараз.
+                </p>
+                <MoreLink href="/zapyt" pad={false} className="py-1.5">
+                  Надіслати запит
+                </MoreLink>
+              </SideBox>
+            ) : exhibiting ? (
+              <SideBox title="Де побачити роботи">
+                <p className="m-0">
+                  {channels.length ? `${channels.join(', ').replace(/^./, (c) => c.toUpperCase())}.` : 'На виставках і в музейних колекціях.'} Замовлень і занять на відкритих сторінках не анонсовано. Шукаєте подібні вироби? Надішліть запит — ми підберемо студії.
+                </p>
+                <MoreLink href="/zapyt" pad={false} className="py-1.5">
+                  Надіслати запит
+                </MoreLink>
+              </SideBox>
+            ) : (
+              <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} />
+            )}
+          </>
+        }
+      >
+        {precise && !dormant && (
+          <Block id="where" title="Де знайти" note={<span className="break-words">{placeText}</span>}>
+            <ProfileMap lat={geo!.lat!} lng={geo!.lng!} address={placeText} />
+            <p className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
+              <span className="font-mono text-[11px] tracking-[.06em] text-ink-2 uppercase">Прокласти маршрут:</span>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${routeQuery}`} target="_blank" rel="noopener nofollow">
+                Google Maps
+              </a>
+              <a href={`https://maps.apple.com/?daddr=${routeQuery}`} target="_blank" rel="noopener nofollow">
+                Apple Maps
+              </a>
+              {city?.slug && <Link href={`/mapa?misto=${city.slug}&studio=${s.slug}`}>Показати на мапі студій</Link>}
+            </p>
+          </Block>
+        )}
+        {!precise && !dormant && receivesVisitors && city && <Note>Працює {inCity(city.name)} — точну адресу уточнюйте у студії.</Note>}
+
+        {(products.length > 0 || services.length > 0) && (
+          <Block id="offer" title={exhibiting ? 'Що створює' : 'Що робить і пропонує'}>
+            <div className="grid items-start gap-6 sm:grid-cols-2">
+              {products.length > 0 && <ListBlock title="Вироби" items={products} />}
+              {services.length > 0 && <ListBlock title="Послуги" items={services} />}
+            </div>
+          </Block>
+        )}
+
+        {prices.length > 0 && (
+          <Block id="prices" title="Ціни" note={<>З прайсу, сайту або сторіс студії; після крапки — джерело і рік. Актуальні ціни уточнюйте у студії або через запит.</>}>
+            <div className="grid gap-5">
+              {priceBlocks.map(({ g, lines }) => (
+                <div key={g} className="grid gap-2">
+                  <Kicker as="p">{g}</Kicker>
+                  <PriceList items={lines.slice(0, 6).map((p) => ({ text: p.text, source: p.source }))} />
+                  {lines.length > 6 && (
+                    <details className="group">
+                      <MoreLink as="summary" pad={false} className="py-1.5 text-cobalt">
+                        <span className="group-open:hidden">Ще {lines.length - 6}</span>
+                        <span className="hidden group-open:inline">Згорнути</span>
+                      </MoreLink>
+                      <PriceList items={lines.slice(6).map((p) => ({ text: p.text, source: p.source }))} />
+                    </details>
+                  )}
                 </div>
               ))}
-            </dl>
-          </section>
+            </div>
+          </Block>
+        )}
 
-          {precise && !dormant && (
-            <section aria-labelledby="where">
-              <SectionHead title="Де знайти" id="where">
-                <p className="m-0 break-words">{placeText}</p>
-              </SectionHead>
-              <ProfileMap lat={geo!.lat!} lng={geo!.lng!} address={placeText} />
-              <p className="mt-3 mb-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                <span className="text-umber">Прокласти маршрут:</span>
-                <a href={`https://www.google.com/maps/dir/?api=1&destination=${routeQuery}`} target="_blank" rel="noopener nofollow">Google Maps</a>
-                <a href={`https://maps.apple.com/?daddr=${routeQuery}`} target="_blank" rel="noopener nofollow">Apple Maps</a>
-                {city?.slug && <Link href={`/mapa?misto=${city.slug}&studio=${s.slug}`}>Показати на мапі студій</Link>}
-              </p>
-            </section>
-          )}
-          {!precise && !dormant && receivesVisitors && city && (
-            <p className="m-0 rounded-2xl bg-card px-4 py-3 text-[15px]">
-              Працює {inCity(city.name)} — точну адресу уточнюйте у студії.
+        {!dormant && (venues || companies || hasB2bData) && (
+          <Block id="b2b" kicker="Для бізнесу" title="Умови для закладів і компаній">
+            {hasB2bData ? (
+              <Facts
+                rows={[
+                  ...(b2b.minOrder ? ([['Мінімальне замовлення', b2b.minOrder]] as [string, React.ReactNode][]) : []),
+                  ...(b2b.leadTime ? ([['Термін', b2b.leadTime]] as [string, React.ReactNode][]) : []),
+                  ...(b2b.logoMethods?.length ? ([['Логотип', b2b.logoMethods.map((x) => x.text).join(', ')]] as [string, React.ReactNode][]) : []),
+                ]}
+              />
+            ) : (
+              <Note>Мінімальну партію, терміни й ціни для бізнесу студія ще не вказала. Надішліть запит — ми передамо його студії разом з іншими, що роблять подібні вироби.</Note>
+            )}
+            {showForm && <CtaBand tone="cobalt" title="Надішліть запит цій студії" cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />}
+          </Block>
+        )}
+
+        {cases.length > 0 && (
+          <Block id="keysy" kicker="Для бізнесу" title="Кейси студії">
+            <StudioCells>
+              {cases.map((c) => (
+                <IndexCell key={c.slug} href={casePath(c)} kicker={`Кейс · ${c.client.name}`} title={c.title} cta="Відкрити" />
+              ))}
+            </StudioCells>
+          </Block>
+        )}
+
+        {igPosts.length > 0 && (
+          <Block id="ig" title="Останнє в Instagram" note={s.instagram ? <>Вибрані пости з Instagram студії <a href={s.instagram} target="_blank" rel="noopener nofollow">@{igHandle(s.instagram)}</a> і її колаборацій; завантажуються, коли ви до них гортаєте.</> : undefined}>
+            <InstagramPosts urls={igPosts} handle={igHandle(s.instagram)} />
+          </Block>
+        )}
+
+        {related.length > 0 && city && (
+          <Block id="near" title={`Інші студії та майстри: ${city.name}`}>
+            <StudioCells>
+              {related.map((r) => (
+                <StudioCell key={r.id} s={r} showCity={false} />
+              ))}
+            </StudioCells>
+          </Block>
+        )}
+        <SideBox title="Власникам">
+          {s.ownerVerified ? (
+            <p className="m-0">
+              <b>Ви представляєте цю студію?</b> Оновлюйте профіль у кабінеті. <Link href="/kabinet">Увійти →</Link>
+            </p>
+          ) : (
+            <p className="m-0">
+              <b>Це ваша студія?</b> Керуйте профілем: фото, ціни, умови для бізнесу — безкоштовно. <Link href={`/kabinet/zayavka?studio=${s.slug}`}>Керувати профілем →</Link>
             </p>
           )}
-
-          {(products.length > 0 || services.length > 0) && (
-            <section aria-labelledby="offer">
-              <SectionHead title={exhibiting ? 'Що створює' : 'Що робить і пропонує'} id="offer" />
-              <div className="grid grid-cols-1 items-start gap-4 sm:grid-cols-2">
-                {products.length > 0 && <ListBlock title="Вироби" items={products} />}
-                {services.length > 0 && <ListBlock title="Послуги" items={services} />}
-              </div>
-            </section>
-          )}
-
-          {prices.length > 0 && (
-            <section aria-labelledby="prices">
-              <SectionHead title="Ціни" id="prices">
-                <p className="m-0 text-sm text-umber">З прайсу, сайту або сторіс студії; після крапки — джерело і рік. Актуальні ціни уточнюйте у студії або через запит.</p>
-              </SectionHead>
-              <div className="grid grid-cols-1 gap-5">
-                {priceGroups.map(([g, lines]) => (
-                  <div key={g} className="grid grid-cols-1 gap-2">
-                    <p className="kicker m-0">{g}</p>
-                    <ul className="m-0 grid grid-cols-1 list-none gap-2 p-0">
-                      {lines.slice(0, 6).map((p) => <PriceItem key={p.text} p={p} />)}
-                    </ul>
-                    {lines.length > 6 && (
-                      <details className="group">
-                        <summary className="cursor-pointer list-none text-sm font-bold text-cobalt">
-                          <span className="group-open:hidden">Ще {lines.length - 6}</span>
-                          <span className="hidden group-open:inline">Згорнути</span>
-                        </summary>
-                        <ul className="m-0 mt-2 grid grid-cols-1 list-none gap-2 p-0">
-                          {lines.slice(6).map((p) => <PriceItem key={p.text} p={p} />)}
-                        </ul>
-                      </details>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {!dormant && (venues || companies || hasB2bData) && (
-            <section aria-labelledby="b2b">
-              <SectionHead kicker="Для бізнесу" title="Умови для закладів і компаній" id="b2b" />
-              {hasB2bData ? (
-                <dl className="m-0 grid grid-cols-1 rounded-2xl bg-card">
-                  {b2b.minOrder && <div className="grid grid-cols-1 gap-0.5 border-b border-line px-4 py-3 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-3"><dt className="text-sm font-semibold text-umber">Мінімальне замовлення</dt><dd className="m-0">{b2b.minOrder}</dd></div>}
-                  {b2b.leadTime && <div className="grid grid-cols-1 gap-0.5 border-b border-line px-4 py-3 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-3"><dt className="text-sm font-semibold text-umber">Термін</dt><dd className="m-0">{b2b.leadTime}</dd></div>}
-                  {!!b2b.logoMethods?.length && <div className="grid grid-cols-1 gap-0.5 px-4 py-3 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-3"><dt className="text-sm font-semibold text-umber">Логотип</dt><dd className="m-0">{b2b.logoMethods.map((x) => x.text).join(', ')}</dd></div>}
-                </dl>
-              ) : (
-                <p className="m-0 rounded-2xl bg-card p-4">Мінімальну партію, терміни й ціни для бізнесу студія ще не вказала. Надішліть запит — ми передамо його студії разом з іншими, що роблять подібні вироби.</p>
-              )}
-            </section>
-          )}
-
-          {cases.length > 0 && (
-            <section aria-labelledby="keysy">
-              <SectionHead kicker="Для бізнесу" title="Кейси студії" id="keysy" />
-              <ul className="m-0 grid grid-cols-1 list-none gap-2 p-0">
-                {cases.map((c) => (
-                  <li key={c.slug}>
-                    <Link href={casePath(c)} className="block rounded-2xl bg-card p-4 text-ink no-underline hover:bg-sand hover:text-ink">
-                      <span className="block text-[13px] text-umber">Кейс · {c.client.name}</span>
-                      <b>{c.title}</b>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )}
-
-          {igPosts.length > 0 && (
-            <section aria-labelledby="ig">
-              <SectionHead title="Останнє в Instagram" id="ig">
-                {s.instagram && <p className="m-0 text-sm text-umber">Вибрані пости з Instagram студії <a href={s.instagram} target="_blank" rel="noopener nofollow">@{igHandle(s.instagram)}</a> і її колаборацій; завантажуються, коли ви до них гортаєте.</p>}
-              </SectionHead>
-              <InstagramPosts urls={igPosts} handle={igHandle(s.instagram)} />
-            </section>
-          )}
-
-          {related.length > 0 && city && (
-            <section aria-labelledby="near">
-              <SectionHead title={`Інші студії та майстри: ${city.name}`} id="near" />
-              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">{related.map((r) => <StudioCard key={r.id} s={r} showCity={false} />)}</div>
-            </section>
-          )}
-        </div>
-
-        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
-          {dormant ? (
-            <div className="grid grid-cols-1 gap-2 rounded-[20px] border border-l-[6px] border-line border-l-ochre bg-card p-[18px]">
-              <p className="font-display m-0 text-sm tracking-wide uppercase">{s.status === 'closed' ? 'Не працює' : 'Актуальність не підтверджена'}</p>
-              <p className="m-0 text-[15px]">
-                {s.status === 'closed'
-                  ? 'За нашими даними, студія чи майстерня більше не працює. Профіль лишаємо як довідку.'
-                  : 'Актуальність не підтверджена — уточніть перед візитом. Ми не знайшли свіжих оголошень чи постів після 2022 року.'}{' '}
-                Шукаєте подібне? Надішліть запит — ми підберемо студії, які працюють зараз.
-              </p>
-              <Link href="/zapyt" className="font-bold">Надіслати запит →</Link>
-            </div>
-          ) : exhibiting ? (
-            <div className="grid grid-cols-1 gap-2 rounded-[20px] border border-line bg-card p-[18px]">
-              <p className="font-display m-0 text-sm tracking-wide uppercase">Де побачити роботи</p>
-              <p className="m-0 text-[15px]">
-                {channels.length ? `${channels.join(', ').replace(/^./, (c) => c.toUpperCase())}.` : 'На виставках і в музейних колекціях.'} Замовлень і занять на відкритих сторінках не анонсовано. Шукаєте подібні вироби? Надішліть запит — ми підберемо студії.
-              </p>
-              <Link href="/zapyt" className="font-bold">Надіслати запит →</Link>
-            </div>
-          ) : (
-            <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} />
-          )}
-          <div className="rounded-[20px] border border-line bg-cream p-4 text-sm">
-            {s.ownerVerified ? (
-              <>
-                <b>Ви представляєте цю студію?</b> Оновлюйте профіль у кабінеті. <Link href="/kabinet">Увійти →</Link>
-              </>
-            ) : (
-              <>
-                <b>Це ваша студія?</b> Керуйте профілем: фото, ціни, умови для бізнесу — безкоштовно. <Link href={`/kabinet/zayavka?studio=${s.slug}`}>Керувати профілем →</Link>
-              </>
-            )}
-          </div>
-        </aside>
-      </div>
+        </SideBox>
+      </InnerCols>
       <MobileRequestBar />
-    </main>
+    </InnerMain>
   )
 }

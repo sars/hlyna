@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
+import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { FaqItem } from '@/components/ui/Faq'
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { StudioMap } from '@/components/site/StudioMap.client'
 import { site } from '@/content/site'
@@ -32,52 +33,58 @@ export default async function MapPage() {
     { q: 'Моєї студії немає на мапі. Як додати?', a: 'Заповніть коротку форму на сторінці «Додати студію» — профіль і позначка на мапі безкоштовні.' },
   ]
   return (
-    <main className={`${container} grid grid-cols-1 gap-8 pt-8 pb-16`}>
+    <InnerMain>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Мапа' }]} />
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Мапа керамічних студій України</h1>
-        <p className="m-0 max-w-[70ch] text-lg">
-          На мапі — {fmt(placed.length)} {pluralUk(placed.length, ['студія, бренд чи майстер', 'студії, бренди й майстри', 'студій, брендів і майстрів'])} у {fmt(groups.length)} {pluralUk(groups.length, ['місті й селі', 'містах і селах', 'містах і селах'])}. {fmt(precise)} — за точною адресою, решта — у центрі свого міста, бо працюють за записом. Оберіть формат, щоб побачити, де пройти майстер-клас, спробувати гончарне коло чи замовити посуд для закладу.
-        </p>
-        <Updated />
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Мапа' }]}
+        kicker="Мапа студій"
+        title="Мапа керамічних студій України"
+        lead={
+          <p className="m-0">
+            На мапі — {fmt(placed.length)} {pluralUk(placed.length, ['студія, бренд чи майстер', 'студії, бренди й майстри', 'студій, брендів і майстрів'])} у {fmt(groups.length)} {pluralUk(groups.length, ['місті й селі', 'містах і селах', 'містах і селах'])}. {fmt(precise)} — за точною адресою, решта — у центрі свого міста, бо працюють за записом. Оберіть формат, щоб побачити, де пройти майстер-клас, спробувати гончарне коло чи замовити посуд для закладу.
+          </p>
+        }
+        strip={[
+          { value: fmt(placed.length), label: 'студій на мапі' },
+          { value: fmt(groups.length), label: 'міст і сіл' },
+          { value: fmt(precise), label: 'з точною адресою' },
+        ]}
+      />
+      <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
+        <StudioMap filters={MAP_FILTERS} />
+
+        <Block id="list" title="Усі студії за містами" note={<>Той самий перелік без мапи. {all.length > placed.length ? `${fmt(all.length - placed.length)} ще без координат — їх можна знайти в каталозі.` : ''}</>}>
+          <div className="grid gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
+            {groups.map((g) => (
+              <details key={g.city.slug} id={`misto-${g.city.slug}`} open={g.studios.length <= 3} className="group">
+                <summary className="cursor-pointer list-none font-display text-[15px] font-semibold">
+                  {g.city.name} <span className="text-sm text-terracotta-text">{g.studios.length}</span>
+                </summary>
+                <ul className="mt-1.5 mb-0 grid list-none gap-1 p-0 text-[15px]">
+                  {g.studios.map((s) => (
+                    <li key={s.id}>
+                      <Link href={`/vyrobnyky/${s.slug}`} className="text-cobalt underline underline-offset-[3px]">
+                        {cleanName(s.name)}
+                      </Link>{' '}
+                      <span className="font-mono text-[11px] tracking-[.04em] text-ink-2 uppercase">{TYPE_LABEL[s.type ?? 'other']}</span>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ))}
+          </div>
+        </Block>
+
+        <Block id="faq" kicker="Питання і відповіді" title="Часті питання">
+          <div className="ui-faq max-w-faq">
+            {faq.map((f, i) => (
+              <FaqItem key={f.q} q={f.q} open={i === 0}>
+                <p className="m-0">{f.q.startsWith('Моєї') ? <>Заповніть коротку форму на сторінці <Link href="/dlya-studiy">«Додати студію»</Link> — профіль і позначка на мапі безкоштовні. Ваша студія вже є на сайті, але без адреси? Знайдіть її профіль і натисніть «Керувати профілем».</> : f.a}</p>
+              </FaqItem>
+            ))}
+          </div>
+        </Block>
       </div>
-
-      <StudioMap filters={MAP_FILTERS} />
-
-      <section aria-labelledby="list">
-        <SectionHead title="Усі студії за містами" id="list">
-          <p className="m-0 text-sm text-umber">Той самий перелік без мапи. {all.length > placed.length ? `${fmt(all.length - placed.length)} ще без координат — їх можна знайти в каталозі.` : ''}</p>
-        </SectionHead>
-        <div className="grid grid-cols-1 gap-x-8 gap-y-5 sm:grid-cols-2 lg:grid-cols-3">
-          {groups.map((g) => (
-            <details key={g.city.slug} id={`misto-${g.city.slug}`} open={g.studios.length <= 3} className="group scroll-mt-24">
-              <summary className="cursor-pointer list-none font-semibold">
-                {g.city.name} <span className="text-terra">{g.studios.length}</span>
-              </summary>
-              <ul className="mt-1.5 mb-0 grid list-none gap-1 p-0 text-[15px]">
-                {g.studios.map((s) => (
-                  <li key={s.id}>
-                    <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link> <span className="text-[13px] text-umber">{TYPE_LABEL[s.type ?? 'other']}</span>
-                  </li>
-                ))}
-              </ul>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      <section aria-labelledby="faq">
-        <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-        <div className="grid grid-cols-1 gap-2.5">
-          {faq.map((f, i) => (
-            <details key={f.q} open={i === 0} className="rounded-2xl bg-card px-[18px] py-1">
-              <summary className="cursor-pointer list-none py-3.5 font-bold">{f.q}</summary>
-              <p className="mt-0 mb-3.5">{f.q.startsWith('Моєї') ? <>Заповніть коротку форму на сторінці <Link href="/dlya-studiy">«Додати студію»</Link> — профіль і позначка на мапі безкоштовні. Ваша студія вже є на сайті, але без адреси? Знайдіть її профіль і натисніть «Керувати профілем».</> : f.a}</p>
-            </details>
-          ))}
-        </div>
-      </section>
-    </main>
+    </InnerMain>
   )
 }

@@ -1,9 +1,15 @@
 import type { Metadata } from 'next'
+import { Block, InnerCols, InnerMain, Related } from '@/components/site/Inner'
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
+import { Chip } from '@/components/ui/Chip'
+import { Facts } from '@/components/ui/Facts'
+import { Kicker } from '@/components/ui/Kicker'
+import { NumberedList } from '@/components/ui/NumberedList'
+import { Updated } from '@/components/ui/Updated'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { Breadcrumbs, container, SectionHead } from '@/components/site/Bits'
 import { InstagramPosts } from '@/components/site/InstagramPosts.client'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
@@ -49,7 +55,7 @@ export default async function CasePage({ params }: { params: Params }) {
   const what = caseFormWhat(c)
 
   return (
-    <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
+    <InnerMain bar>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -74,113 +80,91 @@ export default async function CasePage({ params }: { params: Params }) {
         }}
       />
 
-      <div className="grid max-w-[820px] grid-cols-1 gap-4">
+      <div className="grid max-w-[820px] gap-3.5 border-b-2 border-ink pt-hero pb-[clamp(24px,3vw,40px)]">
         <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: studioName, href: `/vyrobnyky/${c.studio.slug}` }, { label: `Кейс: ${c.title}` }]} modified={c.checked} />
-        <span className="kicker break-words">Кейс студії · {c.client.type}</span>
-        <h1 className="h-display m-0 text-[clamp(24px,3.6vw,40px)] leading-[1.08]">{c.title}</h1>
-        <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[14px] text-umber">
-          <span className="rounded-full bg-sand px-2.5 py-1 font-semibold whitespace-nowrap text-ink">{label}</span>
+        <Kicker className="break-words">Кейс студії · {c.client.type}</Kicker>
+        <h1 className="m-0 font-display text-h1 break-words" style={{ letterSpacing: 0 }}>
+          {c.title}
+        </h1>
+        <p className="m-0 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-ink-2">
+          <Chip as="span" size="sm">
+            {label}
+          </Chip>
           <span className="whitespace-nowrap">перевірено {dateUk(c.checked)}</span>
           <Link href={`/zapyt?vid=keys&slug=${encodeURIComponent(`${c.studio.slug}/keisy/${caseShort(c)}`)}`}>Попросити зняти або виправити</Link>
         </p>
-        <p className="m-0 text-lg">{c.lead}</p>
+        <p className="m-0 max-w-read text-lead">{c.lead}</p>
+        <Updated />
       </div>
 
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid grid-cols-1 gap-10">
-          <section aria-labelledby="facts">
-            <SectionHead title="Що відомо" id="facts" />
-            <dl className="m-0 grid grid-cols-1 rounded-2xl bg-card">
-              <div className="grid grid-cols-1 gap-0.5 border-b border-line px-4 py-3 sm:grid-cols-[170px_minmax(0,1fr)] sm:gap-3">
-                <dt className="text-sm font-semibold text-umber">Студія</dt>
-                <dd className="m-0">
+      <InnerCols aside={<RequestForm sourcePage={casePath(c)} defaultWhat={what} />}>
+        <Block id="facts" title="Що відомо">
+          <Facts
+            rows={[
+              [
+                'Студія',
+                <>
                   {studio ? <Link href={`/vyrobnyky/${studio.slug}`}>{studioName}</Link> : studioName}
-                  {c.studio.note && <span className="block text-[13px] text-umber">{c.studio.note}</span>}
-                </dd>
-              </div>
-              {c.facts.map((f) => (
-                <div key={f.label} className="grid grid-cols-1 gap-0.5 border-b border-line px-4 py-3 last:border-b-0 sm:grid-cols-[170px_minmax(0,1fr)] sm:gap-3">
-                  <dt className="text-sm font-semibold text-umber">{f.label}</dt>
-                  <dd className="m-0 break-words">
-                    {f.value}
-                    {f.source && <span className="block text-[13px] text-umber">{f.source}</span>}
-                  </dd>
-                </div>
+                  {c.studio.note && <span className="block text-[13px] text-ink-2">{c.studio.note}</span>}
+                </>,
+              ],
+              ...c.facts.map(
+                (f) =>
+                  [
+                    f.label,
+                    <>
+                      {f.value}
+                      {f.source && <span className="block text-[13px] text-ink-2">{f.source}</span>}
+                    </>,
+                  ] as [string, React.ReactNode],
+              ),
+            ]}
+          />
+        </Block>
+
+        {c.sections.map((sec, i) => (
+          <Block key={sec.heading} id={`s${i}`} title={sec.heading}>
+            <div className="grid max-w-read gap-3">
+              {sec.paragraphs.map((p, j) => (
+                <p key={j} className="m-0">
+                  {p}
+                </p>
               ))}
-            </dl>
-          </section>
+            </div>
+          </Block>
+        ))}
 
-          {c.sections.map((s, i) => (
-            <section key={s.heading} aria-labelledby={`s${i}`}>
-              <SectionHead title={s.heading} id={`s${i}`} />
-              <div className="grid max-w-[70ch] grid-cols-1 gap-3">
-                {s.paragraphs.map((p, j) => (
-                  <p key={j} className="m-0">{p}</p>
-                ))}
-              </div>
-            </section>
-          ))}
+        {c.askStudio.length > 0 && (
+          <Block id="ask" kicker="Для схожого замовлення" title="Що спитати в студії">
+            <NumberedList items={c.askStudio.map((q) => ({ title: q }))} />
+          </Block>
+        )}
 
-          {c.askStudio.length > 0 && (
-            <section aria-labelledby="ask">
-              <SectionHead kicker="Для схожого замовлення" title="Що спитати в студії" id="ask" />
-              <ol className="m-0 grid max-w-[70ch] grid-cols-1 gap-2 pl-5 marker:text-terra">
-                {c.askStudio.map((q) => (
-                  <li key={q}>{q}</li>
-                ))}
-              </ol>
-            </section>
-          )}
+        {c.embeds.length > 0 && (
+          <Block id="ig" title="Пости в Instagram" note={<>Фото належать авторам постів; показуємо вбудованими постами, вони завантажуються з Instagram, коли ви до них гортаєте.</>}>
+            <InstagramPosts urls={c.embeds.slice(0, 4)} handle={handle} />
+          </Block>
+        )}
 
-          {c.embeds.length > 0 && (
-            <section aria-labelledby="ig">
-              <SectionHead title="Пости в Instagram" id="ig">
-                <p className="m-0 text-sm text-umber">Фото належать авторам постів; показуємо вбудованими постами, вони завантажуються з Instagram, коли ви до них гортаєте.</p>
-              </SectionHead>
-              <InstagramPosts urls={c.embeds.slice(0, 4)} handle={handle} />
-            </section>
-          )}
-
-          <section aria-labelledby="sources">
-            <SectionHead title="Джерела" id="sources" />
-            <ul className="m-0 grid grid-cols-1 gap-1.5 pl-5 text-[15px] marker:text-terra">
-              {c.sources.map((s) => (
-                <li key={s.url + s.title}>
-                  <a href={s.url} target="_blank" rel="noopener nofollow">{s.title}</a> <span className="text-umber">· {dateUk(s.date)}</span>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 mb-0 text-sm text-umber">
+        <Block id="sources" title="Джерела">
+          <ul className="m-0 grid max-w-read list-none gap-1.5 p-0 text-[15px]">
+            {c.sources.map((src) => (
+              <li key={src.url + src.title} className="before:text-terracotta-text before:content-['—_']">
+                <a href={src.url} target="_blank" rel="noopener nofollow">
+                  {src.title}
+                </a>{' '}
+                <span className="text-ink-2">· {dateUk(src.date)}</span>
+              </li>
+            ))}
+          </ul>
+          <p className="m-0 text-sm text-ink-2">
               Ви з цієї студії чи від замовника й бачите неточність? <Link href={`/zapyt?vid=keys&slug=${encodeURIComponent(`${c.studio.slug}/keisy/${caseShort(c)}`)}`}>Напишіть нам</Link> — виправимо або знімемо кейс.
-            </p>
-          </section>
+          </p>
+        </Block>
 
-          <nav aria-label="Схожі сторінки" className="grid grid-cols-1 gap-3">
-            <p className="kicker m-0">Дивіться також</p>
-            <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-              {studio && (
-                <li>
-                  <Link href={`/vyrobnyky/${studio.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">
-                    Профіль: {studioName}
-                  </Link>
-                </li>
-              )}
-              {related.map((t) => (
-                <li key={t}>
-                  <Link href={t} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
-                    {RELATED_LABEL[t]}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </nav>
-        </div>
-
-        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
-          <RequestForm sourcePage={casePath(c)} defaultWhat={what} />
-        </aside>
-      </div>
+        <Related items={[...(studio ? [{ label: `Профіль: ${studioName}`, href: `/vyrobnyky/${studio.slug}` }] : []), ...related.map((t) => ({ label: RELATED_LABEL[t], href: t }))]} />
+      </InnerCols>
       <MobileRequestBar />
-    </main>
+    </InnerMain>
   )
 }

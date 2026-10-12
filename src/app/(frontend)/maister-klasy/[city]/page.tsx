@@ -1,4 +1,14 @@
 import type { Metadata } from 'next'
+import { Block, InnerCols, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Button } from '@/components/ui/Button'
+import { Chip } from '@/components/ui/Chip'
+import { ChipGroup } from '@/components/ui/ChipGroup'
+import { CtaBand } from '@/components/ui/CtaBand'
+import { Epigraph } from '@/components/ui/Epigraph'
+import { Faq } from '@/components/ui/Faq'
+import { Kicker } from '@/components/ui/Kicker'
+import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
+import { Panel } from '@/components/ui/Panel'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
@@ -7,15 +17,14 @@ import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 
 import { latestUpdate } from '@/lib/catalog'
 
-import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/utilities/ogImage'
 import { pickVerse } from '@/content/verses'
-import { getAllStudios, groupByCity, hasFormat, igHandle, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
-import { cleanName, firstAddress, inCity, oblastLabel, staleNote } from '@/lib/present'
+import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
+import { cleanName, firstAddress, inCity, oblastLabel } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { cityContent } from '@/editorial/places'
 import { certificateCities } from '@/editorial/topics'
@@ -122,8 +131,17 @@ export default async function CityMasterClassesPage({ params }: Args) {
     { q: 'А для команди?', a: `Корпоратив з ліплення з глини проводять у студії або у вашому офісі; по Україні — ${f.range('corporate')}. Надішліть запит — ми передамо його кільком студіям.` },
   ]
 
+  const chipsOf = (st: StudioCard) => CHIPS.filter(([fm]) => hasFormat(st, fm)).map(([, label]) => ({ label, tone: 'ink' as const }))
+  const placeLead = cityContent(city.slug as string)?.lead
+  const strip = r
+    ? [
+        { value: fmt(studios.length), label: pluralUk(studios.length, ['місце', 'місця', 'місць']) + ' з майстер-класами' },
+        { value: `${fmt(r.min)}–${fmt(r.max)}`, label: 'грн разовий майстер-клас з особи' },
+        { value: fmt(priced), label: pluralUk(priced, ['студія', 'студії', 'студій']) + ' з ціною в прайсі' },
+      ]
+    : undefined
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
+    <InnerMain bar>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{
@@ -143,125 +161,81 @@ export default async function CityMasterClassesPage({ params }: Args) {
           })),
         }}
       />
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи', href: '/maister-klasy' }, { label: city.name }]} modified={latestUpdate(studios)} />
-        <span className="kicker">Майстер-класи{region ? ` · ${region}` : ''}</span>
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Майстер-класи з кераміки: {city.name}</h1>
-        <p className="m-0 max-w-[70ch] text-lg">
-          У каталозі «Глина» — {places(studios.length)} {where}, де проводять заняття з гончарства, ліплення чи розпису кераміки
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи', href: '/maister-klasy' }, { label: city.name }]}
+        modified={latestUpdate(studios)}
+        kicker={`Майстер-класи${region ? ` · ${region}` : ''}`}
+        title={`Майстер-класи з кераміки: ${city.name}`}
+        lead={
+          <>
+            <p className="m-0">
+              У каталозі «Глина» — {places(studios.length)} {where}, де проводять заняття з гончарства, ліплення чи розпису кераміки
           {breakdown.length ? `: ${breakdown.join(', ')}` : ''}.
           {r ? ` Разовий майстер-клас коштує ${priceText(r)} (за прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])}, ${site.dataUpdated}).` : ''} Нижче — кожна студія з форматами й цінами; один запит можна надіслати одразу кільком.
-        </p>
-        {cityContent(city.slug as string)?.lead && (
-          <p className="m-0 max-w-[70ch] text-[15.5px] text-umber">
-            {cityContent(city.slug as string)!.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}{' '}
-            <Link href={`/vyrobnyky/misto/${city.slug}`}>Більше про кераміку {where} →</Link>
-          </p>
+            </p>
+            {placeLead && (
+              <p className="m-0 text-[15.5px] text-ink-2">
+                {placeLead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}{' '}
+                <Link href={`/vyrobnyky/misto/${city.slug}`}>Більше про кераміку {where} →</Link>
+              </p>
+            )}
+          </>
+        }
+        strip={strip}
+        chips={[]}
+        actions={
+          <>
+            <Button href="#zapyt-forma" variant="cobalt" arrow>
+              Отримати пропозиції
+            </Button>
+            <Button href={`/mapa?misto=${city.slug}`} variant="ghost">
+              Показати на мапі
+            </Button>
+          </>
+        }
+      />
+
+      <InnerCols
+        aside={
+          <>
+            <RequestForm sourcePage={`/maister-klasy/${city.slug}`} defaultWhat="master-class" defaultCity={city.name} />
+            <Panel tone="cobalt">
+              <Kicker as="p">Для команди</Kicker>
+              <p className="m-0 mt-1.5 text-[15px] leading-normal">
+                <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny" className="text-paper">
+                  Корпоратив з ліплення з глини: у студії або в офісі, {f.range('corporate')}. →
+                </Link>
+              </p>
+            </Panel>
+          </>
+        }
+      >
+        {studios.length >= 8 && <Epigraph lines={pickVerse(city.slug as string)} />}
+
+        <Block id="list" title={`Де пройти майстер-клас ${where}`} note={<>Ціна — разове групове заняття для дорослих з прайсу студії. Курси, абонементи й корпоративи — у профілі.</>}>
+          <MakerRows>
+            {sorted.map((st) => {
+              const from = minClass(st)
+              return <MakerRow key={st.id} s={st} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(roundNice(from))} грн` } : undefined} />
+            })}
+          </MakerRows>
+        </Block>
+
+        {(formatLinks.length > 0 || hasCertPage) && (
+          <ChipGroup as="nav" label="За форматом" aria-label="Формати">
+            {hasCertPage && <Chip href={`/sertyfikaty/${city.slug}`}>Сертифікати: {city.name}</Chip>}
+            {formatLinks.map(([fm, label, href]) => (
+              <Chip key={fm} href={SLUG_OF[fm] && cityFormat.has(SLUG_OF[fm]!) ? `/maister-klasy/${city.slug}/${SLUG_OF[fm]}` : href}>
+                {label}
+              </Chip>
+            ))}
+          </ChipGroup>
         )}
-        <p className="m-0">
-          <Link href={`/mapa?misto=${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Показати на мапі →</Link>
-        </p>
-        <Updated />
-      </div>
 
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid grid-cols-1 gap-10">
-          {studios.length >= 8 && <Epigraph lines={pickVerse(city.slug as string)} />}
-
-          <section aria-labelledby="list">
-            <SectionHead title={`Де пройти майстер-клас ${where}`} id="list">
-              <p className="m-0 text-sm text-umber">Ціна — разове групове заняття для дорослих з прайсу студії. Курси, абонементи й корпоративи — у профілі.</p>
-            </SectionHead>
-            <ul className="m-0 grid grid-cols-1 list-none gap-2.5 p-0">
-              {sorted.map((s) => {
-                const from = minClass(s)
-                const chips = CHIPS.filter(([f]) => hasFormat(s, f))
-                const addr = firstAddress(s.address)
-                const stale = staleNote(s)
-                return (
-                  <li key={s.id} className="grid grid-cols-1 gap-x-4 gap-y-1.5 rounded-2xl bg-card px-4 py-3.5 sm:grid-cols-[minmax(0,1fr)_auto]">
-                    <div className="grid grid-cols-1 gap-1">
-                      <Link href={`/vyrobnyky/${s.slug}`} className="text-[16.5px] leading-snug font-semibold">
-                        {cleanName(s.name)}
-                      </Link>
-                      <span className="text-[13px] break-words text-umber">
-                        {TYPE_LABEL[s.type ?? 'other']}
-                        {addr ? ` · ${addr}` : ''}
-                        {s.instagram ? (
-                          <>
-                            {' · '}
-                            <a href={s.instagram} target="_blank" rel="noopener nofollow" className="text-umber">
-                              @{igHandle(s.instagram)}
-                            </a>
-                          </>
-                        ) : null}
-                      </span>
-                      {stale && <span className="text-[12.5px] text-terra">{stale}</span>}
-                      {chips.length > 0 && (
-                        <span className="flex flex-wrap gap-1.5 pt-0.5">
-                          {chips.map(([f, label]) => (
-                            <span key={f} className="rounded-full bg-sand px-2 py-0.5 text-[12px] font-semibold text-umber">
-                              {label}
-                            </span>
-                          ))}
-                        </span>
-                      )}
-                    </div>
-                    {from ? <span className="text-[15px] font-semibold whitespace-nowrap text-terra sm:text-right">{fmt(roundNice(from))} грн</span> : null}
-                  </li>
-                )
-              })}
-            </ul>
-          </section>
-
-          {(formatLinks.length > 0 || hasCertPage) && (
-            <nav aria-label="Формати" className="grid grid-cols-1 gap-3">
-              <p className="kicker m-0">За форматом</p>
-              <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-                {hasCertPage && (
-                  <li>
-                    <Link href={`/sertyfikaty/${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
-                      Сертифікати: {city.name}
-                    </Link>
-                  </li>
-                )}
-                {formatLinks.map(([f, label, href]) => (
-                  <li key={f}>
-                    <Link href={SLUG_OF[f] && cityFormat.has(SLUG_OF[f]!) ? `/maister-klasy/${city.slug}/${SLUG_OF[f]}` : href} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm text-ink no-underline hover:bg-sand hover:text-ink">
-                      {label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
-          )}
-
-          <section aria-labelledby="faq">
-            <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-            <div className="grid grid-cols-1 gap-2.5">
-              {faq.map((f, i) => (
-                <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
-                  <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">
-                    {f.q}
-                    <span aria-hidden className="font-display text-terra group-open:hidden">+</span>
-                    <span aria-hidden className="font-display hidden text-terra group-open:inline">–</span>
-                  </summary>
-                  <p className="mt-0 mb-3.5">{f.a}</p>
-                </details>
-              ))}
-            </div>
-          </section>
-        </div>
-
-        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
-          <RequestForm sourcePage={`/maister-klasy/${city.slug}`} defaultWhat="master-class" defaultCity={city.name} />
-          <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny" className="rounded-[20px] bg-cobalt p-4 text-clay no-underline hover:text-clay">
-            <b className="font-display text-sm uppercase">Для команди</b>
-            <span className="mt-1 block text-sm">Корпоратив з ліплення з глини: у студії або в офісі, {f.range('corporate')}. →</span>
-          </Link>
-        </aside>
-      </div>
+        <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />
+        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+      </InnerCols>
       <MobileRequestBar />
-    </main>
+    </InnerMain>
   )
 }

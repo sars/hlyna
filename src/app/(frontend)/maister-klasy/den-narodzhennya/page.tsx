@@ -3,7 +3,8 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { SectionHead } from '@/components/site/Bits'
+import { Block, InfoList } from '@/components/site/Inner'
+import { CityHead } from '@/components/ui/CityHead'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios } from '@/lib/catalog'
 import { cleanName, firstAddress } from '@/lib/present'
@@ -56,32 +57,20 @@ export default async function Page() {
         { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
       ]}
     >
-      <section aria-labelledby="list">
-        <SectionHead title="Студії, де проводять свята" id="list">
-          <p className="m-0 text-sm text-umber">За прайсами й описами студій; формат, кількість гостей і вік уточнюйте при бронюванні.</p>
-        </SectionHead>
-        <div className="grid grid-cols-1 gap-6">
-          {p.groups.map((g) => (
-            <div key={g.city.slug} id={`misto-${g.city.slug}`} className="grid grid-cols-1 gap-2 scroll-mt-24">
-              <h3 className="m-0 text-lg">{g.city.name}</h3>
-              <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0">
-                {g.studios.map((s) => {
-                  const l = partyLines(s)
-                  const line = l.prices[0]?.text ?? l.services[0]
-                  const addr = firstAddress(s.address)
-                  return (
-                    <li key={s.id} className="grid grid-cols-1 gap-0.5 rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-                      <Link href={`/vyrobnyky/${s.slug}`} className="font-bold">{cleanName(s.name)}</Link>
-                      {line && <span>{line}</span>}
-                      {addr && <span className="text-umber">{addr}</span>}
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          ))}
-        </div>
-      </section>
+      <Block id="list" title="Студії, де проводять свята" note={<>За прайсами й описами студій; формат, кількість гостей і вік уточнюйте при бронюванні.</>}>
+        {p.groups.map((g) => (
+          <div key={g.city.slug}>
+            <CityHead id={`misto-${g.city.slug}`} name={g.city.name} />
+            <InfoList
+              items={g.studios.map((s) => {
+                const l = partyLines(s)
+                const line = l.prices[0]?.text ?? l.services[0]
+                return { title: <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>, lines: [line || null, firstAddress(s.address) || null] }
+              })}
+            />
+          </div>
+        ))}
+      </Block>
     </WavePage>
   )
 }

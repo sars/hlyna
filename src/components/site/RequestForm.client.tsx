@@ -297,18 +297,20 @@ export function RequestForm({
           ))}
         </Select>
       </Field>
-      <FieldRow>
-        {kind.qty ? (
+      {kind.qty ? (
+        <FieldRow>
           <Field label={kind.qty} htmlFor={`${uid}-qty`}>
             <Input id={`${uid}-qty`} name="quantity" inputMode="numeric" placeholder={kind.qtyPh} />
           </Field>
-        ) : (
-          <span />
-        )}
+          <Field label={kind.date} htmlFor={`${uid}-date`}>
+            <Input id={`${uid}-date`} name="deadline" placeholder={kind.datePh} />
+          </Field>
+        </FieldRow>
+      ) : (
         <Field label={kind.date} htmlFor={`${uid}-date`}>
           <Input id={`${uid}-date`} name="deadline" placeholder={kind.datePh} />
         </Field>
-      </FieldRow>
+      )}
       <Field label="Місто" htmlFor={`${uid}-city`}>
         <Input id={`${uid}-city`} name="city" value={city} onChange={(e) => setCity(e.target.value)} placeholder="Ваше місто" autoComplete="address-level2" />
       </Field>

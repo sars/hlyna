@@ -1,13 +1,15 @@
 import type { Metadata } from 'next'
+import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Epigraph } from '@/components/ui/Epigraph'
+import { Note } from '@/components/ui/Note'
+import { StudioCell, StudioCells } from '@/components/ui/StudioCell'
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, Epigraph, SectionHead, Updated } from '@/components/site/Bits'
 import { site } from '@/content/site'
 import { ldItemList } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
 import { Faq } from '@/components/site/SelectionFaq'
-import { StudioCard } from '@/components/site/StudioCard'
 import { verses } from '@/content/verses'
 import { groupByCity, pluralUk } from '@/lib/catalog'
 import { contemporaryPicks } from '@/editorial/contemporary'
@@ -32,39 +34,37 @@ export default async function Contemporary() {
     { q: 'Як потрапити в добірку?', a: 'Ми обираємо за відкритими даними: колекції, виставки, сучасні форми, активність в Instagram. Студія може оновити свій профіль — це безкоштовно.' },
   ]
   return (
-    <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 pb-16`}>
+    <InnerMain>
       <JsonLd data={ldItemList('Сучасні українські керамісти', all)} />
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Добірки', href: '/dobirky' }, { label: 'Сучасні керамісти' }]} />
-        <span className="kicker">Добірка · 2026</span>
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Сучасні українські керамісти</h1>
-        <p className="m-0 max-w-[70ch] text-lg">
-          {all.length} сучасних українських брендів, авторок, авторів і студій кераміки з {cities} {pluralUk(cities, ['міста', 'міст', 'міст'])}: посуд і декор у власних колекціях, керамічна скульптура, прикраси. Добірку зроблено за відкритими даними — колекції, виставки, активний Instagram. Це не рейтинг і не реклама: за місце в ній ніхто не платить.
-        </p>
-        <Updated />
-      </div>
-      <div className="grid grid-cols-1 gap-10">
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Добірки', href: '/dobirky' }, { label: 'Сучасні керамісти' }]}
+        kicker="Добірка · 2026"
+        title="Сучасні українські керамісти"
+        lead={
+          <p className="m-0">
+            {all.length} сучасних українських брендів, авторок, авторів і студій кераміки з {cities} {pluralUk(cities, ['міста', 'міст', 'міст'])}: посуд і декор у власних колекціях, керамічна скульптура, прикраси. Добірку зроблено за відкритими даними — колекції, виставки, активний Instagram. Це не рейтинг і не реклама: за місце в ній ніхто не платить.
+          </p>
+        }
+      />
+      <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
         <Epigraph lines={verses.contemporary} />
-        <p className="m-0 max-w-[70ch]">
+        <p className="m-0 max-w-read">
           Сучасна українська кераміка живе одразу в кількох світах. Невеликі бренди роблять посуд для щоденного столу й ресторанів, художниці й художники — скульптуру для виставок, а молоді майстри — прикраси, які носять щодня. Багато хто переосмислює косівський розпис, опішнянську пластику чи давні форми: у профілях видно, як саме.
         </p>
         {groups.map((g) => (
-          <section key={g.key} aria-labelledby={g.key}>
-            <SectionHead title={g.title} id={g.key}>
-              <p className="m-0 text-sm text-umber">{g.studios.length} у добірці</p>
-            </SectionHead>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Block key={g.key} id={g.key} title={g.title} note={`${g.studios.length} у добірці`}>
+            <StudioCells>
               {g.studios.map((s) => (
-                <StudioCard key={s.id} s={s} />
+                <StudioCell key={s.id} s={s} />
               ))}
-            </div>
-          </section>
+            </StudioCells>
+          </Block>
         ))}
-        <p className="m-0 max-w-[860px] rounded-2xl bg-card p-4">
+        <Note>
           Більше — у <Link href="/vyrobnyky/misto">каталозі за містами</Link> і <Link href="/vyrobnyky/vyrib">за виробами</Link>. Окремо: <Link href="/dobirky/kosiv-i-opishne">Косів і Опішне сьогодні</Link>.
-        </p>
-        <div className="max-w-[860px]"><Faq items={faq} /></div>
+        </Note>
+        <Faq items={faq} />
       </div>
-    </main>
+    </InnerMain>
   )
 }

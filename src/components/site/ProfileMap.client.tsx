@@ -2,6 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react'
 
+import { MapFrame } from '@/components/ui/MapFrame'
+
 // Small map with one marker on a studio profile. MapLibre and the tiles load only when the block is
 // near the viewport; until then (or without WebGL) the placeholder shows the address text.
 export function ProfileMap({ lat, lng, address }: { lat: number; lng: number; address: string }) {
@@ -37,7 +39,7 @@ export function ProfileMap({ lat, lng, address }: { lat: number; lng: number; ad
         })
         map = m
         m.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right')
-        new maplibregl.Marker({ color: '#2a4fa8' }).setLngLat([lng, lat]).addTo(m)
+        new maplibregl.Marker({ color: '#1d3ec6' }).setLngLat([lng, lat]).addTo(m)
         m.on('load', () => {
           for (const l of m.getStyle().layers) {
             if (l.type === 'symbol' && m.getLayoutProperty(l.id, 'text-field')) m.setLayoutProperty(l.id, 'text-field', ['coalesce', ['get', 'name:uk'], ['get', 'name']])
@@ -56,13 +58,8 @@ export function ProfileMap({ lat, lng, address }: { lat: number; lng: number; ad
   }, [near, lat, lng])
 
   return (
-    <div className="relative h-[200px] w-full overflow-hidden rounded-2xl border border-line bg-card sm:h-[260px]">
+    <MapFrame height="profile" fallback={state !== 'ready' ? (state === 'failed' ? `Мапа не відкрилася в цьому браузері. Адреса: ${address}` : address) : undefined}>
       <div ref={box} className="h-full w-full" aria-label={`Мапа: ${address}`} role="img" />
-      {state !== 'ready' && (
-        <p className="pointer-events-none absolute inset-0 m-0 grid place-items-center px-6 text-center text-sm text-umber">
-          {state === 'failed' ? `Мапа не відкрилася в цьому браузері. Адреса: ${address}` : address}
-        </p>
-      )}
-    </div>
+    </MapFrame>
   )
 }

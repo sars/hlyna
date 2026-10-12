@@ -1,4 +1,11 @@
 import type { Metadata } from 'next'
+import { Block, InnerCols, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Button } from '@/components/ui/Button'
+import { CtaBand } from '@/components/ui/CtaBand'
+import { DataTable } from '@/components/ui/DataTable'
+import { Faq } from '@/components/ui/Faq'
+import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
+import { MoreLink } from '@/components/ui/MoreLink'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
@@ -7,9 +14,7 @@ import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 
 import { latestUpdate } from '@/lib/catalog'
 
-import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { JsonLd } from '@/components/site/JsonLd'
-import { MakerRow } from '@/components/site/MakerRow'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
@@ -80,7 +85,7 @@ export default async function CityMakersPage({ params }: Args) {
   const faq = mergeFaq(baseFaq, (content?.faq ?? []).map((f) => ({ q: f.q, a: fixPriceRef(f.a, priceWhere) })))
 
   return (
-    <main className={`${container} grid grid-cols-1 gap-10 pt-8 pb-28 lg:pb-16`}>
+    <InnerMain bar>
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })) }} />
       <JsonLd
         data={{
@@ -100,101 +105,83 @@ export default async function CityMakersPage({ params }: Args) {
           })),
         }}
       />
-      <div className="grid grid-cols-1 gap-4">
-        <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, { label: city.name }]} modified={latestUpdate(studios)} />
-        <span className="kicker">Виробники{region ? ` · ${region}` : ''}</span>
-        <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Кераміка ручної роботи: {city.name}</h1>
-        {content?.lead && <p className="m-0 max-w-[70ch] text-lg">{content.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
-        <p className={`m-0 max-w-[70ch] ${content?.lead ? '' : 'text-lg'}`}>
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, { label: city.name }]}
+        modified={latestUpdate(studios)}
+        kicker={`Виробники${region ? ` · ${region}` : ''}`}
+        title={`Кераміка ручної роботи: ${city.name}`}
+        lead={
+          <>
+            {content?.lead && <p className="m-0">{content.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
+            <p className="m-0">
           У каталозі «Глина» — {who(studios.length)} {where}: {counts}.
-          {st.classes ? ` ${st.classes} ${pluralUk(st.classes, ['проводить', 'проводять', 'проводять'])} майстер-класи` : ''}
-          {st.classes && st.venues ? ', ' : st.venues ? ' ' : ''}
-          {st.venues ? `${st.venues} ${pluralUk(st.venues, ['працює', 'працюють', 'працюють'])} із закладами` : ''}
-          {st.classes || st.venues ? '.' : ''} Біля кожного — що робить, адреса й Instagram.
-        </p>
-        <Updated />
-        {(mkPage || certPage) && (
-          <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
-            {mkPage && <li><Link href={`/maister-klasy/${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Майстер-класи: {city.name} →</Link></li>}
-            {certPage && <li><Link href={`/sertyfikaty/${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Сертифікати: {city.name} →</Link></li>}
-            <li><Link href={`/mapa?misto=${city.slug}`} className="inline-block rounded-full bg-card px-3.5 py-2 text-sm font-semibold text-ink no-underline hover:bg-sand hover:text-ink">Показати на мапі →</Link></li>
-          </ul>
-        )}
-      </div>
+              {st.classes ? ` ${st.classes} ${pluralUk(st.classes, ['проводить', 'проводять', 'проводять'])} майстер-класи` : ''}
+              {st.classes && st.venues ? ', ' : st.venues ? ' ' : ''}
+              {st.venues ? `${st.venues} ${pluralUk(st.venues, ['працює', 'працюють', 'працюють'])} із закладами` : ''}
+              {st.classes || st.venues ? '.' : ''} Біля кожного — що робить, адреса й Instagram.
+            </p>
+          </>
+        }
+        strip={st.classes && st.venues ? [{ value: fmt(studios.length), label: pluralUk(studios.length, ['профіль', 'профілі', 'профілів']) }, { value: fmt(st.classes), label: pluralUk(st.classes, ['місце', 'місця', 'місць']) + ' з майстер-класами' }, { value: fmt(st.venues), label: 'працюють із закладами' }] : undefined}
+        chips={[...(mkPage ? [{ label: `Майстер-класи: ${city.name} →`, href: `/maister-klasy/${city.slug}` }] : []), ...(certPage ? [{ label: `Сертифікати: ${city.name} →`, href: `/sertyfikaty/${city.slug}` }] : []), { label: 'Показати на мапі →', href: `/mapa?misto=${city.slug}` }]}
+        actions={
+          <Button href="#zapyt-forma" variant="cobalt" arrow>
+            Отримати пропозиції
+          </Button>
+        }
+      />
 
-      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]">
-        <div className="grid grid-cols-1 gap-10">
-          {content && <PlaceStory c={content} known={known} title={`Кераміка ${where}: що тут роблять`} />}
-          {content && <PlacePicks c={content} known={known} />}
-          {prices.length > 0 && (
-            <section aria-labelledby="prices">
-              <SectionHead kicker="Ціни" title={`Ціни ${where}`} id="prices">
-                <p className="m-0 text-sm text-umber">З прайсів студій цього міста: одна ціна на студію, від найнижчої до найвищої. Порівняння з усією Україною — на сторінці <Link href="/tsiny-2026">«Ціни 2026»</Link>.</p>
-              </SectionHead>
-              <div className="overflow-x-auto rounded-2xl bg-card">
-                <table className="w-full border-collapse text-[14.5px]">
-                  <thead>
-                    <tr className="text-left text-[12.5px] tracking-wide text-umber uppercase">
-                      <th className="border-b border-line px-3.5 py-3">Що</th>
-                      <th className="border-b border-line px-3.5 py-3 whitespace-nowrap">Ціни</th>
-                      <th className="border-b border-line px-3.5 py-3">Медіана</th>
-                      <th className="hidden border-b border-line px-3.5 py-3 sm:table-cell">Студій</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {prices.map((p) => (
-                      <tr key={p.cat.key}>
-                        <td className="border-b border-line px-3.5 py-2.5">{p.cat.label} <span className="text-[12.5px] text-umber">{p.cat.unit}<span className="sm:hidden"> · {p.n} {pluralUk(p.n, ['студія', 'студії', 'студій'])}</span></span></td>
-                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.text}</td>
-                        <td className="border-b border-line px-3.5 py-2.5 whitespace-nowrap">{p.median ? `${fmt(p.median)} грн` : '—'}</td>
-                        <td className="hidden border-b border-line px-3.5 py-2.5 sm:table-cell">{p.n}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-          {groups.map((t, k) => (
-            <section key={t.title} aria-labelledby={`g${k}`}>
-              <SectionHead title={`${t.title} ${t.studios.length > 1 ? `· ${t.studios.length}` : ''}`} id={`g${k}`} />
-              <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0">{t.studios.slice(0, t.studios.length > SHOW + 2 ? SHOW : undefined).map((s) => <MakerRow key={s.id} s={s} />)}</ul>
+      <InnerCols aside={<RequestForm sourcePage={`/vyrobnyky/misto/${city.slug}`} defaultWhat="tableware" defaultCity={city.name} />}>
+        {content && <PlaceStory c={content} known={known} title={`Кераміка ${where}: що тут роблять`} />}
+        {content && <PlacePicks c={content} known={known} />}
+        {prices.length > 0 && (
+          <Block id="prices" kicker="Ціни" title={`Ціни ${where}`} note={<>З прайсів студій цього міста: одна ціна на студію, від найнижчої до найвищої. Порівняння з усією Україною — на сторінці <Link href="/tsiny-2026">«Ціни 2026»</Link>.</>}>
+            <DataTable
+              columns={[{ key: 'what', label: 'Що' }, { key: 'text', label: 'Ціни', numeric: true }, { key: 'median', label: 'Медіана', numeric: true }, { key: 'n', label: 'Студій', numeric: true }]}
+              rows={prices.map((p) => ({
+                what: (
+                  <>
+                    {p.cat.label} <span className="text-[13px] text-ink-2">{p.cat.unit}</span>
+                  </>
+                ),
+                text: p.text,
+                median: p.median ? `${fmt(p.median)} грн` : '—',
+                n: p.n,
+              }))}
+            />
+          </Block>
+        )}
+        {groups.map((t, k) => (
+          <Block key={t.title} id={`g${k}`} title={`${t.title} ${t.studios.length > 1 ? `· ${t.studios.length}` : ''}`}>
+            <div>
+              <MakerRows>
+                {t.studios.slice(0, t.studios.length > SHOW + 2 ? SHOW : undefined).map((s) => (
+                  <MakerRow key={s.id} s={s} />
+                ))}
+              </MakerRows>
               {t.studios.length > SHOW + 2 && (
-                <details className="group mt-2.5 grid grid-cols-1">
-                  <summary className="cursor-pointer list-none justify-self-start rounded-full border border-line bg-cream px-4 py-2.5 text-sm font-bold text-cobalt group-open:mb-2.5">
+                <details className="group">
+                  <MoreLink as="summary">
                     <span className="group-open:hidden">Показати ще {t.studios.length - SHOW}</span>
                     <span className="hidden group-open:inline">Згорнути</span>
-                  </summary>
-                  <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0">{t.studios.slice(SHOW).map((s) => <MakerRow key={s.id} s={s} />)}</ul>
+                  </MoreLink>
+                  <MakerRows>
+                    {t.studios.slice(SHOW).map((s) => (
+                      <MakerRow key={s.id} s={s} />
+                    ))}
+                  </MakerRows>
                 </details>
               )}
-            </section>
-          ))}
-
-          {content && <PlaceSeeAlso c={content} known={known} />}
-
-          <section aria-labelledby="faq">
-            <SectionHead kicker="Питання і відповіді" title="Часті питання" id="faq" />
-            <div className="grid grid-cols-1 gap-2.5">
-              {faq.map((f, i) => (
-                <details key={f.q} open={i === 0} className="group rounded-2xl bg-card px-[18px] py-1">
-                  <summary className="flex cursor-pointer list-none justify-between gap-3 py-3.5 font-bold">
-                    {f.q}
-                    <span aria-hidden className="font-display text-terra group-open:hidden">+</span>
-                    <span aria-hidden className="font-display hidden text-terra group-open:inline">–</span>
-                  </summary>
-                  <p className="mt-0 mb-3.5">{f.a}</p>
-                </details>
-              ))}
             </div>
-          </section>
-          {content && <PlaceSources c={content} />}
-        </div>
-        <aside id="zapyt-forma" className="grid grid-cols-1 scroll-mt-24 gap-4 lg:sticky lg:top-24 lg:self-start">
-          <RequestForm sourcePage={`/vyrobnyky/misto/${city.slug}`} defaultWhat="tableware" defaultCity={city.name} />
-        </aside>
-      </div>
+          </Block>
+        ))}
+
+        {content && <PlaceSeeAlso c={content} known={known} />}
+        <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />
+        <CtaBand tone="ink" title="Опишіть, що потрібно, — студії відповідуть напряму" cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        {content && <PlaceSources c={content} />}
+      </InnerCols>
       <MobileRequestBar />
-    </main>
+    </InnerMain>
   )
 }

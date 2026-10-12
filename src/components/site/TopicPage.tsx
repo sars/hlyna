@@ -168,7 +168,6 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
       <InnerCols
         aside={
           <>
-            <CityJump groups={jump} variant="card" />
             {topic.form ? (
               <RequestForm sourcePage={topic.path} defaultWhat={topic.form} defaultCity={ctx.place} />
             ) : topic.section === 'makers' ? (
@@ -186,6 +185,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
                 <MoreLink href={REQUEST_HREF} pad={false} className="py-1.5">Надіслати запит</MoreLink>
               </SideBox>
             )}
+            <CityJump groups={jump} variant="card" />
           </>
         }
       >

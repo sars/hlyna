@@ -47,14 +47,14 @@ function Post({ url, handle, show }: { url: string; handle?: string; show: boole
   const code = url.match(/\/(p|reel)\/([\w-]+)/)
   if (!code) return null
   return (
-    <div className="overflow-hidden rounded-2xl border border-line bg-card">
+    <div className="overflow-hidden border border-rule bg-paper-2">
       {!height && (
         <a href={url} target="_blank" rel="noopener nofollow" className="flex items-center justify-between gap-3 px-4 py-3.5 text-[15px] text-ink no-underline hover:text-cobalt">
           <span>
-            <span className="block font-semibold">{code[1] === 'reel' ? 'Відео' : 'Пост'} в Instagram</span>
-            {handle && <span className="block text-sm text-umber">@{handle}</span>}
+            <span className="block font-display text-[15px] leading-[1.2] font-semibold">{code[1] === 'reel' ? 'Відео' : 'Пост'} в Instagram</span>
+            {handle && <span className="mt-0.5 block font-mono text-xs text-ink-2">@{handle}</span>}
           </span>
-          <span aria-hidden className="text-terra">→</span>
+          <span aria-hidden className="font-mono text-sm text-cobalt">→</span>
         </a>
       )}
       {show && (

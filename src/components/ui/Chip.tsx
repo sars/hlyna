@@ -10,12 +10,13 @@ type Props = {
   active?: boolean
   tone?: 'ink' | 'cobalt'
   as?: 'a' | 'span' | 'button'
+  onClick?: () => void
   className?: string
   children: React.ReactNode
 }
 
 // A tag, counter or filter: mono caps in a 1.5px frame, no fill (fill only when `active` or on hover).
-export function Chip({ href, count, size = 'md', active, tone = 'ink', as, className, children }: Props) {
+export function Chip({ href, count, size = 'md', active, tone = 'ink', as, onClick, className, children }: Props) {
   const Tag = as ?? (href ? 'a' : 'span')
   const interactive = Tag !== 'span' && size === 'md'
   const cobalt = tone === 'cobalt'
@@ -39,6 +40,6 @@ export function Chip({ href, count, size = 'md', active, tone = 'ink', as, class
     </>
   )
   if (Tag === 'a') return <Link href={href ?? '#'} className={cls} aria-current={active ? 'true' : undefined}>{body}</Link>
-  if (Tag === 'button') return <button type="button" className={cls} aria-pressed={active}>{body}</button>
+  if (Tag === 'button') return <button type="button" className={cls} aria-pressed={active} onClick={onClick}>{body}</button>
   return <span className={cls}>{body}</span>
 }

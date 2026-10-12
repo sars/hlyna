@@ -1,12 +1,14 @@
 import type { Metadata } from 'next'
+import { Block, InnerHero, InnerMain } from '@/components/site/Inner'
+import { CityHead } from '@/components/ui/CityHead'
+import { Note } from '@/components/ui/Note'
+import { StudioCell, StudioCells } from '@/components/ui/StudioCell'
 import Link from 'next/link'
 import React from 'react'
 
-import { Breadcrumbs, container, SectionHead, Updated } from '@/components/site/Bits'
 import { ldItemList } from '@/lib/ld'
 import { JsonLd } from '@/components/site/JsonLd'
 import { Faq } from '@/components/site/SelectionFaq'
-import { StudioCard } from '@/components/site/StudioCard'
 import { pluralUk } from '@/lib/catalog'
 import { cleanName } from '@/lib/present'
 import { kosivOpishne } from '@/editorial/contemporary'
@@ -34,52 +36,50 @@ export default async function KosivOpishne() {
     { q: 'Чи можна там спробувати гончарство?', a: 'Так: у Косові й Опішному є студії й майстерні з майстер-класами на гончарному колі й розписом. Шукайте позначку «майстер-класи» у профілях.' },
   ]
   return (
-    <main className={`${container} grid w-full grid-cols-1 gap-10 pt-8 pb-16`}>
+    <InnerMain>
       <JsonLd data={ldItemList('Косів і Опішне: майстри й студії', all)} />
-      <div className="grid grid-cols-1 items-start gap-8">
-        <div className="grid grid-cols-1 gap-4">
-          <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Добірки', href: '/dobirky' }, { label: 'Косів і Опішне' }]} />
-          <span className="kicker">Добірка · традиція сьогодні</span>
-          <h1 className="h-display m-0 text-[clamp(26px,4vw,44px)] leading-[1.06]">Косів і Опішне сьогодні</h1>
-          <p className="m-0 max-w-[70ch] text-lg">
+      <InnerHero
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Добірки', href: '/dobirky' }, { label: 'Косів і Опішне' }]}
+        kicker="Добірка · традиція сьогодні"
+        title="Косів і Опішне сьогодні"
+        lead={
+          <p className="m-0">
             Косів на Гуцульщині й Опішне на Полтавщині — два найвідоміші гончарні осередки України. У каталозі {many(kosiv.makers.length)} з Косова й довколишніх сіл і {opishne.makers.length} — з Опішного, а ще крамниці, музеї й школи. Нижче — хто працює з глиною зараз, де купити і де повчитися.
           </p>
-          <Updated />
-        </div>
-      </div>
-      <div className="grid grid-cols-1 gap-10">
-        <p className="m-0 max-w-[70ch]">
+        }
+      />
+      <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
+        <p className="m-0 max-w-read">
           Тут традиція не стоїть у вітрині. Косівські майстри розписують тарілки так само ріжком по ангобу, але сюжети на них бувають іронічні й сьогоднішні; в Опішному поруч зі свищиками й баранцями ліплять скульптуру для виставок і посуд для міських кав’ярень. Молоді родинні майстерні продають через Instagram, а старші майстри — на ярмарках і з власних хат.
         </p>
         {places.map((p) => (
-          <section key={p.key} aria-labelledby={p.key} className="grid grid-cols-1 gap-6">
-            <SectionHead title={p.title} id={p.key}>
-              <p className="m-0 text-sm text-umber">{many(p.makers.length)}</p>
-            </SectionHead>
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <Block key={p.key} id={p.key} title={p.title} note={many(p.makers.length)}>
+            <StudioCells>
               {p.makers.map((s) => (
-                <StudioCard key={s.id} s={s} />
+                <StudioCell key={s.id} s={s} />
               ))}
-            </div>
+            </StudioCells>
             {p.places.length > 0 && (
-              <div className="grid grid-cols-1 gap-3">
-                <h3 className="h-display m-0 text-[17px]">Крамниці, музеї, школи</h3>
-                <ul className="m-0 grid grid-cols-1 gap-1.5 pl-5 marker:text-terra">
+              <div>
+                <CityHead id={`${p.key}-places`} name="Крамниці, музеї, школи" />
+                <ul className="m-0 mt-2 grid list-none gap-1.5 p-0">
                   {p.places.map((s) => (
-                    <li key={s.id}>
-                      <Link href={`/vyrobnyky/${s.slug}`}>{cleanName(s.name)}</Link>
+                    <li key={s.id} className="before:text-terracotta-text before:content-['—_']">
+                      <Link href={`/vyrobnyky/${s.slug}`} className="text-ink underline underline-offset-[3px] hover:text-cobalt">
+                        {cleanName(s.name)}
+                      </Link>
                     </li>
                   ))}
                 </ul>
               </div>
             )}
-          </section>
+          </Block>
         ))}
-        <p className="m-0 max-w-[860px] rounded-2xl bg-card p-4">
+        <Note>
           Дивіться також: <Link href="/dobirky/suchasni-keramisty">сучасні українські керамісти</Link>, <Link href="/vyrobnyky/misto/kosiv">усі профілі з Косова</Link>, <Link href="/vyrobnyky/misto/opishne">з Опішного</Link>.
-        </p>
-        <div className="max-w-[860px]"><Faq items={faq} /></div>
+        </Note>
+        <Faq items={faq} />
       </div>
-    </main>
+    </InnerMain>
   )
 }

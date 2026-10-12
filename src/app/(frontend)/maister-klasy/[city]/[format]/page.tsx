@@ -3,7 +3,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
-import { SectionHead } from '@/components/site/Bits'
+import { Block } from '@/components/site/Inner'
+import { DataTable } from '@/components/ui/DataTable'
+import { nobreak } from '@/components/ui/NoBreak'
+import { QuoteBlock } from '@/components/ui/QuoteBlock'
 import { StudioList } from '@/components/site/TopicPage'
 import { WavePage } from '@/components/site/WavePage'
 import { getAllStudios, MIN_LIST } from '@/lib/catalog'
@@ -75,34 +78,24 @@ export default async function Page({ params }: Args) {
         ...others.map((x) => ({ label: FORMAT_PAGES[x].label, href: topicsPath(x) })),
       ]}
     >
-      <section aria-labelledby="list">
-        <SectionHead title={`Де ${f.short === 'курси' ? 'пройти курс' : 'записатися'} ${p.vars.inCity}`} id="list">
-          <p className="m-0 text-sm text-umber">Список за відкритими даними студій (сайти, Instagram, сервіси сертифікатів). Умови кожна студія підтверджує сама.</p>
-        </SectionHead>
+      <Block id="list" title={`Де ${f.short === 'курси' ? 'пройти курс' : 'записатися'} ${p.vars.inCity}`} note={<>Список за відкритими даними студій (сайти, Instagram, сервіси сертифікатів). Умови кожна студія підтверджує сама.</>}>
         <StudioList studios={p.data.all} re={p.topic.evidence} />
-      </section>
+      </Block>
       {p.data.examples.length > 0 && (
-        <section aria-labelledby="prices">
-          <SectionHead kicker="Ціни" title={p.topic.price.title} id="prices">
-            <p className="m-0 text-sm text-umber">{p.topic.price.note}</p>
-          </SectionHead>
+        <Block id="prices" kicker="Ціни" title={p.topic.price.title} note={p.topic.price.note}>
           {p.vars.priceRange && (
-            <p className="m-0 mb-3 text-lg">
-              Найчастіше в прайсах {p.vars.inCity} — <b>{p.vars.priceRange}</b>.{' '}
-              <span className="text-base text-umber">
+            <QuoteBlock>
+              Найчастіше в прайсах {p.vars.inCity} — <b className="font-semibold">{nobreak(String(p.vars.priceRange))}</b>.{' '}
+              <span className="text-ink-2">
                 Це ціни лише місць із цієї сторінки, по одній на студію; загальну ціну разового майстер-класу в місті дивіться на <Link href={`/maister-klasy/${city}`}>сторінці міста</Link> і в «<Link href="/tsiny-2026">Цінах 2026</Link>».
               </span>
-            </p>
+            </QuoteBlock>
           )}
-          <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0">
-            {p.data.examples.map((e) => (
-              <li key={e.studio.id} className="rounded-xl bg-card px-3.5 py-2.5 text-[14.5px]">
-                <Link href={`/vyrobnyky/${e.studio.slug}`}>{cleanName(e.studio.name)}</Link>: {e.text}
-                {e.source && <span className="text-[12.5px] text-umber"> ({e.source})</span>}
-              </li>
-            ))}
-          </ul>
-        </section>
+          <DataTable
+            columns={[{ key: 'studio', label: 'Студія' }, { key: 'price', label: 'З прайсу' }, { key: 'src', label: 'Джерело', mono: true }]}
+            rows={p.data.examples.map((e) => ({ studio: <Link href={`/vyrobnyky/${e.studio.slug}`}>{cleanName(e.studio.name)}</Link>, price: nobreak(e.text), src: e.source ?? '' }))}
+          />
+        </Block>
       )}
     </WavePage>
   )
