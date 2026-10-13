@@ -13,6 +13,16 @@ const inter = Inter({ subsets: ['latin', 'cyrillic'], variable: '--font-inter', 
 export const metadata: Metadata = {
   title: { default: 'Панель · Глина', template: '%s · Панель · Глина' },
   robots: { index: false, follow: false },
+  // Same set as the public layout; without it browsers fall back to a cached /favicon.ico.
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: '48x48' },
+      { url: '/favicon-16.png', type: 'image/png', sizes: '16x16' },
+      { url: '/favicon-32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon.svg', type: 'image/svg+xml', sizes: 'any' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 }
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, viewportFit: 'cover', themeColor: '#f9fafb' }
