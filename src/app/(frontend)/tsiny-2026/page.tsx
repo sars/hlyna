@@ -19,6 +19,8 @@ import { fmt } from '@/lib/money'
 
 export const revalidate = 86400
 
+// The aggregated figures are ours to license: anyone may reuse them with a link back (docs/decisions.md, 2026-10-13).
+const LICENSE = 'https://creativecommons.org/licenses/by/4.0/'
 const grn = (n: number) => `${fmt(n)} грн`
 const span = (s: CategoryStats) => (s.p10 === s.p90 ? grn(s.median) : `${fmt(s.p10)}–${grn(s.p90)}`)
 const studiosN = (n: number) => `${fmt(n)} ${pluralUk(n, ['студія', 'студії', 'студій'])}`
@@ -65,6 +67,7 @@ export default async function PricesPage() {
           temporalCoverage: period.replace('–', '/'),
           spatialCoverage: { '@type': 'Place', name: 'Україна' },
           inLanguage: 'uk',
+          license: LICENSE,
           variableMeasured: stats.map((s) => ({ '@type': 'PropertyValue', name: `${s.cat.label}, ${s.cat.unit}`, unitText: 'UAH', value: s.median, minValue: s.p10, maxValue: s.p90 })),
         }}
       />
@@ -170,6 +173,10 @@ export default async function PricesPage() {
               <li key={2} className="before:text-terracotta-text before:content-['—_']">«Здебільшого» — від 10-го до 90-го перцентиля; крайні значення відкидаємо. Суми округлено до 50 чи 100 грн.</li>
               <li key={3} className="before:text-terracotta-text before:content-['—_']">Ціни для бізнесу (партії, логотип) студії рахують під замовлення, тому тут — лише роздрібні ціни окремих виробів і корпоративи з особи.</li>
               <li key={4} className="before:text-terracotta-text before:content-['—_']">Дані оновлюємо щосезону; поточний зріз — {site.dataUpdated}. Ціни встановлюють студії, і вони можуть змінитися — точну ціну підтверджує студія.</li>
+              <li key={5} className="before:text-terracotta-text before:content-['—_']">
+                Зведені цифри цієї сторінки можна вільно передруковувати й цитувати за ліцензією{' '}
+                <a href={LICENSE} target="_blank" rel="noopener license">CC BY 4.0</a> з посиланням на «Глину».
+              </li>
             </ul>
           </Block>
         </section>
