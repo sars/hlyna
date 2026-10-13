@@ -36,6 +36,13 @@
       "when": 1791816665007,
       "tag": "0004_studio_short_name",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791914960721,
+      "tag": "0005_owner_news_at",
+      "breakpoints": true
     }
   ]
 }

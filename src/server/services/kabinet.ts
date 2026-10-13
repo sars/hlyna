@@ -207,9 +207,11 @@ export async function submitOwnerEdit(
   try {
     const chatId = process.env.TELEGRAM_CHAT_ID
     if (process.env.TELEGRAM_BOT_TOKEN && chatId) {
+      const news = d.ownerNews && d.ownerNews !== (s.ownerNews ?? '') ? d.ownerNews : ''
       const text = [
         `Зміни від власника: ${s.name}`,
-        `${input.ownerName}${input.photos.length ? `, нових фото: ${input.photos.length}` : ''}${d.ownerAbout.slice(0, 10) || d.ownerNews.slice(0, 10) ? ', є текст «своїми словами» — перепишіть голосом сайту' : ''}`,
+        `${input.ownerName}${input.photos.length ? `, нових фото: ${input.photos.length}` : ''}${d.ownerAbout && d.ownerAbout !== (s.ownerAbout ?? '') ? ', є текст «своїми словами» — перепишіть голосом сайту' : ''}`,
+        ...(news ? ['', 'Новини від студії (вийдуть як є після «Опублікувати»):', news] : []),
       ].join('\n')
       await tg('sendMessage', { chat_id: chatId, text, disable_web_page_preview: true, reply_markup: { inline_keyboard: ownerEditKeyboard(s.id, changeSetId) } })
     }

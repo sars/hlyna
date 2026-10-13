@@ -1,5 +1,5 @@
 // Public catalogue reads: published studios in the record shape the pages render (publicShape.ts), sorted by name,
-// with internal fields (owner text, unapproved quote, consent, sources…) left out.
+// with internal fields (owner «about», unapproved quote, consent, sources…) left out.
 import { and, asc, eq, inArray, sql } from 'drizzle-orm'
 
 import type { City, Studio } from '@/types/catalog'
@@ -9,7 +9,7 @@ import { toPublicCity, toPublicStudio } from './publicShape'
 const { studios, studioPrices, cities, studioPhotos, media, studioSlugHistory, citySlugHistory } = schema
 
 // Internal fields never shown to anonymous readers.
-const HIDDEN = ['sources', 'consent', 'sourceId', 'confidence', 'ownerAbout', 'ownerNews'] as const
+const HIDDEN = ['sources', 'consent', 'sourceId', 'confidence', 'ownerAbout'] as const
 
 // Published studios, optionally one shard of them (id % of = index) so a cached part stays small. `order` is the
 // position in the whole catalogue (by name, database collation), so merged shards keep the same order.

@@ -152,10 +152,13 @@ describe('owner change sets', () => {
     expect((await applyChangeSet(db, id, 'all', panel)).already).toBe(true)
   })
 
-  it('«all but text» skips owner text; reject closes without changes', async () => {
-    const id = await changeSet({ ownerNews: 'новина', email: 'a@b.ua' })
+  it('«all but text» skips owner text but publishes studio news, dated; reject closes without changes', async () => {
+    const id = await changeSet({ ownerAbout: 'про нас', ownerNews: 'новина', email: 'a@b.ua' })
+    const [{ updatedAt }] = await db.select({ updatedAt: changeSets.updatedAt }).from(changeSets).where(eq(changeSets.id, id))
     const r = await applyChangeSet(db, id, 'all-but-text', panel)
-    expect(r.applied).toEqual(['email'])
+    expect(r.applied).toEqual(['ownerNews', 'email'])
+    const [n] = await db.select().from(studios).where(eq(studios.id, studioA))
+    expect([n!.ownerNews, n!.ownerNewsAt, n!.ownerAbout]).toEqual(['новина', updatedAt, null])
     const id2 = await changeSet({ email: 'x@y.ua' })
     await rejectChangeSet(db, id2, 'дубль', panel)
     const [a] = await db.select().from(studios).where(eq(studios.id, studioA))
@@ -178,6 +181,14 @@ describe('telegram buttons use the same services', () => {
     expect(a.answer).toBe('Схвалено')
     expect(a.say?.[1]?.text).toMatch(/kabinet\/parol\?token=/)
     expect((await handleTap(db, `c:a:${cid}`, bot)).answer).toBe('Вже схвалено')
+  })
+
+  it('«Опублікувати» publishes studio news without asking', async () => {
+    await db.insert(changeSets).values({ studioId: studioA, proposed: { ownerNews: 'Ярмарок 25 жовтня', phone: '+380' } })
+    expect((await handleTap(db, `s:p:${studioA}`, bot)).answer).toBe('Опубліковано')
+    const [a] = await db.select().from(studios).where(eq(studios.id, studioA))
+    expect(a!.ownerNews).toBe('Ярмарок 25 жовтня')
+    expect(a!.ownerNewsAt).not.toBeNull()
   })
 
   it('«Опублікувати» asks first when owner text is present', async () => {

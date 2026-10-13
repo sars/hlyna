@@ -28,7 +28,7 @@ beforeEach(async () => {
   ;[{ id: cityId }] = await db.insert(s.cities).values({ slug: 'kyiv', name: 'Київ' }).returning({ id: s.cities.id })
   ;[{ id: b }] = await db
     .insert(s.studios)
-    .values({ slug: 'b', name: 'Бета', cityId, visibility: 'public', ownerAbout: 'внутрішнє', ownerQuote: 'не схвалено', consentPhotos: true })
+    .values({ slug: 'b', name: 'Бета', cityId, visibility: 'public', ownerAbout: 'внутрішнє', ownerNews: 'Ярмарок', ownerNewsAt: '2026-10-01T10:00:00Z', ownerQuote: 'не схвалено', consentPhotos: true })
     .returning({ id: s.studios.id })
   ;[{ id: a }] = await db
     .insert(s.studios)
@@ -61,7 +61,8 @@ describe('public catalogue on schema app', () => {
     ])
     expect(alpha.ownerQuote).toBe('схвалено')
     expect(beta.ownerQuote).toBeUndefined()
-    for (const k of ['ownerAbout', 'ownerNews', 'consent', 'sources', 'sourceId', 'confidence', 'photos', 'pendingOwnerChanges', '_status']) expect(beta).not.toHaveProperty(k)
+    expect([beta.ownerNews, beta.ownerNewsAt]).toEqual(['Ярмарок', '2026-10-01T10:00:00.000Z'])
+    for (const k of ['ownerAbout', 'consent', 'sources', 'sourceId', 'confidence', 'photos', 'pendingOwnerChanges', '_status']) expect(beta).not.toHaveProperty(k)
     expect(beta.services).toBeNull() // an empty list reads as null (the shape the pages were built on)
     expect(alpha.services).toEqual([{ text: 'МК' }])
   })

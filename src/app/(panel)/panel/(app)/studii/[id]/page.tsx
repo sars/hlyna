@@ -32,7 +32,7 @@ export default async function StudioEditPage({ params }: { params: Promise<{ id:
         initial={toEditForm(s)}
         initialPhotos={s.photos}
         cities={cities.map((c) => ({ id: c.id, name: c.name }))}
-        owner={{ about: s.row.ownerAbout, news: s.row.ownerNews, quote: s.row.ownerQuote }}
+        owner={{ about: s.row.ownerAbout, quote: s.row.ownerQuote }}
         revision={s.row.revision}
       />
       <Card className="gap-3 p-4 shadow-xs md:p-5">

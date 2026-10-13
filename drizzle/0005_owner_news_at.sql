@@ -1,0 +1,1 @@
+ALTER TABLE "app"."studios" ADD COLUMN "owner_news_at" timestamp with time zone;

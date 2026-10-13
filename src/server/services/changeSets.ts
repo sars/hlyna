@@ -10,8 +10,9 @@ import { NotFound } from './requests'
 import { recordRevision } from './studios'
 
 // Owner changes waiting for review (they replace Payload drafts). Each change set holds only the fields the owner
-// may edit; we accept them field by field. Owner free text (about, news, quote) is stored internally and never
-// rendered as is: we rewrite it in the site voice. Panel and Telegram share this code.
+// may edit; we accept them field by field. Owner free text (about, quote) is stored internally: we rewrite «about»
+// in the site voice and show the quote only once approved. Studio news is the exception: accepted as is, it is shown
+// signed «Новини від студії» with the owner's date. Panel and Telegram share this code.
 
 type Row = typeof studios.$inferSelect
 type B2b = { minOrder: string | null; leadTime: string | null; logoMethods: string[]; foodSafe: boolean; dishwasherSafe: boolean; worksWithHoreca: boolean; worksWithCorporate: boolean }
@@ -22,10 +23,10 @@ export type FieldKey =
   | 'phone' | 'email' | 'facebook' | 'b2b' | 'photos' | 'instagramPosts' | 'consentPhotos'
 
 /** Owner text: kept internal, the editor rewrites it into the public description. */
-export const OWNER_TEXT: FieldKey[] = ['ownerAbout', 'ownerNews', 'ownerQuote']
+export const OWNER_TEXT: FieldKey[] = ['ownerAbout', 'ownerQuote']
 export const FIELD_ORDER: FieldKey[] = [
-  'prices', 'services', 'products', 'b2b', 'address', 'phone', 'email', 'website', 'instagram', 'facebook', 'photos', 'instagramPosts', 'consentPhotos',
-  'ownerAbout', 'ownerNews', 'ownerQuote',
+  'ownerNews', 'prices', 'services', 'products', 'b2b', 'address', 'phone', 'email', 'website', 'instagram', 'facebook', 'photos', 'instagramPosts',
+  'consentPhotos', 'ownerAbout', 'ownerQuote',
 ]
 
 const strs = (v: unknown): string[] =>
@@ -182,6 +183,8 @@ async function applyChangeSetTx(
           await tx.insert(studioPhotos).values(ids.map((mediaId, position) => ({ studioId: cs.studioId, mediaId, position })))
           await tx.update(media).set({ status: 'active' }).where(inArray(media.id, ids))
         }
+      } else if (k === 'ownerNews') {
+        Object.assign(set, { ownerNews: to as string | null, ownerNewsAt: to ? cs.updatedAt : null })
       } else if (k === 'ownerQuote') {
         Object.assign(set, { ownerQuote: to as string | null, ownerQuoteApproved: false })
       } else {

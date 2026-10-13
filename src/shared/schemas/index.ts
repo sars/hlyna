@@ -140,6 +140,7 @@ export const studioEdit = z.object({
   summary: z.string().trim().max(200).nullable(),
   publicDescription: z.string().trim().max(8000).nullable(),
   recentNote: z.string().trim().max(1000).nullable(),
+  ownerNews: z.string().trim().max(600).nullable(),
   descriptionInternal: z.string().trim().max(20000).nullable(),
   ownerQuoteApproved: z.boolean().nullable(),
   instagram: z.string().trim().max(300).nullable(),

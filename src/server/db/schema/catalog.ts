@@ -80,7 +80,9 @@ export const studios = app.table(
     recentNote: text('recent_note'),
     descriptionInternal: text('description_internal'),
     ownerAbout: text('owner_about'),
+    // Studio news, published as is with «Новини від студії» once a change set carrying it is accepted; dated by the owner's save.
     ownerNews: text('owner_news'),
+    ownerNewsAt: ts('owner_news_at'),
     ownerQuote: text('owner_quote'),
     ownerQuoteApproved: boolean('owner_quote_approved'),
 

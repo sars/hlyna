@@ -25,7 +25,7 @@ import { PhotoManager, type PhotoItem } from './photo-manager'
 import { SLUG_RE } from '@/shared/options'
 
 type CityOption = { id: number; name: string }
-type Owner = { about: string | null; news: string | null; quote: string | null }
+type Owner = { about: string | null; quote: string | null }
 type ConflictInfo = { current: number; changes: Record<string, unknown>; by: string | null }
 
 /** What the editor compares to know whether there is anything to save (the revision is not part of it). */
@@ -237,12 +237,12 @@ export function StudioEditor({
         <TextBox id="summary" label={t('editor.summary')} hint={t('editor.summaryHint')} value={form.summary} max={200} soft={160} rows={2} onChange={(v) => set('summary', v)} />
         <TextBox id="publicDescription" label={t('editor.publicDescription')} hint={t('editor.publicDescriptionHint')} value={form.publicDescription} max={8000} rows={8} onChange={(v) => set('publicDescription', v)} />
         <TextBox id="recentNote" label={t('editor.recentNote')} hint={t('editor.recentNoteHint')} value={form.recentNote} max={1000} rows={2} onChange={(v) => set('recentNote', v)} />
+        <TextBox id="ownerNews" label={t('editor.ownerNews')} hint={t('editor.ownerNewsHint')} value={form.ownerNews} max={600} rows={3} onChange={(v) => set('ownerNews', v)} />
         <TextBox id="descriptionInternal" label={t('editor.descriptionInternal')} hint={t('editor.descriptionInternalHint')} value={form.descriptionInternal} max={20000} rows={4} onChange={(v) => set('descriptionInternal', v)} />
-        {(owner.about || owner.news || owner.quote) && (
+        {(owner.about || owner.quote) && (
           <div className="space-y-2 rounded-lg border border-dashed p-3 text-sm">
             <p className="text-xs font-medium text-muted-foreground">{t('editor.ownerText')}</p>
             {owner.about && <p className="whitespace-pre-line">{owner.about}</p>}
-            {owner.news && <p className="whitespace-pre-line text-muted-foreground">{owner.news}</p>}
             {owner.quote && (
               <label className="flex items-start gap-2">
                 <Checkbox checked={Boolean(form.ownerQuoteApproved)} onCheckedChange={(v) => set('ownerQuoteApproved', Boolean(v))} />

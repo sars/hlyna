@@ -301,6 +301,11 @@ const MONTH_STEMS: [RegExp, number][] = [
   [/верес/i, 9], [/жовтн/i, 10], [/листопад/i, 11], [/грудн/i, 12], [/зим/i, 1], [/весн/i, 4], [/літ/i, 7], [/осен/i, 10],
 ]
 
+const NEWS_TTL = 183 * 24 * 3600 * 1000
+
+/** The studio's own news is dated by the owner's save; like «Що нового», it goes after about six months. */
+export const newsIsFresh = (at: string, now = Date.now()) => now - new Date(at).getTime() < NEWS_TTL
+
 // «Що нового» is news: hide it once it is older than about six months. The note's own latest «<місяць> <рік>» counts;
 // without a date in the text, the date of the studio's last Instagram post does.
 export function noteIsFresh(note: string, lastPostDate?: string | null, now = Date.now()): boolean {
@@ -312,5 +317,5 @@ export function noteIsFresh(note: string, lastPostDate?: string | null, now = Da
   }
   if (!newest && lastPostDate) newest = new Date(lastPostDate).getTime()
   if (!newest) return true
-  return now - newest < 183 * 24 * 3600 * 1000
+  return now - newest < NEWS_TTL
 }

@@ -53,7 +53,7 @@ const joinCatalog = async (shard: (i: number) => Promise<CachedStudio[]>, cityLi
 // Scripts (tsx …) have no Next data cache: HLYNA_SCRIPT=1 reads the database directly,
 // so build scripts see exactly what the pages see.
 let scriptLoad: Promise<StudioCard[]> | null = null
-const cachedShard = unstable_cache(loadShard, ['studios-shard-v1'], { revalidate: false, tags: TAGS })
+const cachedShard = unstable_cache(loadShard, ['studios-shard-v2'], { revalidate: false, tags: TAGS })
 const cachedCities = unstable_cache(loadPublicCities, ['cities-v1'], { revalidate: false, tags: TAGS })
 const loadStudios =
   process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= joinCatalog(loadShard, loadPublicCities)) : () => joinCatalog(cachedShard, cachedCities)

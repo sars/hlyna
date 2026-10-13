@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { cleanAddress, cleanPublic, dedupeTexts, firstAddress, inCity, isDomainLike, noteIsFresh, stripPersonal, webUrl } from '@/lib/present'
+import { cleanAddress, cleanPublic, dedupeTexts, firstAddress, inCity, isDomainLike, newsIsFresh, noteIsFresh, stripPersonal, webUrl } from '@/lib/present'
 
 describe('present: public text cleaners', () => {
   it('removes research notes from public text', () => {
@@ -73,5 +73,9 @@ describe('noteIsFresh', () => {
     expect(noteIsFresh('Без дати', '2026-09-01', now)).toBe(true)
     expect(noteIsFresh('Без дати', '2025-12-01', now)).toBe(false)
     expect(noteIsFresh('Без дати', null, now)).toBe(true)
+  })
+  it('studio news goes after about six months from the owner\'s save', () => {
+    expect(newsIsFresh('2026-05-01T00:00:00Z', now)).toBe(true)
+    expect(newsIsFresh('2026-04-01T00:00:00Z', now)).toBe(false)
   })
 })

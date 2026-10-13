@@ -38,6 +38,7 @@ export function toPublicStudio(s: StudioRow, prices: PriceRow[]) {
     publicDescription: s.publicDescription,
     ownerAbout: s.ownerAbout,
     ownerNews: s.ownerNews,
+    ownerNewsAt: iso(s.ownerNewsAt),
     ownerQuote: s.ownerQuote,
     ownerQuoteApproved: s.ownerQuoteApproved,
     recentNote: s.recentNote,

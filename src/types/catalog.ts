@@ -40,7 +40,11 @@ export interface Studio {
    */
   publicDescription?: string | null;
   ownerAbout?: string | null;
+  /**
+   * «Новини від студії»: текст власника як є, після прийняття змін; дата — коли власник зберіг.
+   */
   ownerNews?: string | null;
+  ownerNewsAt?: string | null;
   /**
    * Показується як «Студія про себе: “…”» лише після позначки «Цитату схвалено».
    */

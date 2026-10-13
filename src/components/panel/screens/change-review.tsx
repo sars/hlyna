@@ -15,8 +15,9 @@ import { Textarea } from '@/components/panel/ui/textarea'
 export type ReviewField = { key: string; label: string; changed: boolean; ownerText: boolean; diff: ReactNode }
 
 /**
- * Field-by-field review of an owner's change set. Owner text is never published as is: tick it only to store it
- * internally, and write our own public description in the box below (saved in the same step).
+ * Field-by-field review of an owner's change set. Owner text («about», quote) is never published as is: tick it only
+ * to store it internally, and write our own public description in the box below (saved in the same step). Studio
+ * news is an ordinary field: ticked, it goes out as written, signed and dated.
  */
 export function ChangeReview({
   id,

@@ -33,7 +33,7 @@ import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
-import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, fullNameIfDifferent, inCity, isDomainLike, isExhibitingOnly, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
+import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, fullNameIfDifferent, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { formFor, groupPrices } from '@/lib/profile'
@@ -134,8 +134,10 @@ export default async function StudioPage({ params }: Args) {
   const priceRange = span ? (span.min === span.max ? `${span.min} UAH` : `${span.min}–${span.max} UAH`) : ''
   const priceGroups = groupPrices(prices)
   const description = stripPersonal(s.publicDescription || s.description || '')
-  const recentNote = noteIsFresh(s.recentNote || '', s.activity?.lastPostDate) ? stripPersonal(s.recentNote || '') : ''
   const monthYear = (d?: string | null) => (d ? new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(d)).filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ') : '')
+  // The studio's own news (as written, signed and dated) wins over ours while it is fresh.
+  const studioNews = s.ownerNews && s.ownerNewsAt && newsIsFresh(s.ownerNewsAt) ? { text: s.ownerNews, when: monthYear(s.ownerNewsAt) } : null
+  const recentNote = !studioNews && noteIsFresh(s.recentNote || '', s.activity?.lastPostDate) ? stripPersonal(s.recentNote || '') : ''
   const lastPost = monthYear(s.activity?.lastPostDate)
   const igPosts = (s.activity?.instagramPosts ?? []).map((x) => x.url)
   const facts: [string, React.ReactNode][] = [
@@ -206,6 +208,14 @@ export default async function StudioPage({ params }: Args) {
               </p>
             ))}
             {s.ownerQuote && s.ownerQuoteApproved && <QuoteBlock>Студія про себе: «{s.ownerQuote}»</QuoteBlock>}
+            {studioNews && (
+              <div className="grid gap-1">
+                <Kicker as="p" className="m-0">
+                  Новини від студії · {studioNews.when}
+                </Kicker>
+                <p className="m-0 whitespace-pre-line">{studioNews.text}</p>
+              </div>
+            )}
             {recentNote && (
               <p className="m-0">
                 <Kicker className="mr-2">Що нового:</Kicker> {recentNote}

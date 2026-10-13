@@ -108,8 +108,9 @@ export function StudioEditForm({ initial }: { initial: EditInitial }) {
           <span>Що робите, з якої глини, які поливи, хто веде заняття, для кого, що вирізняє. Ми не публікуємо цей текст напряму: редактор перепише його в єдиному стилі сайту.</span>
         </label>
         <label className={kLabel}>
-          Що нового (нова колекція, формат, розклад, ярмарок)
-          <textarea name="ownerNews" defaultValue={initial.ownerNews} rows={3} className={kField} />
+          Новини студії (нова колекція, формат, розклад, ярмарок)
+          <textarea name="ownerNews" defaultValue={initial.ownerNews} rows={3} maxLength={600} className={kField} />
+          <span>Публікуємо як є, з підписом «Новини від студії» і датою, після короткої перевірки. Через пів року новина ховається: оновіть її, коли буде щось нове. Пишіть українською, з датами подій.</span>
         </label>
         <label className={kLabel}>
           Одне речення від студії для цитати (до 200 знаків, необов’язково)

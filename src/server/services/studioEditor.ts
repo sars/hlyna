@@ -153,6 +153,7 @@ export function toEditForm(s: NonNullable<Awaited<ReturnType<typeof getStudioFor
     summary: r.summary,
     publicDescription: r.publicDescription,
     recentNote: r.recentNote,
+    ownerNews: r.ownerNews,
     descriptionInternal: r.descriptionInternal,
     ownerQuoteApproved: r.ownerQuoteApproved,
     instagram: r.instagram,
@@ -188,7 +189,7 @@ export function toEditForm(s: NonNullable<Awaited<ReturnType<typeof getStudioFor
 
 const ROW_FIELDS = [
   'name', 'shortName', 'slug', 'type', 'status', 'visibility', 'confidence', 'cityId', 'oblast', 'address', 'geoLat', 'geoLng', 'geoPrecision',
-  'summary', 'publicDescription', 'recentNote', 'descriptionInternal', 'ownerQuoteApproved', 'instagram', 'website', 'facebook',
+  'summary', 'publicDescription', 'recentNote', 'ownerNews', 'descriptionInternal', 'ownerQuoteApproved', 'instagram', 'website', 'facebook',
   'phone', 'email', 'b2bMinOrder', 'b2bLeadTime', 'b2bFoodSafe', 'b2bDishwasherSafe', 'b2bWorksWithHoreca', 'b2bWorksWithCorporate',
   'consentPhotos', 'consentRequests', 'consentNotes', 'alternateNames', 'formats', 'services', 'products', 'salesChannels',
   'otherLinks', 'sources', 'instagramPosts', 'b2bLogoMethods',
@@ -222,6 +223,7 @@ export function normalizeSnapshot(raw: unknown): StudioSnapshot {
     summary: v.summary ?? null,
     publicDescription: v.publicDescription ?? null,
     recentNote: v.recentNote ?? null,
+    ownerNews: v.ownerNews ?? null,
     descriptionInternal: v.description ?? null,
     ownerQuoteApproved: v.ownerQuoteApproved ?? null,
     instagram: v.instagram ?? null,

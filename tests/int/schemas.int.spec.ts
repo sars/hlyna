@@ -82,6 +82,7 @@ describe('studioEdit (panel)', () => {
       summary: null,
       publicDescription: null,
       recentNote: null,
+      ownerNews: null,
       descriptionInternal: null,
       ownerQuoteApproved: null,
       instagram: null,
