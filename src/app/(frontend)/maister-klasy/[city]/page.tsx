@@ -22,12 +22,13 @@ import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/lib/ogImage'
 import { pickVerse } from '@/content/verses'
-import { centreOf, cityPages, getAllStudios, giftCertificate, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
+import { centreOf, certTerm, cityPages, getAllStudios, giftCertificate, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, runsCorporateWorkshops, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
+import { mentionedBy, nameList, ofPlaces, ofStudios, pickupAnswer, pickupFacts, verb } from '@/content/topics'
 import { displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { MK_CHIPS as CHIPS } from '@/lib/mkChips'
 import { cityContent } from '@/editorial/places'
-import { certificateCities } from '@/editorial/topics'
+import { certificateCities, localFacts } from '@/editorial/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/editorial/wave-a'
 import { fmt, type Span } from '@/lib/money'
 import { fitTitle } from '@/lib/title'
@@ -75,7 +76,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const where = pageWhere(g)
   return {
     title: fitTitle([`Майстер-класи з кераміки ${where}: ${places(n)} і ціни 2026`, `Майстер-класи з кераміки ${where}: ${places(n)}`, `Майстер-класи з кераміки ${where}`]),
-    description: `${places(n)} ${where}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття коштує ${priceText(r)}` : ''}. Формати, адреси, сертифікати.`,
+    description: `${places(n)} ${where}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття коштує ${priceText(r)}` : ''}. Формати, адреси${g.studios.some(giftCertificate) ? ', сертифікати' : ''}.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
     openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${pageName(g)}`, kicker: 'Майстер-класи', sub: 'Гончарне коло, ліплення і розпис: студії, адреси, формати й сертифікати', img: 'og-318-1' }) },
   }
@@ -99,7 +100,6 @@ export default async function CityMasterClassesPage({ params }: Args) {
   const hasPage = new Set(pages.map((p) => p.city.slug))
   const hub = towns.length || centreOf(city) === city.slug ? null : (pages.find((p) => p.city.slug === centreOf(city)) ?? null)
   const r = scopeSpan(studios, 'group')
-  const priced = r?.n ?? 0
   // Studios with a known class price first, then those with Instagram, then by name.
   const byPrice = (a: StudioCard, b: StudioCard) => Number(minClass(b) !== null) - Number(minClass(a) !== null) || Number(!!b.instagram) - Number(!!a.instagram) || a.name.localeCompare(b.name, 'uk')
   const sorted = [...own].sort(byPrice)
@@ -111,39 +111,61 @@ export default async function CityMasterClassesPage({ params }: Args) {
   const cityFormat = new Set<FormatSlug>()
   for (const slug of Object.keys(WAVE_FORMATS) as FormatSlug[])
     if (hasCopy(formatCityId(city.slug!, slug)) && (await formatCityData(city.slug!, slug)).data.all.length >= MIN_LIST) cityFormat.add(slug)
-  const breakdown = ([['wheel', 'на гончарному колі'], ['couples', 'для двох'], ['kids', 'для дітей']] as [Format, string][])
+  const breakdown = ([['wheel', 'на гончарному колі'], ['handbuilding', 'ліплення'], ['painting', 'розпис'], ['couples', 'для двох'], ['kids', 'для дітей'], ['courses', 'курси']] as [Format, string][])
     .filter(([f]) => count(f))
     .map(([f, label]) => `${label} — ${count(f)}`)
 
   // Who on this page sells gift certificates, from the studios' own texts (never a claim about «most studios»).
   const certs = [...sorted, ...sortedRest].flatMap((st) => {
     const c = giftCertificate(st)
-    return c ? [`${displayName(st)}${c.valid ? ` (дійсний ${c.valid})` : ''}`] : []
+    return c ? [`${displayName(st)}${certTerm(c) ? ` (${certTerm(c)})` : ''}`] : []
   })
+  // What else the city's studios say themselves (audit 15.10.2026, cause 6): when pieces are ready, who runs corporate
+  // classes, and the prices behind the range. A sentence or question without such a fact is left out, so a small city's
+  // page is shorter, not filled with the same lines as Kyiv's.
+  const local = localFacts([...sorted, ...sortedRest])
+  const pickup = pickupFacts(local)
+  const priced = [...sorted, ...sortedRest].flatMap((st) => (minClass(st) ? [{ name: displayName(st), value: minClass(st)! }] : [])).sort((a, b) => a.value - b.value)
+  const pricedNames = nameList(priced.map((x) => `${x.name} — ${fmt(x.value)} грн`), 4)
+  const priv = scopeSpan(studios, 'private')
+  const course = scopeSpan(studios, 'course')
+  const corporate = scopeSpan(studios.filter(runsCorporateWorkshops), 'corporate')
   const CERT_NAMES = 6
   const certAnswer = certs.length
     ? `Так. Подарункові сертифікати згадано в профілях ${certs.length} з ${studios.length} ${pluralUk(studios.length, ['місця', 'місць', 'місць'])} на цій сторінці: ${certs.slice(0, CERT_NAMES).join(', ')}${certs.length > CERT_NAMES ? ` і ще ${certs.length - CERT_NAMES}` : ''}. Суми й умови — у профілях.${hasCertPage ? ` Усі сертифікати ${inCity(city.name)} — на сторінці «Сертифікати: ${city.name}».` : ''}`
     : `У профілях студій ${where} сертифікати не згадано — запитайте студію напряму. Сертифікати на гончарство по всій Україні — на сторінці «Сертифікати».`
   const f = await facts()
+  const priceAnswer = r
+    ? [
+        priced.length > 4 ? `За прайсами ${ofStudios(priced.length)} ${where} разовий груповий майстер-клас коштує ${priceText(r)}.` : `Разовий груповий майстер-клас за прайсами: ${pricedNames}.`,
+        priv ? `Індивідуальне заняття — ${priv.text} (за прайсами ${ofStudios(priv.n)}).` : '',
+        course ? `Курс чи абонемент — ${course.text} (за прайсами ${ofStudios(course.n)}).` : '',
+      ].filter(Boolean).join(' ')
+    : `У прайсах студій ${where} у каталозі ціни разового заняття немає — її називають у студії. По Україні разовий майстер-клас коштує ${f.range('group')}.`
   const faq = [
-    {
-      q: `Скільки коштує майстер-клас з кераміки ${where}?`,
-      a: r
-        ? `За прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])} ${where} разовий майстер-клас коштує ${priceText(r)}. Групове заняття дешевше за індивідуальне; випал і полива іноді оплачуються окремо. Курси й абонементи рахуються окремо.`
-        : `Студії ${where} здебільшого не публікують ціни. По Україні разовий майстер-клас коштує ${f.range('group')}, індивідуальний — ${f.range('private')}.`,
-    },
-    { q: 'Коли можна забрати свій виріб?', a: `Зазвичай через ${site.lead.pickup}: виріб має висохнути і пройти два випали (до і після поливи). Деякі студії надсилають готові вироби Новою поштою.` },
+    { q: `Скільки коштує майстер-клас з кераміки ${where}?`, a: priceAnswer },
+    ...(pickupAnswer(local) ? [{ q: 'Коли можна забрати свій виріб?', a: pickupAnswer(local)! }] : []),
     { q: 'Чи можна подарувати майстер-клас?', a: certAnswer },
-    { q: 'А для команди?', a: `Корпоратив з ліплення з глини проводять у студії або у вашому офісі; по Україні — ${f.range('corporate')}. Надішліть запит — ми передамо його кільком студіям.` },
+    ...(local.corporate.length
+      ? [{ q: 'А для команди?', a: `Корпоративи з ліплення з глини ${where} ${mentionedBy(local.corporate)}${corporate ? `; у прайсах — ${corporate.text} з особи` : ''}. Надішліть запит — передамо студіям, які роблять подібне.` }]
+      : []),
   ]
+  // The lead: counts and formats, then only the facts this city has.
+  const lead = [
+    `У каталозі «Глина» — ${places(studios.length)} ${where}, де проводять заняття з гончарства, ліплення чи розпису кераміки${breakdown.length ? `: ${breakdown.join(', ')}` : ''}.`,
+    rest.length ? `З них ${fmt(own.length)} — ${inCity(city.name)}, ${fmt(rest.length)} — в області: ${towns.map((t) => (t.studios.length > 1 ? `${t.city.name} (${t.studios.length})` : t.city.name)).join(', ')}.` : '',
+    r ? (priced.length > 4 ? `Разовий майстер-клас коштує ${priceText(r)} (за прайсами ${ofStudios(priced.length)}, ${site.dataUpdated}).` : `Ціни разового заняття з прайсів: ${pricedNames}.`) : `Цін разового заняття в прайсах студій ${where} немає.`,
+    certs.length ? `Сертифікати ${verb(certs.length, 'продає', 'продають')} ${fmt(certs.length)} з ${ofPlaces(studios.length)}${local.corporate.length ? `, корпоративи ${verb(local.corporate.length, 'проводить', 'проводять')} ${fmt(local.corporate.length)}` : ''}.` : local.corporate.length ? `Корпоративи ${verb(local.corporate.length, 'проводить', 'проводять')} ${places(local.corporate.length)}.` : '',
+    pickup ? `Готові вироби забирають через ${pickup.span} (${pickup.by}).` : '',
+  ].filter(Boolean)
 
   const chipsOf = (st: StudioCard) => CHIPS.filter(([fm]) => hasFormat(st, fm)).map(([, label]) => ({ label, tone: 'ink' as const }))
   const placeLead = cityContent(city.slug as string)?.lead
   const strip = r
     ? [
         { value: fmt(studios.length), label: pluralUk(studios.length, ['місце', 'місця', 'місць']) + ' з майстер-класами' },
-        { value: `${fmt(r.min)}–${fmt(r.max)}`, label: 'грн разовий майстер-клас з особи' },
-        { value: fmt(priced), label: pluralUk(priced, ['студія', 'студії', 'студій']) + ' з ціною в прайсі' },
+        { value: r.min === r.max ? fmt(r.min) : `${fmt(r.min)}–${fmt(r.max)}`, label: 'грн разовий майстер-клас з особи' },
+        { value: fmt(priced.length), label: pluralUk(priced.length, ['студія', 'студії', 'студій']) + ' з ціною в прайсі' },
       ]
     : undefined
   return (
@@ -174,12 +196,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
         title={`Майстер-класи з кераміки: ${name}`}
         lead={
           <>
-            <p className="m-0">
-              У каталозі «Глина» — {places(studios.length)} {where}, де проводять заняття з гончарства, ліплення чи розпису кераміки
-          {breakdown.length ? `: ${breakdown.join(', ')}` : ''}.
-          {rest.length ? ` З них ${fmt(own.length)} — ${inCity(city.name)}, ${fmt(rest.length)} — в області: ${towns.map((t) => (t.studios.length > 1 ? `${t.city.name} (${t.studios.length})` : t.city.name)).join(', ')}.` : ''}
-          {r ? ` Разовий майстер-клас коштує ${priceText(r)} (за прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])}, ${site.dataUpdated}).` : ''} Нижче — кожна студія з форматами й цінами; один запит можна надіслати одразу кільком.
-            </p>
+            <p className="m-0">{lead.join(' ')}</p>
             {placeLead && (
               <p className="m-0 text-[15.5px] text-ink-2">
                 {placeLead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}{' '}
@@ -208,7 +225,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
             <RequestForm sourcePage={`/maister-klasy/${city.slug}`} defaultWhat="master-class" defaultCity={city.name} />
             <SideBox title="Для команди">
               <p className="m-0">
-                <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny">Корпоратив з ліплення з глини: у студії або в офісі, {f.range('corporate')}. →</Link>
+                <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny">Корпоратив з ліплення з глини: у студії або в офісі, по Україні {f.range('corporate')}. →</Link>
               </p>
             </SideBox>
           </>
@@ -216,7 +233,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
       >
         {studios.length >= 8 && <Epigraph lines={pickVerse(city.slug as string)} />}
 
-        <Block id="list" title={`Де пройти майстер-клас ${inCity(city.name)}`} note={<>Ціна — разове групове заняття для дорослих з прайсу студії. Курси, абонементи й корпоративи — у профілі.</>}>
+        <Block id="list" title={`Де пройти майстер-клас ${inCity(city.name)}`} note={r ? 'Ціна — разове групове заняття для дорослих з прайсу студії.' : undefined}>
           <MakerRows>
             {sorted.map((st) => {
               const from = minClass(st)

@@ -3,16 +3,17 @@ import React from 'react'
 
 import { TYPE_LABEL, type StudioCard } from '@/lib/catalog'
 import { groupMoney } from '@/lib/money'
-import { displayName, staleNote, stripPersonal } from '@/lib/present'
+import { caption, displayName, staleNote, stripPersonal } from '@/lib/present'
 
 export function StudioRows({ children }: { children: React.ReactNode }) {
   return <ul className="ui-rows">{children}</ul>
 }
 
-// A studio in a topic list: type, name, and the line of evidence for that topic (what the studio itself says).
+// A studio in a topic list: type, name, and the line of evidence for that topic (what the studio itself says), without
+// the studio's name and cut to two lines on a phone (caption).
 export function StudioRow({ s, line, showCity }: { s: StudioCard; line?: string; showCity?: boolean }) {
   const stale = staleNote(s)
-  const text = groupMoney(stripPersonal(line ?? ''))
+  const text = caption(s, groupMoney(stripPersonal(line ?? '')))
   const type = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   return (
     <li>

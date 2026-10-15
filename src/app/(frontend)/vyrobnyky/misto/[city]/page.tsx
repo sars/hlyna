@@ -23,7 +23,7 @@ import { CityStudioLinks } from '@/components/ui/CityList'
 import { cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { aboutCity, displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
-import { localPrices } from '@/lib/priceIndex'
+import { localPrices, scopeSpan } from '@/lib/priceIndex'
 import { certificateCities } from '@/editorial/topics'
 import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
@@ -94,9 +94,20 @@ export default async function CityMakersPage({ params }: Args) {
   const prices = localPrices(studios)
   const priceWhere = prices.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
 
+  // Where to buy, counted from the profiles' own links (audit 15.10.2026, cause 6: no «most sell via Instagram» guess).
+  const ig = studios.filter((s) => s.instagram).length
+  const web = studios.filter((s) => s.website).length
+  const etsy = studios.filter((s) => /etsy\./iu.test([s.website, ...(s.otherLinks ?? []).map((l) => l.url), ...(s.salesChannels ?? []).map((l) => l.text)].join(' '))).length
+  const channels = [ig ? `Instagram — у ${fmt(ig)}` : '', web ? `власний сайт — у ${fmt(web)}` : '', etsy ? `Etsy — у ${fmt(etsy)}` : ''].filter(Boolean)
+  const buyAnswer = [
+    `У каталозі — ${who(studios.length)} ${where}.`,
+    channels.length ? `Посилання для покупки й замовлення є в профілях: ${channels.join(', ')}.` : 'Контакти — у профілях.',
+    shops.length ? `Роботи різних майстрів продають ${shops.length > 4 ? `${shops.slice(0, 4).map(linkName).join(', ')} і ще ${fmt(shops.length - 4)}` : shops.map(linkName).join(', ')} — див. «Магазини й галереї».` : '',
+  ].filter(Boolean).join(' ')
+
   const baseFaq = [
-    { q: `Де купити кераміку ручної роботи ${where}?`, a: `У каталозі — ${who(studios.length)} ${where}. Більшість продають напряму: через Instagram, власний сайт, Etsy чи у своїй майстерні; посилання — у профілях. Частина брендів має шоуруми або продається в концепт-сторах.` },
-    ...(st.classes ? [{ q: `Де пройти майстер-клас з кераміки ${where}?`, a: `Майстер-класи проводять ${st.classes} ${pluralUk(st.classes, ['місце', 'місця', 'місць'])} з цього списку${mkPage ? ' — окремий перелік з цінами на сторінці майстер-класів міста' : ''}.` }] : []),
+    { q: `Де купити кераміку ручної роботи ${where}?`, a: buyAnswer },
+    ...(st.classes ? [{ q: `Де пройти майстер-клас з кераміки ${where}?`, a: `Майстер-класи проводять ${st.classes} ${pluralUk(st.classes, ['місце', 'місця', 'місць'])} з цього списку${mkPage ? ` — окремий перелік${mk && scopeSpan(mk.studios, 'group') ? ' з цінами' : ''} на сторінці майстер-класів міста` : ''}.` }] : []),
     { q: 'Чи можна замовити посуд для закладу чи подарунки для компанії?', a: `${st.venues ? `${st.venues} ${pluralUk(st.venues, ['студія тут згадує', 'студії тут згадують', 'студій тут згадують'])} роботу із закладами. ` : ''}Надішліть один запит — ми передамо його студіям, які роблять подібні вироби, у цьому місті й поруч. Для замовника це безкоштовно.` },
   ]
   const faq = mergeFaq(baseFaq, (content?.faq ?? []).map((f) => ({ q: f.q, a: fixPriceRef(f.a, priceWhere) })))
@@ -136,7 +147,7 @@ export default async function CityMakersPage({ params }: Args) {
               {st.classes ? ` ${st.classes} ${pluralUk(st.classes, ['проводить', 'проводять', 'проводять'])} майстер-класи` : ''}
               {st.classes && st.venues ? ', ' : st.venues ? ' ' : ''}
               {st.venues ? `${st.venues} ${pluralUk(st.venues, ['працює', 'працюють', 'працюють'])} із закладами` : ''}
-              {st.classes || st.venues ? '.' : ''} Біля кожного — що робить, адреса й Instagram.
+              {st.classes || st.venues ? '.' : ''}
             </p>
           </>
         }

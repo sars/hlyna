@@ -23,7 +23,7 @@ import { StudioRow, StudioRows } from '@/components/ui/StudioRow'
 import { REQUEST_HREF } from '@/content/navigation'
 import { site } from '@/content/site'
 import type { Topic } from '@/content/topics'
-import { evidenceLine, topicCityLinks, type TopicData } from '@/editorial/topics'
+import { evidenceFor, evidenceLine, topicCityLinks, type Evidence, type TopicData } from '@/editorial/topics'
 import { fixPriceRef, mergeFaq, type PlaceContent } from '@/editorial/places'
 import { groupByCity, latestUpdate, MIN_LIST, pluralUk, type StudioCard } from '@/lib/catalog'
 import { ldStudio } from '@/lib/ld'
@@ -33,17 +33,17 @@ import { MobileRequestBar } from './MobileRequestBar.client'
 
 const SHOW = 12
 
-function RowFor({ s, re, showCity }: { s: StudioCard; re: RegExp; showCity: boolean }) {
-  return <StudioRow s={s} line={evidenceLine(s, re)} showCity={showCity} />
+function RowFor({ s, why, showCity }: { s: StudioCard; why: Evidence[]; showCity: boolean }) {
+  return <StudioRow s={s} line={evidenceLine(s, why)} showCity={showCity} />
 }
 
 // Studios of a topic: one flat list with the city on each row, or grouped by city (cities with ≥ MIN_LIST studios get their own
 // heading, the rest go to a short «Ще міста і села» list). Long lists open the rest in a native `details`.
-export function StudioList({ studios, re, byCity, showCity = true }: { studios: StudioCard[]; re: RegExp; byCity?: boolean; showCity?: boolean }) {
+export function StudioList({ studios, why, byCity, showCity = true }: { studios: StudioCard[]; why: Evidence[]; byCity?: boolean; showCity?: boolean }) {
   const rows = (list: StudioCard[], showCity: boolean) => (
     <StudioRows>
       {list.map((s) => (
-        <RowFor key={s.id} s={s} re={re} showCity={showCity} />
+        <RowFor key={s.id} s={s} why={why} showCity={showCity} />
       ))}
     </StudioRows>
   )
@@ -183,7 +183,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
               </SideBox>
             ) : (
               <SideBox title="Подарувати або піти командою">
-                <p className="m-0">Сертифікат на майстер-клас — подарунок, який можна купити й в останній день. Для колективу є корпоративи з ліплення з глини.</p>
+                <p className="m-0">Заняття можна подарувати сертифікатом, а для колективу — замовити корпоратив з ліплення з глини.</p>
                 {topic.section === 'cert' ? <MoreLink href="/maister-klasy/dlya-dvokh" pad={false} className="py-1.5">Гончарство для двох</MoreLink> : <MoreLink href="/sertyfikaty" pad={false} className="py-1.5">Сертифікати</MoreLink>}
                 <MoreLink href="/dlya-biznesu/korporatyv-lipennya-z-hlyny" pad={false} className="py-1.5">Корпоратив з глиною</MoreLink>
                 <MoreLink href={REQUEST_HREF} pad={false} className="py-1.5">Надіслати запит</MoreLink>
@@ -227,7 +227,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
           l.studios.length ? (
             <Block key={l.title} id={`list${k}`} title={l.title} note={l.note ?? 'Список за відкритими даними студій (сайти, Instagram, медіа). Умови кожна студія підтверджує сама.'}>
               {k === firstByCity && <CityJump groups={jump} variant="chips" />}
-              <StudioList studios={l.studios} re={topic.evidence} byCity={l.byCity} showCity={!ctx.place} />
+              <StudioList studios={l.studios} why={evidenceFor(topic, Boolean(topic.confirmed) && k === 0)} byCity={l.byCity} showCity={!ctx.place} />
             </Block>
           ) : null,
         )}

@@ -110,6 +110,59 @@ export function publicPrices(s: Studio): PriceLine[] {
   return out.map((l) => ({ ...l, text: groupMoney(l.text) }))
 }
 
+// ---------- card captions ----------
+
+// A card already shows the name above its line, so a line that opens with it («Quiet Form — київський бренд…»,
+// «ZOLA, Одеса: кераміка…», «Київська арт-студія КатАртСис: майстер-класи…») drops the name and that lead-in.
+const LEAD_IN = /^[»”"]?\s*(?:\([^)]*\)\s*)?(?:(?:,|з|із|зі|в|у|на|біля)\s+[^:—–.]{1,40}?)?\s*[:—–]\s+/u
+function withoutName(text: string, s: Pick<Studio, 'name' | 'shortName'>): string {
+  const t = text.trim()
+  for (const n of [...new Set([displayName(s), s.name.trim()])].filter(Boolean).sort((a, b) => b.length - a.length)) {
+    // «у»/«в» alternate in Ukrainian («майстерня у Старому замку» / «в Старому замку»); same length, so indices hold.
+    const fold = (x: string) => x.toLowerCase().replace(/(?<!\p{L})в(?!\p{L})/gu, 'у')
+    const at = fold(t).indexOf(fold(n))
+    // The name at the start, or after a few words of kind («Гончарна студія Glynar на Лютеранській: …»), never further in.
+    if (at < 0 || at > 40 || /[:—–.;,]/u.test(t.slice(0, at))) continue
+    const rest = t.slice(at + n.length)
+    const lead = rest.match(LEAD_IN)
+    // «Dosebe робить посуд…» → «Робить посуд…»; anything else (a possessive, a clause) keeps the name.
+    const body = lead ? rest.slice(lead[0].length) : at === 0 && /^\s+\p{Ll}/u.test(rest) && !/^\s+(?:з|із|зі|в|у|та|і|й)\s/u.test(rest) ? rest.trim() : null
+    if (body) return body
+  }
+  return t
+}
+
+// Short enough for two lines on a phone, cut where the text allows: at the end of a sentence or a «;» item, then at a
+// comma, then between words — never inside a word or a number («1 4…», «м…»). Trailing joiners («для», «і») go too.
+export const CAPTION_MAX = 80
+export function clipText(text: string, max = CAPTION_MAX): string {
+  const t = text.trim()
+  if (t.length <= max) return t
+  const head = t.slice(0, max + 1)
+  const at = (re: RegExp) => [...head.matchAll(re)].map((m) => m.index!).filter((i) => i >= max * 0.4 && i <= max)
+  // A sentence ends at «. » before a capital letter, unless the dot closes an abbreviation («вул. Шевченка», «10 зан. — …»).
+  const clause = at(/[;!?](?=\s)|(?<!(?:^|[\s(])(?:вул|просп|пров|бульв|бул|пл|наб|ст|м|с|смт|ім|св|р|т|д|ч))\.(?=\s+\p{Lu})/gu).at(-1)
+  if (clause !== undefined) return t.slice(0, clause).replace(/[\s,:—–-]+$/u, '')
+  const trim = (x: string) => {
+    for (let prev = ''; prev !== x; ) {
+      prev = x
+      x = x.replace(/[\s,;:—–(-]+$/u, '').replace(/\s+(?:і|й|та|а|в|у|з|із|зі|на|до|для|від|по|за|що|чи|або|при|про|без)$/iu, '')
+    }
+    return x
+  }
+  // A cut right after a number would leave a price without its unit («— 5 600…»): step back to the word before it.
+  // Never inside a parenthesis («(tykyiv.com, лютий…»): such a cut falls back to before it.
+  const open = (x: string) => (x.match(/\(/g)?.length ?? 0) > (x.match(/\)/g)?.length ?? 0)
+  const cuts = [...at(/,(?=\s)/g), ...at(/(?<!\d)\s|\s(?!\d)/g)].sort((a, b) => b - a).map((i) => t.slice(0, i)).map((x) => trim(open(x) ? x.slice(0, x.lastIndexOf('(')) : x))
+  return `${cuts.find((x) => !/\d$/u.test(x)) ?? cuts[0] ?? trim(t.slice(0, max))}…`
+}
+
+/** A studio's line on a card: without the studio's own name in front, cut by clause or word, capitalised. */
+export function caption(s: Pick<Studio, 'name' | 'shortName'>, text: string, max = CAPTION_MAX): string {
+  const t = clipText(withoutName(text, s), max)
+  return t.charAt(0).toUpperCase() + t.slice(1)
+}
+
 // ---------- people and places ----------
 
 // Birth years and similar personal details are not business information (CLAUDE.md → privacy).

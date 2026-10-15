@@ -3,7 +3,7 @@ import React from 'react'
 
 import { TYPE_LABEL, type StudioCard } from '@/lib/catalog'
 import { groupMoney } from '@/lib/money'
-import { displayName, staleNote, stripPersonal } from '@/lib/present'
+import { caption, displayName, staleNote, stripPersonal } from '@/lib/present'
 
 // The grid that holds StudioCell / IndexCell items: a 2px rule on top, two columns from sm.
 export function StudioCells({ children }: { children: React.ReactNode }) {
@@ -13,7 +13,7 @@ export function StudioCells({ children }: { children: React.ReactNode }) {
 // A studio in a grid (profile «Інші студії», lists): text first, no photo until the studio consents.
 export function StudioCell({ s, showCity = true, line }: { s: StudioCard; showCity?: boolean; line?: string }) {
   const stale = staleNote(s)
-  const text = groupMoney(stripPersonal(line ?? s.summary ?? (s.publicDescription ?? s.description ?? '').split(/(?<=[.!?])\s/)[0] ?? ''))
+  const text = caption(s, groupMoney(stripPersonal(line ?? s.summary ?? (s.publicDescription ?? s.description ?? '').split(/(?<=[.!?])\s/)[0] ?? '')), 150)
   const type = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   return (
     <li>

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { confirmedForCompanies, confirmedForVenues, igHandle, offersMasterClasses, type StudioCard } from '@/lib/catalog'
-import { displayName, firstAddress, isExhibitingOnly, staleNote, stripPersonal } from '@/lib/present'
+import { caption, displayName, firstAddress, isExhibitingOnly, staleNote, stripPersonal } from '@/lib/present'
 import { groupMoney } from '@/lib/money'
 import { productChips } from '@/lib/products'
 
@@ -19,7 +19,7 @@ export function MakerRow({ s, price, chips: chipsProp, typeLabel, place, showAbo
   const street = firstAddress(s.address)
   const addr = place && !street?.includes(place) ? [place, street].filter(Boolean).join(', ') : street
   const stale = staleNote(s)
-  const about = showAbout ? groupMoney(stripPersonal(s.summary ?? '')) : ''
+  const about = showAbout ? caption(s, groupMoney(stripPersonal(s.summary ?? '')), 160) : ''
   const chips = chipsProp ?? [
     
     ...(isExhibitingOnly(s) ? ['виставки'] : []),

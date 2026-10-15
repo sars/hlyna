@@ -1,12 +1,12 @@
 import type { Metadata } from 'next'
 
-import { topics, type Topic, type TopicCtx } from '@/content/topics'
+import { CLASS_PRICE, topics, type LocalFacts, type Topic, type TopicCtx } from '@/content/topics'
 import { ogImage, ogPhoto } from '@/lib/ogImage'
 import { fitTitle } from '@/lib/title'
-import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, type StudioCard } from '@/lib/catalog'
+import { getAllStudios, giftCertificate, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pickupTime, runsCorporateWorkshops, texts, type StudioCard } from '@/lib/catalog'
 import { facts } from '@/lib/facts'
 
-import { isExhibitingOnly, publicPrices, splitSource } from '@/lib/present'
+import { displayName, isExhibitingOnly, publicPrices, splitSource } from '@/lib/present'
 import { amountsIn, fromTo, near, spanOf } from '@/lib/money'
 import { isCeramicPriceLine } from '@/lib/priceIndex'
 
@@ -103,7 +103,28 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     examples: examples.slice(0, 8),
     amounts,
     priceOf,
-    ctx: { n: sure.length, more: c ? all.length - sure.length : undefined, cities: groupByCity(sure).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, priceStudios: idx ? undefined : span?.n, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
+    ctx: { n: sure.length, more: c ? all.length - sure.length : undefined, cities: groupByCity(sure).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, priceStudios: idx ? undefined : span?.n, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k), local: localFacts(sure) },
+  }
+}
+
+const PARTY = /д(?:е|н)\p{L}* народжен|дитяч\p{L}* свят/iu
+const COWORK = /коворк|оренд\p{L}* (?:кола|круга|місця|майстерні|студії)|самостійн\p{L}* робот/iu
+
+/** What the studios on a page say themselves — certificates and their terms, when pieces are ready, corporate classes —
+ *  for copy that would otherwise generalise (TopicCtx.local, the city master-class page). */
+export function localFacts(studios: StudioCard[]): LocalFacts {
+  return {
+    certs: studios.flatMap((s) => {
+      const c = giftCertificate(s)
+      return c ? [{ name: displayName(s), ...c }] : []
+    }),
+    pickup: studios.flatMap((s) => {
+      const p = pickupTime(s)
+      return p ? [{ name: displayName(s), ...p }] : []
+    }),
+    corporate: studios.filter(runsCorporateWorkshops).map(displayName),
+    parties: studios.filter((s) => PARTY.test(texts(s))).map(displayName),
+    cowork: studios.filter((s) => COWORK.test(texts(s))).map(displayName),
   }
 }
 
@@ -111,17 +132,44 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
 // nothing more specific exists.
 const isGeneric = (t: string) => t.length < 28 && !/\d/.test(t)
 
-// One line that shows why a studio is on the page. Best: a matching price line (format, duration, price);
-// then a specific matching service; then the summary. Source notes like «(сайт, 2026)» are dropped.
-export function evidenceLine(s: StudioCard, re: RegExp): string {
-  const prices = publicPrices(s).map((p) => p.text).filter((t) => re.test(t))
-  const services = [...(s.services ?? []), ...(s.products ?? [])].map((x) => splitSource(x.text).text).filter((t) => re.test(t))
-  const score = (t: string) => (/грн/.test(t) ? 4 : 0) + (/\d/.test(t) ? 2 : 0) + (t.length > 40 ? 1 : 0) - (isGeneric(t) ? 5 : 0)
-  const best = [...prices, ...services].sort((a, b) => score(b) - score(a))[0]
-  const clip = (t: string) => (t.length > 150 ? `${t.slice(0, 147)}…` : t)
-  if (best && !isGeneric(best)) return clip(best)
-  const sentence = (s.publicDescription ?? '').split(/(?<=[.!?])\s+/).find((t) => re.test(t) && t.length < 220)
-  return clip(sentence ?? s.summary ?? best ?? '')
+// A long line starts at the item that names the reason («…; додатково — фотограф; подарункові сертифікати на будь-яку
+// послугу» → «подарункові сертифікати…»), so a card cut to two lines keeps it.
+function fromReason(line: string, re: RegExp): string {
+  const parts = line.split(/(?<=;)\s+|(?<=[.!?])\s+(?=\p{Lu})/u)
+  const at = parts.findIndex((p) => re.test(p))
+  return at > 0 ? parts.slice(at).join(' ') : line
+}
+
+// The reasons a list is made of, strongest first. prices: which price lines may carry the reason — 'all' on class pages
+// (the format's own price line says most), 'goods' on product pages (no class or course prices), 'none' where a price
+// line would only show what else the studio sells (a mask for 270 USD on a gifts page, a course on a tableware page).
+export type Evidence = { re: RegExp; prices: 'all' | 'goods' | 'none' }
+
+/** The caption tiers of one list on a topic page: a business page's confirmed list leads with its claim's own words. */
+export function evidenceFor(topic: Topic, confirmedList: boolean): Evidence[] {
+  const prices = topic.section === 'biz' ? 'none' : topic.section === 'makers' ? 'goods' : 'all'
+  const claim = confirmedList && topic.confirmed?.line
+  return [...(claim ? [{ re: claim, prices: 'all' as const }] : []), { re: topic.evidence, prices }]
+}
+
+// One line that shows why a studio is on the list: for each reason in turn, a specific offer, product or price line that
+// names it (a price line with its numbers first), then a sentence of the description; the summary when nothing names
+// it. Source notes like «(сайт, 2026)» are dropped; the card cuts and de-names the line (caption in lib/present).
+export function evidenceLine(s: StudioCard, reasons: RegExp | Evidence[]): string {
+  const tiers = reasons instanceof RegExp ? [{ re: reasons, prices: 'all' as const }] : reasons
+  const offers = [...(s.services ?? []), ...(s.products ?? [])].map((x) => splitSource(x.text).text)
+  const sentences = (s.publicDescription ?? '').split(/(?<=[.!?])\s+/).filter((t) => t.length < 220)
+  const score = (t: string) => (/грн/.test(t) ? 4 : 0) + (/\d/.test(t) ? 2 : 0) + (t.length > 40 ? 1 : 0)
+  for (const [i, { re, prices }] of tiers.entries()) {
+    const priced = prices === 'none' ? [] : publicPrices(s).map((p) => p.text).filter((t) => prices === 'all' || !CLASS_PRICE.test(t))
+    const hits = [...priced, ...offers].filter((t) => re.test(t))
+    const best = hits.filter((t) => !isGeneric(t)).sort((a, b) => score(b) - score(a))[0]
+    // A bare «корпоративи» still beats a line about something else while a stronger reason follows; on the last
+    // reason the summary says more.
+    const line = best ?? sentences.find((t) => re.test(t)) ?? (i < tiers.length - 1 ? hits[0] : undefined)
+    if (line) return fromReason(line, re)
+  }
+  return s.summary ?? ''
 }
 
 export function topicMetadata(topic: Topic, data: TopicData, over: { title?: string; path?: string; h1?: string } = {}): Metadata {

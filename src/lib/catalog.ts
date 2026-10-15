@@ -131,21 +131,50 @@ export const texts = (s: Studio) =>
     .join(' ')
     .toLowerCase()
 
-// Gift certificates as the studio's own texts state them (offers, prices, description), not the format tag: the FAQ of a
-// city page names who sells them and, where a text says so, for how long one is valid.
-const CERT = /сертифікат/iu
-const NOT_GIFT_CERT = /сертифікат\p{L}* (?:якості|відповідності)|сертифікован/iu
-const CERT_VALID = /(?:дійсн\p{L}*|термін\p{L}*(?: дії)?)\D{0,20}?(\d{1,2})\s*(міс|рок|рік)/iu
-export function giftCertificate(s: Studio): { valid: string | null } | null {
-  const sentences = [s.publicDescription, s.description, ...(s.services ?? []).map((x) => x.text), ...(s.prices ?? []).map((x) => x.text)]
+// A studio's own sentences (description, offers, prices): what the city and format pages quote instead of a «most studios»
+// claim.
+const ownSentences = (s: Studio) =>
+  [s.publicDescription, s.description, ...(s.services ?? []).map((x) => x.text), ...(s.prices ?? []).map((x) => x.text)]
     .filter(Boolean)
     .flatMap((t) => t!.split(/(?<=[.!?;])\s+/))
-    .filter((t) => CERT.test(t) && !NOT_GIFT_CERT.test(t))
+
+// Gift certificates as the studio's own texts state them (offers, prices, description), not the format tag: the FAQ of a
+// city page names who sells them, for how long one is valid (or that it has no term) and whether it comes by email.
+const CERT = /сертифікат/iu
+const NOT_GIFT_CERT = /сертифікат\p{L}* (?:якості|відповідності)|сертифікован/iu
+const CERT_VALID = /(?:дійсн\p{L}*|ді[єюя]\p{L}*|термін\p{L}*(?: дії)?)\D{0,20}?(\d{1,2})\s*(міс|рок|рік)/iu
+const CERT_FOREVER = /без\s+термін|безстроков|необмежен/iu
+const CERT_ONLINE = /електронн|онлайн|на пошту|e-mail|email|у месенджер|pdf/iu
+export const NO_TERM = 'без терміну'
+export function giftCertificate(s: Studio): { valid: string | null; electronic: boolean } | null {
+  const sentences = ownSentences(s).filter((t) => CERT.test(t) && !NOT_GIFT_CERT.test(t))
   if (!sentences.length) return null
+  const electronic = sentences.some((t) => CERT_ONLINE.test(t))
   const m = sentences.map((t) => t.match(CERT_VALID)).find(Boolean)
-  if (!m) return { valid: null }
+  if (!m) return { valid: sentences.some((t) => CERT_FOREVER.test(t)) ? NO_TERM : null, electronic }
   const n = Number(m[1])
-  return { valid: `${n} ${m[2].toLowerCase() === 'міс' ? pluralUk(n, ['місяць', 'місяці', 'місяців']) : pluralUk(n, ['рік', 'роки', 'років'])}` }
+  return { valid: `${n} ${m[2].toLowerCase() === 'міс' ? pluralUk(n, ['місяць', 'місяці', 'місяців']) : pluralUk(n, ['рік', 'роки', 'років'])}`, electronic }
+}
+/** «дійсний 3 місяці» / «без терміну дії», for a list of who sells certificates. */
+export const certTerm = (c: { valid: string | null }) => (c.valid === NO_TERM ? 'без терміну дії' : c.valid ? `дійсний ${c.valid}` : null)
+
+// When a piece from a class can be collected, as the studio's own sentence says it («забирають через 3–4 тижні», «готові за
+// п'ять тижнів»): the phrase as written and its span in weeks. Coworking, subscriptions, a glazing visit and orders are other terms.
+const PICKUP = /забира|забрати|забер|віддают|видают|готов|отрима/iu
+const NOT_PICKUP = /коворк|абонемент|виготовлен|сертифікат|візит|замовлен/iu
+const NUM_WORDS: Record<string, number> = { один: 1, одного: 1, два: 2, двох: 2, три: 3, трьох: 3, чотири: 4, чотирьох: 4, пять: 5, шість: 6, півтора: 1.5, півтори: 1.5 }
+const SPAN = /(?:через|за|займа\p{L}*)\s+(?:приблизно\s+|близько\s+)?(\d+(?:[.,]\d)?(?:\s*[–-]\s*\d+(?:[.,]\d)?)?|один|одного|два|двох|три|трьох|чотири|чотирьох|п.ять|шість|півтора|півтори)\s+(тиж\p{L}*|дн\p{L}*|міс\p{L}*)/giu
+export function pickupTime(s: Studio): { text: string; weeks: [number, number]; unfired: boolean } | null {
+  for (const t of ownSentences(s)) {
+    if (!PICKUP.test(t) || NOT_PICKUP.test(t)) continue
+    const m = [...t.matchAll(SPAN)].at(-1)
+    if (!m) continue
+    const per = /^дн/iu.test(m[2]) ? 1 / 7 : /^міс/iu.test(m[2]) ? 4.3 : 1
+    const nums = m[1].split(/\s*[–-]\s*/).map((x) => NUM_WORDS[x.toLowerCase().replace(/\P{L}/gu, '')] ?? Number(x.replace(',', '.')))
+    if (nums.some((x) => !x)) continue
+    return { text: `${m[1].replace(/\s*[–-]\s*/, '–')} ${m[2]}`, weeks: [nums[0] * per, (nums[1] ?? nums[0]) * per], unfired: /не випалю|без випалу/iu.test(t) }
+  }
+  return null
 }
 
 export type Format = NonNullable<Studio['formats']>[number]
@@ -184,6 +213,15 @@ export const confirmedForVenues = (s: Studio) => MAKER_TYPES.has(s.type ?? '') &
 export const confirmedForLogo = (s: Studio) => MAKER_TYPES.has(s.type ?? '') && (Boolean(s.b2b?.logoMethods?.length) || LOGO_LINE.test(ownLines(s)))
 export const confirmedForCompanies = (s: Studio) => Boolean(s.b2b?.worksWithCorporate) || confirmedForLogo(s) || COMPANY_LINE.test(ownLines(s))
 export const runsCorporateWorkshops = (s: Studio) => WORKSHOP_LINE.test(ownLines(s))
+// The words that show each claim in a studio's own lines: a business page's card quotes such a line (editorial/topics
+// evidenceFor). Venues are confirmed by a b2b field; their words are lines made for venues («для закладів», HoReCa,
+// restaurants, chefs), not a café that merely stocks the studio's cups.
+export const CLAIM_WORDS = {
+  venues: /horeca|хорека|ресторан|шеф|для\s+(?:\p{L}+\s+)?(?:заклад|кав.ярн|кафе|готел|бар)/iu,
+  logo: LOGO_LINE,
+  companies: new RegExp(`${COMPANY_LINE.source}|${LOGO_LINE.source}|корпоратив|для (?:компан|бізнес)|брендув`, 'iu'),
+  workshops: WORKSHOP_LINE,
+}
 
 // Hryvnia amounts mentioned in a studio's price lines (used for honest "from–to" ranges).
 export const hryvniaAmounts = (s: Studio): number[] => (s.prices ?? []).flatMap((p) => wholeAmountsIn(p.text))
