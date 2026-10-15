@@ -69,7 +69,7 @@ export function cleanPublic(text?: string | null): string {
 
 // "… — 1750 грн (сайт, 2026)" → body + source hint. Old (≤2022) and internal lines are dropped.
 const SOURCE = /\s*\(([^()]*?(?:19|20)\d\d[^()]*?|[^()]*?(?:сайт|instagram|bodo|kava|tvoeshop|prom|etsy|olx|facebook|магазин|\.ua|\.com|\.net)[^()]*?)\)\s*$/iu
-const INTERNAL = /медіан|переглянуто|вітрин|застаріл|ціна за запитом|ціни не опубліковано|за квед|ймовірно|уточнити/iu
+const INTERNAL = /медіан|переглянуто|вітрин|застаріл|ціна за запитом|ціни не опубліковано|за квед|ймовірно|уточнити|ціна в хайлайті/iu
 // Donations and charity prices are not a price of a class or a product (and never go into priceRange).
 const DONATION = /донат|благодійн|(?<!\p{L})зсу(?!\p{L})|на військо|на збір/iu
 
@@ -291,6 +291,46 @@ export function staleNote(s: { activity?: { lastPostDate?: string | null } | nul
   if (!Number.isFinite(t) || now - t < 365 * 86400000) return ''
   const parts = new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(t))
   return `останній пост — ${parts.filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ')}`
+}
+
+// The newest dated fact a profile rests on: the last Instagram post, the studio's own news, a price's year or a year
+// named in the text. Year-only facts count as the end of that year. Null when nothing is dated.
+export function dataDate(s: Studio, now = Date.now()): { at: number; label: string } | null {
+  const thisYear = new Date(now).getUTCFullYear()
+  const fmt = (d: string) =>
+    new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' })
+      .formatToParts(new Date(d))
+      .filter((x) => x.type === 'month' || x.type === 'year')
+      .map((x) => x.value)
+      .join(' ')
+  const facts = [s.activity?.lastPostDate, s.ownerNewsAt]
+    .filter((d): d is string => Boolean(d) && Number.isFinite(new Date(d!).getTime()))
+    .map((d) => ({ at: new Date(d).getTime(), label: fmt(d) }))
+  const text = [s.summary, s.publicDescription, s.description, s.recentNote, ...(s.prices ?? []).map((p) => p.text)].filter(Boolean).join(' ')
+  for (const m of text.matchAll(/(?<!\d)(19[5-9]\d|20\d\d)(?!\d|\s*(?:грн|₴|мл|см|шт))/g)) {
+    const y = Number(m[1])
+    if (y <= thisYear) facts.push({ at: Date.UTC(y, 11, 31), label: String(y) })
+  }
+  return facts.reduce<{ at: number; label: string } | null>((a, f) => (!a || f.at > a.at ? f : a), null)
+}
+
+/** The data date of a profile whose newest fact is more than a year old («2019», «березень 2021»), else ''. */
+export function oldDataLabel(s: Studio, now = Date.now()): string {
+  const d = dataDate(s, now)
+  return d && now - d.at > 365 * 86400000 ? d.label : ''
+}
+
+// «Є прайс.» says nothing when the profile shows no prices (all of them old, or none collected): the sentence goes,
+// a clause after it stays («Є прайс; записатися можна через Instagram.» → «Записатися можна через Instagram.»).
+export function withoutPriceMention(text: string): string {
+  return text
+    .replace(/(^|[.!?]\s+|\n)Є прайс(?: на [^.;,]+)?(?:, тож[^.]*)?\.[ \t]*/gu, '$1')
+    .replace(/(^|[.!?]\s+|\n)Є прайс(?: на [^.;,]+)?;\s*(\p{L})/gu, (_m, a: string, c: string) => a + c.toUpperCase())
+    .replace(/Є прайс і /gu, 'Є ')
+    .replace(/,\s*є прайс\./gu, '.')
+    .replace(/\s+[йі] прайс\./gu, '.')
+    .replace(/[ \t]+$/gm, '')
+    .trim()
 }
 
 // Domains and web addresses are not names: «dobraglina.com.ua» or «bigme.ua» shouldn't show as «Також відомі як».
