@@ -18,7 +18,7 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
-import { centreOf, cityPages, getAllStudios, getAllWithShops, getLegacy, getShops, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
+import { centreOf, cityPages, getAllStudios, getAcademies, getAllWithShops, getLegacy, getShops, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { CityStudioLinks } from '@/components/ui/CityList'
 import { cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { aboutCity, displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
@@ -89,6 +89,7 @@ export default async function CityMakersPage({ params }: Args) {
   const inArea = (s: StudioCard) => inPage.has(s.cityDoc?.slug)
   const shops = (await getShops()).filter(inArea).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
   const legacy = (await getLegacy()).filter(inArea).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+  const academies = (await getAcademies()).filter(inArea).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
   const linkName = (s: StudioCard) => (s.cityDoc?.slug === city.slug ? displayName(s) : `${displayName(s)} · ${s.cityDoc?.name}`)
   const known = new Map((await getAllWithShops()).map((s) => [s.slug as string, s]))
   const prices = localPrices(studios)
@@ -241,6 +242,12 @@ export default async function CityMakersPage({ params }: Args) {
         {legacy.length > 0 && (
           <Block id="legacy" title={`Музеї й спадщина · ${legacy.length}`} note="Музеї, осередки традиційної кераміки й пам’ять про майстрів; це не студії, тому окремо від списків вище.">
             <CityStudioLinks studios={legacy.map((s) => ({ id: s.id, name: linkName(s), href: `/vyrobnyky/${s.slug}` }))} />
+          </Block>
+        )}
+
+        {academies.length > 0 && (
+          <Block id="academies" title={`Навчальні заклади · ${academies.length}`} note="Кафедри, академії й коледжі, де вчать кераміки; це не студії, тому окремо від списків вище.">
+            <CityStudioLinks studios={academies.map((s) => ({ id: s.id, name: linkName(s), href: `/vyrobnyky/${s.slug}` }))} />
           </Block>
         )}
 

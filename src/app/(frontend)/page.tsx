@@ -31,6 +31,7 @@ import { HeroSearch } from '@/components/site/search/SiteSearch.client'
 import { site } from '@/content/site'
 import { verses } from '@/content/verses'
 import { cityPages, getAllStudios, groupByCity, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { countPlaces } from '@/lib/linked'
 import { priceIndex } from '@/lib/priceIndex'
 import { facts } from '@/lib/facts'
 
@@ -80,9 +81,10 @@ async function stats() {
     const all = await getAllStudios()
     const mk = all.filter(offersMasterClasses)
     return {
-      makers: all.length,
+      // Linked profiles (a maker and her studio, src/content/linked.json) count once.
+      makers: countPlaces(all),
       cities: groupByCity(all).length,
-      masterClassPlaces: mk.length,
+      masterClassPlaces: countPlaces(mk),
       // The same base as /tsiny-2026 and llms.txt, so the home page and the index never quote two different counts.
       withPrices: (await priceIndex()).studios,
       // Places on each city's master-class page (an oblast centre's page counts the whole oblast).

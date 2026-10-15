@@ -99,8 +99,11 @@ export const getCatalog = cache(loadStudios)
 /** The same records read from the database, past the data cache: for src/proxy.ts, which runs outside a page render. */
 export const loadCatalogUncached = () => joinCatalog(loadShard, loadPublicCities)
 
-/** Shops, galleries and «Спадщина» (museums, traditions, memory of masters) are in the catalogue but are not studios: lists, counts and search about studios leave them out. */
-export const isStudio = (s: { type?: string | null }) => s.type !== 'shop' && s.type !== 'legacy'
+/** Universities, academies, departments and colleges teach ceramics but are not studios (owner, 16.10.2026): profile only, out of studio lists and counts. */
+const ACADEMIC = /університет|академі[яї]|кафедр|факультет|інститут|коледж|ліцей|училищ/iu
+export const isAcademic = (s: { name?: string | null }) => ACADEMIC.test(s.name ?? '')
+/** Shops, galleries, «Спадщина» (museums, traditions, memory of masters) and academies are in the catalogue but are not studios: lists, counts and search about studios leave them out. */
+export const isStudio = (s: { type?: string | null; name?: string | null }) => s.type !== 'shop' && s.type !== 'legacy' && !isAcademic(s)
 
 /** Not closed and not unverified: the records lists may show. */
 export const isOpen = (s: Pick<StudioCard, 'status' | 'unverified'>) => s.status !== 'closed' && !s.unverified
@@ -116,6 +119,9 @@ export const getShops = cache(async () => (await getAllWithShops()).filter((s) =
 
 /** Open museums, traditions and memorial pages only. */
 export const getLegacy = cache(async () => (await getAllWithShops()).filter((s) => s.type === 'legacy'))
+
+/** Open universities, academies and colleges (a block of their own on a city page). */
+export const getAcademies = cache(async () => (await getAllWithShops()).filter((s) => s.type !== 'shop' && s.type !== 'legacy' && isAcademic(s)))
 
 export const getStudioBySlug = cache(async (slug: string) => (await getCatalog()).find((s) => s.slug === slug) ?? null)
 
@@ -198,11 +204,10 @@ export const hasFormat = (s: Studio, f: Format) => Boolean(s.formats?.includes(f
 // departments are never listed.
 const CLASS_TAGS: Format[] = ['wheel', 'handbuilding', 'painting', 'kids', 'couples', 'courses', 'certificates', 'corporate-workshop']
 const CLASS_ONLY_TAGS: Format[] = ['kids', 'couples', 'courses', 'corporate-workshop']
-const ACADEMIC = /університет|академі[яї]|кафедр|факультет|інститут|коледж|ліцей|училищ/iu
 const CLASS_WORDS = /майстер-клас|(?<!\p{L})мк(?!\p{L})|заняття|урок|навчан|гурт[оі]к/iu
 
 export const offersMasterClasses = (s: Studio) => {
-  if (ACADEMIC.test(s.name)) return false
+  if (isAcademic(s)) return false
   if (s.type === 'studio' || s.type === 'school') return CLASS_TAGS.some((f) => hasFormat(s, f)) || CLASS_WORDS.test(texts(s))
   if (!s.formats?.length) return false
   if (s.type === 'shop' || s.type === 'supplier') return false

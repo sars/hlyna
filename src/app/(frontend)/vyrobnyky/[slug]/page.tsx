@@ -37,6 +37,7 @@ import { dropStale } from '@/lib/dates'
 import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, currentLine, currentNews, currentNote, isDomainLike, isExhibitingOnly, oldDataLabel, pageName, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
+import { alsoFor } from '@/lib/linked'
 import { acceptsRequests, dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
 import { topsForStudio } from '@/editorial/tops'
@@ -122,6 +123,14 @@ export default async function StudioPage({ params }: Args) {
   const companies = !exhibiting && !dormant && confirmedForCompanies(s)
   const everyone = await getAllStudios()
   const related = relatedStudios(s, everyone)
+  // «Також»: linked profiles with what each is to this one (src/content/linked.json), only those that are published.
+  const published = new Map((await getCatalog()).map((x) => [x.slug, x]))
+  const also = alsoFor(s.slug!).flatMap((a) => {
+    const x = published.get(a.slug)
+    return x ? [{ ...a, s: x }] : []
+  })
+  // A linked profile already stands under «Також»: the city list leaves it out.
+  const nearby = related.filter((r) => !also.some((a) => a.slug === r.slug))
   // Breadcrumb and «Місто» go to the page that lists the city: its own makers page (/vyrobnyky/misto/<city>), else its
   // oblast centre's page when that page covers the oblast («Тернопіль і область»; a page with the centre alone would read as
   // the wrong city), else the same two kinds of master-class page; none → plain text.
@@ -425,10 +434,22 @@ export default async function StudioPage({ params }: Args) {
           </Block>
         )}
 
-        {related.length > 0 && city && (
+        {also.length > 0 && (
+          <Block id="also" title="Також">
+            <ul className="m-0 grid list-none gap-2 p-0">
+              {also.map((a) => (
+                <li key={a.slug} className="text-[15.5px] leading-normal">
+                  <Link href={`/vyrobnyky/${a.slug}`}>{displayName(a.s)}</Link> <span className="text-ink-2">— {a.label}</span>
+                </li>
+              ))}
+            </ul>
+          </Block>
+        )}
+
+        {nearby.length > 0 && city && (
           <Block id="near" title={`Інші студії та майстри: ${city.name}`}>
             <StudioCells>
-              {related.map((r) => (
+              {nearby.map((r) => (
                 <StudioCell key={r.id} s={r} showCity={false} />
               ))}
             </StudioCells>

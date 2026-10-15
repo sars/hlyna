@@ -9,6 +9,7 @@ import React from 'react'
 import { facts } from '@/lib/facts'
 import { topicList } from '@/content/topics'
 import { cityPages, getAllStudios, groupByCity, offersMasterClasses, onPages, pluralUk } from '@/lib/catalog'
+import { countPlaces } from '@/lib/linked'
 import { pageName } from '@/lib/present'
 import { scopeSpan } from '@/lib/priceIndex'
 import { fmt } from '@/lib/money'
@@ -27,7 +28,7 @@ export default async function MasterClassesIndex() {
   const big = cityPages(groups.flatMap((g) => g.studios))
   const listed = onPages(big)
   const small = groups.filter((g) => !listed.has(g.city.slug))
-  const total = groups.reduce((n, g) => n + g.studios.length, 0)
+  const total = countPlaces(groups.flatMap((g) => g.studios)) // linked profiles count once
   const gr = f.get('group') // the same p10–p90 range as the lead
   const facts_ = gr ? { value: `${fmt(gr.min)}–${fmt(gr.max)}`, label: 'грн разовий майстер-клас з особи' } : null
 
