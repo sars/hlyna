@@ -15,7 +15,7 @@ export const site = {
   analytics: { ga4: 'G-C8P025MR2Y' },
   // Business model, said openly so buyers and LLMs understand why requesting through us costs nothing.
   model:
-    'Для замовника безкоштовно. Ціни встановлюють студії. Якщо замовлення відбулося, студія платить нам 5% від його суми; за розміщення чи запити ми грошей не беремо.',
+    'Для замовника безкоштовно. Ціни встановлюють студії. Якщо замовлення відбулося, студія платить нам 10% від його суми; за розміщення чи запити ми грошей не беремо.',
   // Snapshot of the public catalogue (10 Oct 2026); pages use live counts from the database where available.
   stats: { makers: 507, cities: 110, masterClassPlaces: 196, withPrices: 137 },
   // Lead times as studios state them (not derived from price lines). Prices are never hard-coded:

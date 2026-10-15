@@ -5,7 +5,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 ## Who we build for
 1. **Business buyers (priority):** restaurants, cafés, hotels (tableware), companies (gifts, logo mugs, corporate clay workshops), agencies.
 2. **Traffic engine:** people looking for a master class, pottery date, kids' class or gift certificate in their city. Every such page also points to business offers.
-3. **Studios and makers:** free profile; they pay 5% only from orders that happened.
+3. **Studios and makers:** free profile; they pay 10% only from orders that happened.
 
 ## Rules for every page
 - **Request first:** «Отримати пропозиції» visible at the top, after the answer and at the end.

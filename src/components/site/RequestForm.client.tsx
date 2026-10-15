@@ -233,12 +233,12 @@ export function RequestForm({
           </Button>
         </div>
         {errorLine}
-        <p className={`${small} mt-2.5`}>Профіль безкоштовний. Студія платить 5% лише з замовлень, укладених через наш запит.</p>
+        <p className={`${small} mt-2.5`}>Профіль безкоштовний. Студія платить 10% лише з замовлень, укладених через наш запит.</p>
       </form>
     )
 
   // Compact (home hero): the same fields, paired in rows so the panel is no taller than the hero text; a short «Відповідь напряму від студій»
-  // sits by the button (the 5% model is stated in the FAQ and the footer).
+  // sits by the button (the 10% model is stated in the FAQ and the footer).
   if (compact) {
     const pair = 'grid grid-cols-2 gap-x-4 [&>*:last-child:nth-child(odd)]:col-span-2'
     return (
@@ -340,7 +340,7 @@ export function RequestForm({
         <small className="font-mono text-[11px] tracking-[.03em] text-on-cobalt-2">Відповідь напряму від студій</small>
       </div>
       {errorLine}
-      <p className={`${small} mt-2.5`}>Безкоштовно для замовника. Запит отримають 3–5 студій, які роблять такі вироби. Студії платять нам 5% лише з укладених замовлень.</p>
+      <p className={`${small} mt-2.5`}>Безкоштовно для замовника. Запит отримають 3–5 студій, які роблять такі вироби. Студії платять нам 10% лише з укладених замовлень.</p>
     </form>
   )
 }
