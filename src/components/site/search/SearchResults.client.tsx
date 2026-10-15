@@ -301,7 +301,7 @@ export default function SearchResults({ query, layout, listId, control, onActive
     </Group>
   )
   const all = (
-    <MoreLink href={`/poshuk?q=${encodeURIComponent(q)}`} pad={false}>
+    <MoreLink href={`/poshuk?q=${encodeURIComponent(q)}`} pad={false} className="leading-[1.3] whitespace-normal!">
       <span data-all="">Усі результати для «{q}»</span>
     </MoreLink>
   )
@@ -311,13 +311,13 @@ export default function SearchResults({ query, layout, listId, control, onActive
       <div onClick={onClick}>
         {live}
         {hint}
-        <div id={listId} role="listbox" aria-label="Результати" className="grid gap-[18px]">
+        <div id={listId} role="listbox" aria-label="Результати" className="grid grid-cols-[minmax(0,1fr)] gap-[18px]">
           {answer}
           {studios}
           {cities}
           {pages}
         </div>
-        <div className="grid gap-4 pt-2">
+        <div className="grid grid-cols-[minmax(0,1fr)] gap-4 pt-2">
           {all}
           <Button href={request} variant="cobalt" arrow full>
             Отримати пропозиції

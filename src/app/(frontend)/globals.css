@@ -481,8 +481,12 @@
   .srch-dialog-top input::-webkit-search-cancel-button { display: none; }
   .srch-dialog-top button { height: 44px; padding: 0 2px; border: 0; background: none; font: 400 12px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-cobalt); cursor: pointer; }
   .srch-dialog-body { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 12px 0 calc(24px + env(safe-area-inset-bottom, 0px)); }
-  .srch-dialog-body > div, .srch-drop > div { display: grid; gap: 18px; }
+  /* minmax(0, 1fr): a long «Усі результати для «…»» must wrap, not widen the list past the screen. */
+  .srch-dialog-body > div, .srch-drop > div { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
   .srch-dialog .srch-row, .srch-page .srch-row { min-height: 56px; padding-block: 13px; }
+  /* The dialog's list scrolls: a row may not reach past its right edge (the panel's rows do, by 6px). */
+  .srch-dialog .srch-row { margin-right: 0; padding-right: 0; }
+  .srch-dialog button.srch-row { width: calc(100% + 8px); }
   .srch-dialog .srch-answer strong { font-size: 17px; }
   .srch-dialog-in { width: 100%; max-width: 760px; margin-inline: auto; display: flex; flex-direction: column; min-height: 0; flex: 1; }
   .srch-field { display: flex; align-items: stretch; max-width: 640px; height: 52px; border-radius: var(--radius-btn); box-shadow: inset 0 0 0 2px var(--color-ink); background: var(--color-paper); color: var(--color-ink-2); }
