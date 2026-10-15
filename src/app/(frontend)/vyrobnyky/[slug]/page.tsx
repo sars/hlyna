@@ -33,10 +33,10 @@ import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
-import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
+import { cleanAddress, cleanPublic, dataDate, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
-import { dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
+import { acceptsRequests, dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
 import { redirectOldStudioSlug } from '@/lib/redirects'
 
@@ -170,7 +170,24 @@ export default async function StudioPage({ params }: Args) {
   const photos = await getStudioPhotos(s.id)
   const cases = casesForStudio(s.slug)
 
-  const showForm = !dormant && !exhibiting
+  // Profiles that cannot take a request get a box with what we know and a request to studios that work now.
+  const showForm = acceptsRequests(s)
+  const otherStudios = `/zapyt?${new URLSearchParams({ what: formFor(s), ...(city?.slug ? { misto: city.slug } : {}) })}`
+  const lastData = dataDate(s)?.label
+  const via = [s.website && 'сайт', s.instagram && 'Instagram', s.facebook && 'Facebook'].filter(Boolean).join(', ')
+  const box: { title: string; text: string } = s.type === 'legacy'
+    ? { title: 'Музей, традиція чи пам’ять', text: 'Це не студія: замовлень і занять тут не приймають.' }
+    : s.status === 'closed'
+      ? { title: 'Не працює', text: `За нашими даними, ${s.type === 'maker' ? 'майстер більше не працює' : 'студія чи майстерня більше не працює'}${lastData ? `; останні відомі дані — ${lastData}` : ''}. Профіль лишаємо як довідку.` }
+      : dormant
+        ? { title: 'Актуальність не підтверджена', text: `Свіжих постів чи оголошень ми не знайшли${lastData ? `, останні відомі дані — ${lastData}` : ''}, тому запит сюди не надсилаємо. Перед візитом уточніть, чи ${s.type === 'maker' ? 'майстер працює' : 'студія працює'}.` }
+        : s.type === 'shop'
+          ? { title: 'Де купити', text: `Це магазин: тут купують готові вироби${cleanAddress(s.address) ? ` (${cleanAddress(s.address)})` : ''}${channels.length ? `; канали: ${channels.join(', ')}` : ''}.` }
+          : s.type === 'school' || s.type === 'supplier'
+            ? { title: 'Як записатися', text: via ? `Записуються напряму в закладі: ${via} — у блоці «Коротко».` : 'Записуються напряму в закладі; посилань на його сторінки ми не знайшли.' }
+            : exhibiting
+              ? { title: 'Де побачити роботи', text: channels.length ? `${channels.join(', ').replace(/^./, (c) => c.toUpperCase())}.` : 'Замовлень і занять у відкритих джерелах ми не знайшли.' }
+              : { title: 'Як зв’язатися', text: 'Контактів ми не знайшли, тому запит сюди не надсилаємо.' }
   const chips = [...(mk ? ['майстер-класи'] : []), ...(venues ? ['працює із закладами'] : []), ...(companies ? ['корпоративні замовлення'] : [])]
   const priceBlocks = priceGroups.map(([g, lines]) => ({ g, lines }))
 
@@ -239,13 +256,11 @@ export default async function StudioPage({ params }: Args) {
               ))}
             </ChipGroup>
           )}
-          {showForm && (
-            <div data-hero-cta="" className="flex flex-wrap gap-2.5">
-              <Button href="#zapyt-forma" variant="cobalt" arrow>
-                Запит цій студії
-              </Button>
-            </div>
-          )}
+          <div data-hero-cta="" className="flex flex-wrap gap-2.5">
+            <Button href={showForm ? '#zapyt-forma' : otherStudios} variant="cobalt" arrow>
+              {showForm ? 'Запит цій студії' : 'Запит іншим студіям'}
+            </Button>
+          </div>
           {staleData ? <Updated label="Дані" date={`${staleData}${checked ? ` · перевірено: ${checked}` : ''}`} /> : <Updated />}
         </div>
         <section aria-labelledby="facts" className="min-w-0">
@@ -279,39 +294,20 @@ export default async function StudioPage({ params }: Args) {
       <InnerCols
         aside={
           <>
-            {dormant && s.type !== 'legacy' ? (
-              <SideBox title={s.status === 'closed' ? 'Не працює' : 'Актуальність не підтверджена'}>
-                <p className="m-0">
-                  {s.status === 'closed'
-                    ? 'За нашими даними, студія чи майстерня більше не працює. Профіль лишаємо як довідку.'
-                    : 'Актуальність не підтверджена — уточніть перед візитом. Ми не знайшли свіжих оголошень чи постів після 2022 року.'}{' '}
-                  Шукаєте подібне? Надішліть запит — ми підберемо студії, які працюють зараз.
-                </p>
-                <MoreLink href="/zapyt" pad={false} className="py-1.5">
-                  Надіслати запит
-                </MoreLink>
-              </SideBox>
-            ) : s.type === 'legacy' ? (
-              <SideBox title="Музей, традиція чи пам’ять">
-                <p className="m-0">Це не студія: замовлень і занять тут не приймають. Шукаєте кераміку чи майстер-клас? Надішліть запит — ми підберемо студії, які працюють зараз.</p>
-                <MoreLink href="/zapyt" pad={false} className="py-1.5">
-                  Надіслати запит
-                </MoreLink>
-              </SideBox>
-            ) : exhibiting ? (
-              <SideBox title="Де побачити роботи">
-                <p className="m-0">
-                  {channels.length ? `${channels.join(', ').replace(/^./, (c) => c.toUpperCase())}.` : 'На виставках і в музейних колекціях.'} Замовлень і занять на відкритих сторінках не анонсовано. Шукаєте подібні вироби? Надішліть запит — ми підберемо студії.
-                </p>
-                <MoreLink href="/zapyt" pad={false} className="py-1.5">
-                  Надіслати запит
-                </MoreLink>
-              </SideBox>
-            ) : (
+            {showForm ? (
               <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} studioName={name} />
+            ) : (
+              <SideBox title={box.title}>
+                <p className="m-0">
+                  {box.text} Один запит отримають 3–5 студій{city ? ` ${inCity(city.name)} чи поруч` : ''}, які роблять подібне й працюють зараз.
+                </p>
+                <MoreLink href={otherStudios} pad={false} className="py-1.5">
+                  Запит іншим студіям
+                </MoreLink>
+              </SideBox>
             )}
             {/* A heritage page (late or historical makers, museums) has no owner to claim it (decision 15.10.2026). */}
-            {s.type !== 'legacy' && (
+            {s.type !== 'legacy' && s.status !== 'closed' && (
             <SideBox title="Власникам">
               {s.ownerVerified ? (
                 <p className="m-0">

@@ -21,8 +21,9 @@ export const TYPE_LABEL: Record<string, string> = {
   other: 'Інше',
 }
 
-// unverified: the research found no sign of activity after 2022 and says so (or work is suspended), with no
-// fresher Instagram evidence. Such a studio keeps its profile but is left out of every list, count and map.
+// unverified: the research found no sign of activity after 2022 and says so (or work is suspended), or marked the
+// status unclear or relocated (museums and memorial pages aside), with no fresher Instagram evidence. Such a studio keeps its profile (with its data date
+// and no request form) but is left out of every list, count and map.
 export type StudioCard = Studio & { cityDoc: City | null; unverified?: boolean }
 
 // The data cache holds studios in SHARDS parts (by id) and cities apart, joined per request: Next caps one entry at
@@ -77,7 +78,7 @@ const FRESH_SINCE = '2025-01-01'
 function isUnverified(s: Studio): boolean {
   if (s.status === 'closed') return false // handled separately
   const fresh = (s.activity?.lastPostDate ?? '') >= FRESH_SINCE
-  return !fresh && DOUBT.test([s.publicDescription, s.description, s.summary].filter(Boolean).join(' '))
+  return !fresh && ((s.type !== 'legacy' && (s.status === 'unclear' || s.status === 'relocated')) || DOUBT.test([s.publicDescription, s.description, s.summary].filter(Boolean).join(' ')))
 }
 
 /** Every published record, including closed and unverified ones (profiles and the sitemap). */

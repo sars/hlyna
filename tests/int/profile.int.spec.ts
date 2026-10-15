@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { StudioCard } from '@/lib/catalog'
 import { dataDate, splitSource, withoutPriceMention } from '@/lib/present'
-import { dedupePrices, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
+import { acceptsRequests, dedupePrices, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 
 const lines = (...raw: string[]) => raw.map(splitSource)
 const texts = (ls: { text: string }[]) => ls.map((l) => l.text)
@@ -92,5 +92,21 @@ describe('«Інші студії та майстри»', () => {
     expect(out).not.toContain('me')
     expect(out).not.toContain('lviv')
     expect(out.indexOf('b-wheel')).toBeLessThan(out.indexOf('a-shop'))
+  })
+})
+
+describe('who gets the request form (owner, 15.10.2026)', () => {
+  const card = (extra: Partial<StudioCard>) => ({ id: 1, slug: 's', name: 's', type: 'studio', status: 'active', instagram: 'https://instagram.com/s', formats: ['wheel'], cityDoc: null, ...extra }) as unknown as StudioCard
+  it('an open studio, brand or maker with a live channel', () => {
+    expect(acceptsRequests(card({}))).toBe(true)
+    expect(acceptsRequests(card({ type: 'maker', instagram: null, website: 'https://maker.ua', formats: ['logo'] }))).toBe(true)
+  })
+  it('not without Instagram, site, phone, e-mail or Facebook', () => {
+    expect(acceptsRequests(card({ instagram: null }))).toBe(false)
+  })
+  it('not for shops, schools, heritage, closed or inactive profiles', () => {
+    for (const type of ['shop', 'school', 'legacy'] as const) expect(acceptsRequests(card({ type }))).toBe(false)
+    expect(acceptsRequests(card({ status: 'closed' }))).toBe(false)
+    expect(acceptsRequests(card({ status: 'unclear', unverified: true }))).toBe(false)
   })
 })

@@ -1,6 +1,6 @@
 // Studio profile helpers: which request form a profile opens on, and how its price list and offer lists are tidied.
 import { hasFormat, offersMasterClasses, type StudioCard as Card } from '@/lib/catalog'
-import type { PriceLine } from '@/lib/present'
+import { isExhibitingOnly, type PriceLine } from '@/lib/present'
 
 // The request form opens on what this studio is known for.
 export function formFor(s: Card): string {
@@ -10,6 +10,16 @@ export function formFor(s: Card): string {
   if (offersMasterClasses(s)) return 'master-class'
   if (hasFormat(s, 'corporate-workshop')) return 'corporate-workshop'
   return 'other'
+}
+
+/** Who can take a request (owner, 15.10.2026): an open studio, brand or maker with a live channel. Shops sell finished
+ *  work, schools and clubs enrol through their own office, heritage pages have nobody to answer, closed and inactive
+ *  ones (unverified: unclear or relocated without a fresh post) would not reply, and a profile without Instagram, site,
+ *  phone, e-mail or Facebook would send the request nowhere. */
+export function acceptsRequests(s: Card): boolean {
+  if (s.status === 'closed' || s.unverified || isExhibitingOnly(s)) return false
+  if (s.type === 'shop' || s.type === 'school' || s.type === 'supplier') return false
+  return Boolean(s.instagram || s.website || s.facebook || s.phone || s.email)
 }
 
 // ---------- «Вироби» and «Послуги» ----------
