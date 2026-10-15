@@ -15,7 +15,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 - **Honest:** only collected data; never invent studios, prices, cases, reviews. Say the model openly but briefly (`site.model` in `src/content/site.ts`). Don't publish the legal entity.
 - **Clean:** `pnpm knip` (config `knip.json`) must report nothing: delete dead files, exports and dependencies instead of leaving them; finished projects and superseded drafts go to `docs/archive/`, not next to live docs. Value lists, the slug rule and the owner photo limit live only in `src/shared/options.ts`; the public site URL is `site.url`.
 - **Flexible wording:** no site-wide «від 30 штук»; minimum order lives in profiles. «Корпоратив з ліплення з глини».
-- **Voice:** `docs/voice/README.md` — factual lead, then at most one short verse epigraph (`Epigraph`, `src/content/verses.ts`), then warm, clear potters' prose. Never explain the verse.
+- **Voice:** `docs/voice/README.md` — factual lead, then at most one short verse epigraph (`Epigraph`, `src/content/verses.ts`; none on pages where a business buys a batch), then warm, clear potters' prose. Never explain the verse.
 - **Language:** Ukrainian only; English later via `/en` routes; never Russian.
 - **Scope:** studio-scale ceramics made in Ukraine. Makers who now work abroad, suppliers, factories, media, course platforms and gift-certificate aggregators stay as drafts.
 - **Photos:** only with the maker's consent; stock photos (`public/images/stock`, CC0) only for site chrome.

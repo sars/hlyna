@@ -1,4 +1,5 @@
 // Business topic pages (/dlya-biznesu/…): logo mugs, corporate workshops, tableware for venues, gifts.
+// Pages where a business buys a batch carry no verse; only the corporate workshop keeps one (docs/voice/README.md).
 import { productText } from '@/lib/products'
 import { site } from '../site'
 import { verses } from '../verses'
@@ -17,7 +18,7 @@ export const businessTopics: Record<string, Topic> = {
     metaTitle: () => 'Чашки з логотипом ручної роботи: студії, нанесення, терміни',
     metaDescription: (c) => `Керамічні чашки з логотипом компанії чи закладу: ${studios(c.n)}, які роблять персоналізовані вироби й партії на замовлення. Штамп, деколь, розпис, терміни ${site.lead.batch}. Один запит — пропозиції від кількох студій.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять персоналізовані вироби, корпоративні подарунки або посуд партіями на замовлення. Логотип наносять штампом, деколлю чи розписом; партію зазвичай виготовляють ${site.lead.logoDetail}.`,
-    verse: verses.logo,
+    verse: [],
     photo: sitePhotos.bizLogo,
     lists: [
       { title: 'Прямо пишуть про логотип чи персоналізацію', note: 'Ці студії згадують нанесення логотипа, написів або персоналізовані вироби на своїх сайтах чи в Instagram.', formats: ['logo'], types: MAKERS },
@@ -133,7 +134,7 @@ export const businessTopics: Record<string, Topic> = {
     metaTitle: () => 'Новорічні корпоративні подарунки з кераміки 2026',
     metaDescription: (c) => `Що подарувати команді й клієнтам на Новий рік 2026: чашки, ялинкові прикраси, посуд з логотипом і сертифікати на майстер-клас від ${studios(c.n)}. Коли замовляти, щоб встигнути до свят.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять корпоративні подарунки або святкові колекції: ялинкові прикраси, чашки, свічники, різдвяні тарілки. Партію на замовлення виготовляють ${site.lead.batch}, тож для подарунків з логотипом запит варто надіслати до початку листопада; після середини листопада реальніше вироби з наявності або сертифікати на майстер-клас.`,
-    verse: verses.newYear,
+    verse: [],
     photo: sitePhotos.bizNewYear,
     lists: [
       { title: 'Роблять корпоративні подарунки', formats: ['corporate-gifts', 'logo'], types: MAKERS },
@@ -189,7 +190,7 @@ export const businessTopics: Record<string, Topic> = {
     metaTitle: (c) => `Посуд ручної роботи для ресторанів: ${studios(c.n)}, ціни 2026`,
     metaDescription: (c) => `Українські керамічні студії, які роблять тарілки, миски й посуд для подачі на замовлення: ${studios(c.n)} ${where(c)}. Зразки, харчова полива, дозамовлення, терміни ${site.lead.batch}. Один запит — пропозиції від кількох студій.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять посуд для ресторанів, кафе й готелів або приймають замовлення на серії тарілок, мисок і піал. Партію зазвичай виготовляють ${site.lead.batch}; мінімальна кількість залежить від студії.${priceRange(c) ? ` Тарілки й миски в роздрібних прайсах коштують здебільшого ${priceRange(c)} за штуку.` : ''}`,
-    verse: verses.horeca,
+    verse: [],
     photo: sitePhotos.cardVenues,
     ogImg: 'og-508-wide-1', // owner's choice for restaurants (frame 508); the page itself keeps its photo
     lists: [{ title: 'Студії, які працюють із закладами', formats: ['horeca'], types: ['studio', 'brand', 'maker'], filter: (s) => makesTableware(s), byCity: true }],
@@ -234,7 +235,7 @@ export const businessTopics: Record<string, Topic> = {
     metaTitle: (c) => `Чашки ручної роботи для кав’ярень: ${studios(c.n)}, ціни 2026`,
     metaDescription: (c) => `Керамічні чашки для еспресо, капучино й латте, блюдця і піали від українських студій: ${studios(c.n)} ${where(c)}. Об’єми, міцність, дозамовлення, терміни ${site.lead.batch}.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять чашки й посуд для кав’ярень або приймають замовлення від закладів.${priceRange(c) ? ` Чашки в роздрібних прайсах коштують здебільшого ${priceRange(c)}.` : ''} Серію під вашу кав’ярню зазвичай виготовляють ${site.lead.batch}; запас на бій і дозамовлення варто обговорити одразу.`,
-    verse: verses.cafe,
+    verse: [],
     photo: sitePhotos.bizCafes,
     lists: [
       { title: 'Роблять чашки й працюють із закладами', formats: ['horeca'], types: ['studio', 'brand', 'maker'], filter: (s) => CUPS.test(productText(s)), byCity: true },
@@ -280,7 +281,7 @@ export const businessTopics: Record<string, Topic> = {
     metaTitle: (c) => `Посуд і декор ручної роботи для готелів: ${studios(c.n)}`,
     metaDescription: (c) => `Посуд для сніданків і ресторану, речі для номерів і декор лобі від українських керамічних студій: ${studios(c.n)} ${where(c)}. Великі серії, дозамовлення, терміни ${site.lead.batch}.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять посуд для закладів або керамічний декор на замовлення: тарілки для сніданків, чашки, речі для номерів, вази й світильники для лобі. Серію зазвичай виготовляють ${site.lead.batch}; для готелю на десятки номерів варто одразу обговорити запас і дозамовлення.`,
-    verse: verses.hotel,
+    verse: [],
     lists: [
       { title: 'Посуд для сніданків і ресторану', formats: ['horeca'], types: ['studio', 'brand', 'maker'], filter: (s) => makesTableware(s), byCity: true },
       { title: 'Декор для лобі й номерів', note: 'Вази, світильники, плитка й панно від студій, які працюють із закладами чи компаніями.', formats: ['horeca', 'corporate-gifts', 'logo'], types: ['studio', 'brand', 'maker'], filter: (s) => DECOR.test(productText(s)) },
@@ -334,7 +335,7 @@ export const businessTopics: Record<string, Topic> = {
     metaTitle: (c) => `Корпоративні подарунки з кераміки: ${studios(c.n)}`,
     metaDescription: (c) => `Чашки, набори посуду, вази й свічники для команди, клієнтів і партнерів від ${studios(c.n)}: з логотипом або без, з пакуванням. Бюджет на подарунок, терміни ${site.lead.batch}, сертифікати на майстер-клас.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять корпоративні подарунки, персоналізовані вироби або посуд на замовлення для компаній.${priceRange(c) ? ` Окремий подарунок у роздрібних прайсах коштує здебільшого ${priceRange(c)}.` : ''} Партію з логотипом виготовляють ${site.lead.logoDetail}; вироби з наявності й сертифікати на майстер-клас можна отримати за кілька днів.`,
-    verse: verses.gifts,
+    verse: [],
     photo: sitePhotos.bizGifts,
     lists: [
       { title: 'Роблять корпоративні подарунки й персоналізовані вироби', formats: ['corporate-gifts', 'logo'], types: MAKERS },

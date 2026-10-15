@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Block, InnerCols, InnerHero, InnerMain } from '@/components/site/Inner'
 import { Button } from '@/components/ui/Button'
-import { Epigraph } from '@/components/ui/Epigraph'
 import { Faq } from '@/components/ui/Faq'
 import { Kicker } from '@/components/ui/Kicker'
 import { IndexCell, StudioCells } from '@/components/ui/StudioCell'
@@ -12,7 +11,6 @@ import { RequestForm } from '@/components/site/RequestForm.client'
 import { mainNav } from '@/content/navigation'
 import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
-import { verses } from '@/content/verses'
 import { getAllStudios, groupByCity, hasFormat, pluralUk, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from '@/lib/catalog'
 import { displayName, stripPersonal } from '@/lib/present'
 import { ogImage, ogPhoto } from '@/lib/ogImage'
@@ -84,7 +82,6 @@ export default async function BusinessIndex() {
         }
       />
       <InnerCols aside={<RequestForm sourcePage="/dlya-biznesu" />}>
-        <Epigraph lines={verses.business} />
         {biz.columns.map((c) => (
           <section key={c.title} className="grid gap-2">
             <Kicker as="p">{c.title}</Kicker>
