@@ -1,0 +1,1206 @@
+[
+ {
+  "slug": "cassafonovs",
+  "why": "неактивний: одна згадка The Village 2018, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "gleena",
+  "why": "неактивний: Etsy призупинено («currently not selling»), інших каналів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "iryna-vale",
+  "why": "неактивний: єдине джерело — Е-літня академія в Опішному 2021, каналу продажу немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "khai-roste-hai-roste",
+  "why": "неактивний: The Village 2017; останній пост в Instagram 08.2022",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "lepite",
+  "why": "неактивний: єдине джерело — новина про відкриття 01.2022",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "liudmyla-krasiuk",
+  "why": "неактивний: ЕСУ: останні виставки 2007–2008, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "nadiia-kozak",
+  "why": "неактивний: ЕСУ: остання подія 2008, контактів немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "petro-pechernyi-keramik-dekoratyvni-tareli",
+  "why": "неактивний: майстер 1932 р. н., єдине джерело — виставка 2015; смерть не підтверджена, тож «Спадщина» з роками життя неможлива",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "studiia-keramiky-pottery-magic",
+  "why": "неактивний: згадка 2019, сайт не резолвиться",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "tvorcha-maisternia-soniashnyky",
+  "why": "неактивний: згадка 2019, сайт 404; стояла у списках МК",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "ukrclay",
+  "why": "неактивний: Etsy на перерві з 17.02.2026, останній пост в Instagram 10.2025, виробника не встановлено",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "yuliia-novak",
+  "why": "неактивний: ЕСУ: остання виставка 2019, працює переважно в бронзі й камені, контактів немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "kaviarnia-halereia-shtuka",
+  "why": "неактивний: кав’ярня-експозиція, єдине джерело — ZAXID.NET 01.2017",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "lvivska-kakhliarnia",
+  "why": "неактивний: остання активність — виставка 06.2019; сайт перехоплено (знято раніше), інших контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "nadiia-sobko",
+  "why": "неактивний: студентська виставка ЛНАМ 01.2020, каналів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "orest-holubets",
+  "why": "неактивний: дані 2017–2020 (завкафедри ЛНАМ), власних робіт і каналів не з’ясовано",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "vasyl-bodnarchuk",
+  "why": "неактивний: остання подія — студентська виставка 03.2018",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "barbariski-klub-studiia-keramiky",
+  "why": "неактивний: єдине джерело позначене «можливо неактуальне»; акаунт Instagram зник (скан 10.10.2026)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "keramichna-maisternia-kava-club-raiduzhnyi",
+  "why": "неактивний: на KAVA «тимчасово не працює», назви й власних контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "synyi-krab",
+  "why": "неактивний: останній пост в Instagram і відгук — 11–12.2023",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "1898artspace",
+  "why": "неактивний: архівні події без дат, після 2022 не підтверджено",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "etyka-pedahohika-keramika",
+  "why": "неактивний: сайт з активністю до 2019",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "kharkiv-workshops",
+  "why": "неактивний: останній пост в Instagram 26.02.2022 (скан 10.10.2026)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "petro-mosia",
+  "why": "неактивний: остання подія — виставка 11.2018, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "remember-the-home-kateryna-i-dmytro-yermola",
+  "why": "неактивний: інтерв’ю 2018, згадка 2021, контактів немає; стояв в «Інших студіях» усіх харківських профілів",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "valeriia-polianskova",
+  "why": "неактивний: єдиний факт — подарунок 04.2022",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "volodymyr-korniienko-4rom-people",
+  "why": "неактивний: останній пост в Instagram 10.10.2024, резиденція 2023; місто суперечливе",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "anatolii-filozof",
+  "why": "неактивний: остання подія — МК 02.2016",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "honcharnyi-prostir-mykoly-shavuly",
+  "why": "неактивний: лише відкриття 12.2022, на KAVA «тимчасово не працює», назви й контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "hurtok-keramiky-hlyniana-skarbnychka",
+  "why": "неактивний: шкільний гурток, стаття 09.2017",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "kosivska-orhanizatsiia-spilky-khudozhnykiv",
+  "why": "неактивний: остання подія 06.2022, контактів немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "mykola-poliakov",
+  "why": "неактивний: остання подія — виставка 05.2021",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "yaroslav-prokopyk",
+  "why": "неактивний: майстер 1947 р. н., ЕСУ: дані до 1997; смерть не підтверджена",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "beata-korn",
+  "why": "неактивний: біографія, найсвіжіше — альбом 2018, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "lidiia-onachko",
+  "why": "неактивний: фестиваль 07.2017, low",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "liudmyla-averkiieva",
+  "why": "неактивний: майстриня 1945 р. н., викладала до 2001; смерть не підтверджена (каталог brovdi.art), тож «Спадщина» неможлива",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "myroslava-rosul",
+  "why": "неактивний: жодної дати після 2003, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "oleksandr-sopilniak",
+  "why": "неактивний: найсвіжіше — премія 2017, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "rozaliia-chabanenko",
+  "why": "неактивний: остання подія — музейна виставка 2022, контактів немає; смерть не підтверджена",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "valentyna-loboichenko-valentyna-loboichenko",
+  "why": "неактивний: остання подія — ювілейна виставка 06.2020, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "zhanna-myliashkevych",
+  "why": "неактивний: остання подія — виставка 06.2015",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "art-studiia-tsiatka-snizhana-chornii",
+  "why": "неактивний: останній пост в Instagram 11.2021, МК 03.2021",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "kosivceramart",
+  "why": "неактивний: Etsy на паузі, 0 лістингів (10.2026)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "mokh-mox-maisternia-yevhena-babeshka",
+  "why": "неактивний: репортаж 2016, добірки 2018–2019",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "nina-kosovych",
+  "why": "неактивний: ЕСУ: остання дата 2003, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "shkola-keramiky-fondu-frankivskyi-opir",
+  "why": "неактивний: дані до 05.2018",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "viktor-myhovych",
+  "why": "неактивний: остання подія — виставка 2013, контактів немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "liliia-berezhnenko",
+  "why": "неактивний: ЕСУ: остання подія 2001",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "oleksandr-shkalikov",
+  "why": "неактивний: єдине джерело — виставка 02.2015, low",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "oleksandr-vilchynskyi",
+  "why": "неактивний: ЕСУ: дані 2004; стояв у списках МК",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "tvorcha-maisternia-kbkeramiky",
+  "why": "неактивний: єдине джерело — каталог, сайт показує PHP Fatal error",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "yevhen-hranin",
+  "why": "неактивний: єдине джерело — виставка 2015",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "halyna-blyzniuk-hlyniani-lialky",
+  "why": "неактивний: сюжет 09.2020",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "honcharna-maisternia-chernihivskoho-tsentru",
+  "why": "неактивний: заняття 06.2016; стояла у 4 списках МК",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "maisternia-keramiky-malva-poltava",
+  "why": "неактивний: останній пост в Instagram 17.03.2024",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "maryna-handysh-kontseptualna-keramika",
+  "why": "неактивний: сюжет 02.2020",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "yelyzaveta-putilina",
+  "why": "неактивний: сюжет 06.2021; стояла на 7 бізнес-сторінках",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "happy-potter-ua-oksana-liashok",
+  "why": "неактивний: останній пост в Instagram 27.10.2023",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "polina-nazarenko-artterapevtychni-mk-z-hlyny",
+  "why": "неактивний: матеріал 11.2022",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "poliskyi-khab-vidnovlennia-ta-art-terapii",
+  "why": "неактивний: соцпрограма, дані 05.2024, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "ruslan-druk-ta-uliana-dzhyhryniuk",
+  "why": "неактивний: фестиваль 07.2018",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "studiia-ptakh-yuliia-bondarenko",
+  "why": "неактивний: стаття 03.2024",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "tvorcha-maisternia-remeslo",
+  "why": "неактивний: стаття 03.2024, сайт не відкривається",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "uliana-andriichuk",
+  "why": "неактивний: один сюжет 01.2021",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "artem-maryniuk",
+  "why": "неактивний: переїзд зі Слов’янська 2025 (Суспільне 02.2026), але перезапуск не підтверджений і контактів немає (пошук 15.10.2026)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "vidrodzhennia-narodnykh-remesel-na-podilli",
+  "why": "неактивний: ГО, репортаж 12.2019, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "yevheniia-hrytsku",
+  "why": "неактивний: остання подія — виставка 09.2022",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "anton-i-nataliia-bohach",
+  "why": "неактивний: лише план справи (07.2025), майстерні ще немає; стояв у 5 списках",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "honcharna-maisternia-barskoho-koledzhu",
+  "why": "неактивний: гурток коледжу, репортаж 02.2021",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "keramelnytsia-liudmyla-yarmoliuk",
+  "why": "неактивний: репортаж 03.2020; стояла на бізнес-сторінках",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "majolica-studio",
+  "why": "неактивний: останній пост в Instagram 20.12.2022 (скан 10.10.2026)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "honcharna-sadyba-bohdana-nikiruia",
+  "why": "неактивний: стаття 07.2023, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "iryna-bykova-magic-pot-and-charivne-horniatko",
+  "why": "неактивний: робота призупинена через обстріли (12.2023)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "keramichna-maisternia-perekhrest-ceramic",
+  "why": "неактивний: сайт мертвий, свіжих даних немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "lidiia-ta-andrii-ulianytski",
+  "why": "неактивний: згадка 2019",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "oleksandr-murafa",
+  "why": "неактивний: ЕСУ: остання робота 2015",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "olha-hal",
+  "why": "неактивний: МК 2018",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "pavlo-fraiman",
+  "why": "неактивний: єдине джерело — виставка 02.2015, low",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "serhii-denysenko",
+  "why": "неактивний: ЕСУ: остання подія 2015",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "honcharna-maisternia-pry-kotedzhi-4-sezony",
+  "why": "неактивний: нічого після 2022, сайт веде на новинний ресурс (знято раніше)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "ivan-bibik-honchar-z-oleshni",
+  "why": "неактивний: майстер 1925 р. н., останнє — ювілей 2015 (у 2023 ще згаданий як чинний); смерть не підтверджена, тож «Спадщина» неможлива",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "lesia-padun-lesya-padun",
+  "why": "неактивний: остання подія — симпозіум 09.2021",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "serhii-hlushko-honchar-olviiska-keramika",
+  "why": "неактивний: публікація 10.2019",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "serhii-tkachov",
+  "why": "неактивний: інтерв’ю 07.2017, головне ремесло — лоза",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "aromateque-kontsept-story",
+  "why": "магазин не допомагає покупцю: парфумерна мережа, кераміка — лише Gunia Project",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "cut24-25",
+  "why": "магазин не допомагає покупцю: стокіст Nadiia без перевіреного профілю й контактів",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "goodwine-home",
+  "why": "магазин не допомагає покупцю: відділ гастроному, стокіст Nadiia, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "kendi",
+  "why": "магазин не допомагає покупцю: стокіст Nadiia, профіль не перевірено, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "le-prive-hyatt-regency-kyiv",
+  "why": "магазин не допомагає покупцю: бутик-стокіст Nadiia, контактів немає, асортимент не підтверджено",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "mrii-marii-halereia-ukrainskykh-suveniriv",
+  "why": "магазин не допомагає покупцю: сувенірна крамниця, частка кераміки не підтверджена",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "one-tea-tree",
+  "why": "магазин не допомагає покупцю: чайна крамниця-стокіст Nadiia, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "twlv",
+  "why": "магазин не допомагає покупцю: мережа концепт-сторів одягу, кераміка — лише Gunia, частку не перевірено",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "lvivhandmade",
+  "why": "магазин не допомагає покупцю: Prom-реселер турок і чайників, походження невідоме",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "mahazyn-mamyna-svitlytsia",
+  "why": "магазин не допомагає покупцю: магазин вишиванок, джерело — list.in.ua",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "extra-small-design-room",
+  "why": "магазин не допомагає покупцю: магазин одягу, кераміка — з одного відгуку TripAdvisor, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "sokolroom",
+  "why": "магазин не допомагає покупцю: концепт-стор, кераміка — лише Gunia",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "shoste-chuttia",
+  "why": "магазин не допомагає покупцю: Prom-перепродавець, авторів не вказано",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "karpatiia",
+  "why": "магазин не допомагає покупцю: Prom-магазин карпатських ремесел, авторів кераміки не вказано",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "folk",
+  "why": "магазин не допомагає покупцю: магазин одягу, кераміка — лише GUNIA, не профільна",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "taksel-skhvaleno-taksamy",
+  "why": "магазин не допомагає покупцю: зоомагазин, ~12 керамічних мисок",
+  "set": {
+   "visibility": "hidden",
+   "type": "shop"
+  }
+ },
+ {
+  "slug": "daroslava-prom-mahazyn-zaporizhzhia",
+  "why": "магазин не допомагає покупцю: Prom-перепродавець (серії як у «Доброї глини»)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "hram-kontsept-stor",
+  "why": "магазин не допомагає покупцю: стокіст Nadiia і «Цвіте Терен» без контактів",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "ma-fashion-art",
+  "why": "магазин не допомагає покупцю: магазин одягу, кераміка — лише Gunia",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "clot-ternopil",
+  "why": "магазин не допомагає покупцю: концепт-стор, кераміка — лише Gunia; акаунт Instagram не знайдено (скан 10.10.2026)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "personality-lviv",
+  "why": "магазин не допомагає покупцю: мережа одягу, кераміка — лише Gunia; три різні міста в профілі",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "somide-concept-store",
+  "why": "магазин не допомагає покупцю: стокіст «Цвіте Терен» і Gunia, але єдиний канал — Instagram, якого вже немає (скан 10.10.2026)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "terraandtimber",
+  "why": "магазин не допомагає покупцю: Etsy-магазин, виробника не встановлено, контактів немає",
+  "set": {
+   "visibility": "hidden",
+   "type": "shop"
+  }
+ },
+ {
+  "slug": "honcharna-lavka-prodavets-na-prom",
+  "why": "магазин не допомагає покупцю: Prom-продавець, власне виробництво не з’ясовано",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "hlynianyi-posud-mahazyn-na-prom-shepetivka",
+  "why": "магазин не допомагає покупцю: Prom-магазин, можливий перепродаж",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "ceramics-ukraine",
+  "why": "магазин опішнянської кераміки (виробництво не підтверджене) — тип shop; сайт, телефон і Instagram живі (10.2026); «Є прайс.» — шаблонна фраза",
+  "set": {
+   "type": "shop",
+   "status": "active"
+  },
+  "replace": [
+   [
+    " Є прайс.",
+    ""
+   ]
+  ],
+  "dropFormats": [
+   "horeca"
+  ]
+ },
+ {
+  "slug": "iryna-norets-iryna-norets",
+  "why": "без контактів: один факт 2021, контактів немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "viktoriia-dromaretska",
+  "why": "без контактів: виставка 06.2026, але контактів немає й місто не підтверджене",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "vira-tomashevska",
+  "why": "без контактів: біографія без свіжих подій, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "oleksandra-mahinska-slobodiuk",
+  "why": "без контактів: одне джерело ЕСУ, контактів немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "tvorcha-shkola-33-art",
+  "why": "без контактів: художня школа з list.in.ua, low; «Є прайс» неправда",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "lidiia-lazartseva",
+  "why": "без контактів: біографія ЕСУ (роботи 2025), контактів немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "studiia-art-kreatyvu-oksany-kuzmenko",
+  "why": "без контактів: list.in.ua, low; кераміка — один із напрямів",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "tetiana-levlias",
+  "why": "без контактів: біографія, жодної дати після 1979",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "yaroslav-boretskyi",
+  "why": "без контактів: біографія, дат після 2004 немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "lihtar-likhtar-keramichna-studiia-dnipro",
+  "why": "без контактів: одне джерело (NCECA 03.2024), жодного каналу; Etsy не знайдено (пошук 15.10.2026)",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "anna-kryloshanska",
+  "why": "без контактів: сніпет без дати, low",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "honcharna-maisternia-v-ternopoli-partner-kava",
+  "why": "без контактів: картка партнера KAVA без назви й контакту",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "honcharna-studiia-hurtok-vul-chkalova-6a",
+  "why": "без контактів: джерело — відгуки top20.ua",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "ruslana-kliuchko-keramichna-skulptura",
+  "why": "без контактів: резиденція 2025, але місто не підтверджене й контакту немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "yurii-hordiienko",
+  "why": "без контактів: ЕСУ без дати",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "serhii-khivrich",
+  "why": "без контактів: один сюжет 04.2023, контакту немає",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "oleksandr-verbivskyi",
+  "why": "без контактів: ЕСУ без дати",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "volodymyr-hamyrin",
+  "why": "без контактів: одна стаття ЕСУ",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "diy-pottery-kristina",
+  "why": "без контактів: два оголошення OLX, low; стояла в 6 бізнес-списках",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "lesia-korzh",
+  "why": "без контактів: довідник без дати",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "oleksii-sakovskyi",
+  "why": "без контактів: одна згадка 2023 («записано попутно»), low",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "art-keramika-trypillia",
+  "why": "без контактів: продавець з OLX (3 оголошення), low",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "veronika-taranenko-honcharna-studiia",
+  "why": "без контактів: сюжет 02.2025, але місця й контакту немає (пошук 15.10.2026)",
+  "set": {
+   "visibility": "hidden",
+   "status": "unclear"
+  }
+ },
+ {
+  "slug": "julia-beliaeva-yuliia-beliaieva",
+  "why": "поза рамками: вази робить і розписує KPM Berlin; Київ не підтверджений",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "maryna-shchehelska-shchehelsca",
+  "why": "поза рамками: художниця, кераміка — одна робота",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "shcherbenko-art-centre",
+  "why": "поза рамками: арт-центр, кераміку не продає (одна виставка-аукціон 2020)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "opishnianskyi-derzhavnyi-khudozhnii-litsei",
+  "why": "поза рамками: державний ліцей без контакту",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "prykarpatskyi-universytet-im-stefanyka",
+  "why": "поза рамками: одна дисципліна університету (90 годин)",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "liubov-paraniuk",
+  "why": "поза рамками: таврійський розпис, власної кераміки немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "yelyzaveta-portnova",
+  "why": "за кордоном з 2022 (Agency of Artists in Exile)",
+  "set": {
+   "visibility": "hidden",
+   "status": "relocated"
+  }
+ },
+ {
+  "slug": "anna-kovalenko-anna-kovalenko",
+  "why": "за кордоном (Agency of Artists in Exile, Paris 1); кераміки на сторінці немає",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "maisternia-remisnykiv",
+  "why": "постачальник: магазин керамічних намистин для рукоділля",
+  "set": {
+   "visibility": "hidden",
+   "type": "supplier"
+  }
+ },
+ {
+  "slug": "the-sky-and-rye",
+  "why": "постачальник: бренд-посередник (вироби на аутсорсі), дані 2024; з нього виросла студія «Осоння»",
+  "set": {
+   "visibility": "hidden"
+  }
+ },
+ {
+  "slug": "zhyva-hlyna-pry-muzei-yavornytskoho",
+  "why": "працює: 30.10.2025 музей анонсував заняття студії (museum.dp.ua/uk/news_1461), лишається в списках",
+  "set": {
+   "status": "active",
+   "recentNote": "Наприкінці жовтня 2025 року музей анонсував заняття студії на 2 листопада: квиток — 150 грн у касі музею, запис за телефоном."
+  }
+ },
+ {
+  "slug": "vasyl-omelianenko-vasyl-omelianenko-1925-2021",
+  "why": "«Спадщина»: минулий час",
+  "replace": [
+   [
+    "Член НСХУ та Національної спілки майстрів народного мистецтва.",
+    "Був членом НСХУ та Національної спілки майстрів народного мистецтва."
+   ]
+  ]
+ },
+ {
+  "slug": "hanna-drul",
+  "why": "«Спадщина»: ліплення як формат класів не стосується меморіальної сторінки",
+  "dropFormats": [
+   "handbuilding"
+  ]
+ },
+ {
+  "slug": "fairyhomestudio",
+  "why": "злиття: Fairy Home — майстерня Анни Макеєвої (27.09.2026 майстерня анонсувала «репортаж про майстерню і мій шлях до кераміки» — це репортаж ЧЕline про Макеєву від 24.09.2026; та сама Анна, ті самі 1- і 2-денні МК); факти з профілю Макеєвої перенесено сюди",
+  "set": {
+   "name": "Fairy Home Studio — майстерня Анни Макеєвої",
+   "shortName": "Fairy Home Studio",
+   "summary": "Fairy Home Studio — майстерня керамістки Анни Макеєвої в Чернігові: вази, настінна кераміка, майстер-класи з ліплення.",
+   "publicDescription": "Fairy Home Studio — майстерня чернігівської художниці-керамістки Анни Макеєвої. За освітою вона математик-програміст, у кераміці самоучка: починала вдома з керамічних брошок, власну майстерню відкрила 2018 року. Робить вази (зокрема вази-гарбузи), настінну кераміку, будиночки-свічники й «багатоногих» істот; роботи показували в галереях Одеси й Харкова, продає в Україні й за кордон через Instagram.\n\nНа одноденних і дводенних майстер-класах з ліплення роблять чашки, тарілки, настінні панно, ялинкові іграшки, працюють з деколлю (перекладними картинками, які вплавляють у поливу). Групи невеликі, по 4–5 людей, зустрічаються в майстерні по суботах і неділях; діти до 10 років приходять разом з дорослими.\n\nНа одно- чи дводенний майстер-клас є подарункові сертифікати, заняття можна доповнити фото- чи відеозйомкою. Вироби Анна показує на маркетах; запис і новини — в Instagram."
+  },
+  "addNames": [
+   "Анна Макеєва"
+  ]
+ },
+ {
+  "slug": "anna-makeieva-keramichna-maisternia",
+  "why": "злиття в fairyhomestudio: той самий профіль Анни Макеєвої (див. вище)",
+  "mergeInto": "fairyhomestudio"
+ },
+ {
+  "slug": "anna-demydenko-keramomaisternia-v-kvartyri",
+  "why": "злиття в fairyhomestudio: Анна з Чернігова, математик-інформатик і вчителька, з ~2013 року ліпить удома, брошки й вироби-гарбузи (ЧЕline 2019) — збігається з репортажем про Макеєву 2026; окремих каналів немає, дані 2019",
+  "mergeInto": "fairyhomestudio"
+ },
+ {
+  "slug": "artglina",
+  "why": "злиття: «Експресія» (Даша, Житомир, червона глина з молочним випалом) — та сама майстриня, у записі «Експресії» каталог на vk.com/art_glina",
+  "replace": [
+   [
+    "Artglina — майстерня житомирської керамістки Дар’ї Велібеєвої.",
+    "Artglina — майстерня житомирської керамістки Дар’ї Велібеєвої, яка ліпить посуд із червоної глини приблизно з 2013 року (у 2015 році про неї писали як про майстриню «Експресія»)."
+   ]
+  ],
+  "addNames": [
+   "Експресія"
+  ]
+ },
+ {
+  "slug": "ekspresiia",
+  "why": "злиття в artglina (див. вище); окремих каналів немає, дані 2015",
+  "mergeInto": "artglina"
+ },
+ {
+  "slug": "pokutska-keramika-pokutska-ceramics",
+  "why": "злиття: TapLap ceramics — та сама справа родини Микитюків з Городенки (у записі «Покутської» є Instagram taplap_ceramics; report.if.ua: першим гончарем був Антон Микитюк, починали в гаражі)",
+  "replace": [
+   [
+    "з експортом до ЄС.",
+    "з експортом до ЄС. Це справа родини Микитюків з Городенки: першим гончарем був Антон Микитюк, який починав у гаражі батьківського дому; у 2018 році медіа писали про майстерню як про TapLap ceramics («Тяп-ляп»)."
+   ]
+  ],
+  "addNames": [
+   "TapLap ceramics",
+   "Тяп-ляп"
+  ]
+ },
+ {
+  "slug": "taplap-ceramics-tiap-liap",
+  "why": "злиття в pokutska-keramika-pokutska-ceramics (див. вище); дані 2018, стояв на 8 бізнес-сторінках",
+  "mergeInto": "pokutska-keramika-pokutska-ceramics"
+ },
+ {
+  "slug": "maisternia-keramiky-ta-kavy",
+  "why": "злиття: кав’ярня «Гончар» родини Чорних — той самий заклад у Косові; бите посилання facebook.com/profile.php без id прибрано",
+  "set": {
+   "facebook": ""
+  },
+  "replace": [
+   [
+    "гончаря Миколи в Косові",
+    "гончарської родини Чорних (гончар Микола) в Косові"
+   ]
+  ],
+  "addNames": [
+   "Кав’ярня «Гончар»"
+  ]
+ },
+ {
+  "slug": "kaviarnia-honchar-rodyna-chornykh",
+  "why": "злиття в maisternia-keramiky-ta-kavy (див. вище)",
+  "mergeInto": "maisternia-keramiky-ta-kavy"
+ },
+ {
+  "slug": "rodionpresent-rodion-i-olha-baievy",
+  "why": "злиття: свищики Ольги Баєвої — розділом тут (окремий профіль мав одне джерело 2021)",
+  "replace": [
+   [
+    "Родіон — музикант і колекціонер рослин.",
+    "Родіон — музикант і колекціонер рослин. Ольга Баєва, бандуристка, робить керамічні іграшки-свищики: за грантом Президента для молодих майстрів народного мистецтва вона створила колекцію з 67 свищиків за мотивами археологічних знахідок, козацького бароко й чернігівської вишивки (2021)."
+   ]
+  ]
+ },
+ {
+  "slug": "olha-baieva-keramichna-ihrashka-svyshchyk",
+  "why": "злиття в rodionpresent-rodion-i-olha-baievy (див. вище)",
+  "mergeInto": "rodionpresent-rodion-i-olha-baievy"
+ },
+ {
+  "slug": "havaretska-chornodymlena-keramika",
+  "why": "злиття: тонкий профіль родини Бакусевичів (неперевірені імена) — рядком у сторінці осередку",
+  "replace": [
+   [
+    "Мар’ян і Володимир Бакусевичі, Дмитро Вислінський.",
+    "Мар’ян і Володимир Бакусевичі, Дмитро Вислінський. У Бакусевичів навчався, зокрема, Іван Луковський; за словами дослідниці Мар’яни Мотики (2025), ремесло родини продовжують і нинішні її представники."
+   ]
+  ]
+ },
+ {
+  "slug": "rodyna-bakusevychiv-havarechchyna",
+  "why": "злиття в havaretska-chornodymlena-keramika (див. вище)",
+  "mergeInto": "havaretska-chornodymlena-keramika"
+ },
+ {
+  "slug": "oleh-lutsuk",
+  "why": "злиття: гурток у Стольному — та сама людина й приміщення; факти гуртка перенесено сюди",
+  "replace": [
+   [
+    "Тут проходять майстер-класи для дітей і дорослих.",
+    "Гурток переїхав до Стольного 2023 року з Менської станції юних техніків. Тут проходять майстер-класи для дітей і дорослих, у 2026 році — зокрема для поранених військових; через тривоги дитячих занять стало менше."
+   ]
+  ]
+ },
+ {
+  "slug": "stolnenskyi-honcharnyi-hurtok",
+  "why": "злиття в oleh-lutsuk (див. вище)",
+  "mergeInto": "oleh-lutsuk"
+ },
+ {
+  "slug": "studiia-smereka-sosnivka",
+  "why": "злиття: доньки Оксани Мартинович (Софія Грибовська, Оксана) — учасниці студії, окремі профілі з тих самих двох статей без контактів",
+  "replace": [
+   [
+    "які можна знайти на ярмарках і виставках.",
+    "які можна знайти на ярмарках і виставках.\n\nСтудію веде гончарка Оксана Мартинович із родиною, разом із нею працює гончар Дмитро Каганюк. Гончарюють і доньки Оксани: Софія Грибовська, яка працює з глиною з дитинства (з 1998 року) й робить посуд, свічники та свистунці, та Оксана — випускниця Львівського коледжу декоративного і ужиткового мистецтва імені Труша, стипендіатка Президента для молодих майстрів народного мистецтва (2015), що робить ужиткову й фігурну кераміку."
+   ]
+  ]
+ },
+ {
+  "slug": "oksana-fedotova-ivanytska",
+  "why": "злиття в studiia-smereka-sosnivka; що Федотова — це Іваницька, дослідження лише припускає, тож у тексті прізвища немає",
+  "mergeInto": "studiia-smereka-sosnivka"
+ },
+ {
+  "slug": "sofiia-hrybovska",
+  "why": "злиття в studiia-smereka-sosnivka (див. вище)",
+  "mergeInto": "studiia-smereka-sosnivka"
+ }
+]

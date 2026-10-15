@@ -23,7 +23,7 @@
    "heading": "Порцеляна, червона глина, кам’яна маса",
    "paragraphs": [
     "Порцеляну роблять [Maistrenko Ceramics](maistrenko-ceramics) (сервізи й репліки історичних форм малими тиражами; восени 2026 року майстерня показала посуд зі зграйками синіх рибок і металевими акцентами), [Lebet Project](lebet-project) в Ужгороді, [JaneandMery](janeandmery) з Мукачева, де розписну порцеляну поєднують із гутним склом, і [Yaglyna](yaglyna-olha-khasanshyn) з Луцька: порцелянова тарілка 600–900 грн, чайник INTRO на 800 мл 4000 грн (Всі.Свої, 2026). Львівська [Creating Comfort Lab / ETERA](creating-comfort-lab-etera) випускає порцеляну й stoneware для ринку США, столовий посуд від 54 USD (eterahome.com, 2026).",
-    "Червона глина дає теракоту, неполивну червону кераміку, і посуд для печі. [GLYNKA](glynka-hlynka) робить горщики, макітри й сковорідки, [TerraAndTimber](terraandtimber) з Долини продає горщики для запікання на 0,5–6 л (на 3–6 л за 71–135 USD на Etsy, 2026), [Saffron2](saffron2-saffron2vintage) з Вараша й [UkrClay](ukrclay) з Києва працюють із молочним випалом, про який є окремий [гід](/hayidy/chornodymlena-i-molochena). UkrClay восени 2025 року показав різдвяний сервіз «Святвечір» на шість персон із 26 предметів у техніці димлення.",
+    "Червона глина дає теракоту, неполивну червону кераміку, і посуд для печі. [GLYNKA](glynka-hlynka) робить горщики, макітри й сковорідки, а [Saffron2](saffron2-saffron2vintage) з Вараша працює з молочним випалом, про який є окремий [гід](/hayidy/chornodymlena-i-molochena).",
     "Кам’яну масу, щільний черепок, який після випалу майже не вбирає воду, бере [AQYAR ceramics](aqyar-ceramics): горнята, чавани й гайвані для чаю. Окремо стоїть дров’яний випал: [Восьма Комора](vosma-komora-8-komora) має дров’яну піч і в серпні 2026 року представила нову колекцію столового посуду й новий колір у лінійці CHASOVA; [GORN Ceramics](gorn-ceramics) у вересні 2026 року частину тонкостінних ваз Shell випалив у дров’яній печі, а в жовтні показував роботи на Paris Design Week."
    ]
   },
@@ -39,10 +39,9 @@
   {
    "need": "Посуд для печі з червоної глини",
    "slugs": [
-    "glynka-hlynka",
-    "terraandtimber"
+    "glynka-hlynka"
    ],
-   "why": "горщики, сковорідки й хлібниці 139–475 грн у GLYNKA; горщики для запікання на 0,5–6 л у TerraAndTimber"
+   "why": "горщики, сковорідки й хлібниці 139–475 грн у GLYNKA"
   },
   {
    "need": "Порцеляна українського виробництва",
@@ -90,7 +89,7 @@
   },
   {
    "q": "Які бренди продають посуд за кордон?",
-   "a": "GUNIA Project має 14 магазинів у світі й сайт із безкоштовною доставкою, Nadiia стокіста I Am Volya в Лондоні, ETERA продає в США, Покутська кераміка в Іспанію й Німеччину, Yaglyna у Чикаго й Сінгапур. На Etsy працюють CeramaStudio, MagicCeramicsShop, UkrClay, OK Ceramics, TerraAndTimber і Saffron2."
+   "a": "GUNIA Project має 14 магазинів у світі й сайт із безкоштовною доставкою, Nadiia стокіста I Am Volya в Лондоні, ETERA продає в США, Покутська кераміка в Іспанію й Німеччину, Yaglyna у Чикаго й Сінгапур. На Etsy працюють CeramaStudio, MagicCeramicsShop, OK Ceramics і Saffron2."
   },
   {
    "q": "Де подивитися посуд наживо, а не на сайті?",
@@ -122,7 +121,6 @@
   "https://gornceramics.com",
   "https://www.etsy.com/shop/CeramaStudio",
   "https://www.etsy.com/shop/MagicCeramicsShop",
-  "https://www.etsy.com/shop/UkrClay",
   "https://vsisvoi.ua"
  ]
 }
