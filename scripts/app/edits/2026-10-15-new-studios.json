@@ -4,18 +4,33 @@
     "name": "Zguro Ceramics",
     "type": "brand",
     "summary": "Zguro Ceramics: порцеляновий посуд, вази й декор ручної роботи від художників-керамістів; щосезону порцелянові ялинкові іграшки із золотом і розписом.",
-    "recentNote": "У серпні–вересні 2026 року показали лімітовану серію порцелянових півників і курочок з розписом і баранчика-підвіску, зробленого разом з брендом @tysha.ua.store.",
+    "recentNote": "У серпні–вересні 2026 року показали лімітовану серію порцелянових півників і курочок з розписом і підвіску-ягнятко, зроблену разом з брендом @tysha.ua.store.",
     "instagram": "https://www.instagram.com/zguro.ceramics/",
-    "formats": ["new-year"],
-    "products": ["порцеляновий посуд", "вази", "ялинкові іграшки з порцеляни", "свічники", "брошки"],
-    "salesChannels": ["Instagram"],
-    "sources": ["https://www.instagram.com/zguro.ceramics/", "https://www.instagram.com/p/DShR5R-jV8X/"],
-    "instagramPosts": ["https://www.instagram.com/p/DShR5R-jV8X/", "https://www.instagram.com/p/DS7FUVxjcBk/", "https://www.instagram.com/p/DTLBgc2jT8J/"],
+    "formats": [
+      "new-year"
+    ],
+    "products": [
+      "порцеляновий посуд",
+      "вази",
+      "ялинкові іграшки з порцеляни",
+      "брошки"
+    ],
+    "salesChannels": [
+      "Instagram"
+    ],
+    "sources": [
+      "https://www.instagram.com/zguro.ceramics/",
+      "https://www.instagram.com/p/DShR5R-jV8X/"
+    ],
+    "instagramPosts": [
+      "https://www.instagram.com/p/DShR5R-jV8X/",
+      "https://www.instagram.com/p/DS7FUVxjcBk/",
+      "https://www.instagram.com/p/DTLBgc2jT8J/"
+    ],
     "prices": [
       "Порцелянова ялинкова іграшка «Сова», 4,5 см — 750 грн (Instagram, 12.2025)",
-      "Порцелянова ялинкова іграшка «Ведмедик» — 650 грн (Instagram, 12.2025)",
-      "Порцелянова підвіска «Баранчик» — 650 грн (Instagram, 09.2026)",
-      "Порцеляновий свічник «Баранчик» — 950 грн (Instagram, 09.2026)"
+      "Порцелянова ялинкова іграшка «Ведмедик» — 650 грн (Instagram, 01.2026; ціну підтвердили 09.2026)",
+      "Підвіска «Ягнятко» (разом з @tysha.ua.store) — 650 грн (Instagram, 09.2026)"
     ],
     "followers": 8443,
     "lastPost": "2026-07-14",
@@ -28,10 +43,23 @@
     "type": "maker",
     "summary": "SoulFul Ceramics: авторський керамічний посуд, прикраси й сезонні колекції; на Різдво розписні ялинкові іграшки й подарункові набори в коробках.",
     "instagram": "https://www.instagram.com/soulfulceramics/",
-    "formats": ["new-year"],
-    "products": ["керамічний посуд", "чашки", "блюда", "ялинкові іграшки", "підвіски", "брошки"],
-    "salesChannels": ["Instagram"],
-    "sources": ["https://www.instagram.com/soulfulceramics/"],
+    "formats": [
+      "new-year"
+    ],
+    "products": [
+      "керамічний посуд",
+      "чашки",
+      "блюда",
+      "ялинкові іграшки",
+      "підвіски",
+      "брошки"
+    ],
+    "salesChannels": [
+      "Instagram"
+    ],
+    "sources": [
+      "https://www.instagram.com/soulfulceramics/"
+    ],
     "prices": [
       "Ялинкова іграшка «Ведмедик у светрі», 12,5×9 см — 650 грн (Instagram, 12.2025)",
       "Набір ялинкових іграшок з розписом — 970 грн (Instagram, 12.2025)",
@@ -52,21 +80,35 @@
     "summary": "Spadok: кераміка з українським декором — намиста й підвіски-дукачі, свічники-курочки, ялинкові прикраси з кобальтовим розписом і сграфіто.",
     "recentNote": "У листопаді 2025 року випустили лімітовану колекцію ажурних керамічних зірок «Різдвяна зірка» на стрічці.",
     "instagram": "https://www.instagram.com/spadok.ceramics/",
-    "formats": ["new-year"],
-    "products": ["ялинкові прикраси", "намиста", "підвіски-дукачі", "свічники", "керамічний декор"],
-    "salesChannels": ["Instagram", "Щось цікаве (Львів)"],
-    "sources": ["https://www.instagram.com/spadok.ceramics/", "https://kamomagazine.com/hochu-shhob-czi-rechi-ne-krychaly-a-stvoryuvaly-stan-zasnovnyczya-spadok-ceramics/"],
+    "formats": [
+      "new-year"
+    ],
+    "products": [
+      "ялинкові прикраси",
+      "намиста",
+      "підвіски-дукачі",
+      "свічники",
+      "керамічний декор"
+    ],
+    "salesChannels": [
+      "Instagram",
+      "Щось цікаве (Львів)"
+    ],
+    "sources": [
+      "https://www.instagram.com/spadok.ceramics/",
+      "https://kamomagazine.com/hochu-shhob-czi-rechi-ne-krychaly-a-stvoryuvaly-stan-zasnovnyczya-spadok-ceramics/"
+    ],
     "prices": [
-      "Ялинкова прикраса на оксамитовій стрічці — 300 грн, від 4 шт. по 250 грн (Instagram, 11.2025)",
+      "Ялинкова прикраса на стрічці — 300 грн, від 4 шт. по 250 грн (Instagram, 11.2025)",
       "Ажурна зірка «Різдвяна зірка» — 350 грн, від 4 шт. по 300 грн (Instagram, 11.2025)",
-      "Свічник «Курочка» — 3 000 грн (Instagram, 2025)",
-      "Свічник «Баранець» — 3 500 грн (Instagram, 2025)",
+      "Свічник «Курочка» — 2 500–3 000 грн (Instagram, 2025)",
+      "Керамічна фігура, 18×15×9 см — 3 500 грн (Instagram, 02.2026)",
       "Намисто «Празникове» — 3 000 грн (Instagram, 2024)"
     ],
     "followers": 13500,
     "lastPost": "2026-10-08",
     "checked": "2026-10-15",
-    "note": "Додано з Instagram-скану 14–15.10.2026. У грудні 2024 мали стенд на різдвяному маркеті в Garage Kyiv. Місто не вказане."
+    "note": "Додано з Instagram-скану 14–15.10.2026. 14.12.2024 стояли на маркеті Kurazh у Garage Kyiv. Місто не вказане."
   },
   {
     "slug": "hanna-holomei",
@@ -74,12 +116,22 @@
     "shortName": "Ганна Голомей",
     "type": "maker",
     "city": "Київ",
-    "summary": "Ганна Голомей: авторські вироби з глини та гіпсу, хвилясті миски й фігурки коней; у Львові їх продає галерея ҐАVA.",
+    "summary": "Ганна Голомей: авторські вироби з глини та гіпсу, хвилясті миски й керамічні підвіски-коники; у Львові їх продає галерея ҐАVA.",
     "instagram": "https://www.instagram.com/holomeiclayandplaster/",
-    "products": ["миски", "фігурки коней", "підвіски"],
-    "salesChannels": ["Instagram", "ҐАVA (Львів)"],
-    "sources": ["https://www.instagram.com/holomeiclayandplaster/"],
-    "prices": ["Підвіска-коник на шнурку, 95×85 мм — 1 800 грн (Instagram, 07.2026)"],
+    "products": [
+      "хвилясті миски",
+      "керамічні підвіски-коники"
+    ],
+    "salesChannels": [
+      "Instagram",
+      "ҐАVA (Львів)"
+    ],
+    "sources": [
+      "https://www.instagram.com/holomeiclayandplaster/"
+    ],
+    "prices": [
+      "Керамічна підвіска-коник на бавовняній стрічці 125 см, 95×85 мм — 1 800 грн (Instagram, 07.2026)"
+    ],
     "followers": 858,
     "lastPost": "2026-07-21",
     "checked": "2026-10-15",
@@ -91,13 +143,31 @@
     "type": "studio",
     "city": "Київ",
     "summary": "Bilo Ceramic: керамічна майстерня в центрі Києва біля Золотих воріт; МК з ручного ліплення й розпису, тімбілдинги, коворкінг і випал ваших виробів.",
-    "recentNote": "У вересні 2026 року додали МК з ліплення кулончиків і брелоків.",
+    "recentNote": "З вересня 2026 року в майстерні є МК з ліплення кулончиків і брелоків (1,5 год, 800 грн).",
     "instagram": "https://www.instagram.com/bilo.ceramic/",
-    "formats": ["handbuilding", "painting", "corporate-workshop"],
-    "products": ["кулони", "підсвічники", "горнята"],
-    "services": ["МК з ручного ліплення", "розпис тарілок", "тімбілдинги", "керамічний коворкінг", "випал виробів"],
-    "salesChannels": ["Instagram"],
-    "sources": ["https://www.instagram.com/bilo.ceramic/"],
+    "formats": [
+      "handbuilding",
+      "painting",
+      "corporate-workshop"
+    ],
+    "products": [
+      "кулони",
+      "підсвічники",
+      "горнята"
+    ],
+    "services": [
+      "МК з ручного ліплення",
+      "розпис тарілок",
+      "тімбілдинги",
+      "керамічний коворкінг",
+      "випал виробів"
+    ],
+    "salesChannels": [
+      "Instagram"
+    ],
+    "sources": [
+      "https://www.instagram.com/bilo.ceramic/"
+    ],
     "prices": [
       "МК з ручного ліплення в групі, 2,5 год, випал і полива включені — 1 250 грн (Instagram, 09.2026)",
       "Розпис тарілочки, 1,5 год — 950 грн (Instagram, 09.2026)",
