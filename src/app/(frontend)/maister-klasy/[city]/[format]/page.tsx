@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import React from 'react'
 
 import { Block } from '@/components/site/Inner'
@@ -11,7 +11,7 @@ import { QuoteBlock } from '@/components/ui/QuoteBlock'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
 import { MK_CHIPS } from '@/lib/mkChips'
-import { getAllWithShops, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/lib/catalog'
+import { getAllStudios, getAllWithShops, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL } from '@/lib/catalog'
 import { fmt } from '@/lib/money'
 import { displayName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
@@ -62,6 +62,12 @@ export default async function Page({ params }: Args) {
   const p = await load(city, format)
   if (!p) {
     await redirectOldCitySlug(city, (c) => `/maister-klasy/${c}/${format}`)
+    // A written format page whose city dropped below three places for this format: the city's own page still
+    // answers the same search (same city, every format), so send people there; a city that lost its page is a 404.
+    if (isFormatSlug(format) && waveCopy(formatCityId(city, format))) {
+      const g = groupByCity((await getAllStudios()).filter(offersMasterClasses)).find((x) => x.city.slug === city)
+      if (g && g.studios.length >= MIN_LIST) permanentRedirect(`/maister-klasy/${city}`)
+    }
     notFound()
   }
   const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
