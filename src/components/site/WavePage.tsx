@@ -161,7 +161,7 @@ export function WavePage({
         )}
 
         <Related items={related} />
-        <CtaBand tone="ink" className="max-lg:hidden" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="ink" className="max-lg:hidden" title="Опишіть, що потрібно, — передамо студіям, які роблять подібне" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
 
         {copy.sources.length > 0 && (
           <details className="font-mono text-xs text-ink-2">

@@ -22,14 +22,14 @@ import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/lib/ogImage'
 import { pickVerse } from '@/content/verses'
-import { centreOf, cityPages, getAllStudios, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
+import { centreOf, cityPages, getAllStudios, giftCertificate, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
 import { displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { MK_CHIPS as CHIPS } from '@/lib/mkChips'
 import { cityContent } from '@/editorial/places'
 import { certificateCities } from '@/editorial/topics'
 import { FORMAT_PAGES as WAVE_FORMATS, formatCityData, formatCityId, hasCopy, type FormatSlug } from '@/editorial/wave-a'
-import { fmt, roundNice, type Span } from '@/lib/money'
+import { fmt, type Span } from '@/lib/money'
 import { fitTitle } from '@/lib/title'
 import { redirectOldCitySlug } from '@/lib/redirects'
 
@@ -115,6 +115,15 @@ export default async function CityMasterClassesPage({ params }: Args) {
     .filter(([f]) => count(f))
     .map(([f, label]) => `${label} — ${count(f)}`)
 
+  // Who on this page sells gift certificates, from the studios' own texts (never a claim about «most studios»).
+  const certs = [...sorted, ...sortedRest].flatMap((st) => {
+    const c = giftCertificate(st)
+    return c ? [`${displayName(st)}${c.valid ? ` (дійсний ${c.valid})` : ''}`] : []
+  })
+  const CERT_NAMES = 6
+  const certAnswer = certs.length
+    ? `Так. Подарункові сертифікати згадано в профілях ${certs.length} з ${studios.length} ${pluralUk(studios.length, ['місця', 'місць', 'місць'])} на цій сторінці: ${certs.slice(0, CERT_NAMES).join(', ')}${certs.length > CERT_NAMES ? ` і ще ${certs.length - CERT_NAMES}` : ''}. Суми й умови — у профілях.${hasCertPage ? ` Усі сертифікати ${inCity(city.name)} — на сторінці «Сертифікати: ${city.name}».` : ''}`
+    : `У профілях студій ${where} сертифікати не згадано — запитайте студію напряму. Сертифікати на гончарство по всій Україні — на сторінці «Сертифікати».`
   const f = await facts()
   const faq = [
     {
@@ -124,7 +133,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
         : `Студії ${where} здебільшого не публікують ціни. По Україні разовий майстер-клас коштує ${f.range('group')}, індивідуальний — ${f.range('private')}.`,
     },
     { q: 'Коли можна забрати свій виріб?', a: `Зазвичай через ${site.lead.pickup}: виріб має висохнути і пройти два випали (до і після поливи). Деякі студії надсилають готові вироби Новою поштою.` },
-    { q: 'Чи можна подарувати майстер-клас?', a: 'Так, більшість студій продають подарункові сертифікати; термін дії найчастіше 3–6 місяців. Умови — у профілі студії.' },
+    { q: 'Чи можна подарувати майстер-клас?', a: certAnswer },
     { q: 'А для команди?', a: `Корпоратив з ліплення з глини проводять у студії або у вашому офісі; по Україні — ${f.range('corporate')}. Надішліть запит — ми передамо його кільком студіям.` },
   ]
 
@@ -211,7 +220,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           <MakerRows>
             {sorted.map((st) => {
               const from = minClass(st)
-              return <MakerRow key={st.id} s={st} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(roundNice(from))} грн`, unit: 'з особи' } : undefined} />
+              return <MakerRow key={st.id} s={st} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(from)} грн`, unit: 'з особи' } : undefined} />
             })}
           </MakerRows>
         </Block>
@@ -237,7 +246,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
             <MakerRows>
               {sortedRest.map((st) => {
                 const from = minClass(st)
-                return <MakerRow key={st.id} s={st} place={st.cityDoc?.name ?? undefined} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(roundNice(from))} грн`, unit: 'з особи' } : undefined} />
+                return <MakerRow key={st.id} s={st} place={st.cityDoc?.name ?? undefined} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(from)} грн`, unit: 'з особи' } : undefined} />
               })}
             </MakerRows>
           </Block>
@@ -255,7 +264,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
         )}
 
         <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst jsonLd={false} />
-        <CtaBand tone="ink" className="max-lg:hidden" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="ink" className="max-lg:hidden" title="Опишіть, що потрібно, — передамо студіям, які роблять подібне" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
       </InnerCols>
       <MobileRequestBar />
     </InnerMain>

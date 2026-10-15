@@ -216,7 +216,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
                 columns={[{ key: 'studio', label: 'Студія' }, { key: 'city', label: 'Місто' }, { key: 'price', label: 'З прайсу' }, { key: 'src', label: 'Джерело', mono: true }]}
                 rows={examples.map((e) => ({ studio: <Link href={`/vyrobnyky/${e.studio.slug}`}>{displayName(e.studio)}</Link>, city: e.studio.cityDoc?.name ?? '', price: nobreak(e.text), src: e.source ?? '' }))}
               />
-              <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: request }} />
+              <CtaBand tone="cobalt" title="Один запит — кільком студіям одразу" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: request }} />
             </>
           ) : (
             <p className="m-0">У каталозі цін на цей формат поки немає — уточнюйте в самих студіях{topic.form ? ' або надішліть запит' : ''}.</p>
@@ -236,7 +236,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
 
         <Faq id="faq" kicker="Питання і відповіді" title="Часті питання" items={faq} openFirst />
         <Related items={topic.related} />
-        <CtaBand tone="ink" {...(topic.form ? { className: 'max-lg:hidden' } : {})} title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: request }} />
+        <CtaBand tone="ink" {...(topic.form ? { className: 'max-lg:hidden' } : {})} title="Опишіть, що потрібно, — передамо студіям, які роблять подібне" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: request }} />
         {place && <PlaceSources c={place} />}
       </InnerCols>
       {topic.form && <MobileRequestBar />}

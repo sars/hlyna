@@ -1,4 +1,4 @@
-import { cityPages, getAllStudios, getAllWithShops, isStudio, offersMasterClasses, worksWithVenues, type StudioCard } from './catalog'
+import { cityPages, getAllStudios, getAllWithShops, isStudio, confirmedForVenues, offersMasterClasses, type StudioCard } from './catalog'
 
 // Everyone in the studio lists except suppliers (hidden for now): studios, brands, makers, schools. Shops and galleries are not
 // studios: they have their own block on a city page (getShops).
@@ -38,5 +38,5 @@ export const TYPE_GROUPS: { title: string; types: string[] }[] = [
 
 export const cityStats = (studios: StudioCard[]) => ({
   classes: studios.filter(offersMasterClasses).length,
-  venues: studios.filter(worksWithVenues).length,
+  venues: studios.filter(confirmedForVenues).length,
 })

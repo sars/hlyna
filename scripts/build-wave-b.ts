@@ -9,7 +9,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 
-import { getAllStudios, groupByCity, hasFormat, worksWithVenues, type StudioCard } from '../src/lib/catalog'
+import { confirmedForVenues, getAllStudios, groupByCity, hasFormat, type StudioCard } from '../src/lib/catalog'
 import { facts } from '../src/lib/facts'
 import { cleanName, firstAddress, publicPrices } from '../src/lib/present'
 import { productText } from '../src/lib/products'
@@ -305,7 +305,7 @@ const wiki = { clays: read(path.join(ROOT, '04_suppliers/wiki_clays.md')), glaze
 
 // Sanity: every page id has a pack.
 for (const id of Object.keys(WAVE_B) as WaveBId[]) if (!index.some((x) => x.id === id)) console.warn('no pack for', id)
-const extra = { horecaTotal: all.filter(worksWithVenues).length, newYearTagged: all.filter((s) => hasFormat(s, 'new-year')).length, tablewareText: all.filter((s) => /чашк|тарілк/iu.test(productText(s))).length }
+const extra = { horecaTotal: all.filter(confirmedForVenues).length, newYearTagged: all.filter((s) => hasFormat(s, 'new-year')).length, tablewareText: all.filter((s) => /чашк|тарілк/iu.test(productText(s))).length }
 fs.writeFileSync(path.join(OUT, 'INDEX.json'), JSON.stringify({ generated: new Date().toISOString(), pages: index, catalogue: extra }, null, 1) + '\n')
 console.log(index.map((x) => `${x.id}:${x.count}`).join(' '), 'events', events.length, 'museums', museums.length)
 console.log('materials', MATERIALS.length)

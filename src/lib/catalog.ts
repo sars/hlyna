@@ -120,6 +120,23 @@ export const texts = (s: Studio) =>
     .join(' ')
     .toLowerCase()
 
+// Gift certificates as the studio's own texts state them (offers, prices, description), not the format tag: the FAQ of a
+// city page names who sells them and, where a text says so, for how long one is valid.
+const CERT = /сертифікат/iu
+const NOT_GIFT_CERT = /сертифікат\p{L}* (?:якості|відповідності)|сертифікован/iu
+const CERT_VALID = /(?:дійсн\p{L}*|термін\p{L}*(?: дії)?)\D{0,20}?(\d{1,2})\s*(міс|рок|рік)/iu
+export function giftCertificate(s: Studio): { valid: string | null } | null {
+  const sentences = [s.publicDescription, s.description, ...(s.services ?? []).map((x) => x.text), ...(s.prices ?? []).map((x) => x.text)]
+    .filter(Boolean)
+    .flatMap((t) => t!.split(/(?<=[.!?;])\s+/))
+    .filter((t) => CERT.test(t) && !NOT_GIFT_CERT.test(t))
+  if (!sentences.length) return null
+  const m = sentences.map((t) => t.match(CERT_VALID)).find(Boolean)
+  if (!m) return { valid: null }
+  const n = Number(m[1])
+  return { valid: `${n} ${m[2].toLowerCase() === 'міс' ? pluralUk(n, ['місяць', 'місяці', 'місяців']) : pluralUk(n, ['рік', 'роки', 'років'])}` }
+}
+
 export type Format = NonNullable<Studio['formats']>[number]
 
 // Format tags come from scripts/tag-studios.ts (and admin edits); the regexes below are a fallback for untagged studios.
@@ -144,16 +161,18 @@ export const offersMasterClasses = (s: Studio) => {
 
 const MAKER_TYPES = new Set(['studio', 'brand', 'maker', 'school'])
 
-// Business tags come from scripts/tag-studios.ts (same phrases the old regexes used) or admin checkboxes.
-export const worksWithVenues = (s: Studio) => MAKER_TYPES.has(s.type ?? '') && (hasFormat(s, 'horeca') || Boolean(s.b2b?.worksWithHoreca))
-
-export const worksWithCompanies = (s: Studio) =>
-  hasFormat(s, 'corporate-gifts') || hasFormat(s, 'corporate-workshop') || hasFormat(s, 'logo') || Boolean(s.b2b?.worksWithCorporate)
-
-// Badges («працює із закладами», «корпоративні замовлення») claim more than a format tag: they show only when the studio's
-// business terms say so (b2b fields, filled from sourced facts — scripts/app/edits/2026-10-15-b2b.json). Lists keep the tags.
+// Business claims («працює із закладами», «з логотипом», «корпоративні замовлення», «проводить корпоративи») come from
+// sourced facts only: the b2b fields (filled from sources, scripts/app/edits/2026-10-15-b2b.json) or the studio's own
+// offer, product and price lines. Format tags only pick who may sit lower on a business page, under «уточнимо в запиті».
+// Every list, count, badge and map filter that makes the claim uses these (audit 15.10.2026, cause 3).
+const ownLines = (s: Studio) => [...(s.services ?? []), ...(s.products ?? []), ...(s.prices ?? [])].map((x) => x.text).join('\n')
+const LOGO_LINE = /логотип|персоналізован/iu
+const COMPANY_LINE = /корпоративн\p{L}* (?:подарун|замовлен)|подарунк\p{L}* (?:для )?(?:співробітник|партнер|клієнт|компан)|брендован/iu
+const WORKSHOP_LINE = /корпоратив|тімбілд|тимбілд|для (?:команд|компан|колектив)/iu
 export const confirmedForVenues = (s: Studio) => MAKER_TYPES.has(s.type ?? '') && Boolean(s.b2b?.worksWithHoreca)
-export const confirmedForCompanies = (s: Studio) => Boolean(s.b2b?.worksWithCorporate)
+export const confirmedForLogo = (s: Studio) => MAKER_TYPES.has(s.type ?? '') && (Boolean(s.b2b?.logoMethods?.length) || LOGO_LINE.test(ownLines(s)))
+export const confirmedForCompanies = (s: Studio) => Boolean(s.b2b?.worksWithCorporate) || confirmedForLogo(s) || COMPANY_LINE.test(ownLines(s))
+export const runsCorporateWorkshops = (s: Studio) => WORKSHOP_LINE.test(ownLines(s))
 
 // Hryvnia amounts mentioned in a studio's price lines (used for honest "from–to" ranges).
 export const hryvniaAmounts = (s: Studio): number[] => (s.prices ?? []).flatMap((p) => wholeAmountsIn(p.text))

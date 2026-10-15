@@ -3,7 +3,7 @@ import etsyShops from '@/content/waveA/etsy-shops.json'
 import type { WaveVars } from '@/editorial/copy'
 import { evidenceLine } from '@/editorial/topics'
 import type { EtsyShop } from '@/editorial/wave-a'
-import { groupByCity, hasFormat, worksWithVenues } from '@/lib/catalog'
+import { confirmedForVenues, groupByCity, hasFormat } from '@/lib/catalog'
 import { productText, PRODUCT_RE } from '@/lib/products'
 import { makers } from './makers'
 
@@ -13,7 +13,7 @@ export async function tablewareBrandsData() {
   const brands = studios.filter((s) => s.type === 'brand')
   const others = studios.filter((s) => s.type !== 'brand')
   const groups = groupByCity(studios)
-  const vars: WaveVars = { count: studios.length, brands: brands.length, cities: groups.length, horeca: studios.filter(worksWithVenues).length }
+  const vars: WaveVars = { count: studios.length, brands: brands.length, cities: groups.length, horeca: studios.filter(confirmedForVenues).length }
   return { studios: [...brands, ...others], brands, others, groups, vars }
 }
 
@@ -28,7 +28,7 @@ export async function newYearData() {
 
 export async function businessData() {
   const all = (await makers()).filter((s) => ['brand', 'studio', 'maker'].includes(s.type ?? ''))
-  const horeca = all.filter(worksWithVenues)
+  const horeca = all.filter(confirmedForVenues)
   const logo = all.filter((s) => hasFormat(s, 'logo'))
   const gifts = all.filter((s) => hasFormat(s, 'corporate-gifts'))
   const studios = [...new Map([...horeca, ...logo, ...gifts].map((s) => [s.id, s])).values()]

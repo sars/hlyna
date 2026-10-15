@@ -128,7 +128,7 @@ export default async function CasePage({ params }: { params: Params }) {
             ]}
           />
         </Block>
-        <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="cobalt" title="Один запит — кільком студіям одразу" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
 
         {c.sections.map((sec, i) => (
           <Block key={sec.heading} id={`s${i}`} title={sec.heading}>
@@ -171,7 +171,7 @@ export default async function CasePage({ params }: { params: Params }) {
         </Block>
 
         <Related items={[...(studio ? [{ label: `Профіль: ${studioName}`, href: `/vyrobnyky/${studio.slug}` }] : []), ...related.map((t) => ({ label: RELATED_LABEL[t], href: t }))]} />
-        <CtaBand tone="ink" className="max-lg:hidden" title="Опишіть, що потрібно, — студії відповідуть напряму" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
+        <CtaBand tone="ink" className="max-lg:hidden" title="Опишіть, що потрібно, — передамо студіям, які роблять подібне" text="Безкоштовно для замовника: ціни встановлюють студії." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />
       </InnerCols>
       <MobileRequestBar />
     </InnerMain>

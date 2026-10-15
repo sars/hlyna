@@ -311,7 +311,7 @@ export default async function StudioPage({ params }: Args) {
             ) : (
               <SideBox title={box.title}>
                 <p className="m-0">
-                  {box.text} Один запит отримають 3–5 студій{city ? ` ${inCity(city.name)} чи поруч` : ''}, які роблять подібне й працюють зараз.
+                  {box.text} Один запит отримають до 5 студій{city ? ` ${inCity(city.name)} чи поруч` : ''}, які роблять подібне й працюють зараз.
                 </p>
                 <MoreLink href={otherStudios} pad={false} className="py-1.5">
                   Запит іншим студіям

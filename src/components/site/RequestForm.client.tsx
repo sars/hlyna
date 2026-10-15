@@ -245,7 +245,7 @@ export function RequestForm({
       <form id="zapyt-forma" data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={`${panel} p-[clamp(16px,2vw,24px)]`} noValidate>
         <Kicker>Запит · безкоштовно</Kicker>
         <h2 id={`${uid}-h`} className="m-0 mt-1 mb-1.5 font-display text-[18px] leading-[1.15] font-semibold sm:text-[19px]">
-          Опишіть, що потрібно — відповідять 3–5 студій
+          Опишіть, що потрібно — передамо студіям, які роблять подібне
         </h2>
         <div className={pair}>
           <Field label="Що потрібно" htmlFor={`${uid}-what`}>
@@ -292,7 +292,7 @@ export function RequestForm({
     <form id="zapyt-forma" data-tone="cobalt" onSubmit={onSubmit} aria-labelledby={`${uid}-h`} className={panel} noValidate>
       <Kicker>{studioName ? 'Швидкий запит · безкоштовно' : 'Запит · безкоштовно'}</Kicker>
       <h2 id={`${uid}-h`} className="m-0 mt-1.5 mb-2 font-display text-[19px] leading-[1.15] font-semibold [overflow-wrap:anywhere] sm:text-xl">
-        {studioName ? (studioName.length > 30 ? 'Запит цій студії і ще 2–4 схожим' : `Запит: ${studioName} і ще 2–4 студії`) : 'Опишіть, що потрібно — відповідять 3–5 студій'}
+        {studioName ? (studioName.length > 30 ? 'Запит цій студії і ще 2–4 схожим' : `Запит: ${studioName} і ще 2–4 студії`) : 'Опишіть, що потрібно — передамо студіям, які роблять подібне'}
       </h2>
       <Field label="Що потрібно" htmlFor={`${uid}-what`}>
         <Select id={`${uid}-what`} name="what" value={what} onChange={(e) => setWhat(e.target.value)}>
@@ -340,7 +340,7 @@ export function RequestForm({
         <small className="font-mono text-[11px] tracking-[.03em] text-on-cobalt-2">Відповідь напряму від студій</small>
       </div>
       {errorLine}
-      <p className={`${small} mt-2.5`}>Безкоштовно для замовника. Запит отримають 3–5 студій, які роблять такі вироби. Студії платять нам 10% лише з укладених замовлень.</p>
+      <p className={`${small} mt-2.5`}>Безкоштовно для замовника. Запит отримають до 5 студій, які роблять подібне; відповідають напряму вам. Студії платять нам 10% лише з укладених замовлень.</p>
     </form>
   )
 }

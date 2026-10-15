@@ -11,7 +11,8 @@ import type { HeroPhoto } from '../photos'
 // index's range (same numbers as /tsiny-2026); otherwise the range of this page's own price lines.
 // price(key): the price index range for any category, e.g. c.price('corporate').
 // priceStudios: set when priceText comes from this page's own studios (not the price index) — the caption then says so.
-export type TopicCtx = { n: number; cities: number; min?: number; max?: number; median?: number; priceText?: string; priceStudios?: number; place?: string; price: (key: string) => string }
+// n: entries the page's claim holds for (on a business page only the confirmed ones); more: the rest of its list.
+export type TopicCtx = { n: number; more?: number; cities: number; min?: number; max?: number; median?: number; priceText?: string; priceStudios?: number; place?: string; price: (key: string) => string }
 
 export type TopicList = {
   title: string
@@ -41,6 +42,10 @@ export type Topic = {
   ogSub: string // stable one-line description for the share card (no counts, prices or years)
   lists: TopicList[]
   evidence: RegExp
+  // Business pages: who the page's claim is confirmed for (sourced fact, catalog.ts confirmedFor*). They come first under
+  // `title`, and only they are counted in the title and lead; everyone else the lists pick goes below under `rest`, without
+  // the claim («уточнимо у вашому запиті»). Owner, 15.10.2026.
+  confirmed?: { test: (s: StudioCard) => boolean; title: string; note: string; rest: { title: string; note: string } }
   // unit: only lines matching it count toward the «from–to» range (e.g. per person); unitLabel follows the range.
   price: { re: RegExp; exclude?: RegExp; unit?: RegExp; unitNot?: RegExp; unitLabel?: string; index?: string; title: string; note: string }
   sections: { kicker?: string; title: string; items: [string, string][] }[]

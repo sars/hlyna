@@ -1,4 +1,4 @@
-import { getAllStudios, getAllWithShops, hasFormat, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from './catalog'
+import { getAllStudios, getAllWithShops, hasFormat, offersMasterClasses, TYPE_LABEL, confirmedForLogo, confirmedForVenues, type StudioCard } from './catalog'
 import { displayName, firstAddress } from './present'
 
 // Studios for /mapa: one GeoJSON point per geocoded studio. Filter flags are precomputed here so the
@@ -40,8 +40,8 @@ export function flags(s: StudioCard): MapFilter[] {
   if (hasFormat(s, 'couples')) out.push('couples')
   if (hasFormat(s, 'certificates')) out.push('certificates')
   if (hasFormat(s, 'corporate-workshop')) out.push('corporate')
-  if (worksWithVenues(s)) out.push('horeca')
-  if (hasFormat(s, 'logo') || (worksWithCompanies(s) && hasFormat(s, 'corporate-gifts'))) out.push('logo')
+  if (confirmedForVenues(s)) out.push('horeca')
+  if (confirmedForLogo(s)) out.push('logo')
   return out
 }
 

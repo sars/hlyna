@@ -11,7 +11,7 @@ import { RequestForm } from '@/components/site/RequestForm.client'
 import { mainNav } from '@/content/navigation'
 import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
-import { getAllStudios, groupByCity, hasFormat, pluralUk, TYPE_LABEL, worksWithCompanies, worksWithVenues, type StudioCard } from '@/lib/catalog'
+import { getAllStudios, groupByCity, pluralUk, TYPE_LABEL, confirmedForCompanies, confirmedForLogo, confirmedForVenues, runsCorporateWorkshops, type StudioCard } from '@/lib/catalog'
 import { displayName, stripPersonal } from '@/lib/present'
 import { ogImage, ogPhoto } from '@/lib/ogImage'
 import { sitePhotos } from '@/content/photos'
@@ -36,17 +36,17 @@ const faqFor = (corporate: string) => [
 
 // Studios with the most to show a business buyer: business tags, then prices, then Instagram.
 const bizScore = (s: StudioCard) =>
-  (hasFormat(s, 'horeca') ? 2 : 0) + (hasFormat(s, 'logo') ? 2 : 0) + (hasFormat(s, 'corporate-gifts') ? 1 : 0) + (s.prices?.length ? 1 : 0) + (s.instagram ? 1 : 0)
+  (confirmedForVenues(s) ? 2 : 0) + (confirmedForLogo(s) ? 2 : 0) + (confirmedForCompanies(s) ? 1 : 0) + (s.prices?.length ? 1 : 0) + (s.instagram ? 1 : 0)
 
 const what = (s: StudioCard) =>
-  [hasFormat(s, 'horeca') && 'посуд для закладів', hasFormat(s, 'logo') && 'логотип і персоналізація', hasFormat(s, 'corporate-gifts') && 'корпоративні подарунки', hasFormat(s, 'corporate-workshop') && 'корпоративи']
+  [confirmedForVenues(s) && 'посуд для закладів', confirmedForLogo(s) && 'логотип і персоналізація', confirmedForCompanies(s) && !confirmedForLogo(s) && 'корпоративні подарунки', runsCorporateWorkshops(s) && 'корпоративи']
     .filter(Boolean)
     .join(' · ')
 
 export default async function BusinessIndex() {
   const faq = faqFor((await facts()).range('corporate'))
   const biz = mainNav.find((s) => s.id === 'biz')!
-  const all = (await getAllStudios()).filter((s) => worksWithVenues(s) || worksWithCompanies(s))
+  const all = (await getAllStudios()).filter((s) => confirmedForVenues(s) || confirmedForCompanies(s) || runsCorporateWorkshops(s))
   const top = [...all].filter((s) => s.type !== 'school').sort((a, b) => bizScore(b) - bizScore(a) || a.name.localeCompare(b.name, 'uk')).slice(0, 8)
   const cities = groupByCity(all).length
 

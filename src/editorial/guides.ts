@@ -1,6 +1,6 @@
 // Live numbers for guide pages (/hayidy/*, /dlya-studiy): counts from the catalogue and price ranges from the
 // price index, so guide text never drifts from the data it quotes.
-import { getAllStudios, groupByCity, offersMasterClasses, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
+import { getAllStudios, groupByCity, confirmedForCompanies, confirmedForVenues, offersMasterClasses } from '@/lib/catalog'
 import { priceIndex } from '@/lib/priceIndex'
 import type { Metadata } from 'next'
 
@@ -31,8 +31,8 @@ export async function guideCtx(): Promise<GuideCtx> {
   return {
     makers: all.length,
     cities: groupByCity(all).length,
-    venues: all.filter(worksWithVenues).length,
-    companies: all.filter(worksWithCompanies).length,
+    venues: all.filter(confirmedForVenues).length,
+    companies: all.filter(confirmedForCompanies).length,
     mk: mk.length,
     mkCities: groupByCity(mk).length,
     price,

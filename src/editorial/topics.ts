@@ -46,6 +46,14 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     picked.forEach((s) => seen.add(s.id))
     return { title: l.title, note: l.note, byCity: l.byCity && !citySlug, studios: picked }
   })
+  // A business page splits into the confirmed (counted) and the rest (listed without the claim).
+  const c = topic.confirmed
+  const picked = lists.flatMap((l) => l.studios)
+  const sure = c ? picked.filter(c.test) : picked
+  if (c) {
+    const rest = picked.filter((s) => !c.test(s))
+    lists.splice(0, lists.length, { title: c.title, note: c.note, byCity: false, studios: sure }, { title: c.rest.title, note: c.rest.note, byCity: Boolean(topic.lists[0]?.byCity) && !citySlug, studios: rest })
+  }
   const all = lists.flatMap((l) => l.studios)
   const examples: PriceExample[] = []
   const couplePage = /двох/.test(topic.price.re.source)
@@ -95,7 +103,7 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     examples: examples.slice(0, 8),
     amounts,
     priceOf,
-    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, priceStudios: idx ? undefined : span?.n, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
+    ctx: { n: sure.length, more: c ? all.length - sure.length : undefined, cities: groupByCity(sure).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, priceStudios: idx ? undefined : span?.n, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
   }
 }
 
