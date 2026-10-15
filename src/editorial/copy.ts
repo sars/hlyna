@@ -1,5 +1,6 @@
 // Editorial copy shared by every written page (waves A, B, C): the copy shape and {placeholder} filling.
 // Copy lives in src/content/wave*/<id>.json; live numbers are filled in at render time.
+import { dropStale, isStale, kyivToday } from '@/lib/dates'
 import { fmt, fromTo } from '@/lib/money'
 
 export type WaveCopy = {
@@ -52,16 +53,24 @@ export const fill = (text: string, vars: WaveVars) =>
     // A text that opens with a placeholder («{inCity} кераміку…» → «у Києві…») starts with a capital.
     .replace(/^(\s*)(\p{Ll})/u, (_m, a: string, b: string) => a + b.toUpperCase())
 
-export function fillCopy(c: WaveCopy, vars: WaveVars): WaveCopy {
-  const f = (t: string) => fill(t, vars)
+/** The copy as shown today: placeholders filled ({year} is the current year), and dated sentences that have passed taken
+ *  out (src/lib/dates.ts). A section or a question whose own heading names a past date goes whole. */
+export function fillCopy(c: WaveCopy, vars: WaveVars, today = kyivToday()): WaveCopy {
+  const all: WaveVars = { year: today.slice(0, 4), ...vars }
+  const f = (t: string) => dropStale(fill(t, all), today)
+  const live = (t: string) => !isStale(fill(t, all), today)
   return {
     ...c,
-    title: f(c.title),
+    title: fill(c.title, all),
     metaDescription: f(c.metaDescription),
     lead: f(c.lead),
-    sections: c.sections.map((s) => ({ heading: f(s.heading), paragraphs: s.paragraphs.map(f), bullets: s.bullets?.map(f) })),
+    sections: c.sections
+      .filter((s) => live(s.heading))
+      .map((s) => ({ heading: fill(s.heading, all), paragraphs: s.paragraphs.map(f).filter(Boolean), bullets: s.bullets?.map(f).filter(Boolean) }))
+      .filter((s) => s.paragraphs.length || s.bullets?.length),
     picks: c.picks?.map((p) => ({ ...p, need: f(p.need), why: f(p.why) })),
-    faq: c.faq.map((x) => ({ q: f(x.q), a: f(x.a) })),
+    tops: c.tops?.map((t) => ({ ...t, intro: t.intro && f(t.intro), items: t.items.map((x) => ({ ...x, details: f(x.details), terms: x.terms && f(x.terms) })) })),
+    faq: c.faq.filter((x) => live(x.q)).map((x) => ({ q: fill(x.q, all), a: f(x.a) })).filter((x) => x.a),
   }
 }
 

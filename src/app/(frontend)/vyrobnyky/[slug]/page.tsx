@@ -33,7 +33,8 @@ import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { centreOf, cityPages, getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, confirmedForCompanies, confirmedForVenues, igHandle, offersMasterClasses, TYPE_LABEL, type CityPage } from '@/lib/catalog'
-import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, pageName, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
+import { dropStale } from '@/lib/dates'
+import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, currentLine, currentNews, currentNote, isDomainLike, isExhibitingOnly, oldDataLabel, pageName, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { acceptsRequests, dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
@@ -131,7 +132,7 @@ export default async function StudioPage({ params }: Args) {
   const b2b = s.b2b ?? {}
   const hasB2bData = Boolean(b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length || b2b.dishwasherSafe || b2b.foodSafe)
   const channels = dedupeTexts((s.salesChannels ?? []).map((x) => x.text)).slice(0, 6)
-  const offer = (xs: { text: string }[] | null | undefined) => dedupeTexts((xs ?? []).map((x) => groupMoney(offerItem(cleanPublic(x.text)))).filter(Boolean))
+  const offer = (xs: { text: string }[] | null | undefined) => dedupeTexts((xs ?? []).map((x) => groupMoney(offerItem(cleanPublic(currentLine(x.text))))).filter(Boolean))
   const products = offer(s.products)
   const services = offer(s.services)
   const prices = dedupePrices(publicPrices(s))
@@ -141,11 +142,13 @@ export default async function StudioPage({ params }: Args) {
   const priceGroups = groupPrices(prices)
   // «Є прайс.» goes from the lead when the page shows no prices.
   const unpriced = (t: string) => (prices.length ? t : withoutPriceMention(t))
-  const description = unpriced(stripPersonal(s.publicDescription || s.description || ''))
+  const description = unpriced(stripPersonal(dropStale(s.publicDescription || s.description || '')))
   const monthYear = (d?: string | null) => (d ? new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(d)).filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ') : '')
   // The studio's own news (as written, signed and dated) wins over ours while it is fresh.
-  const studioNews = s.ownerNews && s.ownerNewsAt && newsIsFresh(s.ownerNewsAt) ? { text: s.ownerNews, when: monthYear(s.ownerNewsAt) } : null
-  const recentNote = !studioNews && noteIsFresh(s.recentNote || '', s.activity?.lastPostDate) ? stripPersonal(s.recentNote || '') : ''
+  // Both lose sentences whose date has passed («триває до 11.10») and go once stale (src/lib/dates.ts).
+  const newsText = s.ownerNews && s.ownerNewsAt ? currentNews(s.ownerNews, s.ownerNewsAt) : ''
+  const studioNews = newsText ? { text: newsText, when: monthYear(s.ownerNewsAt) } : null
+  const recentNote = studioNews ? '' : stripPersonal(currentNote(s.recentNote || '', s.activity?.lastPostDate))
   const lastPost = monthYear(s.activity?.lastPostDate)
   const igPosts = (s.activity?.instagramPosts ?? []).map((x) => x.url)
   // «Оновлено» is the catalogue's date while the profile's newest fact is under a year old; an older profile says

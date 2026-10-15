@@ -91,7 +91,7 @@ const mainNavPlan: NavSection[] = [
         links: [
           { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom', note: 'Штамп, деколь, полива у фірмових кольорах' },
           { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky', note: 'Для команди і клієнтів' },
-          { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026', note: 'Що встигнуть зробити до свят' },
+          { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026', note: 'Що встигнуть зробити до свят' },
           { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny', note: 'У студії або у вашому офісі' },
           { label: 'Як відсвяткувати річницю компанії', href: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi', note: '14 форматів поруч: ціни, групи, терміни' },
           { label: 'Подарунки співробітникам', href: '/dlya-biznesu/podarunky-spivrobitnykam', note: 'Кераміка, сертифікати, ліміт без податку' },
@@ -270,7 +270,7 @@ export const footerColumns: NavColumn[] = ([
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
       { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
-      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Річниця компанії: формати', href: '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi' },
       { label: 'Подарунки співробітникам', href: '/dlya-biznesu/podarunky-spivrobitnykam' },
       { label: 'Новий рік і Різдво з керамікою', href: '/novyi-rik-i-rizdvo' },

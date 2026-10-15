@@ -8,6 +8,7 @@ import { Makers } from '@/components/site/Makers'
 import { WavePage } from '@/components/site/WavePage'
 import { isBuilt } from '@/content/navigation'
 import { getAllWithShops, type StudioCard } from '@/lib/catalog'
+import { newYearSeason } from '@/lib/dates'
 import { displayName } from '@/lib/present'
 import { fillCopy } from '@/editorial/wave-a'
 import { WAVE_C, waveCCopy, waveCData, waveCFacts, waveCStudios, type FormatRow, type SourceRef, type WaveCData, type WaveCId } from '@/editorial/wave-c'
@@ -128,7 +129,7 @@ function LiveBlock({ d }: { d: WaveCData }) {
           <Block id="deadlines" title="Коли замовляти (наша оцінка)" note={d.ny.deadlinesNote}>
             <InfoList items={d.ny.deadlinesEstimate.map((x) => ({ title: x.what, lines: [x.by, x.why] }))} />
           </Block>
-          <Block id="offers" title="Що вже пропонують студії" note="Сезонні пропозиції з сайтів і постів студій, з датою джерела.">
+          <Block id="offers" title={newYearSeason().label === d.ny.season ? 'Що вже пропонують студії' : `Що пропонували студії в сезоні ${d.ny.season}`} note="Сезонні пропозиції з сайтів і постів студій, з датою джерела.">
             <InfoList
               columns={2}
               items={d.offers.map((o) => ({
@@ -168,8 +169,8 @@ function LiveBlock({ d }: { d: WaveCData }) {
 
 const RELATED: Record<WaveCId, { label: string; href: string }[]> = {
   'richnytsya-kompaniyi': [{ label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' }, { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Ціни 2026', href: '/tsiny-2026' }],
-  'podarunky-spivrobitnykam': [{ label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' }],
-  'novyi-rik-i-rizdvo': [{ label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Ярмарки й події', href: '/podiyi' }],
+  'podarunky-spivrobitnykam': [{ label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }],
+  'novyi-rik-i-rizdvo': [{ label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Ярмарки й події', href: '/podiyi' }],
 }
 
 export async function WaveCRoute({ id }: { id: WaveCId }) {

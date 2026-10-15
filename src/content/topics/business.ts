@@ -1,6 +1,7 @@
 // Business topic pages (/dlya-biznesu/…): logo mugs, corporate workshops, tableware for venues, gifts.
 // Pages where a business buys a batch carry no verse; only the corporate workshop keeps one (docs/voice/README.md).
 import { confirmedForCompanies, confirmedForLogo, confirmedForVenues, runsCorporateWorkshops } from '@/lib/catalog'
+import { newYearSeason } from '@/lib/dates'
 import { productText } from '@/lib/products'
 import { site } from '../site'
 import { verses } from '../verses'
@@ -61,7 +62,7 @@ export const businessTopics: Record<string, Topic> = {
       { q: 'Скільки коштує ваш сервіс?', a: site.model },
     ],
     related: [
-      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
       { label: 'Посуд для ресторанів і кав’ярень', href: '/dlya-biznesu/posud-dlya-restoraniv' },
       { label: 'Подарункові сертифікати', href: '/sertyfikaty' },
@@ -118,7 +119,7 @@ export const businessTopics: Record<string, Topic> = {
     ],
     related: [
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
-      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Подарункові сертифікати', href: '/sertyfikaty' },
       { label: 'Майстер-класи за містами', href: '/maister-klasy' },
     ],
@@ -129,13 +130,16 @@ export const businessTopics: Record<string, Topic> = {
     path: '/dlya-biznesu/novorichni-podarunky-2026',
     section: 'biz',
     parents: BIZ,
-    crumb: 'Новорічні подарунки 2026/27',
+    crumb: 'Новорічні подарунки',
     kicker: 'Подарунки для команди й клієнтів',
-    h1: 'Новорічні корпоративні подарунки з кераміки: сезон 2026/27',
+    // The season ahead, or the running one until 6 January (src/lib/dates.ts): the page lists the live catalogue.
+    get h1() {
+      return `Новорічні корпоративні подарунки з кераміки: сезон ${newYearSeason().label}`
+    },
     ogTitle: 'Новорічні корпоративні подарунки з кераміки',
     ogSub: 'Чашки, ялинкові прикраси, посуд з логотипом і сертифікати: коли замовляти',
-    metaTitle: () => 'Новорічні корпоративні подарунки з кераміки 2026',
-    metaDescription: (c) => `Що подарувати команді й клієнтам на Новий рік 2026: чашки, ялинкові прикраси, посуд з логотипом і сертифікати на майстер-клас від ${studios(c.n)}. Коли замовляти, щоб встигнути до свят.`,
+    metaTitle: () => `Новорічні корпоративні подарунки з кераміки ${newYearSeason().label}`,
+    metaDescription: (c) => `Що подарувати команді й клієнтам на Новий рік ${newYearSeason().newYear}: чашки, ялинкові прикраси, посуд з логотипом і сертифікати на майстер-клас від ${studios(c.n)}. Коли замовляти, щоб встигнути до свят.`,
     lead: (c) => `У каталозі — ${studios(c.n)} ${where(c)}, які роблять корпоративні подарунки або святкові колекції: ялинкові прикраси, чашки, свічники, різдвяні тарілки. Партію на замовлення виготовляють ${site.lead.batch}, тож для подарунків з логотипом запит варто надіслати до початку листопада; після середини листопада реальніше вироби з наявності або сертифікати на майстер-клас.`,
     verse: [],
     photo: sitePhotos.bizNewYear,
@@ -381,7 +385,7 @@ export const businessTopics: Record<string, Topic> = {
     ],
     related: [
       { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' },
-      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Подарункові сертифікати', href: '/sertyfikaty' },
       { label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
     ],

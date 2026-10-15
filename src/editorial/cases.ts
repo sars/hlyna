@@ -75,7 +75,7 @@ export function caseFormWhat(c: CaseCopy): string {
 export const RELATED_LABEL: Record<string, string> = {
   '/dlya-biznesu/chashky-z-lohotypom': 'Чашки з логотипом',
   '/dlya-biznesu/korporatyvni-podarunky': 'Корпоративні подарунки',
-  '/dlya-biznesu/novorichni-podarunky-2026': 'Новорічні подарунки 2026/27',
+  '/dlya-biznesu/novorichni-podarunky-2026': 'Новорічні подарунки',
   '/dlya-biznesu/podarunky-spivrobitnykam': 'Подарунки співробітникам',
   '/dlya-biznesu/posud-dlya-hoteliv': 'Посуд для готелів',
   '/dlya-biznesu/posud-dlya-kavyaren': 'Посуд для кав’ярень',

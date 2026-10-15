@@ -291,7 +291,7 @@ export const masterClassTopics: Record<string, Topic> = {
     related: [
       { label: 'Для двох', href: '/maister-klasy/dlya-dvokh' },
       { label: 'Гончарне коло', href: '/maister-klasy/honcharne-kolo' },
-      { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
+      { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Майстер-класи за містами', href: '/maister-klasy' },
     ],
   },
