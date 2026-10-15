@@ -184,7 +184,7 @@
   "address": "м. Коломия",
   "website": "https://hutsul.museum/",
   "what": "Музей народного мистецтва Гуцульщини та Покуття в Коломиї: колекції гуцульської кераміки.",
-  "slug": "natsionalnyi-muzei-narodnoho-mystetstva-hutsulshchyny-ta-pokuttia-imeni-yosafata"
+  "slug": "muzei-mystetstva-hutsulshchyny-ta-pokuttia"
  },
  {
   "name": "Музей народного мистецтва та побуту Гуцульщини (Косів)",
@@ -193,7 +193,7 @@
   "address": "м. Косів",
   "website": "",
   "what": "Косівський музей народного мистецтва та побуту Гуцульщини: колекція косівської кераміки XIX–XXI ст.",
-  "slug": "muzei-narodnoho-mystetstva-ta-pobutu-hutsulshchyny-kosiv"
+  "slug": "muzei-mystetstva-ta-pobutu-hutsulshchyny"
  },
  {
   "name": "Музей гончарного мистецтва — музей-садиба братів Герасименків",
@@ -202,7 +202,7 @@
   "address": "с. Новоселівка (Гончарівка), Гайсинський р-н (хата, де жив Яким Герасименко)",
   "website": "",
   "what": "Музей-садиба братів Герасименків у Новоселівці: маленький музей гончарного мистецтва, екскурсії та майстер-класи.",
-  "slug": "muzei-honcharnoho-mystetstva-muzei-sadyba-brativ-herasymenkiv"
+  "slug": "muzei-sadyba-brativ-herasymenkiv"
  },
  {
   "name": "Музей гончарства Івана Гончара (с. Коболчин)",
@@ -229,7 +229,7 @@
   "address": "вул. Шопена, 20, Луцьк",
   "website": "",
   "what": "Волинський краєзнавчий музей у Луцьку: майстер-класи з ліплення посуду давніми техніками, виставки кераміки.",
-  "slug": "volynskyi-kraieznavchyi-muzei-mk-z-davnoslovianskoho-liplennia-posudu-vystavky-k"
+  "slug": "volynskyi-kraieznavchyi-muzei"
  },
  {
   "name": "Музей давньоруського гончарства (Вишгородський історико-культурний заповідник)",
@@ -238,7 +238,7 @@
   "address": "вул. Межигірського Спасу, 11",
   "website": "",
   "what": "Музей давньоруського гончарства у Вишгороді: експозиція на місці гончарного осередку ХІ століття.",
-  "slug": "muzei-davnoruskoho-honcharstva-vyshhorodskyi-istoryko-kulturnyi-zapovidnyk"
+  "slug": "muzei-davnoruskoho-honcharstva"
  },
  {
   "name": "Shvets Museum — Музей порцелянових фігур",

@@ -3,15 +3,15 @@
  "lead": "Київ у 2026 році — місто з найбільшим вибором керамічних студій і брендів в Україні: від щоденних майстер-класів на гончарному колі в центрі до майстерень, що роблять авторський посуд для ресторанів і розписну порцеляну для подарунків.",
  "scene": [
   "Київська сучасна кераміка тримається на кількох лініях. Бренди посуду для дому й ресторанів — [Восьма Комора](vosma-komora-8-komora), [SaGa Pottery](saga-pottery), [AQYAR ceramics](aqyar-ceramics), [KERRA](kerra) — роблять чайний і кавовий посуд, вази й колекції для закладів. Розпис за мотивами народного мистецтва переосмислюють [GUNIA Project](gunia-project), [Хатка](khatka-hatka-ceramics) та [Art-hall ceramics](art-hall-ceramics); порцеляну — [Maistrenko Ceramics](maistrenko-ceramics) і [Цвіте Терен](tsvite-teren-tsvite-teren). Кримськотатарську поліхромну кераміку в Києві робить [Рустем Скибін](rustem-skybin-skybin-rustem), який переїхав із Криму й має майстерню на Глибочицькій.",
-  "Студії з майстер-класами зосереджені в центрі: біля Золотих воріт ([«ЯР»](tvorcha-maisternia-yar) на Малопідвальній, [ARTOS](art-studiia-artos) на Ярославовому Валу, [«Ніжно»](tvorchyi-prostir-maister-klasy-kyiv) на Володимирській, [Eye Sea](eye-sea-gallery-and-studio) на Олеся Гончара), на Лютеранській ([Glynar](glynar-honcharna-na-liuteranskii-maisternia-hlynar)) і на Подолі ([Kyiv Clay Space](kyiv-clay-space), [KUST Ceramics](kust-ceramics-kustceramics), коворкінг [Lepite](lepite-keramichnyi-kovorkinh-u-vyrobnykakh-mrii)). Мережа [«Творча кухня»](art-studiia-tvorcha-kukhnia) має студії в торговельних центрах на обох берегах. Купити кераміку київських брендів офлайн можна на Рейтарській (флагман «Цвіте Терен», [Kendi](kendi), [One Tea Tree](one-tea-tree)), у шоурумах GUNIA на Антоновича й Золотоворітській, на поверсі українських брендів у [ЦУМі](tsum-kyiv-tsum-kyiv-poverkh-ukrainskykh-brendiv) та в [«Всі. Свої»](vsi-svoi-vsi-svoi).",
-  "Сучасну художню кераміку показують галерея «Хлібня» на території «Софії Київської» (фестиваль «ЦеГлина», персональні виставки), Національний музей українського народного декоративного мистецтва та галерея академії Бойчука, де [кафедра художньої кераміки](kafedra-khudozhnoi-keramiky-dereva-skulptury-ta-metalu-kdadpmd-im-mykhaila-boich) проводить міжнародні конкурси керамічних пластів. Керамістів можна зустріти на маркетах «Всі. Свої» на Десятинній, у Design Hall тижня дизайну UDIW у Мистецькому Арсеналі та на ярмарках у Музеї Івана Гончара.",
+  "Студії з майстер-класами зосереджені в центрі: біля Золотих воріт ([«ЯР»](tvorcha-maisternia-yar) на Малопідвальній, [ARTOS](art-studiia-artos) на Ярославовому Валу, [«Ніжно»](tvorchyi-prostir-maister-klasy-kyiv) на Володимирській, [Eye Sea](eye-sea-gallery-and-studio) на Олеся Гончара), на Лютеранській ([Glynar](glynar)) і на Подолі ([Kyiv Clay Space](kyiv-clay-space), [KUST Ceramics](kust-ceramics-kustceramics), коворкінг [Lepite](lepite)). Мережа [«Творча кухня»](art-studiia-tvorcha-kukhnia) має студії в торговельних центрах на обох берегах. Купити кераміку київських брендів офлайн можна на Рейтарській (флагман «Цвіте Терен», [Kendi](kendi), [One Tea Tree](one-tea-tree)), у шоурумах GUNIA на Антоновича й Золотоворітській, на поверсі українських брендів у [ЦУМі](tsum-kyiv-poverkh-ukrainskykh-brendiv) та в [«Всі. Свої»](vsi-svoi-vsi-svoi).",
+  "Сучасну художню кераміку показують галерея «Хлібня» на території «Софії Київської» (фестиваль «ЦеГлина», персональні виставки), Національний музей українського народного декоративного мистецтва та галерея академії Бойчука, де [кафедра художньої кераміки](kafedra-keramiky-akademii-boichuka) проводить міжнародні конкурси керамічних пластів. Керамістів можна зустріти на маркетах «Всі. Свої» на Десятинній, у Design Hall тижня дизайну UDIW у Мистецькому Арсеналі та на ярмарках у Музеї Івана Гончара.",
   "Після 2022 року студії пристосувалися до війни: [MASLO CERAMICS](maslo-ceramics) використовувала свій підвал як укриття, «Восьма Комора» працює з дров'яною піччю навіть під час блекаутів, KUST і «Восьма Комора» проводять арт-терапевтичні заняття, зокрема для ветеранів. GUNIA Project після 2022 року втратила постачання глини зі Слов'янська, а [clay kyiv](clay-kyiv) робить частину ваз і глечиків у Слов'янську за місцевою технологією срібного й золотого напилення."
  ],
  "picks": [
   {
    "need": "Вперше спробувати гончарне коло",
    "slugs": [
-    "glynar-honcharna-na-liuteranskii-maisternia-hlynar",
+    "glynar",
     "kyiv-clay-space"
    ],
    "why": "Glynar працює щодня з 10:00 до 20:00 і має три камерні зали; Kyiv Clay Space на Подолі має вступне заняття «Знайомство з глиною» й курси на 3, 5 або 10 занять."
@@ -27,8 +27,8 @@
   {
    "need": "Кераміка для дітей",
    "slugs": [
-    "kyivskyi-palats-ditei-ta-yunatstva-maisternia-keramichnoho-mystetstva-kerivnytsi",
-    "tsentr-tvorchosti-ditei-ta-yunatstva-sviatoshynskoho-raionu-m-kyieva-hurtok-khud",
+    "kyivskyi-palats-ditei-ta-yunatstva",
+    "tsentr-tvorchosti-sviatoshynskoho-raionu",
     "studiia-keramiky-kvitka"
    ],
    "why": "Гурток у Київському палаці дітей та юнацтва приймає дітей 5–17 років; гурток у Святошинському районі безкоштовний для 5–15 років; «Квітка» на Липській має окремі дитячі заняття."
@@ -36,8 +36,8 @@
   {
    "need": "Ліпити самостійно, з випалом",
    "slugs": [
-    "lepite-keramichnyi-kovorkinh-u-vyrobnykakh-mrii",
-    "studiia-keramiky-marii-poliarush-maria-polyarush-ceramics-studio"
+    "lepite",
+    "studiia-keramiky-marii-poliarush"
    ],
    "why": "Lepite — коворкінг без обмеження часу, де вироби сушать, глазурують і випалюють; студія Марії Поляруш має коворкінг і випалює сторонні роботи."
   },

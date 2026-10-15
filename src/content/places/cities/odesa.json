@@ -2,8 +2,8 @@
  "slug": "odesa",
  "lead": "Одеська студійна кераміка 2026 року живе переважно в Instagram: це невеликі гончарні студії в центрі міста, багатопрофільні творчі простори з керамічними майстернями та авторки, які роблять посуд, прикраси й мистецькі об’єкти.",
  "scene": [
-  "Найпомітніший шар — гончарні студії з майстер-класами: [May Bee ceramics](may-bee-ceramics) на Ковальській, [Glinland](glinland) на Академіка Сахарова, [Room 124](room-124) на Канатній, [Natura](maisternia-keramiky-natura-v-odesi) на Ніжинській. Кераміку тут часто поєднують з іншими ремеслами: арт-простір [«Синій Краб»](synyi-krab) громадської організації «Творці Одеси» (з 2019 року) має керамічну студію поруч із вітражною та інженерною майстернями, а [Magic Art](budynok-tvorchosti-st-magic-art) і [Rabbit handmade](maister-klasy-odesa-epoksydna-smola-liplennia-keramiky-svichky) проводять глиняні майстер-класи разом зі свічками, розписом і святами.",
-  "Серед авторів — [Анна Брюховецька](anna-briukhovetska-anna-briukhovetska), яка 2014 року переїхала з Донецька до Одеси й у 2024 році відкрила власну студію (біла й чорна глина, молочний випал), керамічна художниця [Івана Полякова](ivana-poliakova), бренд [ZOLA](odeska-keramika-zi-zmistom-ceramics-with-sense-from-odesa) з дров’яним випалом в анагамі, кольоровий посуд [imho ceramics](imho-ceramics), «морська» кераміка [Марії Ґрін](avtorska-keramika-honcharstvo-mk-mariia-grin-odesa) та посуд і декор [Artory ceramics](keramika-posud-dekor-maister-klasy-odesa). Окрема ніша — керамічні прикраси: [Eligiy Jewelry](eligiy-jewelry) поєднує кераміку зі сріблом, [Stvoreno luboviu](stvoreno-luboviu) робить каблучки й кулони разом із посудом.",
+  "Найпомітніший шар — гончарні студії з майстер-класами: [May Bee ceramics](may-bee-ceramics) на Ковальській, [Glinland](glinland) на Академіка Сахарова, [Room 124](room-124) на Канатній, [Natura](maisternia-keramiky-natura-v-odesi) на Ніжинській. Кераміку тут часто поєднують з іншими ремеслами: арт-простір [«Синій Краб»](synyi-krab) громадської організації «Творці Одеси» (з 2019 року) має керамічну студію поруч із вітражною та інженерною майстернями, а [Magic Art](budynok-tvorchosti-st-magic-art) і [Rabbit handmade](rabbit-handmade) проводять глиняні майстер-класи разом зі свічками, розписом і святами.",
+  "Серед авторів — [Анна Брюховецька](anna-briukhovetska-anna-briukhovetska), яка 2014 року переїхала з Донецька до Одеси й у 2024 році відкрила власну студію (біла й чорна глина, молочний випал), керамічна художниця [Івана Полякова](ivana-poliakova), бренд [ZOLA](zola) з дров’яним випалом в анагамі, кольоровий посуд [imho ceramics](imho-ceramics), «морська» кераміка [Марії Ґрін](mariia-grin) та посуд і декор [Artory ceramics](keramika-posud-dekor-maister-klasy-odesa). Окрема ніша — керамічні прикраси: [Eligiy Jewelry](eligiy-jewelry) поєднує кераміку зі сріблом, [Stvoreno luboviu](stvoreno-luboviu) робить каблучки й кулони разом із посудом.",
   "Академічну лінію тримає відділення художньої кераміки Одеського художнього фахового коледжу, яким завідує [Лідія Лазарцева](lidiia-lazartseva). Подивитися українську дизайнерську кераміку наживо можна в концепт-сторі [SOKOLROOM](sokolroom) на Рішельєвській (стокіст Gunia Project) і в [Extra Small Design Room](extra-small-design-room) у Пасажі, де продають кераміку власниці.",
   "Керамістів можна зустріти на сезонних маркетах: фестиваль «Затишок» у Будинку вчених (серпень 2025, понад сто українських брендів, серед них кераміка), різдвяні та валентинові ярмарки на подвір’ї Кірхи, новорічний «Гешефт» і фестивалі в Пасажі."
  ],
@@ -19,8 +19,8 @@
   {
    "need": "Заняття з глиною для дітей",
    "slugs": [
-    "studiia-we-can-honcharna-maisternist-yekts-beit-grand",
-    "art-studyia-maliuvannia-liplennia-valiannia-hlyna-maliunok-rysovanye"
+    "studiia-we-can",
+    "art-studiia-kolibri"
    ],
    "why": "We Can при центрі «Beit Grand» веде регулярні групи за віком від 3 років; «Колібрі» має ліплення для дітей від 3 до 16 років і майстер-клас «Наша чашка»."
   },
@@ -36,7 +36,7 @@
    "need": "Авторський посуд з Одеси",
    "slugs": [
     "imho-ceramics",
-    "odeska-keramika-zi-zmistom-ceramics-with-sense-from-odesa",
+    "zola",
     "stvoreno-luboviu"
    ],
    "why": "imho робить кольоровий посуд з малюнками й доставляє по світу, ZOLA — колекції дров’яного випалу з власним сайтом, Stvoreno luboviu — кухлики, тарілки й келихи."
@@ -45,7 +45,7 @@
    "need": "Дитяче свято або корпоратив з глиною",
    "slugs": [
     "budynok-tvorchosti-st-magic-art",
-    "maister-klasy-odesa-epoksydna-smola-liplennia-keramiky-svichky"
+    "rabbit-handmade"
    ],
    "why": "Magic Art проводить дні народження, корпоративи й виїзні майстер-класи з глини та розпису чашок; Rabbit handmade організовує свята й виїзні заняття з ліплення."
   },

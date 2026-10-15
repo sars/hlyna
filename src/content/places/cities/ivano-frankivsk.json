@@ -4,22 +4,22 @@
  "scene": [
   "Історично місто пов’язане з Івано-Франківським художньо-виробничим комбінатом, на якому працювали художники декоративної кераміки, зокрема [Ніна Косович](nina-kosovych). На Івано-Франківщині розташований і Косів з мальованою керамікою, тож гуцульські мотиви тут присутні і в крамницях, і в роботах сучасних майстрів.",
   "Серед сучасних авторів — майстерня [«Мох»](mokh-mox-maisternia-yevhena-babeshka) Євгена Бабешка з посудом «диких» форм, натхненних Карпатами, частину якого молочать; бренд керамічних прикрас [Tradytsiyi](tradytsiyi-keramichni-prykrasy); родинна справа [Mytskan Ceramics](mytskan-ceramics-rodyna-mytskaniv) з ліпленими намистами й свистунцями. Художник-гончар [Віталій Владковський](vitalii-vladkovskyi) робить горнята, окарини й лампи.",
-  "Гончарні заняття проводять [Школа кераміки](shkola-keramiky) на Коновальця, арт-студія [«Цятка»](art-studiia-tsiatka-dot-if-ua-snizhana-chornii) біля драмтеатру, [«Осоння»](studiia-keramiky-osonnia-ivano-frankivsk) на Національної Гвардії, майстерня-крамниця [Pottery Garden](maisternia-kramnytsia-pottery-garden-keramichnyi-sad) на Галицькій та студія [«Еники Беники»](khudozhnia-studiia-enyky-benyky) в ТРЦ «Велес». З 2015 року гончарство в місті використовують і для реабілітації: [школа кераміки фонду «Франківський опір»](shkola-keramiky-fondu-frankivskyi-opir-bastion-halereia-chasu-volodymyr-rozhnov) працювала в галереї-фортеці «Бастіон».",
-  "Купити кераміку можна в Pottery Garden, у крамниці українського крафту [«Спільне»](spilne-kraftovi-produkty-kramnytsia-vsoho-ukrainskoho) з косівською керамікою та в кураторському просторі [FÓLK](folk-gunia-bazhane-ruslan-baginskyi-frolov-jamemme-guzema). Кераміку місцевих майстрів також продають на Ветеранських ярмарках, які в 2025–2026 роках проходили у Франківську."
+  "Гончарні заняття проводять [Школа кераміки](shkola-keramiky) на Коновальця, арт-студія [«Цятка»](art-studiia-tsiatka-snizhana-chornii) біля драмтеатру, [«Осоння»](studiia-keramiky-osonnia-ivano-frankivsk) на Національної Гвардії, майстерня-крамниця [Pottery Garden](pottery-garden-keramichnyi-sad) на Галицькій та студія [«Еники Беники»](khudozhnia-studiia-enyky-benyky) в ТРЦ «Велес». З 2015 року гончарство в місті використовують і для реабілітації: [школа кераміки фонду «Франківський опір»](shkola-keramiky-fondu-frankivskyi-opir) працювала в галереї-фортеці «Бастіон».",
+  "Купити кераміку можна в Pottery Garden, у крамниці українського крафту [«Спільне»](spilne) з косівською керамікою та в кураторському просторі [FÓLK](folk). Кераміку місцевих майстрів також продають на Ветеранських ярмарках, які в 2025–2026 роках проходили у Франківську."
  ],
  "picks": [
   {
    "need": "Вперше спробувати гончарне коло",
    "slugs": [
     "shkola-keramiky",
-    "art-studiia-tsiatka-dot-if-ua-snizhana-chornii"
+    "art-studiia-tsiatka-snizhana-chornii"
    ],
    "why": "Майстер-класи на колі для початківців; у Школі кераміки за одне заняття роблять виріб на колі й ліплений виріб, обидва випалюють."
   },
   {
    "need": "Майстер-клас для двох",
    "slugs": [
-    "art-studiia-tsiatka-dot-if-ua-snizhana-chornii",
+    "art-studiia-tsiatka-snizhana-chornii",
     "studiia-keramiky-osonnia-ivano-frankivsk"
    ],
    "why": "«Цятка» має формат «Гончарство для двох», «Осоння» — парний майстер-клас з ліплення."
@@ -36,7 +36,7 @@
    "need": "Авторський посуд з місцевих майстерень",
    "slugs": [
     "mokh-mox-maisternia-yevhena-babeshka",
-    "maisternia-kramnytsia-pottery-garden-keramichnyi-sad"
+    "pottery-garden-keramichnyi-sad"
    ],
    "why": "Посуд «диких» форм, частково молочений; посуд, світильники й сувеніри, які можна купити просто в майстерні."
   },
