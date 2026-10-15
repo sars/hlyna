@@ -3,15 +3,14 @@ import React from 'react'
 
 import { Block } from '@/components/site/Inner'
 import { InstagramPosts } from '@/components/site/InstagramPosts.client'
-import { MoreLink } from '@/components/ui/MoreLink'
 import { nobreak } from '@/components/ui/NoBreak'
 import type { TopCategory, TopItem } from '@/editorial/copy'
 import { igHandle, type StudioCard } from '@/lib/catalog'
 
 // «Топ за категоріями» on written pages (SYSTEM.md §4.2): one `Block` per category, ranked rows like `NumberedList`
 // (terracotta number 1–5), the price as the most visible line (cobalt, the right column from sm), the maker linked to
-// its profile or, when it has none, to its Instagram. The Instagram post sits behind a native `details`: nothing loads
-// from Instagram until the reader opens it, and the lazy embed then mounts itself (the row has a box only when open).
+// its profile or, when it has none, to its Instagram. The Instagram post is shown open under the row; the embed loads
+// lazily as it nears the viewport (a compact link card stands in until then).
 
 type Known = Map<string, StudioCard>
 
@@ -51,17 +50,11 @@ function Row({ it, n, known }: { it: TopItem; n: number; known: Known }) {
         {it.terms && <p className="m-0 mt-1 max-w-read text-sm leading-normal text-ink-2 sm:col-start-1">{it.terms}</p>}
         <p className="m-0 mt-2 font-mono text-[11.5px] leading-[1.4] tracking-[.04em] text-ink-2 uppercase sm:col-start-1">Дані: {it.seen}</p>
         {it.embed && (
-          <details className="group mt-1 sm:col-start-1">
-            <MoreLink as="summary" pad={false} className="py-2.5">
-              <span className="group-open:hidden">Пост в Instagram</span>
-              <span className="hidden group-open:inline">Сховати пост</span>
-              <span className="ui-faq-pm" aria-hidden />
-            </MoreLink>
-            {/* On a phone the embed takes the full column (it needs ~320px): it steps out of the number's indent. */}
-            <div className="pb-2 max-sm:-ml-[54px]">
-              <InstagramPosts urls={[it.embed]} handle={handle} columns={1} />
-            </div>
-          </details>
+          // Shown open: the embed loads lazily near the viewport (a compact link card until then). On a phone it takes
+          // the full column (it needs ~320px), stepping out of the number's indent.
+          <div className="mt-3 max-w-[480px] pb-1 sm:col-start-1 max-sm:-ml-[54px]">
+            <InstagramPosts urls={[it.embed]} handle={handle} columns={1} />
+          </div>
         )}
       </div>
     </li>
