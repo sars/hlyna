@@ -1,4 +1,4 @@
-import { cityPages, getAllStudios, getAllWithShops, isStudio, confirmedForVenues, offersMasterClasses, type StudioCard } from './catalog'
+import { centreOf, cityPages, getAllStudios, getAllWithShops, isOpen, isStudio, confirmedForVenues, offersMasterClasses, type StudioCard } from './catalog'
 
 // Everyone in the studio lists except suppliers (hidden for now): studios, brands, makers, schools. Shops and galleries are not
 // studios: they have their own block on a city page (getShops).
@@ -8,6 +8,20 @@ const listed = (s: StudioCard) => s.type !== 'supplier'
 // MIN_LIST makers (cityPages).
 export async function makerCities() {
   return cityPages((await getAllStudios()).filter(listed))
+}
+
+/** The same pages from the whole published catalogue (getCatalog's records), for code that has no page cache. */
+export const makerCityPages = (catalog: StudioCard[]) => cityPages(catalog.filter((s) => isOpen(s) && isStudio(s) && listed(s)))
+
+/**
+ * Where a hidden profile's URL goes (its current and old slugs): the makers page of its city, else of its oblast centre,
+ * else the cities index. A hidden profile was taken down on purpose (inactive, no contacts, out of scope); people and
+ * crawlers who still arrive from search see the makers nearby instead of a 404 that Google keeps retrying.
+ */
+export function hiddenProfileTarget(city: { slug: string; oblast?: string | null } | null, pages: Set<string>): string {
+  const centre = centreOf(city)
+  const to = [city?.slug, centre].find((c) => c && pages.has(c))
+  return to ? `/vyrobnyky/misto/${to}` : '/vyrobnyky/misto'
 }
 
 /**

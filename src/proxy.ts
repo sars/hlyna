@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
-import { slugRedirects } from '@/server/slugRedirects'
+import { hiddenProfiles, slugRedirects } from '@/server/slugRedirects'
 
 // Renamed studios and cities: their old URLs answer 308 with Location here, before the page cache. A redirect from
 // inside an ISR page is cached and later served as a bare 308 without Location (Next 16), which crawlers cannot follow.
-// The pages keep their own redirect as a fallback for the minute before the map below is refreshed.
+// The pages keep their own redirect as a fallback for the minute before the map below is refreshed. A hidden profile
+// (current or old slug) goes to the makers page of its city (decisions.md, 2026-10-16); a merged duplicate is hidden too,
+// but its slug is in the history and goes to the kept profile first.
 
 const CITY_PAGES = ['/vyrobnyky/misto/', '/maister-klasy/', '/sertyfikaty/']
 
@@ -20,8 +22,10 @@ export async function proxy(req: NextRequest) {
     const city = cities.get(decodeURIComponent(rest[0] ?? ''))
     if (city) to = prefix + [city, ...rest.slice(1)].join('/')
   } else if (parts[1] === 'vyrobnyky' && parts[2]) {
-    const studio = studios.get(decodeURIComponent(parts[2]))
+    const slug = decodeURIComponent(parts[2])
+    const studio = studios.get(slug)
     if (studio) to = ['', 'vyrobnyky', studio, ...parts.slice(3)].join('/')
+    else to = (await hiddenProfiles()).get(slug) ?? null
   }
 
   if (!to) return NextResponse.next()

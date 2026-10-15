@@ -96,11 +96,17 @@ function isUnverified(s: Studio): boolean {
 /** Every published record, including closed and unverified ones (profiles and the sitemap). */
 export const getCatalog = cache(loadStudios)
 
+/** The same records read from the database, past the data cache: for src/proxy.ts, which runs outside a page render. */
+export const loadCatalogUncached = () => joinCatalog(loadShard, loadPublicCities)
+
 /** Shops, galleries and «Спадщина» (museums, traditions, memory of masters) are in the catalogue but are not studios: lists, counts and search about studios leave them out. */
 export const isStudio = (s: { type?: string | null }) => s.type !== 'shop' && s.type !== 'legacy'
 
-/** Open (not closed, not unverified) records of every kind, shops included: for the pages where shops belong. */
-export const getAllWithShops = cache(async () => (await getCatalog()).filter((s) => s.status !== 'closed' && !s.unverified))
+/** Not closed and not unverified: the records lists may show. */
+export const isOpen = (s: Pick<StudioCard, 'status' | 'unverified'>) => s.status !== 'closed' && !s.unverified
+
+/** Open records of every kind, shops included: for the pages where shops belong. */
+export const getAllWithShops = cache(async () => (await getCatalog()).filter(isOpen))
 
 /** What lists, counts, the map and the price index use: open studios and makers, no shops. */
 export const getAllStudios = cache(async () => (await getAllWithShops()).filter(isStudio))

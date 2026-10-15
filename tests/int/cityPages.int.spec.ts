@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { cityPages, onPages, type StudioCard } from '@/lib/catalog'
+import { hiddenProfileTarget } from '@/lib/makers'
 import { pageName, pageWhere } from '@/lib/present'
 
 let id = 0
@@ -49,5 +50,16 @@ describe('city pages: an oblast centre covers its oblast (owner, 15.10.2026)', (
     const solo = cityPages(at('rivne', 'Рівне', 'Рівненська', 1))
     expect(pageName(solo[0])).toBe('Рівне')
     expect(pageWhere(solo[0])).toBe('у Рівному')
+  })
+})
+
+describe('a hidden profile goes to the makers nearby', () => {
+  const pages = new Set(['kyiv', 'ternopil', 'opishne'])
+  it('its own city page, else its oblast centre, else the cities index', () => {
+    expect(hiddenProfileTarget({ slug: 'opishne', oblast: 'Полтавська' }, pages)).toBe('/vyrobnyky/misto/opishne')
+    expect(hiddenProfileTarget({ slug: 'honcharivka', oblast: 'Тернопільська' }, pages)).toBe('/vyrobnyky/misto/ternopil')
+    expect(hiddenProfileTarget({ slug: 'bucha', oblast: 'Київська' }, pages)).toBe('/vyrobnyky/misto/kyiv')
+    expect(hiddenProfileTarget({ slug: 'myrhorod', oblast: 'Полтавська' }, pages)).toBe('/vyrobnyky/misto')
+    expect(hiddenProfileTarget(null, pages)).toBe('/vyrobnyky/misto')
   })
 })
