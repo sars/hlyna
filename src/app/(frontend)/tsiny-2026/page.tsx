@@ -24,6 +24,8 @@ const LICENSE = 'https://creativecommons.org/licenses/by/4.0/'
 const grn = (n: number) => `${fmt(n)} грн`
 const span = (s: CategoryStats) => (s.p10 === s.p90 ? grn(s.median) : `${fmt(s.p10)}–${grn(s.p90)}`)
 const studiosN = (n: number) => `${fmt(n)} ${pluralUk(n, ['студія', 'студії', 'студій'])}`
+// After «за прайсами» the count takes the genitive: «за прайсами 101 студії», «за прайсами 88 студій».
+const studiosOf = (n: number) => `${fmt(n)} ${pluralUk(n, ['студії', 'студій', 'студій'])}`
 
 export async function generateMetadata(): Promise<Metadata> {
   const { stats } = await priceIndex()
@@ -44,7 +46,7 @@ export default async function PricesPage() {
   const groups: [string, CategoryStats['cat']['group']][] = [['Майстер-класи й навчання', 'mk'], ['Для компаній', 'biz'], ['Вироби в роздріб', 'retail']]
 
   const faq = [
-    ...(g ? [{ q: 'Скільки коштує майстер-клас з кераміки в Україні?', a: `Разовий майстер-клас найчастіше коштує ${span(g)} з особи; медіана — ${grn(g.median)} (за прайсами ${studiosN(g.n)}, ${site.dataUpdated}).${p ? ` Індивідуальне заняття — здебільшого ${span(p)}.` : ''}` }] : []),
+    ...(g ? [{ q: 'Скільки коштує майстер-клас з кераміки в Україні?', a: `Разовий майстер-клас найчастіше коштує ${span(g)} з особи; медіана — ${grn(g.median)} (за прайсами ${studiosOf(g.n)}, ${site.dataUpdated}).${p ? ` Індивідуальне заняття — здебільшого ${span(p)}.` : ''}` }] : []),
     ...(c ? [{ q: 'Скільки коштує гончарство для двох?', a: `Здебільшого ${span(c)} за двох; медіана — ${grn(c.median)} (${studiosN(c.n)}).` }] : []),
     ...(cert ? [{ q: 'Скільки коштує сертифікат на гончарство?', a: `Здебільшого ${span(cert)}; медіана — ${grn(cert.median)}. Ціна сертифіката зазвичай дорівнює ціні заняття.` }] : []),
     ...(corp ? [{ q: 'Скільки коштує корпоратив з ліплення з глини?', a: `Здебільшого ${span(corp)} з особи; медіана — ${grn(corp.median)} (${studiosN(corp.n)}). Для групи студія зазвичай рахує окрему пропозицію.` }] : []),
@@ -61,7 +63,7 @@ export default async function PricesPage() {
           '@context': 'https://schema.org',
           '@type': 'Dataset',
           name: 'Ціни на кераміку ручної роботи і майстер-класи в Україні, 2026',
-          description: `Медіани й типові діапазони цін за прайсами ${studiosN(studios)} з каталогу «Глина».`,
+          description: `Медіани й типові діапазони цін за прайсами ${studiosOf(studios)} з каталогу «Глина».`,
           url: `${site.url}/tsiny-2026`,
           creator: { '@type': 'Organization', name: site.name, url: site.url },
           temporalCoverage: period.replace('–', '/'),
@@ -77,7 +79,7 @@ export default async function PricesPage() {
         title="Ціни на кераміку ручної роботи і майстер-класи в Україні — 2026"
         lead={
           <p className="m-0">
-                      За прайсами {studiosN(studios)} з каталогу «Глина»
+                      За прайсами {studiosOf(studios)} з каталогу «Глина»
           {g ? `: разовий майстер-клас з кераміки найчастіше коштує ${span(g)} з особи (медіана ${grn(g.median)})` : ''}
           {p ? `, індивідуальне заняття — ${span(p)}` : ''}
           {c ? `, для двох — ${span(c)} за пару` : ''}

@@ -207,7 +207,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
           {examples.length ? (
             <>
               {ctx.priceText && (
-                <QuoteBlock source={`Індекс цін «Глини», ${site.dataUpdated}`}>
+                <QuoteBlock source={ctx.priceStudios ? `За прайсами ${ctx.priceStudios} ${pluralUk(ctx.priceStudios, ['студії', 'студій', 'студій'])} з цієї сторінки, ${site.dataUpdated}` : `Індекс цін «Глини», ${site.dataUpdated}`}>
                   {ctx.min === ctx.max ? 'У прайсах' : 'Найчастіше в прайсах'} — <b className="font-semibold">{nobreak(`${ctx.priceText}${topic.price.unitLabel ? ` ${topic.price.unitLabel}` : ''}`)}</b>.
                 </QuoteBlock>
               )}

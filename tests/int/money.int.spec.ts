@@ -41,7 +41,7 @@ describe('money: numbers', () => {
   })
   it('typical range trims extremes from 5 prices on', () => {
     expect(typicalRange([300, 900])).toEqual({ min: 300, max: 900 })
-    expect(typicalRange([100, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 20000])).toEqual({ min: 800, max: 20000 })
+    expect(typicalRange([100, 800, 900, 1000, 1100, 1200, 1300, 1400, 1500, 20000])).toEqual({ min: 800, max: 1500 })
   })
 })
 

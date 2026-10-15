@@ -29,7 +29,8 @@ import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { sitePhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import { verses } from '@/content/verses'
-import { getAllStudios, groupByCity, hryvniaAmounts, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { getAllStudios, groupByCity, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { priceIndex } from '@/lib/priceIndex'
 import { facts } from '@/lib/facts'
 
 export const revalidate = 86400
@@ -81,7 +82,8 @@ async function stats() {
       makers: all.length,
       cities: groupByCity(all).length,
       masterClassPlaces: mk.length,
-      withPrices: all.filter((x) => hryvniaAmounts(x).length).length,
+      // The same base as /tsiny-2026 and llms.txt, so the home page and the index never quote two different counts.
+      withPrices: (await priceIndex()).studios,
       cityCounts: new Map(groupByCity(mk).map((g) => [g.city.slug as string, g.studios.length])),
     }
   } catch {
@@ -196,7 +198,7 @@ export default async function HomePage() {
               <Stat variant="tile" value={nf(s.makers)} label={`${makers} у каталозі`} />
               <Stat variant="tile" value={String(s.masterClassPlaces)} label={`${places} з майстер-класами`} />
               <Stat variant="tile" value={String(s.cities)} label={cityWord} />
-              <Stat variant="tile" value={String(s.withPrices)} label={`${pluralUk(s.withPrices, ['профіль', 'профілі', 'профілів'])} з цінами з прайсу`} />
+              <Stat variant="tile" value={String(s.withPrices)} label={`${pluralUk(s.withPrices, ['студія', 'студії', 'студій'])} у вибірці цін`} />
             </div>
             <DataTable
               caption="Типові формати і ціни, 2026"

@@ -8,6 +8,7 @@ import { facts } from '@/lib/facts'
 
 import { isExhibitingOnly, publicPrices, splitSource } from '@/lib/present'
 import { amountsIn, fromTo, near, spanOf } from '@/lib/money'
+import { isCeramicPriceLine } from '@/lib/priceIndex'
 
 // A museum or museum shop is listed on class pages only if its own services name a class it runs.
 const museumOnly = (s: StudioCard) =>
@@ -64,6 +65,8 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
       // A private lesson is not the usual price of a class (it has its own line on /tsiny-2026).
       .filter((p) => couplePage || topic.price.index === 'private' || !/індивідуал/iu.test(p.text))
       .filter((p) => !DONATION.test(p.text))
+      // Painting, candles, wood, add-ons and hourly rates are not the price of this format (same rule as /tsiny-2026).
+      .filter((p) => isCeramicPriceLine(p.text))
     // A newer line replaces older ones: prices from before 2025 count only when the studio has nothing newer.
     if (usable.some((p) => (p.year ?? 0) >= 2025)) usable = usable.filter((p) => !p.year || p.year >= 2025)
     // The price next to the page's own words, lower end of a range («1 750–3 400 грн» → 1 750).
@@ -92,7 +95,7 @@ export async function topicData(topic: Topic, citySlug?: string): Promise<TopicD
     examples: examples.slice(0, 8),
     amounts,
     priceOf,
-    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
+    ctx: { n: all.length, cities: groupByCity(all).length, min: r?.min, max: r?.max, median: r?.median ?? medianOf(perStudio), priceText: r?.text, priceStudios: idx ? undefined : span?.n, place: citySlug ? all[0]?.cityDoc?.name : undefined, price: (k: string) => f.range(k) },
   }
 }
 

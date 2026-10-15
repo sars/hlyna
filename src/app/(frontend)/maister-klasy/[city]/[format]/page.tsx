@@ -12,7 +12,7 @@ import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
 import { MK_CHIPS } from '@/lib/mkChips'
 import { getAllWithShops, hasFormat, MIN_LIST, pluralUk, TYPE_LABEL } from '@/lib/catalog'
-import { fmt, roundNice } from '@/lib/money'
+import { fmt } from '@/lib/money'
 import { displayName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
 import { ogImage } from '@/lib/ogImage'
@@ -101,14 +101,14 @@ export default async function Page({ params }: Args) {
       <Block id="list" title={`Де ${f.short === 'курси' ? 'пройти курс' : 'записатися'} ${p.vars.inCity}`} note={<>Список за відкритими даними студій (сайти, Instagram, сервіси сертифікатів). Умови кожна студія підтверджує сама.</>}>
         <MakerRows>
           {[...priced].sort((a, b) => Number(!!b.v) - Number(!!a.v) || a.s.name.localeCompare(b.s.name, 'uk')).map(({ s, v }) => (
-            <MakerRow key={s.id} s={s} typeLabel={TYPE_LABEL[s.type ?? 'other']} showAbout={false} chips={MK_CHIPS.filter(([fm]) => hasFormat(s, fm)).map(([, label]) => ({ label, tone: 'ink' as const }))} price={v ? { value: `${fmt(roundNice(v))} грн`, unit } : undefined} />
+            <MakerRow key={s.id} s={s} typeLabel={TYPE_LABEL[s.type ?? 'other']} showAbout={false} chips={MK_CHIPS.filter(([fm]) => hasFormat(s, fm)).map(([, label]) => ({ label, tone: 'ink' as const }))} price={v ? { value: `${fmt(v)} грн`, unit } : undefined} />
           ))}
         </MakerRows>
       </Block>
       {p.data.examples.length > 0 && (
         <Block id="prices" kicker="Ціни" title={p.topic.price.title} note={p.topic.price.note}>
           {p.vars.priceRange && (
-            <QuoteBlock source={`Індекс цін «Глини», ${site.dataUpdated}`}>
+            <QuoteBlock source={`За прайсами місць з цієї сторінки, ${site.dataUpdated}`}>
               Найчастіше в прайсах {p.vars.inCity} — <b className="font-semibold">{nobreak(String(p.vars.priceRange))}</b>.{' '}
               <span className="text-ink-2">
                 Це ціни лише місць із цієї сторінки, по одній на студію; загальну ціну разового майстер-класу в місті дивіться на <Link href={`/maister-klasy/${city}`}>сторінці міста</Link> і в «<Link href="/tsiny-2026">Цінах 2026</Link>».

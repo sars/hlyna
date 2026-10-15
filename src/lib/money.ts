@@ -22,7 +22,8 @@ export const median = (a: number[]) => {
 }
 
 /** Value at percentile p of an already sorted array. */
-export const quantile = (sorted: number[], p: number) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))]
+// Nearest rank on (n − 1): with 9 studios the 90th percentile is the 8th price, not the most expensive one.
+export const quantile = (sorted: number[], p: number) => sorted[Math.min(sorted.length - 1, Math.round(p * (sorted.length - 1)))]
 
 /** Round to a believable step: 3 120 → 3 100, 870 → 850. */
 export const roundNice = (n: number) => (n < 1000 ? Math.round(n / 50) * 50 : Math.round(n / 100) * 100)
@@ -61,27 +62,26 @@ export const near = (kw: RegExp) => (t: string) => {
 export function typicalRange(amounts: number[]): { min: number; max: number } | null {
   if (!amounts.length) return null
   const sorted = [...amounts].sort((a, b) => a - b)
-  const pick = (q: number) => sorted[Math.min(sorted.length - 1, Math.floor(q * sorted.length))]
+  const pick = (q: number) => quantile(sorted, q)
   const r = sorted.length >= 5 ? { min: pick(0.1), max: pick(0.9) } : { min: sorted[0], max: sorted[sorted.length - 1] }
   return { min: roundNice(r.min), max: roundNice(r.max) }
 }
 
 /**
  * One wording for a set of prices (one value per studio), used by every page so the same studios never
- * produce two different numbers: 1 price → «900 грн», 2 → «900 і 1 300 грн», 3–4 → «від 900 до 1 700 грн»,
- * 5+ → the typical span (10th–90th percentile). Never «від X до X».
+ * produce two different numbers: 1 price → «900 грн», 2 → «900 і 1 300 грн», 3–4 → «від 900 до 1 700 грн» (exact),
+ * 5+ → the typical span (10th–90th percentile, rounded). Never «від X до X».
  */
 export type Span = { n: number; min: number; max: number; median: number; text: string }
 export function spanOf(values: number[]): Span | null {
   const v = values.filter((x) => x > 0).sort((a, b) => a - b)
   if (!v.length) return null
-  const med = roundNice(v[Math.floor(v.length / 2)])
-  const nice = (x: number) => roundNice(x).toLocaleString('uk-UA')
-  if (v.length === 1) return { n: 1, min: roundNice(v[0]), max: roundNice(v[0]), median: med, text: `${nice(v[0])} грн` }
-  if (v.length === 2) {
-    const [a, b] = [roundNice(v[0]), roundNice(v[1])]
-    return { n: 2, min: a, max: b, median: med, text: a === b ? `${nice(a)} грн` : `${nice(a)} і ${nice(b)} грн` }
-  }
-  const r = typicalRange(v)!
-  return { n: v.length, min: r.min, max: r.max, median: med, text: r.min === r.max ? `${r.min.toLocaleString('uk-UA')} грн` : `від ${r.min.toLocaleString('uk-UA')} до ${r.max.toLocaleString('uk-UA')} грн` }
+  // Up to four studios: their own prices, unrounded (a reader can find 1 030 or 1 560 in the studio's list).
+  // Five and more: the typical span, rounded, because a percentile is no studio's price anyway.
+  const med = v.length >= 5 ? roundNice(v[Math.floor(v.length / 2)]) : v[Math.floor((v.length - 1) / 2)]
+  const f = (x: number) => x.toLocaleString('uk-UA')
+  if (v.length === 1) return { n: 1, min: v[0], max: v[0], median: med, text: `${f(v[0])} грн` }
+  if (v.length === 2) return { n: 2, min: v[0], max: v[1], median: med, text: v[0] === v[1] ? `${f(v[0])} грн` : `${f(v[0])} і ${f(v[1])} грн` }
+  const r = v.length >= 5 ? typicalRange(v)! : { min: v[0], max: v[v.length - 1] }
+  return { n: v.length, min: r.min, max: r.max, median: med, text: r.min === r.max ? `${f(r.min)} грн` : `від ${f(r.min)} до ${f(r.max)} грн` }
 }
