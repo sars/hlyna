@@ -50,6 +50,22 @@ export async function patchStudio(ex: Exec, id: number, patch: Partial<typeof st
   return changes
 }
 
+export type NewStudio = Omit<typeof studios.$inferInsert, 'id' | 'revision' | 'createdAt' | 'updatedAt' | 'createdBy' | 'updatedBy'> & {
+  prices?: { text: string; source?: string | null; dateText?: string | null }[]
+}
+
+/** Adds a studio (research or panel): the row and its prices, a first revision and an audit «create». */
+export async function createStudio(ex: Exec, input: NewStudio, actor: Actor, note: string) {
+  const { prices = [], ...row } = input
+  const [r] = await ex.insert(studios).values({ ...row, createdBy: actor.id, updatedBy: actor.id }).returning({ id: studios.id })
+  const id = r!.id
+  if (prices.length) await ex.insert(studioPrices).values(prices.map((p, position) => ({ studioId: id, position, text: p.text, source: p.source ?? null, dateText: p.dateText ?? null })))
+  const snap = await snapshotStudio(ex, id)
+  await ex.insert(studioRevisions).values({ studioId: id, revision: 1, snapshot: snap, actorId: actor.id, source: actor.source, note })
+  await audit(ex, actor, 'studio', id, 'create', { slug: { from: null, to: row.slug }, name: { from: null, to: row.name } })
+  return id
+}
+
 /** Small studio search for pickers (assign a request, link an owner): name, alternate names, slug, Instagram. */
 export async function searchStudios(db: Db, q: string, limit = 12) {
   const term = q.trim()
