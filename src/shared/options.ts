@@ -52,3 +52,33 @@ export const REQUEST_WHAT_LABEL: Record<RequestWhat, string> = {
 export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 /** Photos an owner may attach to a profile (cabinet form and the service that applies the change). */
 export const MAX_OWNER_PHOTOS = 10
+/**
+ * Oblast (as written in cities.oblast) → the slug of its centre. A centre's city page covers the whole oblast
+ * («Тернопіль і область»; owner, 15.10.2026); Kyiv's page covers Kyiv oblast too. Donetsk, Luhansk and Crimea are left
+ * out: their centres are occupied and the catalogue has no studio there, so their towns stay on no city page.
+ */
+export const OBLAST_CENTRES: Record<string, string> = {
+  'м. Київ (спецстатус)': 'kyiv',
+  Київська: 'kyiv',
+  Вінницька: 'vinnytsia',
+  Волинська: 'lutsk',
+  Дніпропетровська: 'dnipro',
+  Житомирська: 'zhytomyr',
+  Закарпатська: 'uzhhorod',
+  Запорізька: 'zaporizhzhia',
+  'Івано-Франківська': 'ivano-frankivsk',
+  Кіровоградська: 'kropyvnytskyi',
+  Львівська: 'lviv',
+  Миколаївська: 'mykolaiv',
+  Одеська: 'odesa',
+  Полтавська: 'poltava',
+  Рівненська: 'rivne',
+  Сумська: 'sumy',
+  Тернопільська: 'ternopil',
+  Харківська: 'kharkiv',
+  Херсонська: 'kherson',
+  Хмельницька: 'khmelnytskyi',
+  Черкаська: 'cherkasy',
+  Чернівецька: 'chernivtsi',
+  Чернігівська: 'chernihiv',
+}

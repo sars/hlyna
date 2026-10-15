@@ -1,12 +1,13 @@
-import { getAllStudios, getAllWithShops, groupByCity, isStudio, MIN_LIST, offersMasterClasses, worksWithVenues, type StudioCard } from './catalog'
+import { cityPages, getAllStudios, getAllWithShops, isStudio, offersMasterClasses, worksWithVenues, type StudioCard } from './catalog'
 
 // Everyone in the studio lists except suppliers (hidden for now): studios, brands, makers, schools. Shops and galleries are not
 // studios: they have their own block on a city page (getShops).
 const listed = (s: StudioCard) => s.type !== 'supplier'
 
-// Cities with at least MIN_LIST makers get /vyrobnyky/misto/<city> (no thin pages).
+// Who gets /vyrobnyky/misto/<city>: every oblast centre with a maker (its page covers the oblast) and any other town with
+// MIN_LIST makers (cityPages).
 export async function makerCities() {
-  return groupByCity((await getAllStudios()).filter(listed)).filter((g) => g.studios.length >= MIN_LIST)
+  return cityPages((await getAllStudios()).filter(listed))
 }
 
 /**

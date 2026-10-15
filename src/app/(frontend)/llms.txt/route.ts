@@ -2,8 +2,9 @@ import { aboutPage, guides, studioPage } from '@/content/guides'
 import { liveWrittenPages } from '@/editorial/registry'
 import { site } from '@/content/site'
 import { topicList } from '@/content/topics'
-import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { cityPages, getAllStudios, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { makerCities } from '@/lib/makers'
+import { pageName } from '@/lib/present'
 import { priceIndex } from '@/lib/priceIndex'
 import { certificateCities, topicData } from '@/editorial/topics'
 
@@ -35,11 +36,11 @@ export async function GET() {
     lines.push(...extra, '')
   }
   await section('Для бізнесу', ['biz'])
-  const mkCities = groupByCity((await getAllStudios()).filter(offersMasterClasses)).filter((g) => g.studios.length >= MIN_LIST)
-  await section('Майстер-класи', ['mk'], mkCities.map((g) => `- [Майстер-класи з кераміки: ${g.city.name}](${site.url}/maister-klasy/${g.city.slug}): ${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}`))
+  const mkCities = cityPages((await getAllStudios()).filter(offersMasterClasses))
+  await section('Майстер-класи', ['mk'], mkCities.map((g) => `- [Майстер-класи з кераміки: ${pageName(g)}](${site.url}/maister-klasy/${g.city.slug}): ${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}`))
   await section('Подарункові сертифікати', ['cert'], (await certificateCities()).map((c) => `- [Сертифікати на гончарство: ${c.name}](${site.url}/sertyfikaty/${c.slug})`))
   await section('Вироби', ['makers'])
-  lines.push('## Виробники за містами', ...(await makerCities()).map((g) => `- [Кераміка ручної роботи: ${g.city.name}](${site.url}/vyrobnyky/misto/${g.city.slug}): ${g.studios.length} студій, брендів і майстрів`), '')
+  lines.push('## Виробники за містами', ...(await makerCities()).map((g) => `- [Кераміка ручної роботи: ${pageName(g)}](${site.url}/vyrobnyky/misto/${g.city.slug}): ${g.studios.length} студій, брендів і майстрів`), '')
   const written = await liveWrittenPages()
   const wave = written.filter((w) => w.section !== 'keysy')
   const cases = written.filter((w) => w.section === 'keysy')

@@ -18,10 +18,10 @@ import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
-import { getAllStudios, getAllWithShops, getLegacy, getShops, groupByCity, MIN_LIST, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
+import { centreOf, cityPages, getAllStudios, getAllWithShops, getLegacy, getShops, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { CityStudioLinks } from '@/components/ui/CityList'
 import { cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
-import { aboutCity, displayName, firstAddress, inCity, oblastLabel } from '@/lib/present'
+import { aboutCity, displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
 import { localPrices } from '@/lib/priceIndex'
 import { certificateCities } from '@/editorial/topics'
@@ -52,10 +52,10 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const g = await makerCity((await params).city)
   if (!g) return {}
   return {
-    title: fitTitle([`Кераміка ручної роботи ${inCity(g.city.name)}: ${fmt(g.studios.length)} ${pluralUk(g.studios.length, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])}`]),
-    description: (cityContent(g.city.slug as string)?.lead || `Керамічні студії, бренди й майстри ${inCity(g.city.name)}: ${who(g.studios.length)} — посуд, декор, майстер-класи, замовлення для закладів і компаній.`).replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').slice(0, 300),
+    title: fitTitle([`Кераміка ручної роботи ${pageWhere(g)}: ${fmt(g.studios.length)} ${pluralUk(g.studios.length, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])}`, `Кераміка ручної роботи ${pageWhere(g)}`]),
+    description: (cityContent(g.city.slug as string)?.lead || `Керамічні студії, бренди й майстри ${pageWhere(g)}: ${who(g.studios.length)} — посуд, декор, майстер-класи, замовлення для закладів і компаній.`).replace(/\[([^\]]+)\]\([^)]+\)/g, '$1').slice(0, 300),
     alternates: { canonical: `/vyrobnyky/misto/${g.city.slug}` },
-    openGraph: { images: ogImage({ title: `Кераміка ручної роботи: ${g.city.name}`, kicker: 'Виробники', sub: 'Студії, бренди й майстри: посуд, декор, майстер-класи, замовлення для закладів і компаній', img: 'og-318-1' }) },
+    openGraph: { images: ogImage({ title: `Кераміка ручної роботи: ${pageName(g)}`, kicker: 'Виробники', sub: 'Студії, бренди й майстри: посуд, декор, майстер-класи, замовлення для закладів і компаній', img: 'og-318-1' }) },
   }
 }
 
@@ -68,17 +68,28 @@ export default async function CityMakersPage({ params }: Args) {
     if (dropped) permanentRedirect(dropped)
     notFound()
   }
-  const { city, studios } = g
-  const where = inCity(city.name)
+  const { city, studios, towns } = g
+  const name = pageName(g)
+  const where = pageWhere(g)
   const region = oblastLabel(city)
   const st = cityStats(studios)
-  const mkPage = groupByCity((await getAllStudios()).filter(offersMasterClasses)).some((x) => x.city.slug === city.slug && x.studios.length >= MIN_LIST)
+  // On a centre's page the oblast's other towns follow the centre's own sections, each row with its town.
+  const inPage = new Set([city.slug, ...towns.map((t) => t.city.slug)])
+  const own = studios.filter((s) => s.cityDoc?.slug === city.slug)
+  const rest = towns.flatMap((t) => [...t.studios].sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name, 'uk')))
+  const pages = await makerCities()
+  const hasPage = new Set(pages.map((p) => p.city.slug))
+  const hub = towns.length || centreOf(city) === city.slug ? null : (pages.find((p) => p.city.slug === centreOf(city)) ?? null)
+  const mk = cityPages((await getAllStudios()).filter(offersMasterClasses)).find((x) => x.city.slug === city.slug) ?? null
+  const mkPage = Boolean(mk)
   const certPage = (await certificateCities()).some((c) => c.slug === city.slug)
-  const groups = TYPE_GROUPS.map((t) => ({ ...t, studios: studios.filter((s) => t.types.includes(s.type ?? '')).sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name, 'uk')) })).filter((t) => t.studios.length)
+  const groups = TYPE_GROUPS.map((t) => ({ ...t, studios: own.filter((s) => t.types.includes(s.type ?? '')).sort((a, b) => rank(b) - rank(a) || a.name.localeCompare(b.name, 'uk')) })).filter((t) => t.studios.length)
   const counts = groups.map((t) => `${t.title.toLowerCase()} — ${t.studios.length}`).join(', ')
   const content = cityContent(city.slug as string)
-  const shops = (await getShops()).filter((s) => s.cityDoc?.slug === city.slug).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
-  const legacy = (await getLegacy()).filter((s) => s.cityDoc?.slug === city.slug).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+  const inArea = (s: StudioCard) => inPage.has(s.cityDoc?.slug)
+  const shops = (await getShops()).filter(inArea).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+  const legacy = (await getLegacy()).filter(inArea).sort((a, b) => a.name.localeCompare(b.name, 'uk'))
+  const linkName = (s: StudioCard) => (s.cityDoc?.slug === city.slug ? displayName(s) : `${displayName(s)} · ${s.cityDoc?.name}`)
   const known = new Map((await getAllWithShops()).map((s) => [s.slug as string, s]))
   const prices = localPrices(studios)
   const priceWhere = prices.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
@@ -97,30 +108,31 @@ export default async function CityMakersPage({ params }: Args) {
         data={{
           '@context': 'https://schema.org',
           '@type': 'ItemList',
-          name: `Кераміка ручної роботи: ${city.name}`,
+          name: `Кераміка ручної роботи: ${name}`,
           numberOfItems: studios.length,
-          itemListElement: groups.flatMap((t) => t.studios).map((s, i) => ({
+          itemListElement: [...groups.flatMap((t) => t.studios), ...rest].map((s, i) => ({
             '@type': 'ListItem',
             position: i + 1,
             item: {
               '@type': s.type === 'maker' ? 'Person' : 'LocalBusiness',
               name: displayName(s),
               url: `${site.url}/vyrobnyky/${s.slug}`,
-              ...(s.type === 'maker' ? {} : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(firstAddress(s.address) ? { streetAddress: firstAddress(s.address) } : {}) } }),
+              ...(s.type === 'maker' ? {} : { address: { '@type': 'PostalAddress', addressLocality: s.cityDoc?.name ?? city.name, addressCountry: 'UA', ...(firstAddress(s.address) ? { streetAddress: firstAddress(s.address) } : {}) } }),
             },
           })),
         }}
       />
       <InnerHero
-        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, { label: city.name }]}
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, ...(hub ? [{ label: pageName(hub), href: `/vyrobnyky/misto/${hub.city.slug}` }] : []), { label: name }]}
         modified={latestUpdate(studios)}
         kicker={`Виробники${region ? ` · ${region}` : ''}`}
-        title={`Кераміка ручної роботи: ${city.name}`}
+        title={`Кераміка ручної роботи: ${name}`}
         lead={
           <>
             {content?.lead && <p className="m-0">{content.lead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}</p>}
             <p className="m-0">
-          У каталозі «Глина» — {who(studios.length)} {where}: {counts}.
+          У каталозі «Глина» — {who(studios.length)} {where}
+              {rest.length ? `: ${fmt(own.length)} ${inCity(city.name)} (${counts}) і ${fmt(rest.length)} в області — ${towns.map((t) => (t.studios.length > 1 ? `${t.city.name} (${t.studios.length})` : t.city.name)).join(', ')}.` : `: ${counts}.`}
               {st.classes ? ` ${st.classes} ${pluralUk(st.classes, ['проводить', 'проводять', 'проводять'])} майстер-класи` : ''}
               {st.classes && st.venues ? ', ' : st.venues ? ' ' : ''}
               {st.venues ? `${st.venues} ${pluralUk(st.venues, ['працює', 'працюють', 'працюють'])} із закладами` : ''}
@@ -130,7 +142,7 @@ export default async function CityMakersPage({ params }: Args) {
         }
         strip={st.classes && st.venues ? [{ value: fmt(studios.length), label: pluralUk(studios.length, ['профіль', 'профілі', 'профілів']) }, { value: fmt(st.classes), label: pluralUk(st.classes, ['місце', 'місця', 'місць']) + ' з майстер-класами' }, { value: fmt(st.venues), label: 'працюють із закладами' }] : undefined}
         chipsLabel={`Ще про ${aboutCity(city.name)}:`}
-        chips={[...(mkPage ? [{ label: `Майстер-класи: ${city.name} →`, href: `/maister-klasy/${city.slug}` }] : []), ...(certPage ? [{ label: `Сертифікати: ${city.name} →`, href: `/sertyfikaty/${city.slug}` }] : []), { label: 'Показати на мапі →', href: `/mapa?misto=${city.slug}` }]}
+        chips={[...(mk ? [{ label: `Майстер-класи: ${pageName(mk)} →`, href: `/maister-klasy/${city.slug}` }] : []), ...(certPage ? [{ label: `Сертифікати: ${city.name} →`, href: `/sertyfikaty/${city.slug}` }] : []), { label: 'Показати на мапі →', href: `/mapa?misto=${city.slug}` }]}
         actions={
           <Button href="#zapyt-forma" variant="cobalt" arrow>
             Отримати пропозиції
@@ -139,10 +151,10 @@ export default async function CityMakersPage({ params }: Args) {
       />
 
       <InnerCols aside={<RequestForm sourcePage={`/vyrobnyky/misto/${city.slug}`} defaultWhat="tableware" defaultCity={city.name} />}>
-        {content && <PlaceStory c={content} known={known} title={`Кераміка ${where}: що тут роблять`} />}
+        {content && <PlaceStory c={content} known={known} title={`Кераміка ${inCity(city.name)}: що тут роблять`} />}
         {content && <PlacePicks c={content} known={known} />}
         {prices.length > 0 && (
-          <Block id="prices" kicker="Ціни" title={`Ціни ${where}`} note={<>З прайсів студій цього міста: одна ціна на студію, від найнижчої до найвищої. Порівняння з усією Україною — на сторінці <Link href="/tsiny-2026">«Ціни 2026»</Link>.</>}>
+          <Block id="prices" kicker="Ціни" title={`Ціни ${where}`} note={<>З прайсів студій з цієї сторінки: одна ціна на студію, від найнижчої до найвищої. Порівняння з усією Україною — на сторінці <Link href="/tsiny-2026">«Ціни 2026»</Link>.</>}>
             <DataTable
               columns={[{ key: 'what', label: 'Що' }, { key: 'text', label: 'Ціни', numeric: true }, { key: 'median', label: 'Медіана', numeric: true, align: 'end' }, { key: 'n', label: 'Студій', numeric: true, align: 'end' }]}
               rows={prices.map((p) => ({
@@ -183,15 +195,41 @@ export default async function CityMakersPage({ params }: Args) {
           </Block>
         ))}
 
+        {rest.length > 0 && (
+          <Block
+            id="oblast"
+            title={`Ще в області · ${rest.length}`}
+            note={
+              <>
+                {oblastGen(towns)}: біля кожного — його місто чи село.
+                {towns
+                  .filter((t) => hasPage.has(t.city.slug))
+                  .map((t) => (
+                    <React.Fragment key={t.city.slug}>
+                      {' '}
+                      <Link href={`/vyrobnyky/misto/${t.city.slug}`}>Окрема сторінка: {t.city.name} →</Link>
+                    </React.Fragment>
+                  ))}
+              </>
+            }
+          >
+            <MakerRows>
+              {rest.map((s) => (
+                <MakerRow key={s.id} s={s} place={s.cityDoc?.name ?? undefined} />
+              ))}
+            </MakerRows>
+          </Block>
+        )}
+
         {shops.length > 0 && (
           <Block id="shops" title={`Магазини й галереї · ${shops.length}`} note="Де продають і показують кераміку різних майстрів; це не студії, тому окремо від списків вище.">
-            <CityStudioLinks studios={shops.map((s) => ({ id: s.id, name: displayName(s), href: `/vyrobnyky/${s.slug}` }))} />
+            <CityStudioLinks studios={shops.map((s) => ({ id: s.id, name: linkName(s), href: `/vyrobnyky/${s.slug}` }))} />
           </Block>
         )}
 
         {legacy.length > 0 && (
           <Block id="legacy" title={`Музеї й спадщина · ${legacy.length}`} note="Музеї, осередки традиційної кераміки й пам’ять про майстрів; це не студії, тому окремо від списків вище.">
-            <CityStudioLinks studios={legacy.map((s) => ({ id: s.id, name: displayName(s), href: `/vyrobnyky/${s.slug}` }))} />
+            <CityStudioLinks studios={legacy.map((s) => ({ id: s.id, name: linkName(s), href: `/vyrobnyky/${s.slug}` }))} />
           </Block>
         )}
 

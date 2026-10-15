@@ -22,8 +22,8 @@ import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/lib/ogImage'
 import { pickVerse } from '@/content/verses'
-import { getAllStudios, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
-import { displayName, firstAddress, inCity, oblastLabel } from '@/lib/present'
+import { centreOf, cityPages, getAllStudios, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL, type Format, type StudioCard } from '@/lib/catalog'
+import { displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
 import { scopeSpan, studioPrice } from '@/lib/priceIndex'
 import { MK_CHIPS as CHIPS } from '@/lib/mkChips'
 import { cityContent } from '@/editorial/places'
@@ -35,17 +35,13 @@ import { redirectOldCitySlug } from '@/lib/redirects'
 
 export const revalidate = 86400
 
-async function cityData(slug: string) {
-  const groups = groupByCity((await getAllStudios()).filter(offersMasterClasses))
-  const g = groups.find((x) => x.city.slug === slug)
-  return g && g.studios.length >= MIN_LIST ? g : null
-}
+// Every oblast centre with a class place (its page covers the oblast) and any other town with MIN_LIST places.
+const mkPages = async () => cityPages((await getAllStudios()).filter(offersMasterClasses))
+const cityData = async (slug: string) => (await mkPages()).find((p) => p.city.slug === slug) ?? null
 
 export async function generateStaticParams() {
   try {
-    return groupByCity((await getAllStudios()).filter(offersMasterClasses))
-      .filter((g) => g.studios.length >= MIN_LIST)
-      .map((g) => ({ city: g.city.slug as string }))
+    return (await mkPages()).map((g) => ({ city: g.city.slug as string }))
   } catch {
     return []
   }
@@ -76,11 +72,12 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!g) return {}
   const r = scopeSpan(g.studios, 'group')
   const n = g.studios.length
+  const where = pageWhere(g)
   return {
-    title: fitTitle([`Майстер-класи з кераміки ${inCity(g.city.name)}: ${places(n)} і ціни 2026`, `Майстер-класи з кераміки ${inCity(g.city.name)}: ${places(n)}`]),
-    description: `${places(n)} ${inCity(g.city.name)}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття коштує ${priceText(r)}` : ''}. Формати, адреси, сертифікати.`,
+    title: fitTitle([`Майстер-класи з кераміки ${where}: ${places(n)} і ціни 2026`, `Майстер-класи з кераміки ${where}: ${places(n)}`, `Майстер-класи з кераміки ${where}`]),
+    description: `${places(n)} ${where}, де проводять майстер-класи з гончарства, ліплення і розпису${r ? `; разове заняття коштує ${priceText(r)}` : ''}. Формати, адреси, сертифікати.`,
     alternates: { canonical: `/maister-klasy/${g.city.slug}` },
-    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${g.city.name}`, kicker: 'Майстер-класи', sub: 'Гончарне коло, ліплення і розпис: студії, адреси, формати й сертифікати', img: 'og-318-1' }) },
+    openGraph: { images: ogImage({ title: `Майстер-класи з кераміки: ${pageName(g)}`, kicker: 'Майстер-класи', sub: 'Гончарне коло, ліплення і розпис: студії, адреси, формати й сертифікати', img: 'og-318-1' }) },
   }
 }
 
@@ -91,13 +88,22 @@ export default async function CityMasterClassesPage({ params }: Args) {
     await redirectOldCitySlug(citySlug, (c) => `/maister-klasy/${c}`)
     notFound()
   }
-  const { city, studios } = g
-  const where = inCity(city.name)
+  const { city, studios, towns } = g
+  const name = pageName(g)
+  const where = pageWhere(g)
   const region = oblastLabel(city)
+  // On a centre's page the centre's own places come first, then the rest of the oblast with the town on each row.
+  const own = studios.filter((s) => s.cityDoc?.slug === city.slug)
+  const rest = towns.flatMap((t) => t.studios)
+  const pages = await mkPages()
+  const hasPage = new Set(pages.map((p) => p.city.slug))
+  const hub = towns.length || centreOf(city) === city.slug ? null : (pages.find((p) => p.city.slug === centreOf(city)) ?? null)
   const r = scopeSpan(studios, 'group')
   const priced = r?.n ?? 0
   // Studios with a known class price first, then those with Instagram, then by name.
-  const sorted = [...studios].sort((a, b) => Number(minClass(b) !== null) - Number(minClass(a) !== null) || Number(!!b.instagram) - Number(!!a.instagram) || a.name.localeCompare(b.name, 'uk'))
+  const byPrice = (a: StudioCard, b: StudioCard) => Number(minClass(b) !== null) - Number(minClass(a) !== null) || Number(!!b.instagram) - Number(!!a.instagram) || a.name.localeCompare(b.name, 'uk')
+  const sorted = [...own].sort(byPrice)
+  const sortedRest = towns.flatMap((t) => [...t.studios].sort(byPrice))
   const hasCertPage = (await certificateCities()).some((c) => c.slug === city.slug)
   const count = (f: Format) => studios.filter((s) => hasFormat(s, f)).length
   const formatLinks = FORMAT_PAGES.filter(([f]) => count(f) >= 2)
@@ -114,8 +120,8 @@ export default async function CityMasterClassesPage({ params }: Args) {
     {
       q: `Скільки коштує майстер-клас з кераміки ${where}?`,
       a: r
-        ? `За прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])} міста разовий майстер-клас коштує ${priceText(r)}. Групове заняття дешевше за індивідуальне; випал і полива іноді оплачуються окремо. Курси й абонементи рахуються окремо.`
-        : `Студії міста здебільшого не публікують ціни. По Україні разовий майстер-клас коштує ${f.range('group')}, індивідуальний — ${f.range('private')}.`,
+        ? `За прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])} ${where} разовий майстер-клас коштує ${priceText(r)}. Групове заняття дешевше за індивідуальне; випал і полива іноді оплачуються окремо. Курси й абонементи рахуються окремо.`
+        : `Студії ${where} здебільшого не публікують ціни. По Україні разовий майстер-клас коштує ${f.range('group')}, індивідуальний — ${f.range('private')}.`,
     },
     { q: 'Коли можна забрати свій виріб?', a: `Зазвичай через ${site.lead.pickup}: виріб має висохнути і пройти два випали (до і після поливи). Деякі студії надсилають готові вироби Новою поштою.` },
     { q: 'Чи можна подарувати майстер-клас?', a: 'Так, більшість студій продають подарункові сертифікати; термін дії найчастіше 3–6 місяців. Умови — у профілі студії.' },
@@ -138,36 +144,37 @@ export default async function CityMasterClassesPage({ params }: Args) {
         data={{
           '@context': 'https://schema.org',
           '@type': 'ItemList',
-          name: `Майстер-класи з кераміки: ${city.name}`,
-          numberOfItems: sorted.length,
-          itemListElement: sorted.map((s, i) => ({
+          name: `Майстер-класи з кераміки: ${name}`,
+          numberOfItems: studios.length,
+          itemListElement: [...sorted, ...sortedRest].map((s, i) => ({
             '@type': 'ListItem',
             position: i + 1,
             item: {
               '@type': 'LocalBusiness',
               name: displayName(s),
               url: `${site.url}/vyrobnyky/${s.slug}`,
-              address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(firstAddress(s.address) ? { streetAddress: firstAddress(s.address) } : {}) },
+              address: { '@type': 'PostalAddress', addressLocality: s.cityDoc?.name ?? city.name, addressCountry: 'UA', ...(firstAddress(s.address) ? { streetAddress: firstAddress(s.address) } : {}) },
             },
           })),
         }}
       />
       <InnerHero
-        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи', href: '/maister-klasy' }, { label: city.name }]}
+        crumbs={[{ label: 'Головна', href: '/' }, { label: 'Майстер-класи', href: '/maister-klasy' }, ...(hub ? [{ label: pageName(hub), href: `/maister-klasy/${hub.city.slug}` }] : []), { label: name }]}
         modified={latestUpdate(studios)}
         kicker={`Майстер-класи${region ? ` · ${region}` : ''}`}
-        title={`Майстер-класи з кераміки: ${city.name}`}
+        title={`Майстер-класи з кераміки: ${name}`}
         lead={
           <>
             <p className="m-0">
               У каталозі «Глина» — {places(studios.length)} {where}, де проводять заняття з гончарства, ліплення чи розпису кераміки
           {breakdown.length ? `: ${breakdown.join(', ')}` : ''}.
+          {rest.length ? ` З них ${fmt(own.length)} — ${inCity(city.name)}, ${fmt(rest.length)} — в області: ${towns.map((t) => (t.studios.length > 1 ? `${t.city.name} (${t.studios.length})` : t.city.name)).join(', ')}.` : ''}
           {r ? ` Разовий майстер-клас коштує ${priceText(r)} (за прайсами ${priced} ${pluralUk(priced, ['студії', 'студій', 'студій'])}, ${site.dataUpdated}).` : ''} Нижче — кожна студія з форматами й цінами; один запит можна надіслати одразу кільком.
             </p>
             {placeLead && (
               <p className="m-0 text-[15.5px] text-ink-2">
                 {placeLead.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')}{' '}
-                <Link href={`/vyrobnyky/misto/${city.slug}`}>Більше про кераміку {where} →</Link>
+                <Link href={`/vyrobnyky/misto/${city.slug}`}>Більше про кераміку {inCity(city.name)} →</Link>
               </p>
             )}
           </>
@@ -200,7 +207,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
       >
         {studios.length >= 8 && <Epigraph lines={pickVerse(city.slug as string)} />}
 
-        <Block id="list" title={`Де пройти майстер-клас ${where}`} note={<>Ціна — разове групове заняття для дорослих з прайсу студії. Курси, абонементи й корпоративи — у профілі.</>}>
+        <Block id="list" title={`Де пройти майстер-клас ${inCity(city.name)}`} note={<>Ціна — разове групове заняття для дорослих з прайсу студії. Курси, абонементи й корпоративи — у профілі.</>}>
           <MakerRows>
             {sorted.map((st) => {
               const from = minClass(st)
@@ -208,6 +215,33 @@ export default async function CityMasterClassesPage({ params }: Args) {
             })}
           </MakerRows>
         </Block>
+
+        {rest.length > 0 && (
+          <Block
+            id="oblast"
+            title={`Ще в області · ${rest.length}`}
+            note={
+              <>
+                {oblastGen(towns)}: біля кожного місця — його місто чи село.
+                {towns
+                  .filter((t) => hasPage.has(t.city.slug))
+                  .map((t) => (
+                    <React.Fragment key={t.city.slug}>
+                      {' '}
+                      <Link href={`/maister-klasy/${t.city.slug}`}>Окрема сторінка: {t.city.name} →</Link>
+                    </React.Fragment>
+                  ))}
+              </>
+            }
+          >
+            <MakerRows>
+              {sortedRest.map((st) => {
+                const from = minClass(st)
+                return <MakerRow key={st.id} s={st} place={st.cityDoc?.name ?? undefined} typeLabel={TYPE_LABEL[st.type ?? 'other']} showAbout={false} chips={chipsOf(st)} price={from ? { value: `${fmt(roundNice(from))} грн`, unit: 'з особи' } : undefined} />
+              })}
+            </MakerRows>
+          </Block>
+        )}
 
         {(formatLinks.length > 0 || hasCertPage) && (
           <ChipGroup as="nav" label="За форматом" aria-label="Формати">

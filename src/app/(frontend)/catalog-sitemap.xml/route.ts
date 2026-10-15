@@ -1,7 +1,7 @@
 import { guides } from '@/content/guides'
 import { site } from '@/content/site'
 import { topicList } from '@/content/topics'
-import { getAllStudios, getCatalog, groupByCity, MIN_LIST, offersMasterClasses } from '@/lib/catalog'
+import { cityPages, getAllStudios, getCatalog, offersMasterClasses } from '@/lib/catalog'
 import { makerCities } from '@/lib/makers'
 import { certificateCities } from '@/editorial/topics'
 import { liveWrittenPages } from '@/editorial/registry'
@@ -22,7 +22,7 @@ export async function GET() {
   const latest = (xs: { updatedAt?: string | null }[]) => xs.reduce((m, x) => (x.updatedAt && x.updatedAt > m ? x.updatedAt : m), site.contentUpdated)
   const now = latest(studios)
   const content = site.contentUpdated
-  const cities = groupByCity(studios.filter(offersMasterClasses)).filter((g) => g.studios.length >= MIN_LIST)
+  const cities = cityPages(studios.filter(offersMasterClasses))
   const xml = urlset([
     ...HUBS.map((p) => ({ loc: site.url + p, lastmod: now })),
     ...topicList.map((t) => ({ loc: site.url + t.path, lastmod: now })),

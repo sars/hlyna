@@ -14,8 +14,10 @@ export function MakerRows({ children }: { children: React.ReactNode }) {
 
 // A studio in a city's master-class list: name, address and Instagram, one line, what it offers, and the price of a single
 // group class (from its price list) on the right. Without a price there is no price column.
-export function MakerRow({ s, price, chips: chipsProp, typeLabel, showAbout = true }: { s: StudioCard; price?: { value: string; unit?: string }; chips?: { label: string; tone?: 'ink' | 'cobalt' }[]; typeLabel?: string; showAbout?: boolean }) {
-  const addr = firstAddress(s.address)
+export function MakerRow({ s, price, chips: chipsProp, typeLabel, place, showAbout = true }: { s: StudioCard; price?: { value: string; unit?: string }; chips?: { label: string; tone?: 'ink' | 'cobalt' }[]; typeLabel?: string; place?: string; showAbout?: boolean }) {
+  // place: the town on a page that lists several (an oblast centre's page); left out when the address already names it
+  const street = firstAddress(s.address)
+  const addr = place && !street?.includes(place) ? [place, street].filter(Boolean).join(', ') : street
   const stale = staleNote(s)
   const about = showAbout ? groupMoney(stripPersonal(s.summary ?? '')) : ''
   const chips = chipsProp ?? [

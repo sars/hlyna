@@ -29,7 +29,7 @@ import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { sitePhotos } from '@/content/photos'
 import { site } from '@/content/site'
 import { verses } from '@/content/verses'
-import { getAllStudios, groupByCity, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { cityPages, getAllStudios, groupByCity, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { priceIndex } from '@/lib/priceIndex'
 import { facts } from '@/lib/facts'
 
@@ -84,7 +84,8 @@ async function stats() {
       masterClassPlaces: mk.length,
       // The same base as /tsiny-2026 and llms.txt, so the home page and the index never quote two different counts.
       withPrices: (await priceIndex()).studios,
-      cityCounts: new Map(groupByCity(mk).map((g) => [g.city.slug as string, g.studios.length])),
+      // Places on each city's master-class page (an oblast centre's page counts the whole oblast).
+      cityCounts: new Map(cityPages(mk).map((g) => [g.city.slug as string, g.studios.length])),
     }
   } catch {
     return { ...site.stats, cityCounts: new Map<string, number>() }
@@ -236,7 +237,7 @@ export default async function HomePage() {
           <CityList
             items={[
               ...cities
-                .filter(([, , slug]) => (s.cityCounts.get(slug) ?? 0) >= 3 || !s.cityCounts.size)
+                .filter(([, , slug]) => s.cityCounts.has(slug) || !s.cityCounts.size)
                 .map(([n, c, slug]) => ({ name: n === 'Івано-Франківськ' ? 'Франківськ' : n, href: `/maister-klasy/${slug}`, count: s.cityCounts.get(slug) ?? c })),
               { name: 'Усі міста', href: '/maister-klasy', count: '→' },
             ]}

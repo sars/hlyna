@@ -8,7 +8,8 @@ import React from 'react'
 
 import { facts } from '@/lib/facts'
 import { topicList } from '@/content/topics'
-import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
+import { cityPages, getAllStudios, groupByCity, offersMasterClasses, onPages, pluralUk } from '@/lib/catalog'
+import { pageName } from '@/lib/present'
 import { scopeSpan } from '@/lib/priceIndex'
 import { fmt } from '@/lib/money'
 
@@ -23,8 +24,9 @@ export const metadata: Metadata = {
 export default async function MasterClassesIndex() {
   const f = await facts()
   const groups = groupByCity((await getAllStudios()).filter(offersMasterClasses))
-  const big = groups.filter((g) => g.studios.length >= MIN_LIST)
-  const small = groups.filter((g) => g.studios.length < MIN_LIST)
+  const big = cityPages(groups.flatMap((g) => g.studios))
+  const listed = onPages(big)
+  const small = groups.filter((g) => !listed.has(g.city.slug))
   const total = groups.reduce((n, g) => n + g.studios.length, 0)
   const gr = f.get('group') // the same p10–p90 range as the lead
   const facts_ = gr ? { value: `${fmt(gr.min)}–${fmt(gr.max)}`, label: 'грн разовий майстер-клас з особи' } : null
@@ -64,7 +66,7 @@ export default async function MasterClassesIndex() {
           <CityList
             items={big.map((g) => {
               const r = scopeSpan(g.studios, 'group')
-              return { name: g.city.name, href: `/maister-klasy/${g.city.slug}`, count: g.studios.length, note: r ? `від ${fmt(r.min)} грн` : 'ціни уточнюються' }
+              return { name: pageName(g), href: `/maister-klasy/${g.city.slug}`, count: g.studios.length, note: r ? `від ${fmt(r.min)} грн` : 'ціни уточнюються' }
             })}
           />
         </Block>

@@ -11,7 +11,7 @@ import { QuoteBlock } from '@/components/ui/QuoteBlock'
 import { MakerRow, MakerRows } from '@/components/ui/MakerRow'
 import { WavePage } from '@/components/site/WavePage'
 import { MK_CHIPS } from '@/lib/mkChips'
-import { getAllStudios, getAllWithShops, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL } from '@/lib/catalog'
+import { getAllStudios, cityPage, getAllWithShops, hasFormat, MIN_LIST, offersMasterClasses, pluralUk, TYPE_LABEL } from '@/lib/catalog'
 import { fmt } from '@/lib/money'
 import { displayName } from '@/lib/present'
 import { FORMAT_PAGES, fillCopy, formatCityData, formatCityId, isFormatSlug, liveFormatCityPages, waveCopy, type FormatSlug } from '@/editorial/wave-a'
@@ -65,8 +65,7 @@ export default async function Page({ params }: Args) {
     // A written format page whose city dropped below three places for this format: the city's own page still
     // answers the same search (same city, every format), so send people there; a city that lost its page is a 404.
     if (isFormatSlug(format) && waveCopy(formatCityId(city, format))) {
-      const g = groupByCity((await getAllStudios()).filter(offersMasterClasses)).find((x) => x.city.slug === city)
-      if (g && g.studios.length >= MIN_LIST) permanentRedirect(`/maister-klasy/${city}`)
+      if (cityPage((await getAllStudios()).filter(offersMasterClasses), city)) permanentRedirect(`/maister-klasy/${city}`)
     }
     notFound()
   }

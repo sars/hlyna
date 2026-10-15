@@ -6,8 +6,8 @@ import React from 'react'
 
 import { JsonLd } from '@/components/site/JsonLd'
 import { site } from '@/content/site'
-import { getAllStudios, groupByCity, pluralUk } from '@/lib/catalog'
-import { displayName } from '@/lib/present'
+import { getAllStudios, groupByCity, onPages, pluralUk } from '@/lib/catalog'
+import { displayName, pageName } from '@/lib/present'
 import { cityStats, makerCities } from '@/lib/makers'
 import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
@@ -24,11 +24,12 @@ export const metadata: Metadata = {
 export default async function CitiesIndex() {
   const big = await makerCities()
   const all = groupByCity((await getAllStudios()).filter((s) => s.type !== 'supplier'))
-  const small = all.filter((g) => !big.some((b) => b.city.slug === g.city.slug))
+  const listed = onPages(big)
+  const small = all.filter((g) => !listed.has(g.city.slug))
   const total = all.reduce((n, g) => n + g.studios.length, 0)
   return (
     <InnerMain>
-      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Кераміка ручної роботи за містами України', itemListElement: big.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/misto/${g.city.slug}`, name: g.city.name })) }} />
+      <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: 'Кераміка ручної роботи за містами України', itemListElement: big.map((g, i) => ({ '@type': 'ListItem', position: i + 1, url: `${site.url}/vyrobnyky/misto/${g.city.slug}`, name: pageName(g) })) }} />
       <InnerHero
         crumbs={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами' }]}
         kicker="Виробники"
@@ -45,7 +46,7 @@ export default async function CitiesIndex() {
           <CityList
             items={big.map((g) => {
               const st = cityStats(g.studios)
-              return { name: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}`, count: g.studios.length, note: st.classes ? `майстер-класи: ${st.classes}` : 'вироби й замовлення' }
+              return { name: pageName(g), href: `/vyrobnyky/misto/${g.city.slug}`, count: g.studios.length, note: st.classes ? `майстер-класи: ${st.classes}` : 'вироби й замовлення' }
             })}
           />
         </Block>

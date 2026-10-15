@@ -2,6 +2,7 @@ import { unstable_cache } from 'next/cache'
 import { cache } from 'react'
 
 import type { City, Studio } from '@/types/catalog'
+import { OBLAST_CENTRES } from '@/shared/options'
 import { cleanAddress, cleanPublic } from './present'
 import { wholeAmountsIn } from './money'
 import { loadPublicCities, loadPublicPhotos, loadPublicStudios } from '@/server/publicCatalog'
@@ -170,10 +171,41 @@ export function groupByCity(studios: StudioCard[]): CityGroup[] {
   return [...map.values()].sort((a, b) => b.studios.length - a.studios.length)
 }
 
+/** The slug of the oblast centre whose page lists this city (a centre's own slug for the centre), or null. */
+export const centreOf = (c?: Pick<City, 'oblast'> | null) => (c?.oblast ? (OBLAST_CENTRES[c.oblast] ?? null) : null)
+
+/** A city page: the city's entries, or on an oblast centre's page the whole oblast (`towns`: the other settlements, largest first). */
+export type CityPage = CityGroup & { towns: CityGroup[] }
+
+/**
+ * Which cities get a page for this list (owner, 15.10.2026). An oblast centre with at least one entry gets a page for the
+ * whole oblast («Тернопіль і область»: the centre first, then every other town or village with its name), even with one or
+ * two entries: people search by their oblast centre. Any other town or village keeps its own page with at least MIN_LIST
+ * entries, and is on its centre's page as well. Entries of an oblast whose centre has none, or of a city without an oblast,
+ * are on no city page (the index lists them by name).
+ */
+export function cityPages(studios: StudioCard[]): CityPage[] {
+  const groups = groupByCity(studios)
+  const pages: CityPage[] = []
+  for (const g of groups) {
+    const centre = centreOf(g.city)
+    if (centre === g.city.slug) {
+      const towns = groups.filter((t) => t !== g && centreOf(t.city) === centre)
+      pages.push({ city: g.city, studios: [...g.studios, ...towns.flatMap((t) => t.studios)], towns })
+    } else if (g.studios.length >= MIN_LIST) pages.push({ ...g, towns: [] })
+  }
+  return pages.sort((a, b) => b.studios.length - a.studios.length)
+}
+
+/** Slugs of every city some page lists (its own page or its centre's): the rest go to an index's «Ще міста і села». */
+export const onPages = (pages: CityPage[]) => new Set(pages.flatMap((p) => [p.city.slug, ...p.towns.map((t) => t.city.slug)]))
+
+export const cityPage = (studios: StudioCard[], slug: string) => cityPages(studios).find((p) => p.city.slug === slug) ?? null
+
 /** Newest updatedAt among studios (page dateModified / sitemap lastmod). */
 export const latestUpdate = (xs: { updatedAt?: string | null }[]) => xs.reduce<string | null>((m, x) => (x.updatedAt && (!m || x.updatedAt > m) ? x.updatedAt : m), null)
 
-export const MIN_LIST = 3 // no thin pages: a list needs at least 3 real entries (AGENTS.md)
+export const MIN_LIST = 3 // no thin pages: a list needs at least 3 real entries (AGENTS.md; oblast centres' pages excepted, cityPages)
 
 export const igHandle = (url?: string | null) => url?.replace(/\/$/, '').split('/').pop() ?? ''
 

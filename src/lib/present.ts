@@ -153,6 +153,18 @@ export const aboutCity = (name: string) =>
 
 export const inCity = (name?: string | null) => (name ? LOCATIVE[name] ?? `у м. ${name}` : '')
 
+/** A city page's name and «where»: «Тернопіль і область», «у Тернополі й області» on a centre's page with other towns. */
+export const pageName = (p: { city: Pick<City, 'name'>; towns: unknown[] }) => (p.towns.length ? `${p.city.name} і область` : p.city.name)
+/** «Населені пункти Тернопільської області» for the towns on a centre's page (their oblast as written in cities.oblast). */
+export const oblastGen = (towns: { city: Pick<City, 'oblast'> }[]) => {
+  const o = towns.find((t) => t.city.oblast)?.city.oblast?.replace(/\([^)]*\)/g, '').trim()
+  return o ? `Населені пункти ${o.replace(/ька$/u, 'ької')} області` : 'Населені пункти області'
+}
+export const pageWhere = (p: { city: Pick<City, 'name'>; towns: unknown[] }) => {
+  const w = inCity(p.city.name)
+  return p.towns.length ? `${w} ${/[аеєиіїоуюя]$/u.test(w) ? 'й' : 'і'} області` : w
+}
+
 // Admin labels like «м. Київ (спецстатус)» or a bare «Вінницька» → readable region names.
 export function oblastLabel(c?: Pick<City, 'oblast' | 'name'> | null): string {
   const o = (c?.oblast ?? '').replace(/\([^)]*\)/g, '').trim()

@@ -32,8 +32,8 @@ import { ogImage } from '@/lib/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
-import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, confirmedForCompanies, confirmedForVenues, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL } from '@/lib/catalog'
-import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
+import { centreOf, cityPages, getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, confirmedForCompanies, confirmedForVenues, igHandle, offersMasterClasses, TYPE_LABEL, type CityPage } from '@/lib/catalog'
+import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, pageName, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { acceptsRequests, dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
@@ -120,11 +120,13 @@ export default async function StudioPage({ params }: Args) {
   const companies = !exhibiting && !dormant && confirmedForCompanies(s)
   const everyone = await getAllStudios()
   const related = relatedStudios(s, everyone)
-  // Link the city only when it has its own master-class page (MIN_LIST places).
-  const cityPage = city ? (groupByCity(everyone.filter(offersMasterClasses)).find((g) => g.city.slug === city.slug)?.studios.length ?? 0) >= MIN_LIST : false
-  // Breadcrumb and «Місто» go to the city's makers page (/vyrobnyky/misto/<city>), else to its master-class page.
-  const makersPage = city ? (await makerCities()).some((g) => g.city.slug === city.slug) : false
-  const cityHref = city ? (makersPage ? `/vyrobnyky/misto/${city.slug}` : cityPage ? `/maister-klasy/${city.slug}` : '') : ''
+  // Breadcrumb and «Місто» go to the page that lists the city: its own makers page (/vyrobnyky/misto/<city>), else its
+  // oblast centre's page («Тернопіль і область»), else the same two kinds of master-class page; none → plain text.
+  const pageOf = (pages: CityPage[]) => (city ? (pages.find((p) => p.city.slug === city.slug) ?? pages.find((p) => p.city.slug === centreOf(city)) ?? null) : null)
+  const makersPage = pageOf(await makerCities())
+  const classPage = makersPage ? null : pageOf(cityPages(everyone.filter(offersMasterClasses)))
+  const cityHref = makersPage ? `/vyrobnyky/misto/${makersPage.city.slug}` : classPage ? `/maister-klasy/${classPage.city.slug}` : ''
+  const cityCrumb = makersPage ?? classPage
   const b2b = s.b2b ?? {}
   const hasB2bData = Boolean(b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length || b2b.dishwasherSafe || b2b.foodSafe)
   const channels = dedupeTexts((s.salesChannels ?? []).map((x) => x.text)).slice(0, 6)
@@ -217,7 +219,7 @@ export default async function StudioPage({ params }: Args) {
 
       <div className="grid grid-cols-[minmax(0,1fr)] items-start gap-[clamp(20px,3vw,40px)] border-b-2 border-ink pt-hero pb-[clamp(24px,3vw,40px)] lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
         <div className="grid min-w-0 gap-3.5">
-          <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityHref ? [{ label: city.name, href: cityHref }] : []), { label: name }]} modified={s.updatedAt} />
+          <Breadcrumbs items={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, ...(city && cityCrumb ? [{ label: pageName(cityCrumb), href: cityHref }] : []), { label: name }]} modified={s.updatedAt} />
           <Kicker>
             {typeLabel}
             {city ? ` · ${city.name}` : ''}
