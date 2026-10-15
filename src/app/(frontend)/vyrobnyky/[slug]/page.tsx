@@ -121,8 +121,9 @@ export default async function StudioPage({ params }: Args) {
   const everyone = await getAllStudios()
   const related = relatedStudios(s, everyone)
   // Breadcrumb and «Місто» go to the page that lists the city: its own makers page (/vyrobnyky/misto/<city>), else its
-  // oblast centre's page («Тернопіль і область»), else the same two kinds of master-class page; none → plain text.
-  const pageOf = (pages: CityPage[]) => (city ? (pages.find((p) => p.city.slug === city.slug) ?? pages.find((p) => p.city.slug === centreOf(city)) ?? null) : null)
+  // oblast centre's page when that page covers the oblast («Тернопіль і область»; a page with the centre alone would read as
+  // the wrong city), else the same two kinds of master-class page; none → plain text.
+  const pageOf = (pages: CityPage[]) => (city ? (pages.find((p) => p.city.slug === city.slug) ?? pages.find((p) => p.city.slug === centreOf(city) && p.towns.length > 0) ?? null) : null)
   const makersPage = pageOf(await makerCities())
   const classPage = makersPage ? null : pageOf(cityPages(everyone.filter(offersMasterClasses)))
   const cityHref = makersPage ? `/vyrobnyky/misto/${makersPage.city.slug}` : classPage ? `/maister-klasy/${classPage.city.slug}` : ''
@@ -153,7 +154,14 @@ export default async function StudioPage({ params }: Args) {
   const checked = monthYear(s.activity?.checkedAt)
   const facts: [string, React.ReactNode][] = [
     ['Тип', typeLabel],
-    ...(city ? [['Місто', cityHref ? <Link key="c" href={cityHref}>{city.name}</Link> : city.name] as [string, React.ReactNode]] : []),
+    ...(city
+      ? [
+          [
+            'Місто',
+            !cityCrumb ? city.name : cityCrumb.city.slug === city.slug ? <Link key="c" href={cityHref}>{city.name}</Link> : <React.Fragment key="c">{city.name} · <Link href={cityHref}>{pageName(cityCrumb)}</Link></React.Fragment>,
+          ] as [string, React.ReactNode],
+        ]
+      : []),
     ...(cleanAddress(s.address) ? [['Адреса', cleanAddress(s.address)] as [string, React.ReactNode]] : []),
     ...(s.instagram ? [['Instagram', link(s.instagram, '@' + igHandle(s.instagram))] as [string, React.ReactNode]] : []),
     ...(lastPost ? [['Останній пост', lastPost] as [string, React.ReactNode]] : []),
