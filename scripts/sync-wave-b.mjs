@@ -60,6 +60,21 @@ for (const file of fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.ends
     picks: (Array.isArray(d.picks) ? d.picks : [])
       .filter((p) => p && str(p.need) && Array.isArray(p.slugs) && p.slugs.length)
       .map((p) => ({ need: p.need.trim(), slugs: p.slugs.filter(str), why: str(p.why) ? p.why.trim() : '' })),
+    ...(Array.isArray(d.tops) && d.tops.length
+      ? {
+          tops: d.tops
+            .filter((c) => c && str(c.id) && str(c.heading) && Array.isArray(c.items))
+            .map((c) => ({
+              id: c.id.trim(),
+              heading: c.heading.trim(),
+              ...(str(c.intro) ? { intro: c.intro.trim() } : {}),
+              items: c.items
+                .filter((x) => x && str(x.title) && str(x.maker) && str(x.details) && str(x.seen))
+                .map((x) => Object.fromEntries(['title', 'maker', 'slug', 'href', 'city', 'price', 'details', 'terms', 'seen', 'embed'].filter((k) => str(x[k])).map((k) => [k, x[k].trim()]))),
+            }))
+            .filter((c) => c.items.length),
+        }
+      : {}),
     faq: (Array.isArray(d.faq) ? d.faq : []).filter((x) => x && str(x.q) && str(x.a)).map((x) => ({ q: x.q.trim(), a: x.a.trim() })),
     sources: [...new Set((Array.isArray(d.sources) ? d.sources : []).filter((s) => str(s) && /^https?:\/\//.test(s)))],
   }
@@ -68,11 +83,19 @@ for (const file of fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.ends
     continue
   }
   if (out.epigraph.length > 6) warn(file, 'epigraph longer than 6 lines')
+  for (const c of out.tops ?? []) {
+    if (c.items.length > 5) warn(file, `top «${c.heading}» has ${c.items.length} items (5 at most)`)
+    for (const x of c.items) {
+      if (x.href && !/^https:\/\/(www\.)?instagram\.com\/[\w.]+\/?$/.test(x.href)) warn(file, `top item «${x.title}»: href must be an Instagram profile URL`)
+      if (x.embed && !/^https:\/\/www\.instagram\.com\/(p|reel)\/[\w-]+\/$/.test(x.embed)) warn(file, `top item «${x.title}»: embed must be an Instagram post URL`)
+      if (x.slug && x.href) warn(file, `top item «${x.title}»: slug and href both set (slug wins)`)
+    }
+  }
   const all = JSON.stringify(out)
   for (const m of all.matchAll(/\{(\w+)\}/g)) if (!placeholdersOf.get(id)?.has(m[1])) warn(file, `unknown placeholder {${m[1]}}`)
   if (published) {
     const linked = [...all.matchAll(LINK)].map((m) => m[2]).filter((s) => !s.startsWith('/'))
-    for (const s of [...linked, ...out.picks.flatMap((p) => p.slugs)]) if (!published.has(s)) warn(file, `unknown studio slug "${s}" (renders as plain text)`)
+    for (const s of [...linked, ...out.picks.flatMap((p) => p.slugs), ...(out.tops ?? []).flatMap((c) => c.items.map((x) => x.slug).filter(Boolean))]) if (!published.has(s)) warn(file, `unknown studio slug "${s}" (renders as plain text)`)
   }
   fs.writeFileSync(path.join(OUT, `${id}.json`), JSON.stringify(out, null, 1) + '\n')
   ids.push(id)

@@ -1,11 +1,12 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { Block, FaqRich, InfoList, InnerCols, InnerHero, InnerMain, Related } from '@/components/site/Inner'
+import { Block, FaqRich, InfoList, InnerCols, InnerHero, InnerMain, Related, RequestBand } from '@/components/site/Inner'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RichText } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
+import { isBusinessTop, TopList } from '@/components/site/TopList'
 import { Button } from '@/components/ui/Button'
 import { CtaBand } from '@/components/ui/CtaBand'
 import { Epigraph } from '@/components/ui/Epigraph'
@@ -13,11 +14,12 @@ import type { HeroPhoto } from '@/content/photos'
 import type { WaveCopy } from '@/editorial/wave-a'
 import { latestUpdate } from '@/lib/catalog'
 import type { StudioCard } from '@/lib/catalog'
-import { ldItemList } from '@/lib/ld'
+import { ldItemList, ldTopList } from '@/lib/ld'
 import { displayName } from '@/lib/present'
 
-// Wave A page layout: written copy around a live data block. Order: lead → first section → live data
-// (lists, prices) → other sections → picks → FAQ → sources. Studio links in copy are [Name](slug),
+// Wave A page layout: written copy around a live data block. Order: lead → first section → tops by category
+// (when the copy has them; the request band follows the business category) → live data (lists, prices) → other
+// sections → picks → FAQ → sources. Studio links in copy are [Name](slug),
 // rendered only when the studio is published.
 
 type Known = Map<string, StudioCard>
@@ -84,12 +86,16 @@ export function WavePage({
 }) {
   const [first, ...rest] = copy.sections
   const picks = (copy.picks ?? []).map((p) => ({ ...p, studios: p.slugs.map((s) => known.get(s)).filter((s): s is StudioCard => !!s) })).filter((p) => p.studios.length)
+  const tops = (copy.tops ?? []).filter((c) => c.items.length)
   return (
     <InnerMain>
       {copy.faq.length > 0 && (
         <JsonLd data={{ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: copy.faq.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a.replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') } })) }} />
       )}
       {studios.length > 0 && <JsonLd data={ldItemList(copy.title, studios)} />}
+      {tops.map((c) => (
+        <JsonLd key={c.id} data={ldTopList(c, known)} />
+      ))}
 
       <InnerHero
         crumbs={crumbs}
@@ -115,6 +121,12 @@ export function WavePage({
       <InnerCols aside={<RequestForm sourcePage={path} defaultWhat={form} defaultCity={city} />}>
         {copy.epigraph && copy.epigraph.length > 0 && <Epigraph lines={copy.epigraph} />}
         {first && <CopySection s={first} k={0} known={known} />}
+        {tops.map((c) => (
+          <React.Fragment key={c.id}>
+            <TopList cat={c} known={known} />
+            {isBusinessTop(c) && <RequestBand path={path} tone="cobalt" href="#zapyt-forma" />}
+          </React.Fragment>
+        ))}
         {children}
         {rest.map((s, i) => (
           <CopySection key={s.heading} s={s} k={i + 1} known={known} />

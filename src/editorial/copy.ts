@@ -10,9 +10,33 @@ export type WaveCopy = {
   epigraph?: string[]
   sections: { heading: string; paragraphs: string[]; bullets?: string[] }[]
   picks?: { need: string; slugs: string[]; why: string }[]
+  /** Ranked selections by category (e.g. «Розписні прикраси», top 5 each): one product line per maker. */
+  tops?: TopCategory[]
   faq: { q: string; a: string }[]
   sources: string[]
 }
+
+export type TopItem = {
+  /** What is offered, e.g. «Косівські розписні прикраси, понад 40 форм». */
+  title: string
+  /** Maker as the reader knows it; linked to the profile when `slug` is set, else to `href` (their Instagram). */
+  maker: string
+  slug?: string
+  href?: string
+  city?: string
+  /** Price line as published, with the unit: «190–445 грн за штуку». */
+  price?: string
+  /** One or two sentences: forms, sizes, set contents, quantities. */
+  details: string
+  /** How to get it: preorder, deadline, minimum order, delivery. */
+  terms?: string
+  /** When the facts were seen: «сезон 2026/27», «грудень 2025». */
+  seen: string
+  /** Instagram post that shows the item (embedded lazily). */
+  embed?: string
+}
+
+export type TopCategory = { id: string; heading: string; intro?: string; items: TopItem[] }
 
 export type WaveVars = Record<string, string | number | undefined>
 

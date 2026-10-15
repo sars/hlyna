@@ -378,6 +378,8 @@ const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500
 
 **`InstagramPosts.client`** — комірки як `StudioCell` (ruled), без радіуса.
 
+**`TopList`** — «топ за категоріями» на письмових сторінках (поле `tops` у копії, `WavePage` ставить після першої секції; приклад у `/dev/styleguide` №20). Кожна категорія — `Block` з кікером «Топ за категоріями»; `ol` з лінійками як `NumberedList`: номер 1–5 Unbounded 800 24px terracotta у колонці 44px; назва виробу Unbounded 600 16px; ціна — найпомітніший рядок (Unbounded 600 17px cobalt, tabular; від sm окрема права колонка); виробник — посилання на профіль, без профілю — на Instagram (`nofollow`); деталі 15px, умови 14px ink-2; «Дані: …» mono 11.5px верхній ink-2. Пост в Instagram — за нативним `details` («Пост в Instagram» / «Сховати пост», знак +/–), embed монтується лише після відкриття; на телефоні виходить з відступу номера. Після бізнесової категорії (корпоративні, з логотипом) — `RequestBand tone="cobalt"` на `#zapyt-forma`. JSON-LD: `ItemList` з `ListItem` (назва + посилання), без Product/Offer.
+
 **`KabinetForms.client` / `StudioEditForm.client`** — `Field` на папері, `Button variant="ink"`, повідомлення — `Note`; фото профілю квадратні без радіуса.
 
 ---

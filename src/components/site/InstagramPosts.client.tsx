@@ -5,7 +5,9 @@ import React, { useEffect, useRef, useState } from 'react'
 // Instagram posts on a studio profile. Nothing loads from Instagram until the block is near the viewport
 // (no third-party script, no cookies before that). Until a post's embed has actually loaded, a compact card
 // with a link stands in its place, so a slow or blocked Instagram never leaves big empty boxes.
-export function InstagramPosts({ urls, handle }: { urls: string[]; handle?: string }) {
+// `columns={1}` is a single post at full width (a top-list row); inside a closed `details` the block has no box, so the
+// observer only fires once the reader opens it.
+export function InstagramPosts({ urls, handle, columns = 2 }: { urls: string[]; handle?: string; columns?: 1 | 2 }) {
   const ref = useRef<HTMLDivElement>(null)
   const [show, setShow] = useState(false)
 
@@ -18,7 +20,7 @@ export function InstagramPosts({ urls, handle }: { urls: string[]; handle?: stri
   }, [show])
 
   return (
-    <div ref={ref} className="grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-2">
+    <div ref={ref} className={columns === 2 ? 'grid grid-cols-1 items-start gap-x-6 gap-y-2 sm:grid-cols-2' : 'grid grid-cols-1 items-start gap-y-2'}>
       {urls.map((u) => (
         <Post key={u} url={u} handle={handle} show={show} />
       ))}

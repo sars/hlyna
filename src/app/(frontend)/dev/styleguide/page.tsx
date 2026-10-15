@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { TopList } from '@/components/site/TopList'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { Button } from '@/components/ui/Button'
 import { Checkbox, Field, FieldRow, Input, Select, Textarea } from '@/components/ui/Fields'
@@ -128,6 +129,31 @@ export default async function StyleguidePage() {
     { n: '02', tone: 'cobalt', title: 'Чашки з логотипом', text: 'Штамп, деколь або полива з вашим знаком.', cta: 'Як це роблять →', photo: sitePhotos.cardLogo },
   ] as const
   const ruleStyle = 'grid gap-3'
+  // TopList fixture: two categories of a season's top, makers from the catalogue (Kyiv), one without a profile (Instagram only).
+  const withIg = all.find((s) => s.activity?.instagramPosts?.length && s.instagram)
+  const igPost = withIg?.activity?.instagramPosts?.[0]?.url
+  const topMaker = (i: number) => ({ maker: sample[i] ? displayName(sample[i]) : `Майстерня ${i + 1}`, slug: sample[i]?.slug ?? undefined, city: sample[i]?.cityDoc?.name ?? 'Київ' })
+  const tops = [
+    {
+      id: 'rozpysni',
+      heading: 'Розписні ялинкові прикраси',
+      intro: 'Кулі, дзвіночки й фігурки з ручним розписом по поливі або ангобах; ціни за штуку, як опубліковано у студій.',
+      items: [
+        { title: 'Кулі з розписом по білій поливі, 6–8 см', ...topMaker(0), price: '190–445 грн за штуку', details: 'Кулі й дзвіночки, 12 малюнків; кожна прикраса підписана від руки. Пакування — крафтова коробка.', terms: 'Передзамовлення до 1 грудня, відправка Новою поштою.', seen: 'сезон 2026/27, Instagram', embed: igPost },
+        { title: 'Фігурки з ангобним розписом', ...topMaker(1), price: '260 грн за штуку', details: 'Пташки, коники й зірки, 7–9 см; набір із 6 різних фігурок.', seen: 'грудень 2025, сайт студії', embed: igPost },
+        { title: 'Підвіски з гравіюванням і золотом', maker: withIg ? displayName(withIg) : 'Майстерня без профілю', href: withIg?.instagram ?? 'https://www.instagram.com/instagram/', city: withIg?.cityDoc?.name ?? 'Львів', details: 'Пласкі підвіски 5–6 см, матова полива і штрихи золотом; тираж до 100 штук на сезон.', seen: 'сезон 2026/27, Instagram' },
+      ],
+    },
+    {
+      id: 'korporatyvni',
+      heading: 'Корпоративні прикраси з логотипом',
+      intro: 'Партії з логотипом або кольорами компанії; мінімум і строки — у кожної студії свої.',
+      items: [
+        { title: 'Кулі з логотипом, деколь або штамп', ...topMaker(2), price: '320–480 грн за штуку', details: 'Кулі 8 см у фірмовій коробці; логотип деколлю під поливу або штампом у сирцеві.', terms: 'Від 30 штук, 3–5 тижнів до відправки.', seen: 'сезон 2026/27, прайс студії', embed: igPost },
+        { title: 'Набори «три дзвіночки» з тисненням', ...topMaker(3), details: 'Три дзвіночки різної висоти в одній коробці; тиснення знака компанії на кожному.', terms: 'Від 20 наборів, передоплата 50%.', seen: 'грудень 2025, Instagram' },
+      ],
+    },
+  ]
 
   return (
     <main className={cx(wrap, 'grid gap-block pt-hero pb-section')}>
@@ -397,6 +423,11 @@ export default async function StyleguidePage() {
 
       <Block id="sg-wordmark" title="18 · WordmarkWindow">
         <WordmarkWindow photo={{ desktop: sitePhotos.wordmarkDesktop, mobile: sitePhotos.wordmarkMobile }} />
+      </Block>
+
+      <Block id="sg-tops" title="20 · TopList">
+        <Cap>Топ за категоріями (хвилі B/C): номер, ціна праворуч від sm, виробник з посиланням, пост в Instagram за запитом</Cap>
+        {tops.map((c) => <TopList key={c.id} cat={c} known={new Map(all.map((s) => [s.slug!, s]))} />)}
       </Block>
 
       <Block id="sg-vessels" title="19 · VesselWindow">

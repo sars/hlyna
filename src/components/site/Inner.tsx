@@ -31,8 +31,8 @@ export function HeroRequest({ path }: { path: string }) {
     </Button>
   )
 }
-export function RequestBand({ path, tone }: { path: string; tone: 'cobalt' | 'ink' }) {
-  const cta = { label: 'Отримати пропозиції', href: requestHrefFor(path) }
+export function RequestBand({ path, tone, href }: { path: string; tone: 'cobalt' | 'ink'; href?: string }) {
+  const cta = { label: 'Отримати пропозиції', href: href ?? requestHrefFor(path) }
   return tone === 'cobalt' ? (
     <CtaBand tone="cobalt" title="Надішліть один запит — відповідять 3–5 студій" text="Вкажіть, що потрібно, скільки і до якої дати." cta={cta} />
   ) : (
