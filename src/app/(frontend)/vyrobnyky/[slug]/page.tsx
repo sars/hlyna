@@ -262,7 +262,8 @@ export default async function StudioPage({ params }: Args) {
               {showForm ? 'Запит цій студії' : 'Запит іншим студіям'}
             </Button>
           </div>
-          {staleData ? <Updated label="Дані" date={`${staleData}${checked ? ` · перевірено: ${checked}` : ''}`} /> : <Updated />}
+          {/* An inactive profile without any dated fact says when we looked, not «Оновлено» (it would read as fresh). */}
+          {staleData ? <Updated label="Дані" date={`${staleData}${checked ? ` · перевірено: ${checked}` : ''}`} /> : dormant && s.type !== 'legacy' ? <Updated label="Перевірено" {...(checked ? { date: checked } : {})} /> : <Updated />}
         </div>
         <section aria-labelledby="facts" className="min-w-0">
           <Kicker as="p">
