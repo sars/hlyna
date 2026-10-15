@@ -17,7 +17,7 @@ vi.mock('@/server/services/kabinet', () => ({
 }))
 
 const post = async () => {
-  const { POST } = await import('@/app/(frontend)/kabinet/api/studio/[slug]/route')
+  const { POST } = await import('@/app/(kabinet)/kabinet/api/studio/[slug]/route')
   const body = new FormData()
   body.set('data', '{}')
   return POST(new Request('http://localhost/kabinet/api/studio/x', { method: 'POST', body }), { params: Promise.resolve({ slug: 'chuzha-studiia' }) })

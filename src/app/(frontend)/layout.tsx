@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { Golos_Text, JetBrains_Mono, Playfair_Display, Unbounded } from 'next/font/google'
 import React from 'react'
 
 import { Analytics } from '@/components/site/Analytics'
@@ -8,18 +7,13 @@ import { SiteFooter } from '@/components/site/SiteFooter'
 import { SiteHeader } from '@/components/site/SiteHeader'
 import { site } from '@/content/site'
 
-import './globals.css'
+import { fontVars } from '../fonts'
 
-// Fonts are downloaded at build time and served from our own domain (no requests to Google at runtime).
-const unbounded = Unbounded({ subsets: ['cyrillic', 'latin'], weight: ['600', '800'], variable: '--font-unbounded', display: 'swap' })
-const golos = Golos_Text({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600'], variable: '--font-golos', display: 'swap' })
-// Below the first screen: not preloaded.
-const playfair = Playfair_Display({ subsets: ['cyrillic', 'latin'], weight: ['400'], style: ['italic'], variable: '--font-playfair', display: 'swap', preload: false })
-const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500'], variable: '--font-jetbrains', display: 'swap', preload: false })
+import './globals.css'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html className={`${unbounded.variable} ${golos.variable} ${playfair.variable} ${jetbrains.variable}`} lang="uk">
+    <html className={fontVars} lang="uk">
       <head>
         <link href="/favicon.ico" rel="icon" sizes="48x48" />
         <link href="/favicon-16.png" rel="icon" type="image/png" sizes="16x16" />
