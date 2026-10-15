@@ -6,7 +6,8 @@ import { fitTitle } from '@/lib/title'
 import { getAllStudios, giftCertificate, groupByCity, hasFormat, MIN_LIST, offersMasterClasses, pickupTime, runsCorporateWorkshops, texts, type StudioCard } from '@/lib/catalog'
 import { facts } from '@/lib/facts'
 
-import { displayName, isExhibitingOnly, publicPrices, splitSource } from '@/lib/present'
+import { currentLine, displayName, isExhibitingOnly, publicPrices, splitSource } from '@/lib/present'
+import { dropStale } from '@/lib/dates'
 import { amountsIn, fromTo, near, spanOf } from '@/lib/money'
 import { isCeramicPriceLine } from '@/lib/priceIndex'
 
@@ -157,8 +158,9 @@ export function evidenceFor(topic: Topic, confirmedList: boolean): Evidence[] {
 // it. Source notes like «(сайт, 2026)» are dropped; the card cuts and de-names the line (caption in lib/present).
 export function evidenceLine(s: StudioCard, reasons: RegExp | Evidence[]): string {
   const tiers = reasons instanceof RegExp ? [{ re: reasons, prices: 'all' as const }] : reasons
-  const offers = [...(s.services ?? []), ...(s.products ?? [])].map((x) => splitSource(x.text).text)
-  const sentences = (s.publicDescription ?? '').split(/(?<=[.!?])\s+/).filter((t) => t.length < 220)
+  // Offers and sentences whose date has passed («розклад на вересень: 18.09…») never become the reason (lib/dates).
+  const offers = [...(s.services ?? []), ...(s.products ?? [])].map((x) => splitSource(currentLine(x.text)).text).filter(Boolean)
+  const sentences = dropStale(s.publicDescription ?? '').split(/(?<=[.!?])\s+/).filter((t) => t && t.length < 220)
   const score = (t: string) => (/грн/.test(t) ? 4 : 0) + (/\d/.test(t) ? 2 : 0) + (t.length > 40 ? 1 : 0)
   for (const [i, { re, prices }] of tiers.entries()) {
     const priced = prices === 'none' ? [] : publicPrices(s).map((p) => p.text).filter((t) => prices === 'all' || !CLASS_PRICE.test(t))
