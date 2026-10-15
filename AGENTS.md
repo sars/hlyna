@@ -40,6 +40,7 @@ Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Aut
 - `pnpm shots /path` — screenshots to `.shots/` (dev server must run). Look once per finished screen.
 - Schema changes: edit `src/server/db/schema`, `pnpm db:generate`, review the SQL in `drizzle/`, commit; apply with `pnpm db:migrate` (see deploy/README.md). `pnpm exec tsc --noEmit` before finishing (the Stop hook runs it).
 - `pnpm build` — production build (needs the database reachable).
+- `pnpm exec tsx scripts/app/check-content-slugs.ts` (with `DATABASE_URL` of a current catalogue copy) — every studio link in `src/content` and `src/editorial` must be a published slug; run after editing copy and before a deploy (an unknown slug silently drops a link or a pick).
 
 ## How to work
 Act when you have enough information; recommend rather than list options. Prefer the better solution for the goals over the easiest one, but don't add abstractions the task doesn't need. Commit in small steps with clear messages; never push or deploy without the owner. Verify with a command or a screenshot before saying something works.
