@@ -6,7 +6,10 @@ import type { StudioFormat } from '../../../shared/options'
 import type { Actor } from '../audit'
 import { studiosWithPendingOwnerChanges, writeStudio } from './runs'
 
-// Format tags from the research data (ported from scripts/tag-studios.ts, same rules). Tags only grow unless reset.
+// Format tags from the research data. The rules only PROPOSE a tag, with the phrase that triggered it; a tag is written
+// after someone (a person or a review agent) accepted it in the proposals file. Keyword rules misfire («ресторан» in a
+// note about the owner's day job, «логотип» of the studio itself), and business lists (logo, horeca, corporate) are
+// what companies read, so nothing is applied unreviewed.
 
 const WORKSHOP = new Set(['studio', 'school', 'maker', 'heritage', 'other'])
 const MAKER = new Set(['studio', 'brand', 'maker', 'school', 'heritage'])
@@ -47,30 +50,55 @@ export function tagsFor(type: string | null, text: string): StudioFormat[] {
 type Raw = Record<string, unknown>
 const flat = (v: unknown): string => (Array.isArray(v) ? v.map(flat).join(' · ') : typeof v === 'string' ? v : '')
 
-export async function tagStudios(db: Db, raw: Map<string, Raw>, opts: { dry?: boolean; reset?: boolean }, actor: Actor) {
+/** The phrase around a rule's first valid hit, for the reviewer. */
+function evidence(text: string, re: RegExp, skip?: RegExp): string | null {
+  const hit = ruleHit(text, re, skip)
+  if (!hit) return null
+  const i = text.indexOf(hit)
+  return text.slice(Math.max(0, i - 90), i + hit.length + 90).replace(/\s+/g, ' ').trim()
+}
+
+export type TagProposal = { slug: string; name: string; visibility: string; type: string | null; tag: StudioFormat; evidence: string; ok?: boolean; note?: string }
+
+/** Tags the rules would add, each with the phrase that triggered it (the studio's stored texts plus its research entry). */
+export async function tagProposals(db: Db, raw: Map<string, Raw>): Promise<TagProposal[]> {
   const all = await db.select().from(studios)
-  const pending = await studiosWithPendingOwnerChanges(db)
-  const counts: Record<string, number> = {}
-  let changed = 0
-  const log: string[] = []
+  const out: TagProposal[] = []
   for (const s of all) {
-    if (pending.has(s.id)) continue
     const e = (s.sourceId && raw.get(s.sourceId)) || {}
     const prices = (await db.select({ text: studioPrices.text }).from(studioPrices).where(eq(studioPrices.studioId, s.id)).orderBy(asc(studioPrices.position))).map((p) => p.text)
     const text = [
       s.descriptionInternal, s.summary, s.publicDescription, ...(s.services ?? []), ...(s.products ?? []), ...prices,
       flat(e.b2b), flat(e.ig_bio), flat(e.ig_highlights), flat(e.techniques), flat(e.services), flat(e.products),
-    ].filter(Boolean).join(' \n ')
-    const tags = new Set<string>(opts.reset ? [] : (s.formats ?? []))
-    for (const t of tagsFor(s.type, text)) tags.add(t)
-    if (s.b2bWorksWithHoreca) tags.add('horeca')
-    if (s.b2bWorksWithCorporate) tags.add('corporate-gifts')
-    if (s.visibility === 'public') for (const t of tags) counts[t] = (counts[t] ?? 0) + 1
-    const next = [...tags].sort()
-    if (JSON.stringify(next) === JSON.stringify([...(s.formats ?? [])].sort())) continue
-    changed++
-    if (opts.dry) { log.push(`${s.slug} ${next.join(',')}`); continue }
-    await db.transaction((tx) => writeStudio(tx, s.id, { formats: next }, undefined, actor, 'Теги форматів'))
+    ].filter(Boolean).join(' \n ').toLowerCase()
+    const have = new Set(s.formats ?? [])
+    for (const r of TAG_RULES) {
+      if (have.has(r.tag) || !r.types.has(s.type ?? '')) continue
+      const ev = evidence(text, r.re, r.skip)
+      if (ev) out.push({ slug: s.slug, name: s.name, visibility: s.visibility, type: s.type, tag: r.tag, evidence: ev })
+    }
+    if (s.b2bWorksWithHoreca && !have.has('horeca')) out.push({ slug: s.slug, name: s.name, visibility: s.visibility, type: s.type, tag: 'horeca', evidence: 'b2b_works_with_horeca = true' })
+    if (s.b2bWorksWithCorporate && !have.has('corporate-gifts')) out.push({ slug: s.slug, name: s.name, visibility: s.visibility, type: s.type, tag: 'corporate-gifts', evidence: 'b2b_works_with_corporate = true' })
   }
-  return { changed, publicPerTag: counts, log }
+  return out
+}
+
+/** Adds the accepted tags (ok: true); studios with an owner's pending change set are left for later. */
+export async function applyTagProposals(db: Db, accepted: TagProposal[], actor: Actor) {
+  const bySlug = new Map<string, Set<StudioFormat>>()
+  for (const p of accepted) if (p.ok) bySlug.set(p.slug, (bySlug.get(p.slug) ?? new Set()).add(p.tag))
+  const rows = bySlug.size ? await db.select({ id: studios.id, slug: studios.slug, formats: studios.formats }).from(studios) : []
+  const pending = await studiosWithPendingOwnerChanges(db)
+  let changed = 0
+  const skipped: string[] = []
+  for (const s of rows) {
+    const add = bySlug.get(s.slug)
+    if (!add) continue
+    if (pending.has(s.id)) { skipped.push(s.slug); continue }
+    const next = [...new Set([...(s.formats ?? []), ...add])].sort()
+    if (next.length === (s.formats ?? []).length) continue
+    await db.transaction((tx) => writeStudio(tx, s.id, { formats: next }, undefined, actor, 'Теги форматів (перевірені)'))
+    changed++
+  }
+  return { changed, skipped }
 }

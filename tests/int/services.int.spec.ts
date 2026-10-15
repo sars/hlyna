@@ -25,7 +25,7 @@ import { applyFixes, setVisibility } from '../../src/server/services/imports/fix
 import { addressCandidates } from '../../src/server/services/imports/geo'
 import { importHighlights, importIgNotes, sameOffer } from '../../src/server/services/imports/instagram'
 import { finishRun, scriptActor, startRun, writeStudio } from '../../src/server/services/imports/runs'
-import { tagsFor } from '../../src/server/services/imports/tags'
+import { applyTagProposals, tagProposals, tagsFor } from '../../src/server/services/imports/tags'
 
 const url = process.env.PANEL_TEST_DATABASE_URL ?? 'postgres://localhost/hlyna_apptest'
 const pool = new Pool({ connectionString: url, max: 4 })
@@ -172,6 +172,20 @@ describe('imports', () => {
     expect(s!.recentNote).toBe('Наш текст')
     expect(s!.activityFollowers).toBe(500)
     expect(s!.formats).toEqual(['kids'])
+  })
+
+  it('tag rules only propose (with the phrase); only accepted tags are written', async () => {
+    await db.update(studios).set({ summary: 'Майстер-класи на гончарному колі для дітей' }).where(eq(studios.id, studioA))
+    const list = await tagProposals(db, new Map())
+    const mine = list.filter((p) => p.slug === 'a')
+    expect(mine.map((p) => p.tag).sort()).toEqual(['kids', 'wheel'])
+    expect(mine.find((p) => p.tag === 'wheel')!.evidence).toContain('гончарному колі')
+    let [s] = await db.select().from(studios).where(eq(studios.id, studioA))
+    expect(s!.formats).toEqual([])
+    const r = await applyTagProposals(db, mine.map((p) => ({ ...p, ok: p.tag === 'wheel' })), script)
+    expect(r.changed).toBe(1)
+    ;[s] = await db.select().from(studios).where(eq(studios.id, studioA))
+    expect(s!.formats).toEqual(['wheel'])
   })
 
   it('tags, alternate names and address candidates keep the old rules', () => {

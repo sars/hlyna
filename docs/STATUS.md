@@ -22,10 +22,10 @@ Updated 2026-10-12.
 
 ## Topic pages (2026-10-10)
 - Config: `src/content/topics/` (business, master-classes, products); layout: `src/components/site/TopicPage.tsx`; data: `src/editorial/topics.ts`. Written pages (waves A–C) live in `src/editorial/`; `src/editorial/registry.ts` lists the live ones.
-- Lists come from `studios.formats` tags (`pnpm exec tsx scripts/app/tag-studios.ts`, re-run after each import).
+- Lists come from `studios.formats` tags. `pnpm exec tsx scripts/app/tag-studios.ts` only proposes tags with the phrase that triggered each rule (`_site_content/tag_review/proposals-<date>.json`); after review (`"ok": true`) `APPLY=<file>` writes the accepted ones.
 - Photos: `public/images/doc/` (Wikimedia Commons, credits in CREDITS.md, visible caption via `<DocPhoto>` and on OG cards).
 - IndexNow: `deploy/indexnow.sh` runs at the end of `deploy/push.sh`; key file `public/12e1186b0c0ec23ee49b7f8359e536ca.txt`.
-- After an import on production: `PROD=1 … pnpm exec tsx scripts/app/tag-studios.ts`, otherwise the topic lists go stale.
+- After an import: propose, review, then `PROD=1 APPLY=<file> … pnpm exec tsx scripts/app/tag-studios.ts`, otherwise the topic lists go stale.
 
 ## Review 2 fixes (2026-10-10)
 - Numbers: prices only from the live price index via `src/lib/facts.ts` (`facts().range('group' | 'private' | 'couple' | 'kids' | 'course' | 'cert' | 'corporate' | 'cup' | 'plate' | 'vase' | 'jewelry')`); topic pages with `price.index` quote the same range. Lead times only from `site.lead` (batch 3–8 weeks, logo 4–10, one custom piece 3–6, pick-up after a class 2–4).
