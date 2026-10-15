@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import type { StudioCard } from '@/lib/catalog'
+import { confirmedForCompanies, confirmedForVenues, type StudioCard } from '@/lib/catalog'
 import { dataDate, splitSource, withoutPriceMention } from '@/lib/present'
 import { acceptsRequests, dedupePrices, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 
@@ -108,5 +108,15 @@ describe('who gets the request form (owner, 15.10.2026)', () => {
     for (const type of ['shop', 'school', 'legacy'] as const) expect(acceptsRequests(card({ type }))).toBe(false)
     expect(acceptsRequests(card({ status: 'closed' }))).toBe(false)
     expect(acceptsRequests(card({ status: 'unclear', unverified: true }))).toBe(false)
+  })
+})
+
+describe('business badges rest on the b2b terms, not on format tags', () => {
+  const card = (extra: Partial<StudioCard>) => ({ id: 1, slug: 's', name: 's', type: 'brand', status: 'active', formats: ['horeca', 'logo'], cityDoc: null, ...extra }) as unknown as StudioCard
+  it('a tag alone gives no badge; a sourced term does', () => {
+    expect(confirmedForVenues(card({}))).toBe(false)
+    expect(confirmedForCompanies(card({}))).toBe(false)
+    expect(confirmedForVenues(card({ b2b: { worksWithHoreca: true } }))).toBe(true)
+    expect(confirmedForCompanies(card({ b2b: { worksWithCorporate: true } }))).toBe(true)
   })
 })

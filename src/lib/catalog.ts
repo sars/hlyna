@@ -149,6 +149,11 @@ export const worksWithVenues = (s: Studio) => MAKER_TYPES.has(s.type ?? '') && (
 export const worksWithCompanies = (s: Studio) =>
   hasFormat(s, 'corporate-gifts') || hasFormat(s, 'corporate-workshop') || hasFormat(s, 'logo') || Boolean(s.b2b?.worksWithCorporate)
 
+// Badges («працює із закладами», «корпоративні замовлення») claim more than a format tag: they show only when the studio's
+// business terms say so (b2b fields, filled from sourced facts — scripts/app/edits/2026-10-15-b2b.json). Lists keep the tags.
+export const confirmedForVenues = (s: Studio) => MAKER_TYPES.has(s.type ?? '') && Boolean(s.b2b?.worksWithHoreca)
+export const confirmedForCompanies = (s: Studio) => Boolean(s.b2b?.worksWithCorporate)
+
 // Hryvnia amounts mentioned in a studio's price lines (used for honest "from–to" ranges).
 export const hryvniaAmounts = (s: Studio): number[] => (s.prices ?? []).flatMap((p) => wholeAmountsIn(p.text))
 

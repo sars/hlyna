@@ -2,10 +2,12 @@
 //   EDITS=path pnpm exec tsx scripts/app/edit-studios.ts   (PROD=1 for production, DRY=1 to preview)
 //   [{ "slug": "…", "why"?: "reason, printed with the change", "set"?: { "name"?, "shortName"?, "slug"?, "type"? (one of STUDIO_TYPES), "status"? (one of STUDIO_STATUSES),
 //      "visibility"? ("public" | "hidden"), "address"?, "summary"?, "publicDescription"?, "recentNote"?, "website"?, "instagram"?, "facebook"? ("" clears; otherwise an absolute http(s) URL) },
-//      "replace"?: [["from", "to"], …], "dropFormats"?: ["courses", …], "addNames"?: ["…"], "mergeInto"?: "kept-slug" }]
+//      "replace"?: [["from", "to"], …], "dropFormats"?: ["courses", …], "addNames"?: ["…"], "mergeInto"?: "kept-slug",
+//      "b2b"?: { "minOrder"?, "leadTime"? ("" clears), "logoMethods"?: ["…"], "worksWithHoreca"?, "worksWithCorporate"?, "foodSafe"?, "dishwasherSafe"? (true | false | null) } }]
 //   replace runs over name, address, summary, publicDescription, recentNote; dropFormats removes format tags the profile does not support (tags
 //   are added only through tag-studios proposals); addNames appends alternate names; mergeInto hides a duplicate and points its slug at the kept
-//   public profile (the proxy answers its old URL with a redirect, docs/decisions.md 2026-10-15) — move any facts into the kept profile first.
+//   public profile (the proxy answers its old URL with a redirect, docs/decisions.md 2026-10-15) — move any facts into the kept profile first;
+//   b2b sets the terms for venues and companies (only facts with a source: the profile shows them and its badges rest on them).
 import fs from 'node:fs'
 import { eq } from 'drizzle-orm'
 
@@ -20,7 +22,10 @@ import { finishRun, scriptActor, startRun } from '../../src/server/services/impo
 
 type Field = 'name' | 'shortName' | 'slug' | 'type' | 'status' | 'visibility' | 'address' | 'summary' | 'publicDescription' | 'recentNote' | LinkField
 type LinkField = 'website' | 'instagram' | 'facebook'
-type Edit = { slug: string; why?: string; set?: Partial<Record<Field, string>>; replace?: [string, string][]; dropFormats?: string[]; addNames?: string[]; mergeInto?: string }
+type B2b = { minOrder?: string; leadTime?: string; logoMethods?: string[]; worksWithHoreca?: boolean | null; worksWithCorporate?: boolean | null; foodSafe?: boolean | null; dishwasherSafe?: boolean | null }
+type Edit = { slug: string; why?: string; set?: Partial<Record<Field, string>>; replace?: [string, string][]; dropFormats?: string[]; addNames?: string[]; mergeInto?: string; b2b?: B2b }
+// b2b keys → editor form fields.
+const B2B = { minOrder: 'b2bMinOrder', leadTime: 'b2bLeadTime', logoMethods: 'b2bLogoMethods', worksWithHoreca: 'b2bWorksWithHoreca', worksWithCorporate: 'b2bWorksWithCorporate', foodSafe: 'b2bFoodSafe', dishwasherSafe: 'b2bDishwasherSafe' } as const
 
 const { dry } = guard('edit-studios')
 const edits = JSON.parse(fs.readFileSync(process.env.EDITS || '/tmp/hlyna-edits.json', 'utf8')) as Edit[]
@@ -56,6 +61,11 @@ for (const e of edits) {
   Object.assign(form, e.set ?? {}, ...LINKS.filter((f) => e.set?.[f] === '').map((f) => ({ [f]: null })))
   const dropped = (e.dropFormats ?? []).filter((f) => form.formats.includes(f as never))
   if (dropped.length) form.formats = form.formats.filter((f) => !dropped.includes(f))
+  for (const [k, f] of Object.entries(e.b2b ?? {}) as [keyof B2b, B2b[keyof B2b]][]) {
+    if (!(k in B2B)) throw new Error(`${e.slug}: unknown b2b field ${k} (one of ${Object.keys(B2B).join(', ')})`)
+    Object.assign(form, { [B2B[k]]: f === '' ? null : f })
+  }
+  const b2bChanged = Object.values(B2B).filter((f) => JSON.stringify(form[f] ?? null) !== JSON.stringify(toEditForm(s)[f] ?? null))
   const names = (e.addNames ?? []).filter((n) => !form.alternateNames.includes(n))
   if (names.length) form.alternateNames = [...form.alternateNames, ...names]
   const changed = (['slug', 'shortName', 'type', 'status', 'visibility', ...TEXT, ...LINKS] as Field[]).filter((f) => form[f] !== toEditForm(s)[f])
@@ -64,12 +74,13 @@ for (const e of edits) {
   const lines = [
     ...changed.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f])?.slice(0, 80)} → ${JSON.stringify(form[f])?.slice(0, 80)}`),
     ...(dropped.length ? [`formats: −${dropped.join(', −')}`] : []),
+    ...b2bChanged.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f] ?? null)} → ${JSON.stringify(form[f] ?? null)}`),
     ...(names.length ? [`names: +${names.join(', +')}`] : []),
     ...(redirect ? [`redirect → ${into!.slug}`] : []),
   ]
   console.log(`${e.slug}: ${lines.join('\n  ') || 'no change'}${e.why && lines.length ? `\n  why: ${e.why}` : ''}`)
   if (dry || !lines.length) continue
-  if (changed.length || dropped.length || names.length) await saveStudio(db, row.id, form, actor, 'Виправлення (скрипт)')
+  if (changed.length || dropped.length || names.length || b2bChanged.length) await saveStudio(db, row.id, form, actor, 'Виправлення (скрипт)')
   if (redirect)
     await db.transaction(async (tx) => {
       await tx.insert(studioSlugHistory).values({ oldSlug: e.slug, studioId: into!.id }).onConflictDoUpdate({ target: studioSlugHistory.oldSlug, set: { studioId: into!.id } })

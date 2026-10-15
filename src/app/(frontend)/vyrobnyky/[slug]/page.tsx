@@ -32,8 +32,8 @@ import { ogImage } from '@/lib/ogImage'
 import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
-import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
-import { cleanAddress, cleanPublic, dataDate, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
+import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, confirmedForCompanies, confirmedForVenues, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL } from '@/lib/catalog'
+import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { acceptsRequests, dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
@@ -116,8 +116,8 @@ export default async function StudioPage({ params }: Args) {
   // Closed, or no confirmed activity after 2022: the profile stays (history, search), but nothing invites a visit.
   const dormant = Boolean(s.unverified) || s.status === 'closed'
   const mk = !exhibiting && !dormant && offersMasterClasses(s)
-  const venues = !exhibiting && !dormant && worksWithVenues(s)
-  const companies = !exhibiting && !dormant && worksWithCompanies(s)
+  const venues = !exhibiting && !dormant && confirmedForVenues(s)
+  const companies = !exhibiting && !dormant && confirmedForCompanies(s)
   const everyone = await getAllStudios()
   const related = relatedStudios(s, everyone)
   // Link the city only when it has its own master-class page (MIN_LIST places).
@@ -126,7 +126,7 @@ export default async function StudioPage({ params }: Args) {
   const makersPage = city ? (await makerCities()).some((g) => g.city.slug === city.slug) : false
   const cityHref = city ? (makersPage ? `/vyrobnyky/misto/${city.slug}` : cityPage ? `/maister-klasy/${city.slug}` : '') : ''
   const b2b = s.b2b ?? {}
-  const hasB2bData = Boolean(b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length)
+  const hasB2bData = Boolean(b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length || b2b.dishwasherSafe || b2b.foodSafe)
   const channels = dedupeTexts((s.salesChannels ?? []).map((x) => x.text)).slice(0, 6)
   const offer = (xs: { text: string }[] | null | undefined) => dedupeTexts((xs ?? []).map((x) => groupMoney(offerItem(cleanPublic(x.text)))).filter(Boolean))
   const products = offer(s.products)
@@ -173,7 +173,8 @@ export default async function StudioPage({ params }: Args) {
   // Profiles that cannot take a request get a box with what we know and a request to studios that work now.
   const showForm = acceptsRequests(s)
   const otherStudios = `/zapyt?${new URLSearchParams({ what: formFor(s), ...(city?.slug ? { misto: city.slug } : {}) })}`
-  const lastData = dataDate(s)?.label
+  // Only an old data date says something in these boxes («останні відомі дані — 2019»).
+  const lastData = oldDataLabel(s)
   const via = [s.website && 'сайт', s.instagram && 'Instagram', s.facebook && 'Facebook'].filter(Boolean).join(', ')
   const box: { title: string; text: string } = s.type === 'legacy'
     ? { title: 'Музей, традиція чи пам’ять', text: 'Це не студія: замовлень і занять тут не приймають.' }
@@ -379,8 +380,10 @@ export default async function StudioPage({ params }: Args) {
             <Facts
               rows={[
                 ...(b2b.minOrder ? ([['Мінімальне замовлення', b2b.minOrder]] as [string, React.ReactNode][]) : []),
-                ...(b2b.leadTime ? ([['Термін', b2b.leadTime]] as [string, React.ReactNode][]) : []),
+                ...(b2b.leadTime ? ([['Термін виготовлення', b2b.leadTime]] as [string, React.ReactNode][]) : []),
                 ...(b2b.logoMethods?.length ? ([['Логотип', b2b.logoMethods.map((x) => x.text).join(', ')]] as [string, React.ReactNode][]) : []),
+                ...(b2b.dishwasherSafe ? ([['Посудомийна машина', 'можна']] as [string, React.ReactNode][]) : []),
+                ...(b2b.foodSafe ? ([['Для їжі', 'безпечно']] as [string, React.ReactNode][]) : []),
               ]}
             />
             {showForm && <CtaBand tone="cobalt" title="Надішліть запит цій студії" text="Безкоштовно для замовника. Студія відповідає напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />}

@@ -27,7 +27,7 @@ export function acceptsRequests(s: Card): boolean {
 // Research items carry where and when they were seen: «… (Instagram, 03.2025)», «(за видачею пошуку)»,
 // «(Paint & Pottery Studio за TripAdvisor)», «(хайлайт «Фарфор»)». The profile shows the fact, not the note;
 // a fact seen before 2025 keeps its year, so it does not read as current.
-const ITEM_SOURCE = /\s*\((?:[^()]*?(?:instagram|facebook|tiktok|telegram|сайт|bodo|tripadvisor|google)[^()]*?(?:\d{1,2}\.)?(?:19|20)\d\d[^()]*|[^()]*(?<!\p{L})за\s+(?:видач|list\.|tripadvisor|google|повідомл|назвами|даними|інформац)[^()]*|\s*хайлайт[^()]*)\)/giu
+const ITEM_SOURCE = /\s*\((?:[^()]*?(?:instagram|facebook|tiktok|telegram|сайт|bodo|tripadvisor|google)[^()]*?(?:\d{1,2}\.)?(?:19|20)\d\d[^()]*|[^()]*(?<!\p{L})(?:за\s+(?:видач|list\.|tripadvisor|google|повідомл|назвами|даними|інформац)|згадк\p{L}*\s)[^()]*|\s*хайлайт[^()]*)\)/giu
 // Items that are schedules, opening hours or directions go stale; contacts belong in «Коротко».
 const ITEM_NOTE = /^\s*(?:розклад|графік(?!\p{L})|режим роботи|контакти|як знайти|ціни (?:станом|на .{0,40}оновлено)|на сертифікаті вказано)/iu
 const CONTACT = /станом на \d|\+?38\s*\(?0\d|(?<!\d)0\d{2}[\s-]?\d{3}[\s-]?\d{2}[\s-]?\d{2}(?!\d)|[\w.-]+@[\w-]+\.\w+/iu

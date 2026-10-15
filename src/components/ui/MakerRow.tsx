@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { hasFormat, igHandle, offersMasterClasses, worksWithVenues, type StudioCard } from '@/lib/catalog'
+import { confirmedForCompanies, confirmedForVenues, igHandle, offersMasterClasses, type StudioCard } from '@/lib/catalog'
 import { displayName, firstAddress, isExhibitingOnly, staleNote, stripPersonal } from '@/lib/present'
 import { groupMoney } from '@/lib/money'
 import { productChips } from '@/lib/products'
@@ -23,8 +23,8 @@ export function MakerRow({ s, price, chips: chipsProp, typeLabel, showAbout = tr
     ...(isExhibitingOnly(s) ? ['виставки'] : []),
     ...productChips(s),
     ...(offersMasterClasses(s) ? ['майстер-класи'] : []),
-    ...(worksWithVenues(s) ? ['для закладів'] : []),
-    ...(hasFormat(s, 'corporate-gifts') || hasFormat(s, 'logo') ? ['для компаній'] : []),
+    ...(confirmedForVenues(s) ? ['для закладів'] : []),
+    ...(confirmedForCompanies(s) ? ['для компаній'] : []),
   ].map((label) => ({ label, tone: label === 'майстер-класи' ? ('cobalt' as const) : ('ink' as const) }))
   return (
     <li>
