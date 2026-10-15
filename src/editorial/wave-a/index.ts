@@ -24,13 +24,15 @@ export const FIXED_PAGES = {
   'mk-den-narodzhennya': { path: '/maister-klasy/den-narodzhennya' },
 } as const
 
-/** Every live wave A page (copy exists): path, title and filled meta description, for the sitemap and llms.txt. */
-export async function liveWavePages(): Promise<{ path: string; title: string; summary: string }[]> {
-  const out: { path: string; title: string; summary: string }[] = []
-  const add = (path: string, c: WaveCopy, vars: WaveVars) => {
-    const f = fillCopy(c, vars)
-    out.push({ path, title: f.title, summary: f.metaDescription })
-  }
+type LivePage = { path: string; title: string; summary: string }
+const livePage = (path: string, c: WaveCopy, vars: WaveVars): LivePage => {
+  const f = fillCopy(c, vars)
+  return { path, title: f.title, summary: f.metaDescription }
+}
+
+/** The live fixed wave A pages (where to buy, gifts, birthdays), without the format × city ones (the slow part). */
+export async function liveFixedWavePages(): Promise<LivePage[]> {
+  const out: LivePage[] = []
   const fixed: [keyof typeof FIXED_PAGES, () => Promise<{ vars: WaveVars }>][] = [
     ['de-kupyty-keramiku', whereToBuyData],
     ['podarunky-z-keramiky', giftsData],
@@ -38,11 +40,17 @@ export async function liveWavePages(): Promise<{ path: string; title: string; su
   ]
   for (const [id, data] of fixed) {
     const c = waveCopy(id)
-    if (c) add(FIXED_PAGES[id].path, c, (await data()).vars)
+    if (c) out.push(livePage(FIXED_PAGES[id].path, c, (await data()).vars))
   }
+  return out
+}
+
+/** Every live wave A page (copy exists): path, title and filled meta description, for the sitemap and llms.txt. */
+export async function liveWavePages(): Promise<LivePage[]> {
+  const out = await liveFixedWavePages()
   for (const p of await liveFormatCityPages()) {
     const c = waveCopy(formatCityId(p.city, p.format))!
-    add(`/maister-klasy/${p.city}/${p.format}`, c, (await formatCityData(p.city, p.format)).vars)
+    out.push(livePage(`/maister-klasy/${p.city}/${p.format}`, c, (await formatCityData(p.city, p.format)).vars))
   }
   return out
 }

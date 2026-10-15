@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { SearchAnswer, SearchField, SearchRow } from '@/components/site/search/SearchRow'
 import { TopList } from '@/components/site/TopList'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { Button } from '@/components/ui/Button'
@@ -49,6 +50,7 @@ import { facts } from '@/lib/facts'
 import { fmt } from '@/lib/money'
 import { displayName, firstAddress, inCity, publicPrices } from '@/lib/present'
 import { priceIndex, studioPrice } from '@/lib/priceIndex'
+import { searchCatalog } from '@/server/searchIndex'
 
 // Living reference of the design system (docs/design/SYSTEM.md §8): real components with real data. Local only.
 export const metadata: Metadata = { title: 'Стайлгайд', robots: { index: false, follow: false } }
@@ -100,7 +102,11 @@ const Cap = ({ children }: { children: React.ReactNode }) => <p className="m-0 f
 export default async function StyleguidePage() {
   if (process.env.NODE_ENV === 'production') notFound()
 
-  const [all, f, idx, saga] = await Promise.all([getAllStudios(), facts(), priceIndex(), getStudioBySlug('saga-pottery')])
+  const [all, f, idx, saga, found] = await Promise.all([getAllStudios(), facts(), priceIndex(), getStudioBySlug('saga-pottery'), searchCatalog('коло львів')])
+  const search = found.result
+  // A row with a price, one without, and one of a studio whose activity is not confirmed (from the real index).
+  const searchRows = search ? [search.studios.find((h) => h.p), search.studios.find((h) => !h.p && !h.x)].filter((h) => h !== undefined) : []
+  const staleRow = found.index.docs.find((d) => d.k === 'studio' && d.x)
   const kyiv = all.filter((s) => s.cityDoc?.slug === 'kyiv')
   const sample: StudioCard[] = kyiv.slice(0, 4)
   const mkStudios = all.filter(offersMasterClasses)
@@ -428,6 +434,21 @@ export default async function StyleguidePage() {
       <Block id="sg-tops" title="20 · TopList">
         <Cap>Топ за категоріями (хвилі B/C): номер, ціна праворуч від sm, виробник з посиланням, пост в Instagram за запитом</Cap>
         {tops.map((c) => <TopList key={c.id} cat={c} known={new Map(all.map((s) => [s.slug!, s]))} />)}
+      </Block>
+
+      <Block id="sg-search" title="21 · SearchRow, SearchAnswer, SearchField">
+        <Cap>Пошук (§4.3): відповідь, рядки зі збігом і ціною, рядок студії з непідтвердженою активністю, поле /poshuk</Cap>
+        <div className="srch-page grid max-w-[640px] gap-4">
+          {search?.answer && <SearchAnswer hit={search.answer} />}
+          <div className="grid">
+            {searchRows.map((h) => (
+              <SearchRow key={h.u} hit={h} />
+            ))}
+            {staleRow && <SearchRow hit={{ ...staleRow, score: 0, marks: [] }} />}
+            {searchRows[0] && <SearchRow hit={searchRows[0]} id="sg-search-selected" selected />}
+          </div>
+          <SearchField q="коло львів" />
+        </div>
       </Block>
 
       <Block id="sg-vessels" title="19 · VesselWindow">

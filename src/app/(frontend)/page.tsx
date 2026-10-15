@@ -27,6 +27,7 @@ import { WordmarkWindow } from '@/components/ui/WordmarkWindow'
 import { glossary } from '@/content/glossary'
 import { STUDIO_JOIN_HREF } from '@/content/navigation'
 import { sitePhotos } from '@/content/photos'
+import { HeroSearch } from '@/components/site/search/SiteSearch.client'
 import { site } from '@/content/site'
 import { verses } from '@/content/verses'
 import { cityPages, getAllStudios, groupByCity, offersMasterClasses, pluralUk } from '@/lib/catalog'
@@ -122,9 +123,10 @@ export default async function HomePage() {
             <p className="m-0 mt-4 max-w-[33em] text-lead text-ink-2">
               Для ресторанів, кав’ярень, готелів і компаній. Порівняйте умови, терміни й ціни та надішліть один запит одразу кільком студіям.
             </p>
-            <div className="mt-[22px] flex flex-wrap gap-2.5">
-              <Button href={REQUEST} variant="cobalt" arrow>Отримати пропозиції</Button>
-              <Button href="/maister-klasy" variant="ghost">Знайти майстер-клас</Button>
+            {/* The search field takes the place of «Знайти майстер-клас» (owner, 15.10.2026); the request button stays right under it. */}
+            <div className="mt-[22px] grid max-w-[640px] gap-3">
+              <HeroSearch />
+              <Button href={REQUEST} variant="cobalt" arrow className="max-sm:w-full sm:justify-self-start">Отримати пропозиції</Button>
             </div>
             <Epigraph lines={verses.home} className="m-0 mt-[26px]" />
             <div className="mt-[26px] flex flex-wrap gap-x-7 gap-y-2" aria-label="Цифри каталогу">

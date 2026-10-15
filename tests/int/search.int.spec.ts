@@ -50,7 +50,7 @@ const index: SearchIndex = {
     doc({ k: 'studio', t: 'glinland', u: '/vyrobnyky/glinland', s: 'Одеса · гончарне коло' }),
     doc({ k: 'studio', t: 'Кераміка Львів', u: '/vyrobnyky/keramika-lviv', s: 'Львів · гончарне коло', c: ['lviv'], f: ['wheel'] }),
     doc({ k: 'studio', t: 'Глиняна хата', u: '/vyrobnyky/hlyniana-khata', s: 'Львів · ліплення', c: ['lviv'], f: ['handbuilding'] }),
-    doc({ k: 'studio', t: 'Глиняний дім', u: '/vyrobnyky/hlynianyi-dim', s: 'Львів · ліплення', c: ['lviv'], f: ['handbuilding'], x: 1 }),
+    doc({ k: 'studio', t: 'Глиняний дім', u: '/vyrobnyky/hlynianyi-dim', s: 'Львів · ліплення', c: ['lviv'], f: ['handbuilding'], x: 'активність не підтверджена' }),
     doc({ k: 'studio', t: 'Ірпінська майстерня', u: '/vyrobnyky/irpinska', s: 'Ірпінь · для двох', c: ['irpin'], f: ['couples'] }),
     doc({ k: 'studio', t: 'Миколаївська кераміка', u: '/vyrobnyky/mykolaivska', s: 'Миколаїв', c: ['mykolaiv'] }),
     doc({ k: 'guide', t: 'Як обрати майстер-клас з кераміки', u: '/hayidy/yak-obraty-maister-klas', s: 'Гайд' }),
@@ -89,10 +89,12 @@ describe('search: studios and forgiveness', () => {
     expect(r.corrected).toBe('glinland')
     expect(r.studios[0]?.u).toBe('/vyrobnyky/glinland')
   })
-  it('fixes a city typed in the wrong layout', () => {
+  it('fixes words typed in the wrong layout', () => {
     const r = find('kmdsd')
     expect(r.corrected).toBe('львів')
     expect(r.answer?.u).toBe('/maister-klasy/lviv')
+    expect(find('kmdsd rjkj').answer?.u).toBe('/maister-klasy/lviv/honcharne-kolo')
+    expect(find('lviv').corrected).toBeUndefined()
   })
   it('finds a name while it is being typed and with a typo', () => {
     expect(find('глиняна х').studios[0]?.u).toBe('/vyrobnyky/hlyniana-khata')

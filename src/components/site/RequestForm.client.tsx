@@ -35,6 +35,7 @@ const KIND: Record<string, { qty: string; qtyPh: string; date: string; datePh: s
 // /zapyt?vid=studiya (or forStudio, on /dlya-studiy) opens the form for studios that want to add or update their profile.
 // /zapyt?what=<kind>&misto=<city slug> (set by the header button from the page the visitor came from) pre-fills the form.
 // /zapyt?vid=keys&slug=<case slug> asks us to remove or correct a case page («Інше» with a prefilled note).
+// /zapyt?q=<words> (from a search with no answer) puts the words into «Деталі».
 export function RequestForm({
   sourcePage,
   compact = false,
@@ -90,6 +91,9 @@ export function RequestForm({
       setCaseFix(true)
       setDetails(`Прошу зняти або виправити кейс /vyrobnyky/${caseSlug}. Що саме: `)
     }
+    // /zapyt?q=<what they searched for>: a search with no answer hands its words over to the request.
+    const searched = (q.get('q') ?? '').trim().slice(0, 100)
+    if (searched && !caseSlug) setDetails(searched)
     const w = q.get('what')
     if (w && KIND[w]) setWhat(w)
     const m = q.get('misto')

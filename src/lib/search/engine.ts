@@ -10,6 +10,7 @@ import { fold, near, otherLayout, words } from './normalize'
 export type SearchKind = 'page' | 'city' | 'studio' | 'guide'
 export type SearchDoc = {
   k: SearchKind
+  m?: string // mono kicker over the title: «Студія · Львів», «Майстер-класи»
   t: string // title as shown
   u: string // path
   s?: string // one line under the title
@@ -17,7 +18,8 @@ export type SearchDoc = {
   c?: string[] // city slugs the document is about
   f?: StudioFormat[]
   n?: number // how many places it lists (or 1): a light tie-breaker
-  x?: 1 // closed or activity not confirmed: shown lower
+  p?: number // a studio's single-class price per person, UAH
+  x?: string // closed or activity not confirmed: shown lower, with this note («останній пост — травень 2024»)
 }
 export type SearchIndex = { v: 1; at: string; cities: [slug: string, name: string][]; docs: SearchDoc[] }
 
@@ -79,13 +81,16 @@ function rank(prepared: Prepared, query: QWord[], phrase: string) {
   const required = query.some((q) => !q.generic) ? query.filter((q) => !q.generic) : query
   const weight = query.reduce((a, q) => a + (q.generic ? 0.3 : 1), 0) // «майстер-клас», «кераміка» count less than «Львів»
   const hits: SearchHit[] = []
-  const seen = new Set<number>() // query words that matched somewhere
+  const typed = query.map(() => false) // the word as typed (or its start) is a word of some document
   for (const d of prepared.docs) {
     let sum = 0, covered = 0
     for (const [i, q] of query.entries()) {
       let best = 0
-      for (const t of d.terms) best = Math.max(best, score(q, t))
-      if (best > 0) seen.add(i)
+      for (const t of d.terms) {
+        const s = score(q, t)
+        if (s > best) best = s
+        if (!typed[i] && s >= 0.9 * t.weight && t.w.startsWith(q.w)) typed[i] = true
+      }
       sum += best * (q.generic ? 0.3 : 1)
       if (best > 0 && required.includes(q)) covered++
     }
@@ -93,7 +98,8 @@ function rank(prepared: Prepared, query: QWord[], phrase: string) {
     const coverage = covered / required.length
     const title = d.title
     let s = (sum / weight) * coverage * coverage
-    if (title.startsWith(phrase)) s += d.k === 'studio' ? 0.25 : 0.1 // a name being typed
+    // A studio name being typed; when the query names a city or a format («kyiv»), its page still answers first.
+    if (title.startsWith(phrase)) s += d.k === 'studio' && !want.cities.size && !want.formats.size ? 0.25 : 0.1
     else if (query.length > 1 && title.includes(phrase)) s += 0.1
     if (coverage === 1) s += KIND_BONUS[d.k]
     if (d.c?.[0] && want.cities.has(d.c[0])) s += 0.15
@@ -101,11 +107,12 @@ function rank(prepared: Prepared, query: QWord[], phrase: string) {
     if (d.f?.some((f) => want.formats.has(f))) s += 0.1
     else if (d.f?.length && d.k !== 'studio') s -= 0.2
     s += 0.06 * Math.min(1, Math.log10((d.n ?? 1) + 1) / 2)
+    if (d.p) s += 0.03 // a studio with a known class price first among equals, as on the city pages
     if (d.x) s *= 0.7
     const { terms: _, title: __, ...doc } = d
     hits.push({ ...doc, score: s, marks: [] })
   }
-  return { hits: hits.sort((a, b) => b.score - a.score), seen }
+  return { hits: hits.sort((a, b) => b.score - a.score), typed }
 }
 
 // Character ranges of the title to highlight: the typed prefix of a word, or the whole word for a looser match.
@@ -139,17 +146,18 @@ export function search(prepared: Prepared, raw: string, limits = { cities: 3, st
   let query = parse(raw)
   if (!query.length || query.map((q) => q.w).join('').length < 2) return null
   const first = rank(prepared, query, query.map((q) => q.w).join(' '))
-  const { seen } = first
   let { hits } = first
-  // A word that matches nothing anywhere may be typed in the wrong keyboard layout («kmdsd» → «львів»).
+  // A word that is no document's word (only its sounds match, if anything) may be typed in the wrong keyboard layout
+  // («kmdsd rjkj» → «львів коло»): read those words in the other layout and keep whichever reading finds more.
   let corrected: string | undefined
   const rawWords = raw.trim().split(/\s+/)
-  if (seen.size < query.length && rawWords.length === query.length) {
-    const fixed = rawWords.map((w, i) => (seen.has(i) ? w : (otherLayout(w) ?? w))).join(' ')
+  const weak = first.typed.map((t) => !t)
+  if (weak.some(Boolean) && rawWords.length === query.length) {
+    const fixed = rawWords.map((w, i) => (weak[i] ? (otherLayout(w) ?? w) : w)).join(' ')
     const q2 = parse(fixed)
     if (fixed !== raw.trim() && q2.length) {
       const again = rank(prepared, q2, q2.map((q) => q.w).join(' '))
-      if (again.seen.size > seen.size) {
+      if ((again.hits[0]?.score ?? 0) > (hits[0]?.score ?? 0)) {
         ;({ hits } = again)
         query = q2
         corrected = q2.map((q) => q.w).join(' ')
@@ -166,7 +174,8 @@ export function search(prepared: Prepared, raw: string, limits = { cities: 3, st
     corrected,
     answer: answer && shown([answer])[0],
     cities: shown(rest.filter((h) => h.k === 'city').slice(0, limits.cities)),
-    studios: shown(rest.filter((h) => h.k === 'studio').slice(0, limits.studios)),
+    // Closed studios and those with activity not confirmed go to the end of their group.
+    studios: shown(rest.filter((h) => h.k === 'studio').slice(0, limits.studios).sort((a, b) => Number(!!a.x) - Number(!!b.x))),
     pages: shown(rest.filter((h) => h.k === 'page' || h.k === 'guide').slice(0, limits.pages)),
     total: hits.length,
   }

@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Mark } from '@/components/ui/Mark'
 import { mainNav, requestHrefFor, simpleNav, STUDIO_JOIN_HREF, utilityNav } from '@/content/navigation'
+import { SearchHeader } from './search/SiteSearch.client'
 
 // The menu data comes from src/content/navigation.ts (planned pages already filtered out); this file is only presentation.
 // Desktop (lg+): mono menu, mega panels opened by click, Enter/Space or hover intent; Escape, outside click and navigation
@@ -140,6 +141,7 @@ export function MainNav() {
       </nav>
 
       <div className="nav-actions">
+        <SearchHeader onOpen={() => setOpen(null)} />
         <button type="button" className="ui-btn min-[65rem]:hidden" data-variant="ghost" data-size="sm" aria-expanded={drawer} aria-controls="mobile-menu" onClick={openDrawer}>
           Меню
         </button>

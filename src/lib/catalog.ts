@@ -57,8 +57,19 @@ const joinCatalog = async (shard: (i: number) => Promise<CachedStudio[]>, cityLi
 let scriptLoad: Promise<StudioCard[]> | null = null
 const cachedShard = unstable_cache(loadShard, ['studios-shard-v2'], { revalidate: false, tags: TAGS })
 const cachedCities = unstable_cache(loadPublicCities, ['cities-v1'], { revalidate: false, tags: TAGS })
-const loadStudios =
-  process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= joinCatalog(loadShard, loadPublicCities)) : () => joinCatalog(cachedShard, cachedCities)
+// Outside a React render (route handlers: catalog-sitemap.xml, llms.txt, /poshuk/index.json) `cache` below does not
+// memoize, and those builds ask for the catalogue hundreds of times (once per city × format). The joined catalogue is
+// kept for a few seconds per process; a write's revalidateTag is seen at most that much later. Nothing mutates it.
+const JOIN_TTL = 5000
+let joined: { at: number; list: Promise<StudioCard[]> } | null = null
+const sharedJoin = () => {
+  if (!joined || Date.now() - joined.at > JOIN_TTL) {
+    joined = { at: Date.now(), list: joinCatalog(cachedShard, cachedCities) }
+    joined.list.catch(() => (joined = null))
+  }
+  return joined.list
+}
+const loadStudios = process.env.HLYNA_SCRIPT === '1' ? () => (scriptLoad ??= joinCatalog(loadShard, loadPublicCities)) : sharedJoin
 
 // Research annotations stay in the database (the panel shows them) but never reach public pages.
 const cleanList = <T extends { text: string }>(xs?: T[] | null) => (xs ?? []).map((x) => ({ ...x, text: cleanPublic(x.text) })).filter((x) => x.text)
