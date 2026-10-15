@@ -1,27 +1,26 @@
-import Link from 'next/link'
-import { cx, wrap } from '@/components/ui/layout'
+import type { Metadata } from 'next'
 import { notFound, redirect } from 'next/navigation'
 import React from 'react'
 
-import { StudioEditForm } from '@/components/site/StudioEditForm.client'
-import { kabinetEdit } from '@/lib/kabinetData'
+import { SectionScreen } from '@/components/kabinet/SectionScreen'
+import { StudioFrame } from '@/components/kabinet/StudioFrame.client'
+import { cx, wrap } from '@/components/ui/layout'
+import { kabinetSection } from '@/lib/kabinetData'
 
-export default async function EditStudio({ params }: { params: Promise<{ slug: string }> }) {
+export const metadata: Metadata = { title: 'Огляд студії' }
+
+// Overview: a list of the six sections below lg; from lg the same list is the side navigation and the first section
+// opens beside it (one load, one markup; the section is hidden by CSS on phones).
+export default async function StudioOverview({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
-  const found = await kabinetEdit(slug)
-  if (found === 'login') redirect('/kabinet/vhid')
-  if (!found) notFound()
-  const { initial } = found
+  const page = await kabinetSection(slug, 'pro-studiyu')
+  if (page === 'login') redirect('/kabinet/vhid')
+  if (!page) notFound()
   return (
-    <main className={cx(wrap, 'grid gap-4 pt-hero')}>
-      <div className="grid max-w-[860px] gap-4">
-        <p className="m-0 text-sm">
-          <Link href="/kabinet">← Кабінет</Link>
-        </p>
-        <h1 className="m-0 font-display text-h1">{found.name}</h1>
-        <p className="m-0 max-w-read text-ink-2">Збережені зміни ми переглядаємо й публікуємо, зазвичай протягом доби. Внутрішні нотатки й статус студії тут не показуються й не змінюються.</p>
-        <StudioEditForm initial={initial} />
-      </div>
+    <main className={cx(wrap, 'flex flex-1 flex-col pt-hero pb-6 lg:pb-0')}>
+      <StudioFrame key="overview" initial={page.studio} mode="overview">
+        <SectionScreen page={page} level="h2" />
+      </StudioFrame>
     </main>
   )
 }

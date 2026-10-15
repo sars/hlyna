@@ -79,6 +79,8 @@ export async function tapPublishOwnerChanges(db: Db, studioId: number, withoutTe
   const csId = await pendingChangeSetOf(db, studioId)
   if (!csId) return { answer: 'Нових змін немає', mark: { line: 'Вже розглянуто', keyboard: [] } }
   const cs = await getChangeSet(db, csId)
+  // The owner is still adding photos (the note about them has not gone out yet): «Опублікувати» here would publish photos nobody has seen.
+  if (cs?.photosNotifyAt) return { answer: 'Є нові фото від студії, повідомлення про них прийде за кілька хвилин. Опублікуйте після нього або в панелі.' }
   const hasText = Boolean(cs?.fields.some((f) => f.ownerText && f.changed && f.to))
   if (hasText && !withoutText)
     return {

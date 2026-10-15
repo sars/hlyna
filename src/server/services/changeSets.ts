@@ -4,6 +4,7 @@ import type { Db } from '../db'
 import { user } from '../db/schema/auth'
 import { cities, media, studioPhotos, studioPrices, studios } from '../db/schema/catalog'
 import { changeSets } from '../db/schema/history'
+import { deleteMedia } from '../media'
 import { revalidateStudios } from '../revalidate'
 import { audit, same, type Actor } from './audit'
 import { NotFound } from './requests'
@@ -68,7 +69,8 @@ export function normalizeProposed(p: Record<string, unknown>): Partial<Record<Fi
   return out
 }
 
-function currentValue(key: FieldKey, row: Row, prices: Price[], photos: number[]): unknown {
+/** The published value of a field, in the shape change sets propose it (the cabinet reads it too). */
+export function currentValue(key: FieldKey, row: Row, prices: Price[], photos: number[]): unknown {
   switch (key) {
     case 'prices': return prices
     case 'photos': return photos
@@ -209,26 +211,50 @@ async function applyChangeSetTx(
       .where(eq(changeSets.id, id))
     await audit(tx, actor, 'studio', cs.studioId, 'owner-changes', changes)
     await audit(tx, actor, 'change_set', id, status, { fields: { from: offered, to: keys } })
-    return { status, applied: keys, already: false, studioId: cs.studioId, slug: row!.slug }
+    return { status, applied: keys, already: false, studioId: cs.studioId, slug: row!.slug, newMediaIds: cs.newMediaIds }
   })
 }
 
 /** Applies the accepted fields of an owner's change set and refreshes the studio's public pages. */
 export async function applyChangeSet(...args: Parameters<typeof applyChangeSetTx>) {
   const res = await applyChangeSetTx(...args)
+  if (!res.already && 'newMediaIds' in res && res.newMediaIds) await dropOrphanMedia(args[0], res.newMediaIds, args[3])
   if (!res.already && 'studioId' in res && res.studioId && res.status !== 'rejected') await revalidateStudios(args[0], [res.studioId])
   return res
 }
 
+/**
+ * Deletes the files an owner uploaded for a change set that is now closed, when they never went live: still «pending»,
+ * shown by no profile and named by no other open change set. Never touches media used elsewhere; a failure is only logged.
+ */
+async function dropOrphanMedia(db: Db, ids: number[], actor: Actor) {
+  for (const id of ids) {
+    try {
+      const [orphan] = await db
+        .select({ id: media.id })
+        .from(media)
+        .where(sql`${media.id} = ${id} and ${media.status} = 'pending'
+          and not exists (select 1 from ${studioPhotos} sp where sp.media_id = ${id})
+          and not exists (select 1 from ${changeSets} c where c.status = 'pending' and (${id} = any(c.new_media_ids) or c.proposed->'photos' @> to_jsonb(${id}::int)))`)
+        .limit(1)
+      if (orphan) await deleteMedia(db, id, actor)
+    } catch (err) {
+      console.error('Orphan media cleanup error', id, String(err).slice(0, 200))
+    }
+  }
+}
+
 export async function rejectChangeSet(db: Db, id: number, note: string, actor: Actor) {
-  return db.transaction(async (tx) => {
-    const [cs] = await tx.select({ status: changeSets.status }).from(changeSets).where(eq(changeSets.id, id)).for('update').limit(1)
+  const res = await db.transaction(async (tx) => {
+    const [cs] = await tx.select({ status: changeSets.status, newMediaIds: changeSets.newMediaIds }).from(changeSets).where(eq(changeSets.id, id)).for('update').limit(1)
     if (!cs) throw new NotFound(`Зміни #${id} не знайдено`)
-    if (cs.status !== 'pending') return { status: cs.status, already: true }
+    if (cs.status !== 'pending') return { status: cs.status, already: true as const, newMediaIds: [] as number[] }
     await tx.update(changeSets).set({ status: 'rejected', decidedBy: actor.id, decidedAt: sql`now()`, decisionNote: note.trim() || null, updatedAt: sql`now()` }).where(eq(changeSets.id, id))
     await audit(tx, actor, 'change_set', id, 'rejected', note.trim() ? { note: { from: null, to: note.trim() } } : null)
-    return { status: 'rejected' as const, already: false }
+    return { status: 'rejected' as const, already: false as const, newMediaIds: cs.newMediaIds }
   })
+  if (!res.already) await dropOrphanMedia(db, res.newMediaIds, actor)
+  return res
 }
 
 /** The open change set of a studio, if any (Telegram buttons address studios, not change sets). */

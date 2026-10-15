@@ -1,0 +1,1 @@
+ALTER TABLE "app"."change_sets" ADD COLUMN "photos_notify_at" timestamp with time zone;

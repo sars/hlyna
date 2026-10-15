@@ -1,21 +1,20 @@
 import type { Metadata, Viewport } from 'next'
+import { cookies } from 'next/headers'
 import React from 'react'
 
-import { Analytics } from '@/components/site/Analytics'
-import { SiteFooter } from '@/components/site/SiteFooter'
-import { SiteHeader } from '@/components/site/SiteHeader'
+import { KabinetFooter, KabinetHeader } from '@/components/kabinet/KabinetChrome'
 
 import { fontVars } from '../../fonts'
 
 import '../../(frontend)/globals.css'
 
-// The studio cabinet's own root layout, so the cabinet can get its own chrome. For now it renders the same header and
-// footer as the public site. /kabinet/zayavka stays in (frontend): it is a public page.
+// The studio cabinet's own root layout: the site's fonts and stylesheet, but none of the public chrome (mega menu,
+// search, request bar, footer columns) and no analytics (invite tokens and pre-hydration URLs must not reach GA). /kabinet/zayavka stays in (frontend): it is a public page with the site header.
 
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Кабінет студії',
+  title: { default: 'Кабінет студії · Глина', template: '%s · Кабінет студії · Глина' },
   robots: { index: false, follow: false },
   icons: {
     icon: [
@@ -30,14 +29,15 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#efe9de', width: 'device-width', initialScale: 1, viewportFit: 'cover' }
 
-export default function KabinetLayout({ children }: { children: React.ReactNode }) {
+export default async function KabinetLayout({ children }: { children: React.ReactNode }) {
+  // Only whether a session cookie exists decides if «Вийти» shows; the pages check the session itself.
+  const signedIn = (await cookies()).getAll().some((c) => c.name.endsWith('hlyna.session_token'))
   return (
     <html className={fontVars} lang="uk">
-      <body>
-        <SiteHeader />
+      <body className="flex min-h-dvh flex-col">
+        <KabinetHeader signedIn={signedIn} />
         {children}
-        <SiteFooter />
-        <Analytics />
+        <KabinetFooter />
       </body>
     </html>
   )

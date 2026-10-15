@@ -59,6 +59,8 @@ export const changeSets = app.table(
     decidedBy: text('decided_by'),
     decidedAt: ts('decided_at'),
     decisionNote: text('decision_note'),
+    // When the editor is told about the owner's photo changes: 10 minutes after the last one, once (null = nothing to send).
+    photosNotifyAt: ts('photos_notify_at'),
     createdAt: ts('created_at').notNull().defaultNow(),
     updatedAt: ts('updated_at').notNull().defaultNow(),
   },

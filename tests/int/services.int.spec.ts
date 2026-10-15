@@ -1,5 +1,4 @@
-// Milestone 3 services against a real Postgres (schema `app`): public forms, the owner cabinet (change sets, pending
-// photos), ported import scripts, rate limits. Uses PANEL_TEST_DATABASE_URL (default hlyna_apptest).
+// Milestone 3 services against a real Postgres (schema `app`): public forms, ported import scripts, rate limits. Uses PANEL_TEST_DATABASE_URL (default hlyna_apptest).
 import { mkdtempSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
@@ -7,17 +6,13 @@ import path from 'node:path'
 import { eq, sql } from 'drizzle-orm'
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
-import sharp from 'sharp'
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 
 import * as schema from '../../src/server/db/schema'
-import { cities, media, studioPhotos, studioPrices, studios } from '../../src/server/db/schema/catalog'
+import { cities, studioPrices, studios } from '../../src/server/db/schema/catalog'
 import { changeSets, importRuns, studioRevisions } from '../../src/server/db/schema/history'
 import { claimStudios, claims, requests } from '../../src/server/db/schema/requests'
-import { createUser, grantStudios } from '../../src/server/auth/users'
 import type { Db } from '../../src/server/db'
-import { applyChangeSet } from '../../src/server/services/changeSets'
-import { Forbidden, ownerEditInitial, ownerStudios, submitOwnerEdit } from '../../src/server/services/kabinet'
 import { rateLimited } from '../../src/server/services/limits'
 import { requestMessage, submitClaim, submitRequest } from '../../src/server/services/publicForms'
 import { alternateNamesFor, nameParts } from '../../src/server/services/imports/altNames'
@@ -55,8 +50,6 @@ afterAll(async () => {
   await pool.end()
 })
 
-const png = (color: string) => sharp({ create: { width: 900, height: 600, channels: 3, background: color } }).png().toBuffer()
-
 describe('public forms', () => {
   it('request: saves, answers {ok,id}, message lists the fields', async () => {
     const r = await submitRequest(db, { what: 'logo-mugs', quantity: '20', city: 'Суми', contactName: 'Оля', contactPhoneOrTelegram: '+380501234567', sourcePage: '/x' }, nextIp())
@@ -91,59 +84,6 @@ describe('public forms', () => {
     expect(await submitClaim(db, { name: 'x', contact: 'y', studio: 'nope', represents: true }, nextIp())).toMatchObject({ status: 404 })
     expect(await submitClaim(db, { name: 'x', contact: 'y', studio: 'a', represents: false }, nextIp())).toMatchObject({ status: 400 })
     expect((await db.select().from(claims)).length).toBe(1)
-  })
-})
-
-describe('owner cabinet', () => {
-  it('a save becomes one pending change set, updated on the next save; others get Forbidden', async () => {
-    const owner = await createUser(db, { role: 'owner', name: 'Оля' })
-    await grantStudios(db, owner, [studioA])
-    expect((await ownerStudios(db, owner)).map((s) => s.slug)).toEqual(['a'])
-    const data = { ownerAbout: 'Ми ліпимо', services: ['Коло'], prices: [{ text: 'МК на гончарному колі, 2 год — 900 грн (сайт, 2025)', source: 'сайт', date: '2025' }, { text: 'Розпис — 700 грн' }], b2b: { minOrder: '20 шт' }, keepPhotos: [] }
-    const first = await submitOwnerEdit(db, { userId: owner, ownerName: 'Оля', slug: 'a', data, photos: [] })
-    const second = await submitOwnerEdit(db, { userId: owner, ownerName: 'Оля', slug: 'a', data: { ...data, ownerNews: 'Нова серія' }, photos: [] })
-    expect(second.changeSetId).toBe(first.changeSetId)
-    const [cs] = await db.select().from(changeSets)
-    const p = cs!.proposed as Record<string, unknown>
-    expect(p.ownerNews).toBe('Нова серія')
-    // unchanged price keeps its source, a new line is «від студії»
-    expect((p.prices as { source: string }[]).map((x) => x.source)).toEqual(['сайт', expect.stringMatching(/^від студії, \d{2}\.\d{4}$/)])
-    // the studio itself is untouched until we accept
-    const [s] = await db.select().from(studios).where(eq(studios.id, studioA))
-    expect(s!.ownerAbout).toBeNull()
-    await expect(submitOwnerEdit(db, { userId: owner, ownerName: 'Оля', slug: 'b', data, photos: [] })).rejects.toBeInstanceOf(Forbidden)
-  })
-
-  it('the edit form shows the pending proposal over published data', async () => {
-    const owner = await createUser(db, { role: 'owner', name: 'Оля' })
-    await grantStudios(db, owner, [studioA])
-    await submitOwnerEdit(db, { userId: owner, ownerName: 'Оля', slug: 'a', data: { address: 'вул. Нова, 1', services: ['Коло'], keepPhotos: [] }, photos: [] })
-    const f = await ownerEditInitial(db, owner, 'a')
-    expect(f!.initial.address).toBe('вул. Нова, 1')
-    expect(f!.initial.pending).toBe(true)
-    expect(await ownerEditInitial(db, owner, 'b')).toBeNull()
-  })
-
-  it('new photos are pending media until the change set is accepted', async () => {
-    const owner = await createUser(db, { role: 'owner', name: 'Оля' })
-    await grantStudios(db, owner, [studioA])
-    const r = await submitOwnerEdit(db, { userId: owner, ownerName: 'Оля', slug: 'a', data: { keepPhotos: [] }, photos: [{ bytes: await png('#c86'), fileName: 'cup.png', mime: 'image/png', alt: 'Чашка' }] })
-    expect(r.newPhotos).toBe(1)
-    const [m] = await db.select().from(media)
-    expect(m!.status).toBe('pending')
-    expect((await db.select().from(studioPhotos)).length).toBe(0)
-    await applyChangeSet(db, r.changeSetId, 'all-but-text', { id: null, source: 'panel' })
-    expect((await db.select().from(media))[0]!.status).toBe('active')
-    expect((await db.select().from(studioPhotos)).map((p) => p.mediaId)).toEqual([m!.id])
-    expect((await db.select().from(studios).where(eq(studios.id, studioA)))[0]!.consentPhotos).toBe(true)
-  })
-
-  it('a photo without alt text is refused', async () => {
-    const owner = await createUser(db, { role: 'owner', name: 'Оля' })
-    await grantStudios(db, owner, [studioA])
-    await expect(
-      submitOwnerEdit(db, { userId: owner, ownerName: 'Оля', slug: 'a', data: { keepPhotos: [] }, photos: [{ bytes: await png('#123'), fileName: 'x.png', mime: 'image/png', alt: ' ' }] }),
-    ).rejects.toThrow(/опис/)
   })
 })
 

@@ -4,24 +4,24 @@ import { headers } from 'next/headers'
 
 import { currentUser } from '@/server/auth/guards'
 import { db } from '@/server/db'
-import { ownerEditInitial, ownerStudios } from '@/server/services/kabinet'
-import type { OwnerEditInitial } from '@/server/services/kabinet'
+import { ownerStudioSummaries, sectionPage } from '@/server/services/kabinet'
+import type { KabinetSection } from '@/shared/options'
+import type { SectionPage, StudioSummary } from '@/shared/kabinet'
 
 // What the /kabinet pages read: the owner's Better Auth session and their studios in the app schema.
+// 'login' = not signed in as an owner; null = not this owner's studio (or no such studio).
 
-export type KabinetOwner = { name: string; studios: { id: number; name: string; slug: string; pending: boolean }[] }
-
-export async function kabinetOwner(): Promise<KabinetOwner | null> {
+async function ownerId() {
   const u = await currentUser(await headers())
-  if (!u || u.role !== 'owner') return null
-  return { name: u.name, studios: await ownerStudios(db, u.id) }
+  return u && u.role === 'owner' ? u : null
 }
 
-export type { OwnerEditInitial }
+export async function kabinetOwner(): Promise<{ name: string; studios: StudioSummary[] } | null> {
+  const u = await ownerId()
+  return u ? { name: u.name, studios: await ownerStudioSummaries(db, u.id) } : null
+}
 
-/** 'login' = not signed in; null = not this owner's studio (or no such studio). */
-export async function kabinetEdit(slug: string): Promise<{ name: string; initial: OwnerEditInitial } | 'login' | null> {
-  const u = await currentUser(await headers())
-  if (!u || u.role !== 'owner') return 'login'
-  return ownerEditInitial(db, u.id, slug)
+export async function kabinetSection<S extends KabinetSection>(slug: string, section: S): Promise<SectionPage<S> | 'login' | null> {
+  const u = await ownerId()
+  return u ? sectionPage(db, u.id, slug, section) : 'login'
 }

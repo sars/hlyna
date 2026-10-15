@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { claimCreate, ownerStudioEdit, requestCreate, studioEdit } from '../../src/shared/schemas'
+import { claimCreate, ownerAboutSection, ownerContactsSection, ownerPricesSection, requestCreate, studioEdit } from '../../src/shared/schemas'
 
 describe('requestCreate', () => {
   it('needs a way to reply', () => {
@@ -37,20 +37,20 @@ describe('claimCreate', () => {
   })
 })
 
-describe('ownerStudioEdit (owner whitelist)', () => {
-  it('drops fields owners may not write', () => {
-    const r = ownerStudioEdit.parse({ ownerAbout: 'Про нас', publicDescription: 'hack', status: 'closed', visibility: 'public' } as never)
+describe('owner sections', () => {
+  it('drop fields owners may not write', () => {
+    const r = ownerAboutSection.parse({ ownerAbout: 'Про нас', publicDescription: 'hack', status: 'closed', visibility: 'public' } as never)
     expect(r).not.toHaveProperty('publicDescription')
     expect(r).not.toHaveProperty('status')
     expect(r.ownerAbout).toBe('Про нас')
   })
-  it('normalises URLs and keeps only Instagram post links, max 3', () => {
-    const r = ownerStudioEdit.parse({
+  it('normalise URLs and keep only Instagram post links, max 3', () => {
+    const r = ownerContactsSection().parse({
       website: 'studio.ua',
       instagramPosts: [
         'https://www.instagram.com/p/AAA/',
-        'https://www.instagram.com/reel/BBB/',
-        'https://evil.example/p/CCC/',
+        'instagram.com/reel/BBB?igsh=x',
+        '',
         'https://www.instagram.com/p/DDD/',
         'https://www.instagram.com/p/EEE/',
       ],
@@ -58,9 +58,28 @@ describe('ownerStudioEdit (owner whitelist)', () => {
     expect(r.website).toBe('https://studio.ua/')
     expect(r.instagramPosts).toEqual(['https://www.instagram.com/p/AAA/', 'https://www.instagram.com/reel/BBB/', 'https://www.instagram.com/p/DDD/'])
   })
-  it('keeps at most 40 non-empty price lines', () => {
-    const r = ownerStudioEdit.parse({ prices: Array.from({ length: 50 }, (_, i) => ({ text: i % 5 ? `МК ${i} — 900 грн` : '' })) })
+  it('keep at most 40 non-empty price lines', () => {
+    const r = ownerPricesSection.parse({ prices: Array.from({ length: 50 }, (_, i) => ({ text: i % 5 ? `МК ${i} — 900 грн` : '' })) })
     expect(r.prices).toHaveLength(40)
+  })
+  it('say which field is wrong, in Ukrainian', () => {
+    const c = ownerContactsSection().safeParse({ phone: '123', email: 'a@b', website: 'not a site', instagram: 'two words', instagramPosts: ['', 'https://evil.example/p/CCC/'] })
+    expect(c.success).toBe(false)
+    const fields = Object.fromEntries(c.error!.issues.map((i) => [i.path.join('.'), i.message]))
+    expect(Object.keys(fields).sort()).toEqual(['email', 'instagram', 'instagramPosts.1', 'phone', 'website'])
+    expect(fields.phone).toMatch(/10 цифр/)
+    const p = ownerPricesSection.safeParse({ prices: [{ text: 'Коло — 900 грн' }, { text: '', date: 'жовтень 2026' }, { text: '', date: '' }] })
+    expect(p.error!.issues.map((i) => [i.path.join('.'), i.message])).toEqual([['prices.1.text', 'Напишіть, що саме й скільки коштує.']])
+  })
+  it('read phones and Instagram forgivingly', () => {
+    const ok = (phone: string, instagram = '') => ownerContactsSection().parse({ phone, instagram })
+    expect(ok('099 123-45-67').phone).toBe('+380 99 123 45 67')
+    expect(ok('+38 (099) 123 45 67').phone).toBe('+380 99 123 45 67')
+    expect(ok('380991234567').phone).toBe('+380 99 123 45 67')
+    expect(ok('', '@osonnya.ceramics').instagram).toBe('https://www.instagram.com/osonnya.ceramics/')
+    expect(ok('', 'osonnya').instagram).toBe('https://www.instagram.com/osonnya/')
+    expect(ok('', 'https://instagram.com/osonnya?igsh=1').instagram).toBe('https://www.instagram.com/osonnya/')
+    expect(ownerContactsSection({ phone: '+38 (095) 699-76-80; салон +38 (050) 670-50-22' }).parse({ phone: '+38 (095) 699-76-80; салон +38 (050) 670-50-22' }).phone).toContain('салон')
   })
 })
 

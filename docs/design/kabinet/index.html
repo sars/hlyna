@@ -1,0 +1,832 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Кабінет студії · макети · Глина</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@600;800&family=Golos+Text:wght@400;500;600&family=Playfair+Display:ital,wght@1,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* ──────────────────────────────────────────────────────────────────────────────
+   Кабінет студії «Глина» — дошка станів. Токени = globals.css (SYSTEM.md §2).
+   Кадр (.fr) — контейнер: та сама розмітка малюється по-телефонному у 390 і
+   по-десктопному у 1280 через @container. Нові класи — пропозиція для SYSTEM.md:
+   .ui-box (поле-бланк), .ui-savebar, .ui-tag, .ui-list, .ui-photos, .kb-* (кабінет).
+   У макеті вони скорочені (.bx, .sb, .tag, .le, .pt, .kh…), відповідність — у README.
+   ────────────────────────────────────────────────────────────────────────────── */
+:root{
+  --paper:#efe9de; --paper-2:#e4dccd; --paper-white:#fff;
+  --ink:#15130f; --ink-2:#4e483f;
+  --cobalt:#1d3ec6; --cobalt-deep:#132b8f; --on-cobalt-2:#cfd7ff; --on-ink-2:#d6cfc2;
+  --peach:#ffd9a8; --terracotta:#b4532e; --terracotta-text:#a84a27;
+  --rule:rgb(21 19 15 / .2); --rule-on-dark:rgb(239 233 222 / .4);
+  --display:'Unbounded','Arial Black',system-ui,sans-serif;
+  --body:'Golos Text','Helvetica Neue',Arial,sans-serif;
+  --serif:'Playfair Display',Georgia,serif;
+  --mono:'JetBrains Mono',Menlo,monospace;
+  --gutter:clamp(16px,3vw,40px);
+  --radius-btn:2px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#d9d1c2;color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+img{display:block;max-width:100%}
+a{color:var(--cobalt);text-decoration:none}
+p,h1,h2,h3,ul,ol,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--cobalt);outline-offset:3px}
+
+/* ── дошка ── */
+.board{max-width:1360px;margin:0 auto;padding:28px 24px 80px}
+.board>header{padding:0 0 18px;border-bottom:2px solid var(--ink);margin-bottom:28px}
+.board h1{font-family:var(--display);font-weight:600;font-size:28px;line-height:1.1;letter-spacing:-.01em}
+.board header p{max-width:78ch;color:var(--ink-2);margin-top:8px;font-size:15.5px}
+.st{margin:44px 0 0}
+.st>h2{font-family:var(--mono);font-weight:500;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);display:flex;gap:14px;align-items:baseline;flex-wrap:wrap}
+.st>h2 b{font-family:var(--display);font-weight:600;font-size:17px;letter-spacing:0;text-transform:none;color:var(--ink)}
+.st>p{max-width:82ch;font-size:14.5px;color:var(--ink-2);margin:6px 0 14px}
+.st>p code,.board header code{font-family:var(--mono);font-size:.9em}
+.row{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-start}
+.note-board{font-size:13px;color:var(--ink-2);margin-top:8px;max-width:390px}
+.ph-mark{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--terracotta-text);padding:2px 6px;box-shadow:inset 0 0 0 1px var(--terracotta-text);border-radius:var(--radius-btn);margin-left:6px;vertical-align:middle}
+
+/* ── кадр ── */
+.fr{--gutter:clamp(16px,3cqw,40px);container-type:inline-size;container-name:fr;position:relative;background:var(--paper);color:var(--ink);outline:1px solid rgb(21 19 15 / .35);overflow:hidden;text-align:left;display:flex;flex-direction:column}
+.fr-d{width:1280px;min-height:760px}
+.fr-m{width:390px;height:844px}
+.fr-m.tall{height:auto;min-height:844px}
+.wrap{max-width:1600px;margin-inline:auto;padding-inline:var(--gutter);width:100%}
+.fr main{flex:1}
+
+/* ── примітиви (копія вигляду з globals.css) ── */
+.ui-btn{display:inline-flex;align-items:center;justify-content:center;gap:.5em;height:52px;padding-inline:1.4em;border:0;border-radius:var(--radius-btn);font-family:var(--display);font-weight:600;font-size:13.5px;letter-spacing:.03em;line-height:1;text-transform:uppercase;white-space:nowrap;cursor:pointer;background:var(--ink);color:var(--paper);transition:background-color .2s,color .2s;text-decoration:none}
+.ui-btn[data-size=sm]{height:44px;font-size:12px}
+.ui-btn[data-variant=cobalt]{background:var(--cobalt);color:var(--paper)}
+.ui-btn[data-variant=ghost]{background:transparent;color:inherit;box-shadow:inset 0 0 0 2px currentColor}
+.ui-btn[data-full]{width:100%}
+.ui-btn[disabled],.ui-btn.is-busy{opacity:.6}
+.ui-arrow{display:inline-block}
+.k{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.chip{display:inline-flex;align-items:center;padding:7px 11px;border-radius:var(--radius-btn);box-shadow:inset 0 0 0 1.5px var(--ink);font-family:var(--mono);font-size:11.5px;letter-spacing:.04em;line-height:1;text-transform:uppercase;color:var(--ink);white-space:nowrap;cursor:pointer}
+.chips{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.more{font-family:var(--display);font-weight:600;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);display:inline-flex;gap:.5em;align-items:center}
+.svg-mark{width:26px;height:26px;color:var(--terracotta);flex:none}
+.note{background:var(--paper-2);padding:14px 16px;font-size:15px;line-height:1.45;max-width:70ch}
+.note .k{display:block;margin-bottom:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* ── НОВЕ: шапка кабінету (.kb-head) — без мегаменю, пошуку й кнопки запиту ── */
+.kh{background:var(--paper);border-bottom:2px solid var(--ink)}
+.kh-in{display:flex;align-items:center;gap:14px;padding-block:12px;min-height:66px}
+.logo{display:inline-flex;align-items:center;gap:10px;font-family:var(--display);font-weight:800;font-size:22px;line-height:1;letter-spacing:.02em;text-transform:uppercase;color:var(--ink);white-space:nowrap}
+.kh-t{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding-left:14px;border-left:1px solid var(--rule);line-height:1.2;display:none}
+.kh-nav{margin-left:auto;display:flex;align-items:center;gap:18px}
+.kh-nav a,.kh-nav button{display:inline-flex;align-items:center;min-height:44px;padding:0 2px;border:0;background:transparent;font-family:var(--mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);cursor:pointer;white-space:nowrap}
+.kh-nav .site{display:none}
+.kh-nav .out{color:var(--ink-2)}
+@container fr (min-width:40rem){.kh-t{display:block}.kh-nav .site{display:inline-flex}}
+/* підвал кабінету — один рядок */
+.kf{border-top:1px solid var(--rule);padding:16px 0 calc(16px + 0px);font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--ink-2);display:flex;gap:18px;flex-wrap:wrap}
+.kf a{color:var(--ink-2);text-decoration:underline;text-underline-offset:3px}
+.tall .kf{padding-bottom:16px}
+
+/* ── внутрішня сітка кабінету ── */
+.pg{padding-block:clamp(18px,3cqw,32px) 28px;display:grid;gap:18px;max-width:760px}
+.pg.wide{max-width:none}
+.back{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:var(--ink-2);display:inline-flex;align-items:center;min-height:32px}
+.back:hover{color:var(--cobalt)}
+h1.t{font-family:var(--display);font-weight:600;font-size:clamp(24px,3.2cqw,40px);line-height:1.08;letter-spacing:-.01em;overflow-wrap:anywhere}
+h1.t2{font-family:var(--display);font-weight:600;font-size:clamp(22px,2.4cqw,30px);line-height:1.12}
+.lead{font-size:17px;line-height:1.5;color:var(--ink);max-width:42em}
+.lead.s{font-size:15.5px;color:var(--ink-2)}
+.head{display:grid;gap:8px}
+.head .k{margin-bottom:2px}
+
+/* ── НОВЕ: поле-бланк (.ui-box): біле тло, 1px ink-2, 48px ── */
+.f{display:grid;gap:6px;align-content:start;padding-block:8px;min-width:0}
+.f-l{font-size:15px;font-weight:500;line-height:1.3;color:var(--ink)}
+.f-l small{font-size:13.5px;font-weight:400;color:var(--ink-2);margin-left:6px}
+.f-h{font-size:13.5px;line-height:1.4;color:var(--ink-2);max-width:60ch}
+.bx{display:block;width:100%;min-width:0;min-height:48px;padding:12px 14px;border:0;border-radius:0;background:var(--paper-white);box-shadow:inset 0 0 0 1px var(--ink-2);font-family:var(--body);font-size:16px;font-weight:400;line-height:1.4;color:var(--ink);text-transform:none;letter-spacing:0;appearance:none;-webkit-appearance:none}
+.bx::placeholder{color:var(--ink-2);opacity:.75}
+.bx.ph{color:var(--ink-2);opacity:.75}
+.bx:hover{box-shadow:inset 0 0 0 1px var(--ink)}
+.bx:focus,.bx.is-focus{outline:none;box-shadow:inset 0 0 0 2px var(--cobalt)}
+.bx[aria-invalid=true],.bx.is-err{box-shadow:inset 0 0 0 2px var(--terracotta-text)}
+textarea.bx,.bx.ta{min-height:120px;resize:vertical;white-space:pre-wrap}
+.bx.sm{min-height:40px;padding:8px 10px;font-size:14px}
+select.bx{padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%2315130f' stroke-width='1.6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center;background-size:12px}
+.f-e{font-size:13.5px;line-height:1.4;color:var(--terracotta-text)}
+.f-c{font-family:var(--mono);font-size:11px;letter-spacing:.03em;color:var(--ink-2);text-align:right}
+.f-foot{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.two{display:grid;grid-template-columns:minmax(0,1fr);gap:0 16px}
+@container fr (min-width:40rem){.two{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.pw{position:relative}
+.pw .bx{padding-right:92px}
+.pw .show{position:absolute;right:4px;top:50%;transform:translateY(-50%);height:40px;padding:0 10px;border:0;background:transparent;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--cobalt);cursor:pointer}
+/* чекбокс-рядок 48px */
+.ck{display:flex;align-items:center;gap:14px;min-height:48px;padding:8px 0;border-bottom:1px solid var(--rule);font-size:16px;line-height:1.3;cursor:pointer}
+.ck input{width:22px;height:22px;margin:0;flex:none;accent-color:var(--cobalt)}
+.ck small{display:block;font-size:13px;color:var(--ink-2)}
+.cks{border-top:1px solid var(--rule);margin-top:4px}
+/* чип-вибір (кілька з переліку) */
+.cc{position:relative}
+.cc input{position:absolute;inset:0;opacity:0;margin:0;cursor:pointer}
+.cc .chip{padding:11px 13px}
+.cc input:checked+.chip{background:var(--ink);color:var(--paper)}
+.cc input:focus-visible+.chip{outline:3px solid var(--cobalt);outline-offset:3px}
+
+/* ── НОВЕ: редактор переліку (.ui-list): рядок = поле + «×», знизу «+ Додати» ── */
+.le{display:grid;gap:8px}
+.le-r{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:8px;align-items:start}
+.xb{display:inline-flex;align-items:center;justify-content:center;width:48px;height:48px;border:0;border-radius:var(--radius-btn);background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-2);font-family:var(--mono);font-size:18px;line-height:1;color:var(--ink-2);cursor:pointer}
+.xb:hover{box-shadow:inset 0 0 0 1.5px var(--ink);color:var(--ink)}
+.add{justify-self:start;margin-top:4px}
+/* рядок ціни: текст + «коли актуально» */
+.pr{display:grid;grid-template-columns:minmax(0,1fr) 48px;grid-template-areas:'t x' 'd x';gap:8px;align-items:start;padding:10px 0;border-bottom:1px solid var(--rule)}
+.pr .pt-t{grid-area:t}.pr .pt-d{grid-area:d;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}.pr .xb{grid-area:x}
+.pr .src{font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;color:var(--ink-2);align-self:center}
+@container fr (min-width:40rem){.pr{grid-template-columns:minmax(0,1fr) 200px 48px;grid-template-areas:'t d x';border-bottom:0;padding:4px 0}.pr .pt-d{grid-template-columns:minmax(0,1fr)}.pr .src{grid-column:1/-1}}
+.prs{display:grid;gap:0}
+
+/* ── НОВЕ: мітка стану (.ui-tag) ── */
+.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;line-height:1;white-space:nowrap;color:var(--ink-2)}
+.tag::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor;flex:none}
+.tag.rev{color:var(--cobalt)}
+.tag.miss{color:var(--terracotta-text)}
+.tag.miss::before{background:transparent;box-shadow:inset 0 0 0 1.5px currentColor}
+.tag.off::before{display:none}
+
+/* ── огляд студії і список студій ── */
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 16px;align-items:start;padding:13px 0;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none}
+.srows{border-top:2px solid var(--ink)}
+.srow .n{font-family:var(--display);font-weight:600;font-size:16px;line-height:1.2}
+.srow .l{font-size:13px;line-height:1.4;color:var(--ink-2);overflow-wrap:anywhere}
+.srow .go{grid-column:2;grid-row:1/4;align-self:center;font-family:var(--mono);font-size:16px;color:var(--cobalt)}
+.srow .tag{margin-top:2px}
+.srow:hover .n{color:var(--cobalt)}
+.srow[aria-current=page]{background:var(--paper-2);margin-inline:-12px;padding-inline:12px}
+.srow[aria-current=page] .n{color:var(--cobalt)}
+.srow[aria-current=page] .tag.miss{color:var(--ink-2)} /* terracotta-text на paper-2 заборонено (§2.1) */
+/* студія в списку кабінету */
+.stud{display:grid;gap:10px;padding:18px 0;border-bottom:1px solid var(--rule)}
+.stud .n{font-family:var(--display);font-weight:600;font-size:18px;line-height:1.2}
+.stud .city{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2)}
+.stud .acts{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:4px}
+.stud .acts .more{padding:12px 0}
+.meter{display:grid;gap:6px}
+.meter .v{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:14px;color:var(--ink-2)}
+.meter .v b{font-family:var(--display);font-weight:600;font-size:15px;color:var(--ink)}
+.meter .bar{height:4px;background:var(--rule);position:relative}
+.meter .bar i{position:absolute;left:0;top:0;bottom:0;background:var(--cobalt)}
+.miss{font-size:14.5px;line-height:1.45;color:var(--ink);max-width:60ch}
+.miss a{text-decoration:underline;text-underline-offset:3px}
+@container fr (min-width:40rem){.stud{grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:8px 32px}.stud .acts{grid-column:1}.stud .meter,.stud .miss{grid-column:2}.stud .meter{grid-row:1/3}.stud .miss{grid-row:3}}
+
+/* ── НОВЕ: бар збереження (.ui-savebar) ── */
+.sb{position:absolute;left:0;right:0;bottom:0;z-index:30;background:var(--paper);border-top:2px solid var(--ink);padding:10px var(--gutter) 10px;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+.tall .sb{position:sticky;margin-top:auto}
+.sb .s{font-size:13.5px;line-height:1.35;color:var(--ink-2)}
+.sb .s b{font-weight:500;color:var(--ink)}
+.sb .s.err{color:var(--terracotta-text)}
+.sb .s.err a{color:inherit;text-decoration:underline;text-underline-offset:3px}
+.sb .busy{position:absolute;left:0;top:-2px;height:2px;width:38%;background:var(--cobalt)}
+.sb.lg{position:sticky;bottom:0}
+
+/* ── розділ ── */
+.sec{display:grid;gap:2px}
+.sec>h2{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);padding:0 0 10px;border-bottom:2px solid var(--ink);margin:10px 0 6px}
+.now{background:var(--paper-2);padding:14px 16px;display:grid;gap:6px;font-size:15px;line-height:1.45}
+.now .k{display:flex;justify-content:space-between;gap:12px}
+.now p{color:var(--ink);max-width:60ch}
+.now a{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+.posted{display:grid;gap:6px;padding:14px 16px;background:var(--paper-2);font-size:15px;line-height:1.45}
+.posted b{font-weight:500}
+.posted .k{display:block}
+
+/* ── НОВЕ: менеджер фото (.ui-photos) ── */
+.dz{display:grid;gap:10px;justify-items:stretch;padding:0}
+.dz .hint{font-family:var(--mono);font-size:11.5px;letter-spacing:.03em;line-height:1.5;color:var(--ink-2)}
+@container fr (min-width:40rem){
+  .dz{padding:26px 24px;box-shadow:inset 0 0 0 2px var(--ink);justify-items:center;text-align:center}
+  .dz.over{box-shadow:inset 0 0 0 2px var(--cobalt);background:var(--paper-2)}
+  .dz .ui-btn{width:auto}
+}
+.pts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@container fr (min-width:40rem){.pts{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}}
+.pt{display:grid;gap:6px;align-content:start;position:relative}
+.pt .im{position:relative;aspect-ratio:1/1;background:var(--paper-2);overflow:hidden}
+.pt .im img{width:100%;height:100%;object-fit:cover}
+.pt .n{position:absolute;left:0;top:0;padding:5px 7px;background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;line-height:1;text-transform:uppercase}
+.pt.main .n{color:var(--peach)}
+.pt .st{position:absolute;right:0;bottom:0;padding:4px 7px;background:var(--paper);color:var(--cobalt);font-family:var(--mono);font-size:10px;letter-spacing:.06em;line-height:1;text-transform:uppercase}
+.pt .prog{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgb(21 19 15 / .15)}
+.pt .prog i{display:block;height:100%;background:var(--cobalt)}
+.pt .im.busy img{opacity:.45}
+.pt .im .lbl{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:8px;font-family:var(--mono);font-size:10.5px;letter-spacing:.04em;line-height:1.4;text-transform:uppercase;color:var(--ink)}
+.pt .im.err{box-shadow:inset 0 0 0 2px var(--terracotta-text)}
+.pt .im.err .lbl{color:var(--terracotta-text);text-transform:none;font-family:var(--body);font-size:13px;letter-spacing:0}
+.pt .im.err .lbl a{display:block;margin-top:6px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--cobalt)}
+.pt .a{display:flex;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;line-height:1}
+.pt .a button,.pt .a a{display:inline-flex;align-items:center;min-height:28px;padding:0;border:0;background:transparent;font:inherit;color:var(--ink-2);cursor:pointer;text-transform:inherit;letter-spacing:inherit}
+.pt .a .pri{color:var(--cobalt)}
+.pt.gone .im{opacity:.35}
+.pt.gone .n{display:none}
+.pt .cap{font-size:12.5px;line-height:1.35;color:var(--ink-2)}
+.pt.wide{grid-column:1/-1}
+.pt-cap{grid-column:1/-1;display:grid;gap:6px;padding:8px 0 4px}
+.pt-cap .f-l{font-size:14px}
+.phint{font-size:13.5px;line-height:1.45;color:var(--ink-2)}
+.pcount{display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);padding-bottom:8px;border-bottom:1px solid var(--rule)}
+.pcount b{font-weight:500;color:var(--ink)}
+/* порожній стан фото */
+.empty{display:grid;gap:12px;padding:22px 0 6px}
+.empty h3{font-family:var(--display);font-weight:600;font-size:19px;line-height:1.2;max-width:22ch}
+.empty p{font-size:15.5px;line-height:1.45;color:var(--ink-2);max-width:48ch}
+
+/* ── десктоп: нав розділів ліворуч + розділ праворуч ── */
+.ed{display:grid;grid-template-columns:minmax(0,1fr);gap:28px;align-items:start}
+@container fr (min-width:60rem){.ed{grid-template-columns:300px minmax(0,720px);gap:clamp(28px,4cqw,64px)}.ed>aside{position:sticky;top:20px}}
+.ed>aside{display:grid;gap:14px}
+.ed>aside .srow{padding:12px 0;grid-template-columns:minmax(0,1fr)}
+.ed>aside .srow .l,.ed>aside .srow .n,.ed>aside .srow .tag{grid-column:1}
+.ed>aside .srow .n{font-size:14.5px}
+.ed>aside .srow .go{display:none}
+.ed>aside .srow .l{font-size:12.5px}
+.ed>section{display:grid;gap:18px;position:relative;min-width:0}
+.ed .sb{position:sticky;bottom:0;margin:12px calc(-1 * var(--gutter)) 0 0;padding-inline:0 0}
+@container fr (min-width:60rem){.ed .sb{margin:12px 0 0;padding-inline:0}}
+
+/* ── варіант A: одна довга сторінка ── */
+.va-nav{display:flex;flex-wrap:wrap;gap:8px;padding:12px 0;border-bottom:1px solid var(--rule);position:sticky;top:0;background:var(--paper);z-index:20}
+.va-nav .chip{font-size:10.5px;padding:8px 10px}
+.va-nav .chip.on{background:var(--ink);color:var(--paper)}
+.va .sec{padding-top:8px}
+.va .sec>h2{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+
+/* a11y-only + клавіатура-заглушка */
+.kbdph{position:absolute;left:0;right:0;bottom:0;height:291px;background:var(--paper-2);border-top:1px solid var(--rule);padding:10px 6px;z-index:31}
+.kbdph .lbl{text-align:center;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin-bottom:8px}
+.kbdph .krow{display:flex;gap:5px;justify-content:center;margin-bottom:8px}
+.kbdph .krow i{display:block;width:32px;height:40px;border-radius:2px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--rule)}
+.kbdph .krow i.w{width:56px}.kbdph .krow i.sp{width:200px}.kbdph .krow i.b{background:var(--cobalt)}
+.ico{width:18px;height:18px;flex:none;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round}
+</style>
+</head>
+<body>
+<div class="board">
+<header>
+  <h1>Кабінет студії — стани й варіанти</h1>
+  <p>Макети для власника, 16.10.2026. Токени й примітиви — з <code>SYSTEM.md</code>; дані — студія кераміки «Осоння» (Суми) з каталогу станом на жовтень 2026 (послуги, вироби, 5 цін, адреса, сайт, Instagram, email; телефону, умов для бізнесу і фото в профілі нема). Фото в менеджері — з архіву власника (<code>template/img/os-*</code>). Усе, що показує стан, а не факт (перевірка «з 14 жовтня», завантаження, помилки), позначено <span class="ph-mark">стан</span>.</p>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 64 64"><path fill-rule="evenodd" d="M32 17 A21 21 0 1 1 31.99 17 Z M32 27.2 A10.8 10.8 0 1 0 32.01 27.2 Z"/><path d="M23.3 4 H40.7 L35.7 18 H28.3 Z"/><rect x="23.5" y="59" width="17" height="3.6"/></symbol>
+</svg>
+
+<!-- ════════════════════════ 1. Вхід і пароль (телефон) ════════════════════════ -->
+<section class="st">
+  <h2><b>1 · Телефон 390</b> вхід · створення пароля (з помилкою «паролі не збігаються»)</h2>
+  <p>Шапка кабінету без мегаменю, пошуку й «Отримати пропозиції»: лише знак, «Вийти» (після входу) або «На сайт». Поля — бланки: біле тло, 1px <code>ink-2</code>, 48px, підпис Golos 500 15px у реченні. Пароль із «Показати». Помилка — текст під полем і рамка 2px <code>terracotta-text</code>.</p>
+  <div class="row">
+    <div class="fr fr-m" data-shot="01-phone-vhid">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <div class="head"><span class="k">Кабінет студії</span><h1 class="t">Вхід</h1><p class="lead s">Для студій, які підтвердили свій профіль у каталозі.</p></div>
+        <form>
+          <div class="f"><label class="f-l" for="l1">Email або телефон</label><input class="bx" id="l1" autocomplete="username" inputmode="email"></div>
+          <div class="f"><label class="f-l" for="l2">Пароль</label><div class="pw"><input class="bx" id="l2" type="password" value="••••••••••••"><button type="button" class="show">Показати</button></div></div>
+          <div class="f" style="padding-top:14px"><span class="ui-btn" data-full>Увійти</span></div>
+        </form>
+        <p class="lead s" style="font-size:14.5px">Забули пароль? <a href="#" style="text-decoration:underline;text-underline-offset:3px">Напишіть нам</a> — надішлемо нове посилання.<br>Ще не маєте кабінету? Відкрийте профіль своєї студії на сайті й натисніть «Це ваша студія?».</p>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+
+    <div class="fr fr-m" data-shot="02-phone-parol">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <div class="head"><span class="k">Кабінет студії · Осоння</span><h1 class="t">Створіть пароль</h1><p class="lead s">Посилання з нашого повідомлення діє 7 днів і спрацьовує один раз.</p></div>
+        <form>
+          <div class="f"><label class="f-l" for="p1">Логін — ваш email або телефон</label><span class="f-h">Ним ви будете входити.</span><input class="bx" id="p1" value="osonnya.ceramics@gmail.com"></div>
+          <div class="f"><label class="f-l" for="p2">Пароль</label><span class="f-h">Щонайменше 10 символів. Підійде коротка фраза, яку легко запам’ятати.</span><div class="pw"><input class="bx" id="p2" type="text" value="глина дзвенить у печі" aria-invalid="true"><button type="button" class="show">Сховати</button></div></div>
+          <div class="f"><label class="f-l" for="p3">Пароль ще раз</label><div class="pw"><input class="bx is-err" id="p3" type="password" value="••••••••••••••" aria-invalid="true" aria-describedby="p3e"><button type="button" class="show">Показати</button></div><span class="f-e" id="p3e" role="alert">Паролі не збігаються. Перевірте обидва поля.</span></div>
+          <div class="f" style="padding-top:14px"><span class="ui-btn" data-full>Зберегти й увійти</span></div>
+        </form>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+    <p class="note-board">Приклад пароля в кадрі — ілюстрація поля з «Показати», не рекомендація конкретного пароля. <span class="ph-mark">стан</span></p>
+  </div>
+</section>
+
+<!-- ════════════════════════ 2. Кабінет: 1 і 2+ студії (телефон) ════════════════════════ -->
+<section class="st">
+  <h2><b>2 · Телефон</b> головна кабінету — одна студія · дві студії (одна на перевірці)</h2>
+  <p>Кожна студія — рядок зі смужкою заповнення «4 з 6 розділів», переліком того, чого бракує (посилання ведуть одразу в розділ), станом перевірки й двома діями: «Заповнити профіль» (чорна кнопка) і «Профіль на сайті →». Вітальне речення пояснює модель одним рядком, без цифр.</p>
+  <div class="row">
+    <div class="fr fr-m" data-shot="03-phone-kabinet-1">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <div class="head"><span class="k">Кабінет студії</span><h1 class="t">Ваша студія</h1><p class="lead s">Усе, що ви зміните, ми переглянемо й опублікуємо — зазвичай протягом доби. Профіль безкоштовний; повний профіль із фото, цінами й умовами для бізнесу частіше отримує запити.</p></div>
+        <ul class="srows">
+          <li class="stud">
+            <span class="city">Студія кераміки · Суми</span>
+            <b class="n">Осоння</b>
+            <div class="meter"><span class="v"><b>Заповнено 4 з 6 розділів</b><span class="tag">на сайті</span></span><span class="bar"><i style="width:66.6%"></i></span></div>
+            <p class="miss">Бракує: <a href="#">фото</a>, <a href="#">умов для бізнесу</a> і <a href="#">телефону</a>.</p>
+            <div class="acts"><a class="ui-btn" data-size="sm" href="#">Заповнити профіль</a><a class="more" href="#">Профіль на сайті <span class="ui-arrow">→</span></a></div>
+          </li>
+        </ul>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+
+    <div class="fr fr-m" data-shot="04-phone-kabinet-2">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <div class="head"><span class="k">Кабінет студії</span><h1 class="t">Ваші студії</h1><p class="lead s">Усе, що ви зміните, ми переглянемо й опублікуємо — зазвичай протягом доби. Профіль безкоштовний.</p></div>
+        <ul class="srows">
+          <li class="stud">
+            <span class="city">Студія кераміки · Суми</span>
+            <b class="n">Осоння</b>
+            <div class="meter"><span class="v"><b>4 з 6 розділів</b><span class="tag">на сайті</span></span><span class="bar"><i style="width:66.6%"></i></span></div>
+            <p class="miss">Бракує: <a href="#">фото</a>, <a href="#">умов для бізнесу</a> і <a href="#">телефону</a>.</p>
+            <div class="acts"><a class="ui-btn" data-size="sm" href="#">Заповнити</a><a class="more" href="#">На сайті <span class="ui-arrow">→</span></a></div>
+          </li>
+          <li class="stud">
+            <span class="city">Студія кераміки · Івано-Франківськ</span>
+            <b class="n">Осоння</b>
+            <div class="meter"><span class="v"><b>4 з 6 розділів</b><span class="tag rev">на перевірці з 14.10</span></span><span class="bar"><i style="width:66.6%"></i></span></div>
+            <p class="miss">Бракує: <a href="#">фото</a> і <a href="#">умов для бізнесу</a>. Нові ціни й новина — на перевірці.</p>
+            <div class="acts"><a class="ui-btn" data-size="sm" href="#">Заповнити</a><a class="more" href="#">На сайті <span class="ui-arrow">→</span></a></div>
+          </li>
+        </ul>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+    <p class="note-board">«На перевірці з 14.10» і «нові ціни й новина» у франківській студії — ілюстрація стану, не факт. <span class="ph-mark">стан</span></p>
+  </div>
+</section>
+
+<!-- ════════════════════════ 3. Огляд студії (телефон) ════════════════════════ -->
+<section class="st">
+  <h2><b>3 · Телефон</b> огляд студії — шість розділів зі станом, замість однієї довгої форми (варіант B)</h2>
+  <p>Один екран без прокрутки: назва, стан, що бракує, і шість рядків-розділів. У рядку — що вже є («7 послуг, 4 вироби») і мітка: сіра крапка «на сайті», кобальт «на перевірці», теракотове кільце «порожньо». Порожні розділи не переставляються нагору — порядок завжди той самий, щоб звикнути.</p>
+  <div class="row">
+    <div class="fr fr-m" data-shot="05-phone-ohliad">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Кабінет</a>
+        <div class="head"><span class="k">Студія кераміки · Суми</span><h1 class="t">Осоння</h1>
+          <div class="meter"><span class="v"><b>Заповнено 4 з 6 розділів</b><a class="more" href="#" style="font-size:11px">На сайті <span class="ui-arrow">→</span></a></span><span class="bar"><i style="width:66.6%"></i></span></div>
+          <p class="miss">Бракує фото, умов для бізнесу й телефону.</p>
+        </div>
+        <nav class="srows" aria-label="Розділи профілю">
+          <a class="srow" href="#"><b class="n">Про студію</b><span class="l">Опис від редактора є. Своїми словами — ще ні.</span><span class="tag">на сайті</span><span class="go">→</span></a>
+          <a class="srow" href="#"><b class="n">Послуги й вироби</b><span class="l">7 послуг, 4 вироби</span><span class="tag">на сайті</span><span class="go">→</span></a>
+          <a class="srow" href="#"><b class="n">Ціни</b><span class="l">5 цін · жовтень 2026</span><span class="tag">на сайті</span><span class="go">→</span></a>
+          <a class="srow" href="#"><b class="n">Для бізнесу</b><span class="l">Мінімальне замовлення, терміни, логотип</span><span class="tag miss">порожньо</span><span class="go">→</span></a>
+          <a class="srow" href="#"><b class="n">Контакти й Instagram</b><span class="l">Адреса, сайт, Instagram, email · без телефону</span><span class="tag">на сайті</span><span class="go">→</span></a>
+          <a class="srow" href="#"><b class="n">Фото</b><span class="l">Роботи, студія, заняття — до 10</span><span class="tag miss">немає фото</span><span class="go">→</span></a>
+        </nav>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ 4. Розділи (телефон, довгі кадри) ════════════════════════ -->
+<section class="st">
+  <h2><b>4 · Телефон</b> розділ «Про студію» · «Послуги й вироби» · «Ціни»</h2>
+  <p>Кожен розділ — окремий екран із «← Осоння» угорі й липким баром знизу (у довгих кадрах бар намальовано в кінці). Читабельне (paper-2) і редаговане (біле) розрізняються тлом. Переліки — рядок на пункт із «×» і «+ Додати»; ціна — текст + «коли актуально» (місяць і рік із переліку, за замовчуванням поточний).</p>
+  <div class="row">
+    <div class="fr fr-m tall" data-shot="06-phone-pro-studiyu">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 1 з 6</span><h1 class="t2">Про студію</h1></div>
+        <div class="now"><span class="k"><span>Зараз на сайті · написав редактор</span></span><p>«Осоння» — студія кераміки в Сумах, що працює з жовтня 2024 року. Тут ліплять з глини й знайомляться з гончарним колом у невеликих групах, проводять заняття для двох і для компаній до 7 осіб; випал і глазурування входять у ціну.</p><a href="#">Читати повністю</a></div>
+        <form class="sec">
+          <div class="f"><label class="f-l" for="a1">Розкажіть про студію своїми словами</label><span class="f-h">Що робите, з якої глини, які поливи, хто веде заняття, для кого. Редактор перепише це голосом сайту й покаже вам.</span><textarea class="bx" id="a1" rows="6" placeholder="Напр.: ліпимо з білої кам’яної маси, обпалюємо двічі, заняття веде…"></textarea></div>
+          <div class="f"><label class="f-l" for="a2">Новини студії <small>необов’язково</small></label><span class="f-h">Нова колекція, розклад, ярмарок. Виходить як є, з датою і підписом «Новини від студії»; через пів року ховається.</span><textarea class="bx" id="a2" rows="3" style="min-height:96px" placeholder="Напр.: у листопаді — групові МК по суботах о 12:00"></textarea><div class="f-foot"><span></span><span class="f-c">0 / 600</span></div></div>
+          <div class="f"><label class="f-l" for="a3">Одне речення від студії <small>необов’язково</small></label><span class="f-h">Показуємо як цитату «Студія про себе».</span><input class="bx" id="a3" placeholder="Напр.: «Ліпимо повільно й даємо глині говорити»"><div class="f-foot"><span></span><span class="f-c">0 / 200</span></div></div>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s">Є незбережені зміни</p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+    </div>
+
+    <div class="fr fr-m tall" data-shot="07-phone-posluhy">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 2 з 6</span><h1 class="t2">Послуги й вироби</h1><p class="lead s">Коротко, по пункту в рядок — так їх читають і люди, і пошук.</p></div>
+        <form class="sec">
+          <h2>Послуги · 7</h2>
+          <div class="le" role="list" aria-label="Послуги">
+            <div class="le-r" role="listitem"><input class="bx" value="групові майстер-класи з ліплення" aria-label="Послуга 1"><button type="button" class="xb" aria-label="Прибрати: групові майстер-класи з ліплення">×</button></div>
+            <div class="le-r" role="listitem"><input class="bx" value="знайомство з гончарним колом" aria-label="Послуга 2"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r" role="listitem"><input class="bx" value="МК для двох" aria-label="Послуга 3"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r" role="listitem"><input class="bx" value="майстер-класи для компаній до 7 осіб" aria-label="Послуга 4"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r" role="listitem"><input class="bx" value="подарункові сертифікати" aria-label="Послуга 5"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r" role="listitem"><input class="bx" value="подарункові бокси" aria-label="Послуга 6"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r" role="listitem"><input class="bx" value="інтернет-магазин власної кераміки" aria-label="Послуга 7"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <span class="ui-btn add" data-variant="ghost" data-size="sm">+ Додати послугу</span>
+          </div>
+          <h2 style="margin-top:22px">Вироби · 4</h2>
+          <div class="le" role="list" aria-label="Вироби">
+            <div class="le-r"><input class="bx" value="чашки"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r"><input class="bx" value="стакани"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r"><input class="bx" value="свічки в керамічних ємностях"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <div class="le-r"><input class="bx" value="посуд і декор ручної роботи"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <span class="ui-btn add" data-variant="ghost" data-size="sm">+ Додати виріб</span>
+          </div>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s"><b>Збережено</b> · на сайті</p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+    </div>
+
+    <div class="fr fr-m tall" data-shot="08-phone-tsiny">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 3 з 6</span><h1 class="t2">Ціни</h1><p class="lead s">Що, скільки триває й скільки коштує. Місяць поруч із ціною каже відвідувачу, що вона свіжа.</p></div>
+        <form class="sec">
+          <h2>5 цін</h2>
+          <div class="prs">
+            <div class="pr"><div class="pt-t"><textarea class="bx" rows="2" style="min-height:72px" aria-label="Ціна 1">Груповий МК, до 7 осіб, 2,5 год, виріб до 25 см — 650 грн/особа</textarea></div><div class="pt-d"><select class="bx" aria-label="Коли актуально"><option>жовтень 2026</option></select></div><button type="button" class="xb" aria-label="Прибрати ціну">×</button></div>
+            <div class="pr"><div class="pt-t"><textarea class="bx" rows="2" style="min-height:72px" aria-label="Ціна 2">МК для двох, 2,5 год — 1900 грн у будні / 2200 грн у вихідні</textarea></div><div class="pt-d"><select class="bx"><option>жовтень 2026</option></select></div><button type="button" class="xb" aria-label="Прибрати ціну">×</button></div>
+            <div class="pr"><div class="pt-t"><textarea class="bx" rows="2" style="min-height:72px" aria-label="Ціна 3">Корпоратив 3–7 осіб, 3 год — 2400–4600 грн</textarea></div><div class="pt-d"><select class="bx"><option>жовтень 2026</option></select></div><button type="button" class="xb" aria-label="Прибрати ціну">×</button></div>
+            <div class="pr"><div class="pt-t"><textarea class="bx" rows="2" style="min-height:72px" aria-label="Ціна 4">KAVA-сертифікат «Заняття з кераміки в групі», 3 год: 1 особа — 650 грн; пара — 2200 грн</textarea></div><div class="pt-d"><select class="bx"><option>жовтень 2026</option></select></div><button type="button" class="xb" aria-label="Прибрати ціну">×</button></div>
+            <div class="pr"><div class="pt-t"><textarea class="bx" rows="2" style="min-height:72px" aria-label="Ціна 5">Чашка «Злива»/«Мак» — 950 грн; стакан — 800 грн; свічка — 950–1000 грн</textarea></div><div class="pt-d"><select class="bx"><option>жовтень 2026</option></select></div><button type="button" class="xb" aria-label="Прибрати ціну">×</button></div>
+            <div class="pr"><div class="pt-t"><textarea class="bx is-focus" rows="2" style="min-height:72px" aria-label="Нова ціна" placeholder="Напр.: Дитячий МК, 1,5 год — 500 грн з дитини"></textarea></div><div class="pt-d"><select class="bx"><option>жовтень 2026 (зараз)</option></select></div><button type="button" class="xb" aria-label="Прибрати ціну">×</button></div>
+          </div>
+          <span class="ui-btn add" data-variant="ghost" data-size="sm">+ Додати ціну</span>
+          <p class="f-h" style="margin-top:14px">Джерело у дужках («сайт, 2026») дописав редактор — його можна лишити або прибрати, ми підпишемо «від студії».</p>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s">Є незбережені зміни · <b>1 нова ціна</b></p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ 5. Для бізнесу · Контакти (телефон) ════════════════════════ -->
+<section class="st">
+  <h2><b>5 · Телефон</b> розділ «Для бізнесу» · «Контакти й Instagram»</h2>
+  <p>Умови для бізнесу: два коротких поля, способи нанесення логотипа — чипами (кілька одразу; «Інше» відкриває поле), чотири перемикачі рядками по 48px із поясненням. Контакти — бланки з правильною клавіатурою (<code>inputmode</code>, <code>autocomplete</code>); пости в Instagram — три рядки з «×».</p>
+  <div class="row">
+    <div class="fr fr-m tall" data-shot="09-phone-biznes">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 4 з 6</span><h1 class="t2">Для бізнесу</h1><p class="lead s">Кав’ярні, готелі й компанії шукають саме це: від скількох штук, за скільки тижнів і чи буде логотип. Заповніть лише те, що робите.</p></div>
+        <form class="sec">
+          <div class="f"><label class="f-l" for="b1">Мінімальне замовлення <small>необов’язково</small></label><input class="bx" id="b1" placeholder="Напр.: від 20 чашок або від 10 000 грн"></div>
+          <div class="f"><label class="f-l" for="b2">Термін виготовлення партії <small>необов’язково</small></label><input class="bx" id="b2" placeholder="Напр.: 4–6 тижнів"></div>
+          <div class="f"><span class="f-l" id="lm">Як наносите логотип</span><span class="f-h">Оберіть усе, що вмієте.</span>
+            <div class="chips" role="group" aria-labelledby="lm" style="padding-top:4px">
+              <label class="cc"><input type="checkbox"><span class="chip">Штамп у глині</span></label>
+              <label class="cc"><input type="checkbox" checked><span class="chip">Деколь</span></label>
+              <label class="cc"><input type="checkbox"><span class="chip">Ручний розпис</span></label>
+              <label class="cc"><input type="checkbox"><span class="chip">Гравіювання</span></label>
+              <label class="cc"><input type="checkbox"><span class="chip">Інше</span></label>
+            </div>
+          </div>
+          <h2 style="margin-top:18px">Що правда про ваш посуд</h2>
+          <div class="cks">
+            <label class="ck"><input type="checkbox"><span>Полива безпечна для їжі<small>Якщо є сертифікат чи протокол — напишіть про нього в «Про студію».</small></span></label>
+            <label class="ck"><input type="checkbox"><span>Можна мити в посудомийці</span></label>
+            <label class="ck"><input type="checkbox" checked><span>Робимо посуд для закладів<small>Профіль потрапить у списки для ресторанів і кав’ярень.</small></span></label>
+            <label class="ck"><input type="checkbox" checked><span>Беремо корпоративні замовлення<small>Подарунки, чашки з логотипом, майстер-класи для команд.</small></span></label>
+          </div>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s">Є незбережені зміни</p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+    </div>
+
+    <div class="fr fr-m tall" data-shot="10-phone-kontakty">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 5 з 6</span><h1 class="t2">Контакти й Instagram</h1><p class="lead s">Лише робочі контакти — вони показуються в профілі.</p></div>
+        <form class="sec">
+          <div class="f"><label class="f-l" for="c1">Адреса студії</label><input class="bx" id="c1" value="просп. Свободи, 14, Суми" autocomplete="street-address"></div>
+          <div class="f"><label class="f-l" for="c2">Телефон студії <small>необов’язково</small></label><span class="f-h">Для дзвінків від замовників; у запитах ми його не розсилаємо.</span><input class="bx" id="c2" inputmode="tel" autocomplete="tel" placeholder="+380 …"></div>
+          <div class="f"><label class="f-l" for="c3">Email студії</label><input class="bx" id="c3" type="email" inputmode="email" value="osonnya.ceramics@gmail.com"></div>
+          <div class="f"><label class="f-l" for="c4">Сайт <small>необов’язково</small></label><input class="bx" id="c4" inputmode="url" value="https://www.osonnya.shop/"></div>
+          <div class="f"><label class="f-l" for="c5">Instagram</label><input class="bx" id="c5" inputmode="url" value="https://www.instagram.com/osonnya.ceramics/"></div>
+          <h2 style="margin-top:18px">Пости для показу в профілі <small style="font-family:var(--body);font-size:12.5px;letter-spacing:0;text-transform:none">до 3</small></h2>
+          <p class="f-h">Посилання на три пости, які найкраще показують роботи. Вони вбудовуються в профіль.</p>
+          <div class="le" role="list" aria-label="Пости">
+            <div class="le-r"><input class="bx" inputmode="url" placeholder="https://www.instagram.com/p/…"><button type="button" class="xb" aria-label="Прибрати">×</button></div>
+            <span class="ui-btn add" data-variant="ghost" data-size="sm">+ Додати пост</span>
+          </div>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s"><b>Збережено</b> · на сайті</p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ 6. Фото (телефон): порожньо · завантаження · заповнено ════════════════════════ -->
+<section class="st">
+  <h2><b>6 · Телефон</b> фото — порожній стан · іде завантаження (HEIC, помилка) · заповнено (головне, прибрати/повернути, підпис)</h2>
+  <p>Одна велика кнопка «Вибрати фото» з телефонної галереї, будь-який формат — HEIC і великі файли перетворюються й зменшуються в браузері, тож помилки «не той формат / завеликий» зникають. Кожне фото вантажиться одразу після вибору: 3px кобальтова смужка прогресу, помилка — лише на своїй плитці з «Ще раз». Перше фото — «Головне»; будь-яке можна зробити головним. Підпис необов’язковий — його допише редактор. Прибрати — з «Повернути», доки не вийшли з розділу. Фото зберігаються самі, без кнопки.</p>
+  <div class="row">
+    <div class="fr fr-m" data-shot="11-phone-foto-empty">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 6 з 6</span><h1 class="t2">Фото</h1></div>
+        <div class="empty">
+          <h3>У профілі ще немає фото</h3>
+          <p>Додайте до 10: роботи, студію, заняття. Підійдуть знімки просто з телефону — великі й HEIC ми зменшимо самі. Перше стане головним у профілі.</p>
+        </div>
+        <div class="dz">
+          <span class="ui-btn" data-variant="ghost" data-full style="height:56px">Вибрати фото</span>
+          <p class="hint">JPG, PNG, HEIC · до 10 фото · завантажуючи, ви дозволяєте показувати їх на сайті з підписом студії</p>
+        </div>
+      </div></main>
+      <div class="sb"><p class="s">Фото зберігаються самі, одразу після вибору</p><span class="tag off" style="color:var(--ink-2)">0 з 10</span></div>
+    </div>
+
+    <div class="fr fr-m" data-shot="12-phone-foto-uploading">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 6 з 6</span><h1 class="t2">Фото</h1></div>
+        <p class="pcount"><span>Завантажуємо <b>2 з 4</b></span><span>до 10</span></p>
+        <ul class="pts" aria-label="Фото профілю">
+          <li class="pt main"><div class="im"><img src="../template/img/os-hands-bowl.jpg" alt=""><span class="n">Головне</span></div><div class="a"><button type="button">Прибрати</button></div></li>
+          <li class="pt"><div class="im"><img src="../template/img/os-mug-hearts.jpg" alt=""><span class="n">2</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Прибрати</button></div></li>
+          <li class="pt"><div class="im busy"><img src="../template/img/os-paint-mug.jpg" alt=""><span class="n">3</span><span class="lbl">Зменшуємо<br>HEIC → JPG</span><span class="prog"><i style="width:35%"></i></span></div><div class="a"><button type="button">Скасувати</button></div></li>
+          <li class="pt"><div class="im err"><span class="lbl">Не вдалося завантажити<a href="#">Ще раз</a></span></div><div class="a"><button type="button">Прибрати</button></div></li>
+          <li class="pt"><div class="im busy"><img src="../template/img/os-wheel-top.jpg" alt=""><span class="n">4</span><span class="prog"><i style="width:80%"></i></span></div><div class="a"><button type="button">Скасувати</button></div></li>
+        </ul>
+        <div class="dz" style="margin-top:6px"><span class="ui-btn" data-variant="ghost" data-full>Додати ще фото</span></div>
+        <p class="phint">Поки вантажиться — можна йти далі: фото доїдуть самі. Помилка стосується лише одного файла; натисніть «Ще раз» або виберіть інший.</p>
+      </div></main>
+      <div class="sb"><p class="s"><span class="busy"></span>Зберігаємо… <b>2 фото</b> вже на перевірці</p><span class="tag off">4 з 10</span></div>
+    </div>
+
+    <div class="fr fr-m tall" data-shot="13-phone-foto-full">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 6 з 6</span><h1 class="t2">Фото</h1></div>
+        <p class="pcount"><span><b>6 фото</b> · на перевірці</span><span>до 10</span></p>
+        <ul class="pts" aria-label="Фото профілю">
+          <li class="pt main"><div class="im"><img src="../template/img/os-hands-bowl.jpg" alt=""><span class="n">Головне</span><span class="st">перевірка</span></div><div class="a"><button type="button">Підпис</button><button type="button">Прибрати</button></div></li>
+          <li class="pt"><div class="im"><img src="../template/img/os-mug-hearts.jpg" alt=""><span class="n">2</span><span class="st">перевірка</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Прибрати</button></div><p class="cap">Чашка «Злива» з серцями</p></li>
+          <li class="pt"><div class="im"><img src="../template/img/os-paint-mug.jpg" alt=""><span class="n">3</span><span class="st">перевірка</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Прибрати</button></div></li>
+          <li class="pt gone"><div class="im"><img src="../template/img/os-wheel-top.jpg" alt=""><span class="lbl">Прибрано</span></div><div class="a"><button type="button" class="pri">Повернути</button></div></li>
+          <li class="pt"><div class="im"><img src="../template/img/os-four-hands.jpg" alt=""><span class="n">4</span><span class="st">перевірка</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Прибрати</button></div></li>
+          <li class="pt"><div class="im"><img src="../template/img/os-wheel-yard.jpg" alt=""><span class="n">5</span><span class="st">перевірка</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Прибрати</button></div></li>
+          <li class="pt-cap"><label class="f-l" for="cap1">Підпис до головного фото <small>необов’язково</small></label><input class="bx sm is-focus" id="cap1" placeholder="Що на фото: напр. миска після другого випалу"><span class="f-h">Якщо не підпишете — підпише редактор.</span></li>
+        </ul>
+        <div class="dz" style="margin-top:6px"><span class="ui-btn" data-variant="ghost" data-full>Додати ще фото</span><p class="hint">Порядок — як у профілі. Утримайте фото, щоб перетягнути на інше місце; на комп’ютері — просто перетягніть.</p></div>
+      </div></main>
+      <div class="sb"><p class="s"><b>Збережено</b> · опублікуємо після перевірки</p><span class="tag off">6 з 10</span></div>
+    </div>
+    <p class="note-board">Фото «на перевірці» й «Прибрано» показують стан; у каталозі в «Осоння» (Суми) фото поки нема. <span class="ph-mark">стан</span></p>
+  </div>
+</section>
+
+<!-- ════════════════════════ 7. Після збереження · помилки (телефон) ════════════════════════ -->
+<section class="st">
+  <h2><b>7 · Телефон</b> після збереження — «на перевірці» · помилка в полі й помилка мережі</h2>
+  <p>Після «Зберегти» сторінка не перезавантажується: угорі розділу з’являється примітка з датою, бар каже «Збережено · на перевірці», мітка в огляді стає кобальтовою. Помилка перевірки — під своїм полем, а в барі — лічильник із посиланням на перше поле. Мережна помилка — у барі теракотою з «Спробувати ще раз»; набране лишається.</p>
+  <div class="row">
+    <div class="fr fr-m" data-shot="14-phone-saved">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 4 з 6</span><h1 class="t2">Для бізнесу</h1></div>
+        <div class="posted" role="status"><span class="k">Надіслано на перевірку · 16 жовтня, 14:20</span><b>Дякуємо. Опублікуємо зазвичай протягом доби.</b><span>До того на сайті лишається попередня версія. Можна редагувати далі — нові зміни додадуться до цієї ж перевірки.</span></div>
+        <form class="sec">
+          <div class="f"><label class="f-l" for="s1">Мінімальне замовлення <small>необов’язково</small></label><input class="bx" id="s1" value="від 20 чашок"></div>
+          <div class="f"><label class="f-l" for="s2">Термін виготовлення партії <small>необов’язково</small></label><input class="bx" id="s2" value="4–6 тижнів"></div>
+          <div class="f"><span class="f-l">Як наносите логотип</span>
+            <div class="chips" style="padding-top:4px">
+              <label class="cc"><input type="checkbox" checked><span class="chip">Штамп у глині</span></label>
+              <label class="cc"><input type="checkbox" checked><span class="chip">Деколь</span></label>
+              <label class="cc"><input type="checkbox" checked><span class="chip">Ручний розпис</span></label>
+              <label class="cc"><input type="checkbox"><span class="chip">Гравіювання</span></label>
+              <label class="cc"><input type="checkbox"><span class="chip">Інше</span></label>
+            </div>
+          </div>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s"><b>Збережено</b> · <span style="color:var(--cobalt)">на перевірці</span></p><a class="ui-btn" data-size="sm" data-variant="ghost" href="#">Далі: контакти</a></div>
+    </div>
+
+    <div class="fr fr-m" data-shot="15-phone-errors">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 5 з 6</span><h1 class="t2">Контакти й Instagram</h1></div>
+        <form class="sec">
+          <div class="f"><label class="f-l" for="e1">Адреса студії</label><input class="bx" id="e1" value="просп. Свободи, 14, Суми"></div>
+          <div class="f"><label class="f-l" for="e2">Телефон студії <small>необов’язково</small></label><input class="bx is-err" id="e2" inputmode="tel" value="099 363" aria-invalid="true" aria-describedby="e2e"><span class="f-e" id="e2e">Схоже, номер неповний. Потрібно 10 цифр, напр. +380 99 123 45 67.</span></div>
+          <div class="f"><label class="f-l" for="e3">Email студії</label><input class="bx" id="e3" value="osonnya.ceramics@gmail.com"></div>
+          <div class="f"><label class="f-l" for="e4">Instagram</label><input class="bx is-err" id="e4" value="osonnya ceramics" aria-invalid="true" aria-describedby="e4e"><span class="f-e" id="e4e">Вставте посилання або нік без пробілів: @osonnya.ceramics.</span></div>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s err" role="alert">Перевірте 2 поля: <a href="#e2">телефон</a>, <a href="#e4">Instagram</a></p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+    </div>
+
+    <div class="fr fr-m" data-shot="16-phone-network-error" style="height:420px">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg">
+        <a class="back" href="#">← Осоння · усі розділи</a>
+        <div class="head"><span class="k">Розділ 1 з 6</span><h1 class="t2">Про студію</h1></div>
+        <form class="sec"><div class="f"><label class="f-l" for="n1">Розкажіть про студію своїми словами</label><textarea class="bx" id="n1" rows="3" style="min-height:96px">Ліпимо з білої кам’яної маси, випалюємо двічі…</textarea></div></form>
+      </div></main>
+      <div class="sb"><p class="s err" role="alert">Не вдалося зберегти — немає зв’язку. Текст нікуди не зник. <a href="#">Спробувати ще раз</a></p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ 8. Десктоп: вхід · кабінет ════════════════════════ -->
+<section class="st">
+  <h2><b>8 · Десктоп 1280</b> вхід · головна кабінету з двома студіями</h2>
+  <p>На десктопі той самий кабінет у колонці 760px; шапка показує «Кабінет студії» і «На сайт →». У списку студій смужка заповнення стає правою колонкою.</p>
+  <div class="row">
+    <div class="fr fr-d" data-shot="17-desktop-vhid" style="min-height:620px">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a></nav></div></header>
+      <main class="wrap"><div class="pg" style="max-width:520px">
+        <div class="head"><span class="k">Кабінет студії</span><h1 class="t">Вхід</h1><p class="lead s">Для студій, які підтвердили свій профіль у каталозі.</p></div>
+        <form>
+          <div class="f"><label class="f-l" for="dl1">Email або телефон</label><input class="bx" id="dl1"></div>
+          <div class="f"><label class="f-l" for="dl2">Пароль</label><div class="pw"><input class="bx is-focus" id="dl2" type="password"><button type="button" class="show">Показати</button></div></div>
+          <div class="f" style="padding-top:14px"><span class="ui-btn" style="width:auto;justify-self:start">Увійти</span></div>
+        </form>
+        <p class="lead s" style="font-size:14.5px">Забули пароль? <a href="#" style="text-decoration:underline;text-underline-offset:3px">Напишіть нам</a> — надішлемо нове посилання. Ще не маєте кабінету? Відкрийте профіль своєї студії на сайті й натисніть «Це ваша студія?».</p>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+  </div>
+  <div class="row" style="margin-top:24px">
+    <div class="fr fr-d" data-shot="18-desktop-kabinet" style="min-height:640px">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg" style="max-width:860px">
+        <div class="head"><span class="k">Кабінет студії</span><h1 class="t">Ваші студії</h1><p class="lead s">Усе, що ви зміните, ми переглянемо й опублікуємо — зазвичай протягом доби. Профіль безкоштовний; повний профіль із фото, цінами й умовами для бізнесу частіше отримує запити від кав’ярень, готелів і компаній.</p></div>
+        <ul class="srows">
+          <li class="stud">
+            <span class="city">Студія кераміки · Суми</span>
+            <b class="n">Осоння</b>
+            <div class="meter"><span class="v"><b>Заповнено 4 з 6 розділів</b><span class="tag">на сайті</span></span><span class="bar"><i style="width:66.6%"></i></span></div>
+            <p class="miss">Бракує: <a href="#">фото</a>, <a href="#">умов для бізнесу</a> і <a href="#">телефону</a>.</p>
+            <div class="acts"><a class="ui-btn" data-size="sm" href="#">Заповнити профіль</a><a class="more" href="#">Профіль на сайті <span class="ui-arrow">→</span></a></div>
+          </li>
+          <li class="stud">
+            <span class="city">Студія кераміки · Івано-Франківськ</span>
+            <b class="n">Осоння</b>
+            <div class="meter"><span class="v"><b>Заповнено 4 з 6 розділів</b><span class="tag rev">на перевірці з 14.10</span></span><span class="bar"><i style="width:66.6%"></i></span></div>
+            <p class="miss">Бракує: <a href="#">фото</a> і <a href="#">умов для бізнесу</a>. Нові ціни й новина — на перевірці.</p>
+            <div class="acts"><a class="ui-btn" data-size="sm" href="#">Заповнити профіль</a><a class="more" href="#">Профіль на сайті <span class="ui-arrow">→</span></a></div>
+          </li>
+        </ul>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════ 9. Десктоп: редактор — нав + розділ ════════════════════════ -->
+<section class="st">
+  <h2><b>9 · Десктоп</b> редактор: розділи ліворуч (липкі, зі станом) + «Про студію» праворуч · «Фото» із зоною перетягування</h2>
+  <p>Та сама структура, що на телефоні (огляд = ліва колонка 300px, розділ = права 720px), тому маршрути одні: <code>/kabinet/studiya/[slug]</code> на десктопі одразу відкриває перший розділ. Бар збереження липне до низу правої колонки. У «Фото» на ≥ 40rem з’являється рамка 2px: «Вибрати фото або перетягніть сюди».</p>
+  <div class="row">
+    <div class="fr fr-d" data-shot="19-desktop-editor-pro" style="min-height:900px">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg wide">
+        <a class="back" href="#">← Кабінет</a>
+        <div class="ed">
+          <aside>
+            <div class="head"><span class="k">Студія кераміки · Суми</span><h1 class="t2">Осоння</h1>
+              <div class="meter"><span class="v"><b>4 з 6 розділів</b><a class="more" href="#" style="font-size:11px">На сайті <span class="ui-arrow">→</span></a></span><span class="bar"><i style="width:66.6%"></i></span></div>
+            </div>
+            <nav class="srows" aria-label="Розділи профілю">
+              <a class="srow" href="#" aria-current="page"><b class="n">Про студію</b><span class="l">Опис редактора є; своїми словами — ні</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#"><b class="n">Послуги й вироби</b><span class="l">7 послуг, 4 вироби</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#"><b class="n">Ціни</b><span class="l">5 цін · жовтень 2026</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#"><b class="n">Для бізнесу</b><span class="l">Мінімум, терміни, логотип</span><span class="tag miss">порожньо</span></a>
+              <a class="srow" href="#"><b class="n">Контакти й Instagram</b><span class="l">Без телефону</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#"><b class="n">Фото</b><span class="l">До 10</span><span class="tag miss">немає фото</span></a>
+            </nav>
+            <p class="f-h">Усе, що збережете, ми переглянемо й опублікуємо протягом доби. На сайті до того — попередня версія.</p>
+          </aside>
+          <section>
+            <div class="head"><span class="k">Розділ 1 з 6</span><h1 class="t2">Про студію</h1></div>
+            <div class="now"><span class="k"><span>Зараз на сайті · написав редактор за відкритими даними</span></span><p>«Осоння» — студія кераміки в Сумах, що працює з жовтня 2024 року. Тут ліплять з глини й знайомляться з гончарним колом у невеликих групах, проводять заняття для двох і для компаній до 7 осіб; випал і глазурування входять у ціну. Студія продає подарункові сертифікати, зокрема через KAVA, і власний посуд — чашки, стакани, свічки в керамічних ємностях — через магазин osonnya.shop.</p><a href="#">Читати повністю</a></div>
+            <form class="sec">
+              <div class="f"><label class="f-l" for="da1">Розкажіть про студію своїми словами</label><span class="f-h">Що робите, з якої глини, які поливи, хто веде заняття, для кого, що вирізняє. Редактор перепише це голосом сайту й покаже вам перед публікацією.</span><textarea class="bx is-focus" id="da1" rows="7" style="min-height:168px"></textarea></div>
+              <div class="two">
+                <div class="f"><label class="f-l" for="da2">Новини студії <small>необов’язково</small></label><span class="f-h">Нова колекція, розклад, ярмарок — з датами. Виходить як є, через пів року ховається.</span><textarea class="bx" id="da2" rows="4" style="min-height:120px"></textarea><div class="f-foot"><span></span><span class="f-c">0 / 600</span></div></div>
+                <div class="f"><label class="f-l" for="da3">Одне речення від студії <small>необов’язково</small></label><span class="f-h">Показуємо як цитату «Студія про себе».</span><input class="bx" id="da3" placeholder="Напр.: «Ліпимо повільно й даємо глині говорити»"><div class="f-foot"><span></span><span class="f-c">0 / 200</span></div></div>
+              </div>
+            </form>
+            <div class="sb"><p class="s">Є незбережені зміни</p><span class="ui-btn" data-size="sm">Зберегти</span></div>
+          </section>
+        </div>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+  </div>
+  <div class="row" style="margin-top:24px">
+    <div class="fr fr-d" data-shot="20-desktop-editor-foto" style="min-height:900px">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap"><div class="pg wide">
+        <a class="back" href="#">← Кабінет</a>
+        <div class="ed">
+          <aside>
+            <div class="head"><span class="k">Студія кераміки · Суми</span><h1 class="t2">Осоння</h1>
+              <div class="meter"><span class="v"><b>5 з 6 розділів</b><a class="more" href="#" style="font-size:11px">На сайті <span class="ui-arrow">→</span></a></span><span class="bar"><i style="width:83.3%"></i></span></div>
+            </div>
+            <nav class="srows" aria-label="Розділи профілю">
+              <a class="srow" href="#"><b class="n">Про студію</b><span class="l">Опис редактора є; своїми словами — ні</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#"><b class="n">Послуги й вироби</b><span class="l">7 послуг, 4 вироби</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#"><b class="n">Ціни</b><span class="l">5 цін · жовтень 2026</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#"><b class="n">Для бізнесу</b><span class="l">Мінімум, терміни, логотип</span><span class="tag miss">порожньо</span></a>
+              <a class="srow" href="#"><b class="n">Контакти й Instagram</b><span class="l">Без телефону</span><span class="tag">на сайті</span></a>
+              <a class="srow" href="#" aria-current="page"><b class="n">Фото</b><span class="l">5 фото</span><span class="tag rev">на перевірці</span></a>
+            </nav>
+          </aside>
+          <section>
+            <div class="head"><span class="k">Розділ 6 з 6</span><h1 class="t2">Фото</h1><p class="lead s">Роботи, студія, заняття — до 10. Перше — головне в профілі. Завантажуючи, ви дозволяєте показувати фото на сайті з підписом студії.</p></div>
+            <div class="dz over"><span class="ui-btn" data-variant="ghost">Вибрати фото</span><p class="hint">або перетягніть сюди · JPG, PNG, HEIC · великі зменшимо самі</p></div>
+            <p class="pcount"><span><b>5 фото</b> · на перевірці</span><span>до 10</span></p>
+            <ul class="pts" aria-label="Фото профілю">
+              <li class="pt main"><div class="im"><img src="../template/img/os-hands-bowl.jpg" alt=""><span class="n">Головне</span><span class="st">перевірка</span></div><div class="a"><button type="button">Підпис</button><button type="button">Прибрати</button></div></li>
+              <li class="pt"><div class="im"><img src="../template/img/os-mug-hearts.jpg" alt=""><span class="n">2</span><span class="st">перевірка</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Підпис</button><button type="button">Прибрати</button></div><p class="cap">Чашка «Злива» з серцями</p></li>
+              <li class="pt"><div class="im"><img src="../template/img/os-paint-mug.jpg" alt=""><span class="n">3</span><span class="st">перевірка</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Підпис</button><button type="button">Прибрати</button></div></li>
+              <li class="pt"><div class="im busy"><img src="../template/img/os-four-hands.jpg" alt=""><span class="n">4</span><span class="prog"><i style="width:60%"></i></span></div><div class="a"><button type="button">Скасувати</button></div></li>
+              <li class="pt"><div class="im"><img src="../template/img/os-wheel-yard.jpg" alt=""><span class="n">5</span><span class="st">перевірка</span></div><div class="a"><button type="button" class="pri">Головне</button><button type="button">Підпис</button><button type="button">Прибрати</button></div></li>
+              <li class="pt gone"><div class="im"><img src="../template/img/os-wheel-top.jpg" alt=""><span class="lbl">Прибрано</span></div><div class="a"><button type="button" class="pri">Повернути</button></div></li>
+            </ul>
+            <p class="phint">Порядок — як у профілі: перетягніть фото або виділіть його і натисніть ← →. Підпис необов’язковий — допише редактор.</p>
+            <div class="sb"><p class="s"><span class="busy"></span>Зберігаємо… фото зберігаються самі, одразу після вибору</p><span class="tag off">5 з 10</span></div>
+          </section>
+        </div>
+      </div></main>
+      <footer class="wrap kf"><span>Глина · hlyna.com.ua</span><a href="#">Питання? Напишіть нам</a></footer>
+    </div>
+    <p class="note-board" style="max-width:100%">Кобальтова рамка зони — стан «файл над зоною». Фото й «на перевірці» — ілюстрація стану. <span class="ph-mark">стан</span></p>
+  </div>
+</section>
+
+<!-- ════════════════════════ 10. Варіант A для порівняння ════════════════════════ -->
+<section class="st">
+  <h2><b>10 · Варіант A</b> одна довга сторінка з навігацією по розділах (для порівняння; <u>не рекомендую</u>)</h2>
+  <p>Ті самі бланки й бар, але всі шість розділів на одній сторінці: липкий ряд чипів-якорів угорі, одна кнопка «Зберегти» на все. На телефоні ряд чипів або переноситься на два рядки й з’їдає 100px екрана, або стає горизонтальною стрічкою (у системі заборонена); довжина сторінки — п’ять екранів, стан розділів видно лише в чипах. Детально — у README.</p>
+  <div class="row">
+    <div class="fr fr-m" data-shot="21-phone-variant-a">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap va"><div class="pg">
+        <a class="back" href="#">← Кабінет</a>
+        <div class="head"><span class="k">Студія кераміки · Суми</span><h1 class="t">Осоння</h1></div>
+        <nav class="va-nav" aria-label="Розділи"><a class="chip on" href="#">Про студію</a><a class="chip" href="#">Послуги</a><a class="chip" href="#">Ціни</a><a class="chip" href="#" style="box-shadow:inset 0 0 0 1.5px var(--terracotta-text);color:var(--terracotta-text)">Бізнес</a><a class="chip" href="#">Контакти</a><a class="chip" href="#" style="box-shadow:inset 0 0 0 1.5px var(--terracotta-text);color:var(--terracotta-text)">Фото</a></nav>
+        <form class="sec">
+          <h2><span>Про студію</span><span class="tag">на сайті</span></h2>
+          <div class="f"><label class="f-l" for="va1">Розкажіть про студію своїми словами</label><textarea class="bx" id="va1" rows="4" style="min-height:110px"></textarea></div>
+          <div class="f"><label class="f-l" for="va2">Новини студії <small>необов’язково</small></label><textarea class="bx" id="va2" rows="2" style="min-height:72px"></textarea></div>
+          <h2 style="margin-top:22px"><span>Послуги й вироби</span><span class="tag">на сайті</span></h2>
+          <div class="le"><div class="le-r"><input class="bx" value="групові майстер-класи з ліплення"><button type="button" class="xb" aria-label="Прибрати">×</button></div><div class="le-r"><input class="bx" value="знайомство з гончарним колом"><button type="button" class="xb" aria-label="Прибрати">×</button></div></div>
+          <p class="f-h" style="margin-top:14px">… ще ~4 екрани прокрутки: ціни, для бізнесу, контакти, фото</p>
+        </form>
+      </div></main>
+      <div class="sb"><p class="s">Є незбережені зміни в 2 розділах</p><span class="ui-btn" data-size="sm">Зберегти все</span></div>
+    </div>
+    <div class="fr fr-d" data-shot="22-desktop-variant-a" style="width:860px;min-height:844px">
+      <header class="kh"><div class="wrap kh-in"><a class="logo" href="#"><svg class="svg-mark"><use href="#mark"/></svg>Глина</a><span class="kh-t">Кабінет студії</span><nav class="kh-nav"><a class="site" href="#">На сайт →</a><button class="out" type="button">Вийти</button></nav></div></header>
+      <main class="wrap va"><div class="pg wide">
+        <a class="back" href="#">← Кабінет</a>
+        <div class="ed" style="grid-template-columns:220px minmax(0,1fr);gap:40px">
+          <aside><div class="head"><span class="k">Студія · Суми</span><h1 class="t2">Осоння</h1></div>
+            <nav class="srows"><a class="srow" href="#" aria-current="page"><b class="n">Про студію</b><span class="tag">на сайті</span></a><a class="srow" href="#"><b class="n">Послуги й вироби</b><span class="tag">на сайті</span></a><a class="srow" href="#"><b class="n">Ціни</b><span class="tag">на сайті</span></a><a class="srow" href="#"><b class="n">Для бізнесу</b><span class="tag miss">порожньо</span></a><a class="srow" href="#"><b class="n">Контакти</b><span class="tag">на сайті</span></a><a class="srow" href="#"><b class="n">Фото</b><span class="tag miss">немає</span></a></nav>
+            <p class="f-h">Якорі: клік прокручує до розділу на тій самій сторінці.</p>
+          </aside>
+          <section>
+            <form class="sec">
+              <h2><span>Про студію</span><span class="tag">на сайті</span></h2>
+              <div class="f"><label class="f-l" for="vb1">Розкажіть про студію своїми словами</label><textarea class="bx" id="vb1" rows="4" style="min-height:110px"></textarea></div>
+              <h2 style="margin-top:22px"><span>Послуги й вироби</span><span class="tag">на сайті</span></h2>
+              <div class="le"><div class="le-r"><input class="bx" value="групові майстер-класи з ліплення"><button type="button" class="xb" aria-label="Прибрати">×</button></div><div class="le-r"><input class="bx" value="знайомство з гончарним колом"><button type="button" class="xb" aria-label="Прибрати">×</button></div></div>
+              <h2 style="margin-top:22px"><span>Ціни</span><span class="tag">на сайті</span></h2>
+              <div class="prs"><div class="pr"><div class="pt-t"><input class="bx" value="Груповий МК, до 7 осіб, 2,5 год, виріб до 25 см — 650 грн/особа"></div><div class="pt-d"><select class="bx"><option>жовтень 2026</option></select></div><button type="button" class="xb" aria-label="Прибрати">×</button></div></div>
+              <p class="f-h" style="margin-top:14px">… далі «Для бізнесу», «Контакти», «Фото» — одна сторінка на ~3 500px</p>
+            </form>
+            <div class="sb"><p class="s">Є незбережені зміни в 3 розділах</p><span class="ui-btn" data-size="sm">Зберегти все</span></div>
+          </section>
+        </div>
+      </div></main>
+    </div>
+  </div>
+</section>
+
+</div>
+</body>
+</html>

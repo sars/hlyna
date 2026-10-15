@@ -79,25 +79,37 @@ export function FieldDiff({ field, from, to, media }: { field: string; from: unk
   if (field === 'photos') {
     const byId = new Map(media.map((m) => [m.id, m]))
     const before = new Set(from as number[])
+    const after = to as number[]
+    // Removed published photos stay in the list (struck out) so that dropping the main one is seen before publishing.
+    const gone = (from as number[]).filter((id) => !after.includes(id))
+    const tile = (id: number, state: 'new' | 'kept' | 'gone', n?: number) => {
+      const m = byId.get(id)
+      return (
+        <li key={`${state}${id}`} className="w-28 space-y-1">
+          <div className="relative">
+            {m ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={mediaSrc(m)} alt={m.alt ?? ''} className={`aspect-square w-28 rounded-md border object-cover ${state === 'gone' ? 'opacity-40 grayscale' : ''}`} loading="lazy" />
+            ) : (
+              <div className="aspect-square w-28 rounded-md border bg-muted" />
+            )}
+            {n !== undefined && <span className="absolute top-1 left-1 rounded bg-background/90 px-1.5 text-xs font-medium">{n === 1 ? t('changes.photoMain') : n}</span>}
+            {state === 'gone' && <span className="absolute inset-x-0 bottom-1 mx-auto w-fit rounded bg-negative px-1.5 text-xs text-white">{t('changes.photoRemoved')}</span>}
+          </div>
+          <p className={`truncate text-xs text-muted-foreground ${state === 'gone' ? 'line-through decoration-negative/60' : ''}`} title={m?.alt ?? undefined}>
+            {state === 'new' ? `${t('changes.photoPending')}: ${m?.alt ?? ''}` : m?.alt}
+          </p>
+        </li>
+      )
+    }
     return (
-      <ul className="flex flex-wrap gap-2">
-        {(to as number[]).map((id) => {
-          const m = byId.get(id)
-          return (
-            <li key={id} className="w-28 space-y-1">
-              {m ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={mediaSrc(m)} alt={m.alt ?? ''} className="aspect-square w-28 rounded-md border object-cover" loading="lazy" />
-              ) : (
-                <div className="aspect-square w-28 rounded-md border bg-muted" />
-              )}
-              <p className="truncate text-xs text-muted-foreground" title={m?.alt ?? undefined}>
-                {before.has(id) ? m?.alt : `${t('changes.photoPending')}: ${m?.alt ?? ''}`}
-              </p>
-            </li>
-          )
-        })}
-      </ul>
+      <div className="space-y-2">
+        <p className="text-xs text-muted-foreground">{t('changes.photoOrder')}</p>
+        <ul className="flex flex-wrap gap-2">
+          {after.map((id, i) => tile(id, before.has(id) ? 'kept' : 'new', i + 1))}
+          {gone.map((id) => tile(id, 'gone'))}
+        </ul>
+      </div>
     )
   }
   return <Plain from={from} to={to} />

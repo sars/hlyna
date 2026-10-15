@@ -215,6 +215,9 @@ export const uk = {
   'changes.rejected': 'Зміни відхилено',
   'changes.openSite': 'Профіль на сайті',
   'changes.photoPending': 'нове фото',
+  'changes.photoRemoved': 'прибрано',
+  'changes.photoMain': 'головне',
+  'changes.photoOrder': 'Порядок: головне фото — перше.',
   'changes.moreRemoved': 'ще прибрано рядків: {count}',
 
   'field.name': 'Назва',

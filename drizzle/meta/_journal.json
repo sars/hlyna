@@ -43,6 +43,13 @@
       "when": 1791914960721,
       "tag": "0005_owner_news_at",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1792100049086,
+      "tag": "0006_change_sets_photos_notify_at",
+      "breakpoints": true
     }
   ]
 }

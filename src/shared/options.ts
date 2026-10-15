@@ -52,6 +52,19 @@ export const REQUEST_WHAT_LABEL: Record<RequestWhat, string> = {
 export const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 /** Photos an owner may attach to a profile (cabinet form and the service that applies the change). */
 export const MAX_OWNER_PHOTOS = 10
+/** The studio cabinet's sections, in order (URL segment → title). Each one saves on its own; «foto» saves per action. */
+export const KABINET_SECTIONS = ['pro-studiyu', 'posluhy', 'tsiny', 'biznes', 'kontakty', 'foto'] as const
+export type KabinetSection = (typeof KABINET_SECTIONS)[number]
+export const KABINET_SECTION_TITLE: Record<KabinetSection, string> = {
+  'pro-studiyu': 'Про студію',
+  posluhy: 'Послуги й вироби',
+  tsiny: 'Ціни',
+  biznes: 'Для бізнесу',
+  kontakty: 'Контакти й Instagram',
+  foto: 'Фото',
+}
+/** Ways to put a logo on a piece, offered as chips in the cabinet; anything else is kept as the owner's own text. */
+export const LOGO_METHODS = ['Штамп у глині', 'Деколь', 'Ручний розпис', 'Гравіювання'] as const
 /**
  * Oblast (as written in cities.oblast) → the slug of its centre. A centre's city page covers the whole oblast
  * («Тернопіль і область»; owner, 15.10.2026); Kyiv's page covers Kyiv oblast too. Donetsk, Luhansk and Crimea are left

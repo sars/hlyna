@@ -72,45 +72,98 @@ export const claimCreate = z.object({
   website2: z.string().max(0).optional().or(z.literal('')),
 })
 
-// ---------- owner edits in /kabinet: this whitelist IS the permission (nothing else can be written by an owner)
-export const ownerPriceLine = z.object({
-  text: capped(300),
-  date: capped(60).optional().default(''),
-  source: capped(120).optional().default(''),
-})
-export const ownerStudioEdit = z.object({
+// ---------- owner edits in /kabinet: one schema per section; these whitelists ARE the permission (nothing else can be written
+// by an owner). Forgiving on input (a nick, a bare domain, a phone with spaces), the messages are the texts under the fields.
+/** Values already on the profile: left as they are when sent back unchanged (older profiles hold phones in free form). */
+export type OwnerCurrent = Partial<Record<'phone' | 'email' | 'website' | 'instagram', string>>
+
+/** A contact field: empty is fine; `normalise` returns the clean value or null (→ `message` under the field). */
+const contact = (normalise: (s: string) => string | null, message: string, keep = '') =>
+  capped(300).transform((v, ctx) => {
+    if (!v || v === keep) return v
+    const out = normalise(v)
+    if (out !== null) return out
+    ctx.issues.push({ code: 'custom', message, input: v })
+    return z.NEVER
+  })
+
+/** 10 digits starting 0 or 12 starting 380 → «+380 99 123 45 67». */
+const phoneOf = (s: string) => {
+  if (!/^[\d\s\-().+]+$/.test(s)) return null
+  const d = s.replace(/\D/g, '')
+  const n = /^380\d{9}$/.test(d) ? d.slice(2) : /^0\d{9}$/.test(d) ? d : null
+  return n && `+380 ${n.slice(1, 3)} ${n.slice(3, 6)} ${n.slice(6, 8)} ${n.slice(8)}`
+}
+const emailOf = (s: string) => (EMAIL_RE.test(s) ? s : null)
+const websiteOf = (s: string) => {
+  const url = /\s/.test(s) ? '' : looseUrl.parse(s)
+  return url && new URL(url).hostname.includes('.') ? url : null
+}
+const INSTAGRAM_HOST_RE = /^(www\.)?instagram\.com$/i
+/** «@nick», «nick» or a profile link → https://www.instagram.com/nick/. */
+const instagramOf = (s: string) => {
+  if (/\s/.test(s)) return null
+  const nick = (() => {
+    if (!/[/]|^https?:|instagram\.com/i.test(s)) return s.replace(/^@/, '')
+    try {
+      const u = new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`)
+      return INSTAGRAM_HOST_RE.test(u.hostname) ? (u.pathname.split('/')[1] ?? '') : ''
+    } catch {
+      return ''
+    }
+  })()
+  return /^[\w.]{1,30}$/.test(nick) && !['p', 'reel', 'reels', 'explore', 'stories'].includes(nick) ? `https://www.instagram.com/${nick}/` : null
+}
+/** A post or reel link, with or without www, query string and trailing slash → https://www.instagram.com/p/ID/. */
+const instagramPostOf = (s: string) => {
+  try {
+    const u = new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`)
+    const [kind, id] = u.pathname.split('/').filter(Boolean)
+    const out = `https://www.instagram.com/${kind}/${id}/`
+    return INSTAGRAM_HOST_RE.test(u.hostname) && INSTAGRAM_POST_RE.test(out) ? out : null
+  } catch {
+    return null
+  }
+}
+
+export const ownerAboutSection = z.object({
   ownerAbout: capped(4000).optional().default(''),
   ownerNews: capped(600).optional().default(''),
   ownerQuote: capped(200).optional().default(''),
-  services: lines(40),
-  products: lines(40),
-  prices: z
-    .array(ownerPriceLine)
-    .default([])
-    .transform((xs) => xs.filter((p) => p.text).slice(0, 40)),
-  address: capped(300).optional().default(''),
-  website: looseUrl.optional().default(''),
-  instagram: looseUrl.optional().default(''),
-  phone: capped(60).optional().default(''),
-  email: capped(120).optional().default(''),
-  b2b: z
-    .object({
-      minOrder: capped(200).optional().default(''),
-      leadTime: capped(200).optional().default(''),
-      logoMethods: lines(10),
-      foodSafe: z.boolean().optional().default(false),
-      dishwasherSafe: z.boolean().optional().default(false),
-      worksWithHoreca: z.boolean().optional().default(false),
-      worksWithCorporate: z.boolean().optional().default(false),
-    })
-    .default({ minOrder: '', leadTime: '', logoMethods: [], foodSafe: false, dishwasherSafe: false, worksWithHoreca: false, worksWithCorporate: false }),
-  instagramPosts: z
-    .array(z.string())
-    .default([])
-    .transform((xs) => xs.map((u) => u.trim()).filter((u) => INSTAGRAM_POST_RE.test(u)).slice(0, 3)),
-  keepPhotos: z.array(z.coerce.number().int()).default([]),
 })
-export type OwnerStudioEdit = z.output<typeof ownerStudioEdit>
+export const ownerServicesSection = z.object({ services: lines(40), products: lines(40) })
+export const ownerPricesSection = z.object({
+  prices: z
+    .array(z.object({ text: capped(300), date: capped(60).optional().default(''), source: capped(120).optional().default('') }))
+    .default([])
+    .superRefine((xs, ctx) => {
+      xs.forEach((p, i) => {
+        if (!p.text && p.date) ctx.addIssue({ code: 'custom', path: [i, 'text'], message: 'Напишіть, що саме й скільки коштує.' })
+      })
+    })
+    .transform((xs) => xs.filter((p) => p.text).slice(0, 40)),
+})
+export const ownerB2bSection = z.object({
+  minOrder: capped(200).optional().default(''),
+  leadTime: capped(200).optional().default(''),
+  logoMethods: lines(10),
+  foodSafe: z.boolean().optional().default(false),
+  dishwasherSafe: z.boolean().optional().default(false),
+  worksWithHoreca: z.boolean().optional().default(false),
+  worksWithCorporate: z.boolean().optional().default(false),
+})
+export const ownerContactsSection = (current: OwnerCurrent = {}) =>
+  z.object({
+    address: capped(300).optional().default(''),
+    phone: contact(phoneOf, 'Схоже, номер неповний. Потрібно 10 цифр, напр. +380 99 123 45 67.', current.phone).optional().default(''),
+    email: contact(emailOf, 'Перевірте адресу — у ній має бути @ і крапка.', current.email).optional().default(''),
+    website: contact(websiteOf, 'Вставте адресу з https://', current.website).optional().default(''),
+    instagram: contact(instagramOf, 'Вставте посилання або нік без пробілів: @osonnya.ceramics.', current.instagram).optional().default(''),
+    instagramPosts: z
+      .array(contact(instagramPostOf, 'Вставте посилання на пост або рілс: https://www.instagram.com/p/…'))
+      .default([])
+      .transform((xs) => xs.filter(Boolean).slice(0, 3)),
+  })
 
 // ---------- panel: full studio edit (the schema and the editor form agree on this)
 export const priceLine = z.object({ text: z.string().trim().min(1).max(300), source: z.string().trim().max(120).nullish(), dateText: z.string().trim().max(60).nullish() })

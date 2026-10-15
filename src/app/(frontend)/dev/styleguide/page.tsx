@@ -2,6 +2,11 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { ChoiceChip } from '@/components/ui/ChoiceChip'
+import { Meter, SectionRow, SectionRows } from '@/components/ui/SectionRow'
+import { PasswordInput } from '@/components/ui/PasswordInput.client'
+import { SaveBar } from '@/components/ui/SaveBar'
+import { StatusTag } from '@/components/ui/StatusTag'
 import { SearchAnswer, SearchField, SearchRow } from '@/components/site/search/SearchRow'
 import { TopList } from '@/components/site/TopList'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
@@ -51,6 +56,8 @@ import { fmt } from '@/lib/money'
 import { displayName, firstAddress, inCity, publicPrices } from '@/lib/present'
 import { priceIndex, studioPrice } from '@/lib/priceIndex'
 import { searchCatalog } from '@/server/searchIndex'
+
+import { ListDemo, PhotosDemo } from './CabinetDemo.client'
 
 // Living reference of the design system (docs/design/SYSTEM.md §8): real components with real data. Local only.
 export const metadata: Metadata = { title: 'Стайлгайд', robots: { index: false, follow: false } }
@@ -457,6 +464,90 @@ export default async function StyleguidePage() {
           <VesselWindow shape="bowl" photo={sitePhotos.vesselBowl} title="Гончарне коло" caption="центрування, витягування" href="/maister-klasy/honcharne-kolo" />
           <VesselWindow shape="plate" photo={sitePhotos.vesselPlate} title="Розпис" caption="ангоби й полива по сирцю" href="/maister-klasy/rozpys" />
         </VesselWindows>
+      </Block>
+
+      <Block id="sg-kb-fields" title="22 · Field variant=box, ui-check, ChoiceChip">
+        <Cap>Кабінет (§4.4): бланки на білому, підпис у реченні, підказка над полем; читабельне — на paper-2, редаговане — на білому</Cap>
+        <div className="grid max-w-[720px] gap-1">
+          <Field variant="box" label="Спокій" htmlFor="kb-calm" hint="Підказка між підписом і полем">
+            <Input id="kb-calm" placeholder="Напр.: від 20 чашок або від 10 000 грн" />
+          </Field>
+          <Field variant="box" label="Заповнене" optional htmlFor="kb-filled">
+            <Input id="kb-filled" defaultValue="просп. Свободи, 14, Суми" />
+          </Field>
+          <Field variant="box" label="Помилка" htmlFor="kb-err" error="Схоже, номер неповний. Потрібно 10 цифр, напр. +380 99 123 45 67.">
+            <Input id="kb-err" defaultValue="099 363" inputMode="tel" />
+          </Field>
+          <Field variant="box" label="Недоступне" htmlFor="kb-dis">
+            <Input id="kb-dis" disabled defaultValue="Лише для читання" />
+          </Field>
+          <Field variant="box" label="Розкажіть про студію своїми словами" htmlFor="kb-ta" counter="0 / 600">
+            <Textarea id="kb-ta" placeholder="Напр.: ліпимо з білої кам’яної маси, обпалюємо двічі…" />
+          </Field>
+          <FieldRow>
+            <Field variant="box" label="Коли актуально" htmlFor="kb-sel" hint="Місяць, на який ціна правдива.">
+              <Select id="kb-sel" defaultValue="a"><option value="a">жовтень 2026 (зараз)</option><option value="b">вересень 2026</option><option value="c">місяць не вказано</option></Select>
+            </Field>
+            <Field variant="box" label="Пароль" htmlFor="kb-pw" hint="Щонайменше 10 символів.">
+              <PasswordInput id="kb-pw" defaultValue="глина дзвенить у печі" autoComplete="off" />
+            </Field>
+          </FieldRow>
+          <div className="ui-checks">
+            <Checkbox label="Полива безпечна для їжі" hint="Якщо є сертифікат чи протокол — напишіть про нього в «Про студію»." defaultChecked />
+            <Checkbox label="Можна мити в посудомийці" />
+          </div>
+          <fieldset className="m-0 mt-3 grid gap-2 border-0 p-0">
+            <legend className="p-0 pb-1.5 text-[15px] leading-[1.3] font-medium">Як наносите логотип</legend>
+            <div className="ui-chips">
+              <ChoiceChip label="Штамп у глині" defaultChecked />
+              <ChoiceChip label="Деколь" />
+              <ChoiceChip label="Ручний розпис" defaultChecked />
+              <ChoiceChip label="Гравіювання" />
+              <ChoiceChip label="Інше" />
+            </div>
+          </fieldset>
+        </div>
+      </Block>
+
+      <Block id="sg-kb-list" title="23 · ListEditor, StatusTag, SectionRow, Meter, SaveBar">
+        <Cap>ListEditor: перелік і ціна (живий стан; другий рядок ціни — з помилкою)</Cap>
+        <ListDemo />
+        <Cap>StatusTag ×3 (на paper і на paper-2)</Cap>
+        <div className="flex flex-wrap items-center gap-x-8 gap-y-3">
+          <StatusTag state="live" />
+          <StatusTag state="review" />
+          <StatusTag state="missing" />
+          <StatusTag state="missing">немає фото</StatusTag>
+          <StatusTag state="review">на перевірці від 14.10</StatusTag>
+        </div>
+        <Cap>Meter і SectionRow (огляд студії; другий рядок — активний)</Cap>
+        <div className="grid max-w-[560px] gap-4">
+          <Meter filled={4} total={6} />
+          <SectionRows label="Приклад">
+            <SectionRow href="#sg-kb-list" title="Про студію" line="Опис від редактора є. Своїми словами — ще ні." state="live" />
+            <SectionRow href="#sg-kb-list" title="Ціни" line="5 цін · жовтень 2026" state="review" current />
+            <SectionRow href="#sg-kb-list" title="Для бізнесу" line="Мінімальне замовлення, терміни, логотип" state="missing" />
+            <SectionRow href="#sg-kb-list" title="Фото" line="Роботи, студія, заняття — до 10" state="missing" section="foto" />
+          </SectionRows>
+        </div>
+        <Cap>SaveBar: незбережене · зберігаємо · збережено · помилка · мережа · фото</Cap>
+        <div className="grid max-w-[720px] gap-3 [&_.ui-savebar]:static">
+          <SaveBar status="Є незбережені зміни" action={<Button type="button" size="sm">Зберегти</Button>} />
+          <SaveBar busy status="Зберігаємо…" action={<Button type="button" size="sm" disabled>Зберегти</Button>} />
+          <SaveBar status={<><b>Збережено</b> · на перевірці</>} action={<Button variant="ghost" size="sm" href="#sg-kb-list">Далі: контакти</Button>} />
+          <SaveBar tone="error" status={<>Перевірте 2 поля: <a href="#sg-kb-fields">телефон</a>, <a href="#sg-kb-fields">Instagram</a></>} action={<Button type="button" size="sm">Зберегти</Button>} />
+          <SaveBar tone="error" status={<>Не вдалося зберегти — немає зв’язку. Текст нікуди не зник. <button type="button">Спробувати ще раз</button></>} action={<Button type="button" size="sm">Зберегти</Button>} />
+          <SaveBar status={<><b>Збережено</b> · опублікуємо після перевірки</>} action={<span className="ui-savebar-n">6 / 10</span>} />
+        </div>
+      </Block>
+
+      <Block id="sg-kb-photos" title="24 · PhotoManager">
+        <Cap>Порожньо · завантаження (одне йде, одне зменшується HEIC → JPG, одне з помилкою) · заповнено (головне, підпис, перевірка, прибране). Фото — з сайту, лише для показу станів</Cap>
+        {(['empty', 'busy', 'full'] as const).map((mode) => (
+          <div key={mode} className="max-w-[720px] border border-rule px-gutter pt-4 [&_.ui-savebar]:static">
+            <PhotosDemo mode={mode} urls={[sitePhotos.cardClass.src, sitePhotos.cardGifts.src, sitePhotos.cardPair.src, sitePhotos.cardCertificate.src, sitePhotos.vesselPlate.src]} />
+          </div>
+        ))}
       </Block>
     </main>
   )
