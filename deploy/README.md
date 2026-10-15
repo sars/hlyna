@@ -91,9 +91,26 @@ docker compose exec db psql -U hlyna hlyna       # SQL console
 Never run `docker compose down -v`: `-v` deletes the database volume.
 
 ## Deploy from the Mac
-`bash deploy/push.sh` ships the committed HEAD to the VPS (ssh alias `hlyna` in ~/.ssh/config), rebuilds the containers and refreshes all catalogue pages via `/revalidate`. The server has no GitHub access on purpose.
+`bash deploy/push.sh` ships the committed HEAD to the VPS (ssh alias `hlyna` in ~/.ssh/config), rebuilds the containers and refreshes all catalogue pages via `/revalidate`. The server has no GitHub access on purpose. Deploy only with the owner.
 
 It refuses to deploy a HEAD that lacks `origin/main` or the commit already live (kept in `/opt/hlyna/.deployed-commit`): several sessions deploy from different checkouts, and a deploy replaces the whole server tree. Merge first; `FORCE_DEPLOY=1` is only for a deliberate rollback.
+
+It also checks every studio link in the copy (`src/content`, `src/editorial`) against the live catalogue through a short tunnel (`scripts/app/check-content-slugs.ts`) and stops on a slug that is not published: the renderer would drop it silently. Fix the link, or apply the data edit that publishes or renames the studio first. `SKIP_SLUG_CHECK=1` skips it (rollback only).
+
+### Step by step
+1. **Before:** `pnpm exec tsc --noEmit`, `pnpm lint` on what you changed, `pnpm knip`, `pnpm test:int`, and `pnpm build` against a current local copy of the catalogue (`DATABASE_URL=postgres://localhost/<copy>`). Schema changes: apply the migration first («Database migrations» above).
+2. **Data edits on production**, if the change needs them. Data never goes by hand: put the edits in a file under `scripts/app/edits/` (`edit-studios.ts` sets type, status, links and texts, drops wrong format tags; `set-status.ts` hides or shows), apply it to the local copy, then to production through a tunnel. The password is read from the server's `.env` straight into the variable, never printed:
+   ```bash
+   DB_IP=$(ssh hlyna "docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' \$(cd /opt/hlyna && docker compose ps -q db)")
+   ssh -N -L 15432:$DB_IP:5432 hlyna &
+   export DATABASE_URL="postgres://hlyna:$(ssh hlyna 'grep ^POSTGRES_PASSWORD= /opt/hlyna/.env | cut -d= -f2-')@127.0.0.1:15432/hlyna"
+   PROD=1 DRY=1 EDITS=scripts/app/edits/<file>.json pnpm exec tsx scripts/app/edit-studios.ts   # read the diff
+   PROD=1 EDITS=scripts/app/edits/<file>.json pnpm exec tsx scripts/app/edit-studios.ts
+   kill %1
+   ```
+   Scripts refuse production without `PROD=1` (port 15432 counts as production).
+3. **Ship:** `git fetch origin`, merge if `origin/main` moved, `git push origin main`, then `bash deploy/push.sh`.
+4. **After:** open the pages the change touched on https://hlyna.com.ua (or `curl` them) and confirm the change is there. Pages re-render in the background after `/revalidate`, so the first request may still show the old HTML; ask again a few seconds later.
 
 How pages are served: the image is built against the live database, so every page ships as finished HTML with real
 data (the build fails if it sees fewer than 100 studios). Pages re-render only after a write (panel, kabinet,

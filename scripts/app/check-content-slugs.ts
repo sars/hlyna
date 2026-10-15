@@ -1,5 +1,6 @@
 // Studio links in editorial copy must point at published studios. The renderer drops an unknown slug silently
-// (a link turns into plain text, a pick vanishes and its «why» lands under the next name), so check before a deploy:
+// (a link turns into plain text, a pick vanishes and its «why» lands under the next name). deploy/push.sh runs it
+// against production before every deploy; by hand:
 //   DATABASE_URL=… pnpm exec tsx scripts/app/check-content-slugs.ts     (read-only; exit 1 on any unknown slug)
 // Checked: markdown links «[label](slug)», "slugs": [...] lists and "slug": "…" values in src/content and src/editorial.
 // Not studio slugs and skipped: a file's own slug, city slugs, product page slugs, links that start with «/» or «http».
