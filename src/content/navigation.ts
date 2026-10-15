@@ -5,7 +5,7 @@
 
 import { hasWrittenCopy } from '@/editorial/live'
 
-export type NavLink = { label: string; href: string; note?: string }
+export type NavLink = { label: string; href: string; note?: string; offSeason?: boolean }
 export type NavColumn = { title: string; links: NavLink[] }
 export type NavSection = {
   id: string
@@ -14,6 +14,8 @@ export type NavSection = {
   emphasis?: boolean
   columns: NavColumn[]
   promo?: { title: string; text: string; cta: NavLink }
+  /** Seasonal section: shown until this date (YYYY-MM-DD, Kyiv), then it leaves the menu on its own. */
+  until?: string
 }
 
 export const REQUEST_HREF = '/zapyt'
@@ -60,6 +62,9 @@ const WAVE_HREFS: Record<string, string> = {
   '/hayidy/dohliad-za-keramikoyu': 'dohliad-za-keramikoyu',
   '/hayidy/chornodymlena-i-molochena': 'chornodymlena-i-molochena',
   '/dobirky/pratsyuyut-z-biznesom': 'pratsyuyut-z-biznesom',
+  '/dobirky/symvol-2027-roku': 'symvol-2027',
+  '/dobirky/keramichni-svichnyky': 'svichnyky',
+  '/dobirky/rizdvianyi-posud': 'rizdvianyi-posud',
   // Wave C (src/content/waveC, scripts/sync-wave-c.mjs)
   '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi': 'richnytsya-kompaniyi',
   '/dlya-biznesu/podarunky-spivrobitnykam': 'podarunky-spivrobitnykam',
@@ -110,6 +115,37 @@ const mainNavPlan: NavSection[] = [
       title: 'Один запит — кільком студіям',
       text: 'Опишіть, що потрібно, кількість і термін. Ми передамо запит студіям, які можуть це зробити.',
       cta: { label: 'Надіслати запит', href: REQUEST_HREF },
+    },
+  },
+  {
+    id: 'season',
+    label: 'Свята',
+    href: '/novyi-rik-i-rizdvo',
+    until: '2027-01-20',
+    columns: [
+      {
+        title: 'Купити до свят',
+        links: [
+          { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy', note: 'Топ сезону: ціни й наявність' },
+          { label: 'Символ 2027 року', href: '/dobirky/symvol-2027-roku', note: 'Кози й баранці з кераміки' },
+          { label: 'Свічники й трійці', href: '/dobirky/keramichni-svichnyky', note: 'Трійці на Святвечір, будиночки' },
+          { label: 'Різдвяний посуд', href: '/dobirky/rizdvianyi-posud', note: 'Макітри, глечики, набори' },
+        ],
+      },
+      {
+        title: 'Подарунки й заходи',
+        links: [
+          { label: 'Новорічні подарунки компаніям', href: '/dlya-biznesu/novorichni-podarunky-2026', note: 'Що встигнуть зробити до свят' },
+          { label: 'Корпоратив з глиною в грудні', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny', note: 'Ціни з людини й за групу' },
+          { label: 'Сертифікати на гончарство', href: '/sertyfikaty', note: 'Ціни й строк дії' },
+          { label: 'Новий рік і Різдво з керамікою', href: '/novyi-rik-i-rizdvo', note: 'Огляд сезону й дедлайни' },
+        ],
+      },
+    ],
+    promo: {
+      title: 'Партія до свят?',
+      text: 'Прикраси, набори чи корпоратив для команди: опишіть кількість і дату, і ми передамо запит студіям.',
+      cta: { label: 'Надіслати запит', href: '/zapyt?what=corporate-gifts' },
     },
   },
   {
@@ -206,40 +242,13 @@ const mainNavPlan: NavSection[] = [
       cta: { label: 'Корпоративи', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' },
     },
   },
-  {
-    id: 'prices',
-    label: 'Ціни',
-    href: '/tsiny-2026',
-    columns: [
-      { title: 'Індекс цін 2026', links: [{ label: 'Скільки коштує кераміка в Україні', href: '/tsiny-2026', note: 'Огляд за даними сотень студій' }] },
-      {
-        title: 'Для бізнесу',
-        links: [
-          { label: 'Корпоративи з особи', href: '/tsiny-2026#corporate' },
-          { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom#prices' },
-          { label: 'Посуд для ресторанів', href: '/dlya-biznesu/posud-dlya-restoraniv#prices' },
-        ],
-      },
-      {
-        title: 'Для себе',
-        links: [
-          { label: 'Майстер-класи за містами', href: '/tsiny-2026#maister-klasy' },
-          { label: 'Сертифікати', href: '/tsiny-2026#cert' },
-          { label: 'Чашки й посуд у роздріб', href: '/tsiny-2026#cup' },
-        ],
-      },
-    ],
-    promo: {
-      title: 'Як ми рахуємо',
-      text: 'Ціни беремо з опублікованих прайсів студій, рахуємо медіану й типовий діапазон і оновлюємо щосезону.',
-      cta: { label: 'Методологія', href: '/tsiny-2026#metodolohiya' },
-    },
-  },
 ]
 
 const simpleNavPlan: NavLink[] = [
-  { label: 'Гайди', href: '/hayidy' },
-  { label: 'Мапа', href: '/mapa' },
+  { label: 'Ціни', href: '/tsiny-2026' },
+  // The header holds one row: while a seasonal section is shown, these two wait in the footer.
+  { label: 'Гайди', href: '/hayidy', offSeason: true },
+  { label: 'Мапа', href: '/mapa', offSeason: true },
 ]
 
 const utilityNavPlan: NavLink[] = [
@@ -249,14 +258,16 @@ const utilityNavPlan: NavLink[] = [
 ]
 
 // What is rendered: built routes only. Sections whose own page isn't built are dropped; so are empty columns and promos.
+const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Kyiv' }).format(new Date())
 export const mainNav: NavSection[] = mainNavPlan
-  .filter((s) => isBuilt(s.href))
+  .filter((s) => isBuilt(s.href) && (!s.until || today <= s.until))
   .map((s) => ({
     ...s,
     columns: s.columns.map((c) => ({ ...c, links: liveLinks(c.links) })).filter((c) => c.links.length),
     promo: s.promo && isBuilt(s.promo.cta.href) ? s.promo : undefined,
   }))
-export const simpleNav = liveLinks(simpleNavPlan)
+const inSeason = mainNav.some((s) => s.until)
+export const simpleNav = liveLinks(simpleNavPlan.filter((l) => !(inSeason && l.offSeason)))
 export const utilityNav = liveLinks(utilityNavPlan)
 
 // Footer: only pages that exist (it is on every page); the full plan lives in mainNav.
