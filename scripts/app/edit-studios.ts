@@ -37,13 +37,17 @@ let saved = 0
 const missing: string[] = []
 
 for (const e of edits) {
-  const [row] = await db.select({ id: studios.id }).from(studios).where(eq(studios.slug, e.slug)).limit(1)
+  // a slug the file renamed earlier is found by its old address, so the file can be re-run
+  const [row] = (await db.select({ id: studios.id }).from(studios).where(eq(studios.slug, e.slug)).limit(1)).concat(
+    e.mergeInto ? [] : await db.select({ id: studioSlugHistory.studioId }).from(studioSlugHistory).where(eq(studioSlugHistory.oldSlug, e.slug)).limit(1),
+  )
   const s = row && (await getStudioForEdit(db, row.id))
   if (!row || !s) { missing.push(e.slug); continue }
   const form = toEditForm(s)
   for (const f of TEXT) {
     const v = form[f]
-    if (typeof v === 'string') form[f] = (e.replace ?? []).reduce((acc, [a, b]) => acc.split(a).join(b), v)
+    // a replacement that extends its own text («… виставках.» → «… виставках. Студію веде …») is applied once
+    if (typeof v === 'string') form[f] = (e.replace ?? []).reduce((acc, [a, b]) => (b.includes(a) && acc.includes(b) ? acc : acc.split(a).join(b)), v)
   }
   if (e.set?.type && !(STUDIO_TYPES as readonly string[]).includes(e.set.type)) throw new Error(`${e.slug}: unknown type ${e.set.type} (one of ${STUDIO_TYPES.join(', ')})`)
   if (e.set?.status && !(STUDIO_STATUSES as readonly string[]).includes(e.set.status)) throw new Error(`${e.slug}: unknown status ${e.set.status} (one of ${STUDIO_STATUSES.join(', ')})`)
