@@ -170,7 +170,7 @@ function LiveBlock({ d }: { d: WaveCData }) {
 const RELATED: Record<WaveCId, { label: string; href: string }[]> = {
   'richnytsya-kompaniyi': [{ label: 'Корпоратив з ліплення з глини', href: '/dlya-biznesu/korporatyv-lipennya-z-hlyny' }, { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Ціни 2026', href: '/tsiny-2026' }],
   'podarunky-spivrobitnykam': [{ label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }],
-  'novyi-rik-i-rizdvo': [{ label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }, { label: 'Ярмарки й події', href: '/podiyi' }],
+  'novyi-rik-i-rizdvo': [{ label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Символ 2027 року', href: '/dobirky/symvol-2027-roku' }, { label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Різдвяний посуд', href: '/dobirky/rizdvianyi-posud' }, { label: 'Сертифікати на гончарство', href: '/sertyfikaty' }],
 }
 
 export async function WaveCRoute({ id }: { id: WaveCId }) {

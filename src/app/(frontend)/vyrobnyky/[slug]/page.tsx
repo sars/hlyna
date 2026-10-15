@@ -39,6 +39,7 @@ import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { acceptsRequests, dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
+import { topsForStudio } from '@/editorial/tops'
 import { redirectOldStudioSlug } from '@/lib/redirects'
 
 const link = (href: string, label: string) => (
@@ -155,6 +156,7 @@ export default async function StudioPage({ params }: Args) {
   // when its data is from, and when we last looked.
   const staleData = s.type !== 'legacy' ? oldDataLabel(s) : ''
   const checked = monthYear(s.activity?.checkedAt)
+  const inTops = s.slug ? topsForStudio(s.slug) : []
   const facts: [string, React.ReactNode][] = [
     ['Тип', typeLabel],
     ...(city
@@ -171,6 +173,9 @@ export default async function StudioPage({ params }: Args) {
     ...(s.website ? [['Сайт', link(s.website, siteHost(s.website))] as [string, React.ReactNode]] : []),
     ...(s.facebook ? [['Facebook', link(s.facebook, 'сторінка')] as [string, React.ReactNode]] : []),
     ...(channels.length && !exhibiting ? [['Де продає', channels.join(' · ')] as [string, React.ReactNode]] : []),
+    ...(inTops.length
+      ? [['У добірках', <span key="tops">{inTops.map((t, i) => <React.Fragment key={t.href}>{i > 0 && ' · '}<Link href={t.href}>{t.label}</Link></React.Fragment>)}</span>] as [string, React.ReactNode]]
+      : []),
   ]
   const street = firstAddress(s.address)
   const geo = s.geo

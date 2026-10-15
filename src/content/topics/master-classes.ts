@@ -293,6 +293,7 @@ export const masterClassTopics: Record<string, Topic> = {
       { label: 'Гончарне коло', href: '/maister-klasy/honcharne-kolo' },
       { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Майстер-класи за містами', href: '/maister-klasy' },
+      { label: 'Новий рік і Різдво', href: '/novyi-rik-i-rizdvo' },
     ],
     ...freshTops(certificatesFresh),
   },

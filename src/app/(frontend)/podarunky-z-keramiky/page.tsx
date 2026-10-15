@@ -79,6 +79,8 @@ export default async function Page() {
         { label: 'Корпоративні подарунки', href: '/dlya-biznesu/korporatyvni-podarunky' },
         { label: 'Новорічні подарунки 2026/27', href: '/dlya-biznesu/novorichni-podarunky-2026' },
         { label: 'Чашки', href: '/vyrobnyky/vyrib/chashky' },
+        { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' },
+        { label: 'Символ 2027 року', href: '/dobirky/symvol-2027-roku' },
       ]}
     >
       <Block id="budget" kicker="За бюджетом" title="Що є в прайсах студій" note={<>Роздрібні ціни з сайтів, Instagram і маркетплейсів студій; по одному найдешевшому варіанту від студії в кожному діапазоні. Наявність уточнюйте в студії.</>}>
