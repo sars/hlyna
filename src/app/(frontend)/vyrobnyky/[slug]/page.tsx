@@ -33,10 +33,10 @@ import { isPersonMaker } from '@/lib/ld'
 import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, groupByCity, igHandle, MIN_LIST, offersMasterClasses, TYPE_LABEL, worksWithCompanies, worksWithVenues } from '@/lib/catalog'
-import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, fullNameIfDifferent, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, profileUrls, publicPrices, stripPersonal } from '@/lib/present'
+import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, isDomainLike, isExhibitingOnly, newsIsFresh, noteIsFresh, oldDataLabel, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
-import { formFor, groupPrices } from '@/lib/profile'
+import { dedupePrices, formFor, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 import { casePath, casesForStudio, studioLdId } from '@/editorial/cases'
 import { redirectOldStudioSlug } from '@/lib/redirects'
 
@@ -84,9 +84,10 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   if (!s) return {}
   const city = s.cityDoc?.name
   const name = displayName(s)
+  const lead = stripPersonal(s.summary || s.publicDescription || s.description || '')
   return {
     title: studioTitle(name, s.type, city),
-    description: stripPersonal(s.summary || s.publicDescription || s.description || '').slice(0, 160),
+    description: (publicPrices(s).length ? lead : withoutPriceMention(lead)).slice(0, 160),
     alternates: { canonical: `/vyrobnyky/${s.slug}` },
     openGraph: { images: ogImage({ title: name, kicker: [TYPE_LABEL[s.type ?? 'other'], city].filter(Boolean).join(' · '), sub: cardSummary(s.summary ?? ''), studio: true, makes: productChips(s) }) },
   }
@@ -101,13 +102,14 @@ export default async function StudioPage({ params }: Args) {
   }
 
   const name = displayName(s)
-  // The full name goes under the H1 and into schema.org alternateName only when it says more than the short one.
-  const fullName = fullNameIfDifferent(s)
-  // A bare Instagram handle already shown in «Коротко» is not an alternative name.
+  // The research record's full title («Glynar. Гончарна на Лютеранській (Майстерня «Глинар»)») is a note, not a name:
+  // the page shows the short name and the known variants only. A bare Instagram handle already in «Коротко» is not one.
   const handle = igHandle(s.instagram).toLowerCase()
-  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name && t !== fullName && !isDomainLike(t) && t.replace(/^@/, '').toLowerCase() !== handle)
-  // On the page, skip variants already visible in the heading or the full name («Ґроно (Grono)» → only grono.shop is new).
-  const shownAlt = altNames.filter((t) => ![name, fullName ?? ''].some((n) => n.toLowerCase().includes(t.toLowerCase())))
+  // A variant that is the short name plus more of that title («Glynar. Гончарна на Лютеранській») is the title too.
+  const researchTitle = (t: string) => t.length > name.length && s.name.includes(t) && t.includes(name)
+  const altNames = (s.alternateNames ?? []).map((x) => x.text).filter((t) => t && t !== name && !researchTitle(t) && !isDomainLike(t) && t.replace(/^@/, '').toLowerCase() !== handle)
+  // On the page, skip variants already visible in the heading («Ґроно (Grono)» → only grono.shop is new).
+  const shownAlt = altNames.filter((t) => !name.toLowerCase().includes(t.toLowerCase()))
   const city = s.cityDoc
   const typeLabel = TYPE_LABEL[s.type ?? 'other'] ?? 'Інше'
   const exhibiting = isExhibitingOnly(s)
@@ -117,7 +119,7 @@ export default async function StudioPage({ params }: Args) {
   const venues = !exhibiting && !dormant && worksWithVenues(s)
   const companies = !exhibiting && !dormant && worksWithCompanies(s)
   const everyone = await getAllStudios()
-  const related = city ? everyone.filter((x) => x.cityDoc?.slug === city.slug && x.slug !== s.slug).slice(0, 6) : []
+  const related = relatedStudios(s, everyone)
   // Link the city only when it has its own master-class page (MIN_LIST places).
   const cityPage = city ? (groupByCity(everyone.filter(offersMasterClasses)).find((g) => g.city.slug === city.slug)?.studios.length ?? 0) >= MIN_LIST : false
   // Breadcrumb and «Місто» go to the city's makers page (/vyrobnyky/misto/<city>), else to its master-class page.
@@ -126,20 +128,27 @@ export default async function StudioPage({ params }: Args) {
   const b2b = s.b2b ?? {}
   const hasB2bData = Boolean(b2b.minOrder || b2b.leadTime || b2b.logoMethods?.length)
   const channels = dedupeTexts((s.salesChannels ?? []).map((x) => x.text)).slice(0, 6)
-  const products = dedupeTexts((s.products ?? []).map((x) => groupMoney(cleanPublic(x.text))))
-  const services = dedupeTexts((s.services ?? []).map((x) => groupMoney(cleanPublic(x.text))))
-  const prices = publicPrices(s)
+  const offer = (xs: { text: string }[] | null | undefined) => dedupeTexts((xs ?? []).map((x) => groupMoney(offerItem(cleanPublic(x.text)))).filter(Boolean))
+  const products = offer(s.products)
+  const services = offer(s.services)
+  const prices = dedupePrices(publicPrices(s))
   // schema.org priceRange from the studio's own hryvnia prices (typical span, not extremes).
   const span = typicalRange(prices.filter((p) => !p.year || p.year >= 2025 || !prices.some((x) => (x.year ?? 0) >= 2025)).flatMap((p) => amountsIn(p.text)))
   const priceRange = span ? (span.min === span.max ? `${span.min} UAH` : `${span.min}–${span.max} UAH`) : ''
   const priceGroups = groupPrices(prices)
-  const description = stripPersonal(s.publicDescription || s.description || '')
+  // «Є прайс.» goes from the lead when the page shows no prices.
+  const unpriced = (t: string) => (prices.length ? t : withoutPriceMention(t))
+  const description = unpriced(stripPersonal(s.publicDescription || s.description || ''))
   const monthYear = (d?: string | null) => (d ? new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).formatToParts(new Date(d)).filter((x) => x.type === 'month' || x.type === 'year').map((x) => x.value).join(' ') : '')
   // The studio's own news (as written, signed and dated) wins over ours while it is fresh.
   const studioNews = s.ownerNews && s.ownerNewsAt && newsIsFresh(s.ownerNewsAt) ? { text: s.ownerNews, when: monthYear(s.ownerNewsAt) } : null
   const recentNote = !studioNews && noteIsFresh(s.recentNote || '', s.activity?.lastPostDate) ? stripPersonal(s.recentNote || '') : ''
   const lastPost = monthYear(s.activity?.lastPostDate)
   const igPosts = (s.activity?.instagramPosts ?? []).map((x) => x.url)
+  // «Оновлено» is the catalogue's date while the profile's newest fact is under a year old; an older profile says
+  // when its data is from, and when we last looked.
+  const staleData = s.type !== 'legacy' ? oldDataLabel(s) : ''
+  const checked = monthYear(s.activity?.checkedAt)
   const facts: [string, React.ReactNode][] = [
     ['Тип', typeLabel],
     ...(city ? [['Місто', cityHref ? <Link key="c" href={cityHref}>{city.name}</Link> : city.name] as [string, React.ReactNode]] : []),
@@ -173,7 +182,7 @@ export default async function StudioPage({ params }: Args) {
           '@type': isPersonMaker(s) ? 'Person' : dormant ? 'Organization' : 'LocalBusiness',
           ...(cases.length ? { '@id': studioLdId(s.slug) } : {}),
           name,
-          description: stripPersonal(s.summary || description),
+          description: s.summary ? unpriced(stripPersonal(s.summary)) : description,
           url: `${site.url}/vyrobnyky/${s.slug}`,
           ...(city
             ? isPersonMaker(s)
@@ -181,7 +190,7 @@ export default async function StudioPage({ params }: Args) {
               : { address: { '@type': 'PostalAddress', addressLocality: city.name, addressCountry: 'UA', ...(street ? { streetAddress: street } : {}) } }
             : {}),
           ...(precise && !isPersonMaker(s) && !dormant ? { geo: { '@type': 'GeoCoordinates', latitude: geo!.lat, longitude: geo!.lng } } : {}),
-          ...(fullName || altNames.length ? { alternateName: [...(fullName ? [fullName] : []), ...altNames] } : {}),
+          ...(altNames.length ? { alternateName: altNames } : {}),
           ...(profileUrls(s).length ? { sameAs: profileUrls(s) } : {}),
           ...(priceRange && s.type !== 'maker' && !dormant ? { priceRange } : {}),
           ...(photos.length ? { image: photos.map((p) => `${site.url}${p.url}`) } : {}),
@@ -198,7 +207,6 @@ export default async function StudioPage({ params }: Args) {
           <h1 className={`m-0 font-display text-h1 [overflow-wrap:anywhere] ${name.length > 60 ? 'max-md:text-[24px] max-md:leading-[1.15]' : ''}`} style={{ letterSpacing: 0 }}>
             {name}
           </h1>
-          {fullName && <p className="m-0 text-sm break-words text-ink-2">{fullName}</p>}
           {s.ownerVerified && <p className="m-0 text-sm font-semibold text-ink-2">✓ Профіль підтверджено студією</p>}
           {shownAlt.length > 0 && <p className="m-0 text-sm break-words text-ink-2">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}
           <div className="grid max-w-read gap-3 text-body">
@@ -238,7 +246,7 @@ export default async function StudioPage({ params }: Args) {
               </Button>
             </div>
           )}
-          <Updated />
+          {staleData ? <Updated label="Дані" date={`${staleData}${checked ? ` · перевірено: ${checked}` : ''}`} /> : <Updated />}
         </div>
         <section aria-labelledby="facts" className="min-w-0">
           <Kicker as="p">
@@ -321,7 +329,7 @@ export default async function StudioPage({ params }: Args) {
       >
         {precise && !dormant && (
           <Block id="where" title="Де знайти" note={<span className="break-words">{placeText}</span>}>
-            <ProfileMap lat={geo!.lat!} lng={geo!.lng!} address={placeText} />
+            <ProfileMap lat={geo!.lat!} lng={geo!.lng!} />
             <p className="m-0 flex flex-wrap gap-x-4 gap-y-1 text-sm">
               <span className="font-mono text-[11px] tracking-[.06em] text-ink-2 uppercase">Прокласти маршрут:</span>
               <a href={`https://www.google.com/maps/dir/?api=1&destination=${routeQuery}`} target="_blank" rel="noopener nofollow">
@@ -346,7 +354,7 @@ export default async function StudioPage({ params }: Args) {
         )}
 
         {prices.length > 0 && (
-          <Block id="prices" title="Ціни" note={<>З прайсу, сайту або сторіс студії; після крапки — джерело і рік. Актуальні ціни уточнюйте у студії або через запит.</>}>
+          <Block id="prices" title="Ціни" note={<>З прайсу, сайту або сторіс студії; біля кожної ціни — джерело й рік. Актуальні ціни уточнюйте у студії або через запит.</>}>
             <div className="grid gap-5">
               {priceBlocks.map(({ g, lines }) => (
                 <div key={g} className="grid gap-2">
@@ -369,19 +377,16 @@ export default async function StudioPage({ params }: Args) {
           </Block>
         )}
 
-        {!dormant && (venues || companies || hasB2bData) && (
+        {/* Shown only with real terms: an empty «not specified yet» box on a hundred profiles told buyers nothing. */}
+        {!dormant && hasB2bData && (
           <Block id="b2b" kicker="Для бізнесу" title="Умови для закладів і компаній">
-            {hasB2bData ? (
-              <Facts
-                rows={[
-                  ...(b2b.minOrder ? ([['Мінімальне замовлення', b2b.minOrder]] as [string, React.ReactNode][]) : []),
-                  ...(b2b.leadTime ? ([['Термін', b2b.leadTime]] as [string, React.ReactNode][]) : []),
-                  ...(b2b.logoMethods?.length ? ([['Логотип', b2b.logoMethods.map((x) => x.text).join(', ')]] as [string, React.ReactNode][]) : []),
-                ]}
-              />
-            ) : (
-              <Note>Мінімальну партію, терміни й ціни для бізнесу студія ще не вказала. Надішліть запит — ми передамо його студії разом з іншими, що роблять подібні вироби.</Note>
-            )}
+            <Facts
+              rows={[
+                ...(b2b.minOrder ? ([['Мінімальне замовлення', b2b.minOrder]] as [string, React.ReactNode][]) : []),
+                ...(b2b.leadTime ? ([['Термін', b2b.leadTime]] as [string, React.ReactNode][]) : []),
+                ...(b2b.logoMethods?.length ? ([['Логотип', b2b.logoMethods.map((x) => x.text).join(', ')]] as [string, React.ReactNode][]) : []),
+              ]}
+            />
             {showForm && <CtaBand tone="cobalt" title="Надішліть запит цій студії" text="Безкоштовно для замовника. Студія відповідає напряму." cta={{ label: 'Отримати пропозиції', href: '#zapyt-forma' }} />}
           </Block>
         )}

@@ -259,12 +259,6 @@ const hasCyr = (t: string) => /[а-яіїєґ]/i.test(t)
 /** The name a studio goes by on the site: its short name when set, else the cleaned full name. */
 export const displayName = (s: { name: string; shortName?: string | null }): string => s.shortName?.trim() || cleanName(s.name)
 
-/** The full name, when it says more than displayName (shown under the profile H1 and as schema.org alternateName). */
-export const fullNameIfDifferent = (s: { name: string; shortName?: string | null }): string | null => {
-  const full = cleanName(s.name)
-  return full !== displayName(s) ? full : null
-}
-
 export function cleanName(name: string): string {
   let n = name
     .replace(/\s*\((?=[^)]*(?:тел\.?|\+?\d[\d\s-]{6,}|партнер))[^)]*\)/giu, '')

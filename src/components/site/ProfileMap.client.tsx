@@ -5,8 +5,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { MapFrame } from '@/components/ui/MapFrame'
 
 // Small map with one marker on a studio profile. MapLibre and the tiles load only when the block is
-// near the viewport; until then (or without WebGL) the placeholder shows the address text.
-export function ProfileMap({ lat, lng, address }: { lat: number; lng: number; address: string }) {
+// near the viewport. The address stands once, in the block's note: the placeholder does not repeat it.
+export function ProfileMap({ lat, lng }: { lat: number; lng: number }) {
   const box = useRef<HTMLDivElement>(null)
   const [near, setNear] = useState(false)
   const [state, setState] = useState<'idle' | 'ready' | 'failed'>('idle')
@@ -58,8 +58,8 @@ export function ProfileMap({ lat, lng, address }: { lat: number; lng: number; ad
   }, [near, lat, lng])
 
   return (
-    <MapFrame height="profile" fallback={state !== 'ready' ? (state === 'failed' ? `Мапа не відкрилася в цьому браузері. Адреса: ${address}` : address) : undefined}>
-      <div ref={box} className="h-full w-full" aria-label={`Мапа: ${address}`} role="img" />
+    <MapFrame height="profile" fallback={state === 'failed' ? 'Мапа не відкрилася в цьому браузері' : undefined}>
+      <div ref={box} className="h-full w-full" aria-label="Мапа з позначкою студії" role="img" />
     </MapFrame>
   )
 }
