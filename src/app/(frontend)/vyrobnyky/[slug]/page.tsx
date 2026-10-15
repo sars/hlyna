@@ -302,6 +302,8 @@ export default async function StudioPage({ params }: Args) {
             ) : (
               <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} studioName={name} />
             )}
+            {/* A heritage page (late or historical makers, museums) has no owner to claim it (decision 15.10.2026). */}
+            {s.type !== 'legacy' && (
             <SideBox title="Власникам">
               {s.ownerVerified ? (
                 <p className="m-0">
@@ -313,6 +315,7 @@ export default async function StudioPage({ params }: Args) {
                 </p>
               )}
             </SideBox>
+            )}
           </>
         }
       >
