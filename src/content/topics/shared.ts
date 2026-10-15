@@ -1,5 +1,6 @@
 // Shared types and helpers for topic page configs. Lists come from studio format tags (scripts/tag-studios.ts);
 // counts and prices are computed live, the text in the configs stays factual.
+import type { TopCategory } from '@/editorial/copy'
 import type { Format, StudioCard } from '@/lib/catalog'
 import { NO_TERM, pluralUk, texts } from '@/lib/catalog'
 import { inCity } from '@/lib/present'
@@ -42,19 +43,26 @@ export type Topic = {
   ogTitle?: string // share-card title when the h1 carries a year
   ogSub: string // stable one-line description for the share card (no counts, prices or years)
   lists: TopicList[]
-  evidence: RegExp
   // Business pages: who the page's claim is confirmed for (sourced fact, catalog.ts confirmedFor*). They come first under
   // `title`, and only they are counted in the title and lead; everyone else the lists pick goes below under `rest`, without
   // the claim («уточнимо у вашому запиті»). Owner, 15.10.2026. line: the words that show the claim in a studio's own lines,
   // so the card under `title` quotes the reason it is there (evidenceFor), not the first line of its price list.
   confirmed?: { test: (s: StudioCard) => boolean; line: RegExp; title: string; note: string; rest: { title: string; note: string } }
+  evidence: RegExp
   // unit: only lines matching it count toward the «from–to» range (e.g. per person); unitLabel follows the range.
   price: { re: RegExp; exclude?: RegExp; unit?: RegExp; unitNot?: RegExp; unitLabel?: string; index?: string; title: string; note: string }
   sections: { kicker?: string; title: string; items: [string, string][] }[]
   faq: (c: TopicCtx) => { q: string; a: string }[]
   related: { label: string; href: string }[]
   form?: string
+  // Fresh ranked offers by category (content/topics/fresh/*.json), shown above the studio lists; empty or absent renders nothing.
+  tops?: TopCategory[]
+  // One line above the first top: where the data comes from and when it was seen.
+  topsNote?: string
 }
+
+// `tops` and `topsNote` of a topic from its fresh/*.json file.
+export const freshTops = (j: { tops: TopCategory[]; topsNote?: string }): Pick<Topic, 'tops' | 'topsNote'> => ({ tops: j.tops, ...(j.topsNote ? { topsNote: j.topsNote } : {}) })
 
 export const n = (k: number, forms: [string, string, string]) => `${fmt(k)} ${pluralUk(k, forms)}`
 export const studios = (k: number) => n(k, ['студія чи майстер', 'студії й майстри', 'студій і майстрів'])

@@ -8,6 +8,7 @@ import c_etsy from './etsy.json'
 import c_muzei_keramiky from './muzei-keramiky.json'
 import c_podiyi from './podiyi.json'
 import c_pratsyuyut_z_biznesom from './pratsyuyut-z-biznesom.json'
+import c_symvol_2027 from './symvol-2027.json'
 import c_vydy_keramiky from './vydy-keramiky.json'
 import c_yalynkovi_prykrasy from './yalynkovi-prykrasy.json'
 
@@ -19,6 +20,7 @@ export const copies: Record<string, WaveCopy> = {
   'muzei-keramiky': c_muzei_keramiky,
   'podiyi': c_podiyi,
   'pratsyuyut-z-biznesom': c_pratsyuyut_z_biznesom,
+  'symvol-2027': c_symvol_2027,
   'vydy-keramiky': c_vydy_keramiky,
   'yalynkovi-prykrasy': c_yalynkovi_prykrasy,
 }

@@ -4,6 +4,7 @@ import type { WaveVars } from '@/editorial/copy'
 import { evidenceLine } from '@/editorial/topics'
 import type { EtsyShop } from '@/editorial/wave-a'
 import { confirmedForVenues, groupByCity, hasFormat } from '@/lib/catalog'
+import { publicPrices } from '@/lib/present'
 import { productText, PRODUCT_RE } from '@/lib/products'
 import { makers } from './makers'
 
@@ -25,6 +26,29 @@ export async function newYearData() {
   const vars: WaveVars = { count: studios.length, cities: groups.length }
   return { studios, lines, groups, vars }
 }
+
+// Seasonal picks: studios whose own products, services, summary or price lines mention the theme (goat or lamb, candlesticks,
+// Christmas-table ware). Same shape as newYearData; a page needs ≥ 3 entries to go live.
+const mentionsIn = (s: Parameters<typeof productText>[0] & Parameters<typeof publicPrices>[0], re: RegExp) => re.test(`${productText(s)} ${publicPrices(s).map((p) => p.text).join(' ')}`)
+async function mentionData(re: RegExp) {
+  const studios = (await makers()).filter((s) => mentionsIn(s, re))
+  const lines = studios.map((s) => ({ s, line: evidenceLine(s, re) }))
+  const groups = groupByCity(studios)
+  const vars: WaveVars = { count: studios.length, cities: groups.length }
+  return { studios, lines, groups, vars }
+}
+
+// Symbol of 2027 (the year of the Goat / Ram): goat, ram and lamb figures and gifts in ceramics. The lookaheads keep out
+// «козак», «козацький», «козир», «козуля».
+export const SYMBOL_2027 = /(?<!\p{L})(коз(?:а(?![кцч])|и(?!р)|[оі](?!р)|у(?!л)|[ею])|кіз|козл|козен|козоч|баран|ягн|вівц|овеч)/iu
+export const symbolData = () => mentionData(SYMBOL_2027)
+
+export const CANDLESTICKS = /свічник|підсвічник|трійц/iu
+export const candlesticksData = () => mentionData(CANDLESTICKS)
+
+// Christmas Eve table: kutia bowls, makitra, uzvar jugs, «різдвяний посуд».
+export const CHRISTMAS_TABLE = /святвеч|макітр|кут[яію]|узвар|різдвян\p{L}* (?:посуд|набір|тарел|тарі|горнят|чаш)|трійц/iu
+export const christmasTableData = () => mentionData(CHRISTMAS_TABLE)
 
 export async function businessData() {
   const all = (await makers()).filter((s) => ['brand', 'studio', 'maker'].includes(s.type ?? ''))

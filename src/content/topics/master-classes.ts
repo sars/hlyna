@@ -2,7 +2,8 @@
 import { fmt } from '@/lib/money'
 import { verses } from '../verses'
 import { sitePhotos } from '../photos'
-import { certAnswer, mentionedBy, MK, mkCards, mostly, ofPlaces, pickupAnswer, pickupLead, places, priceRange, type Topic, verb, where, WORKSHOP } from './shared'
+import certificatesFresh from './fresh/certificates.json'
+import { certAnswer, freshTops, mentionedBy, MK, mkCards, mostly, ofPlaces, pickupAnswer, pickupLead, places, priceRange, type Topic, verb, where, WORKSHOP } from './shared'
 
 export const masterClassTopics: Record<string, Topic> = {
   couples: {
@@ -261,7 +262,7 @@ export const masterClassTopics: Record<string, Topic> = {
     kicker: 'Подарунок-враження',
     h1: 'Подарункові сертифікати на гончарство і кераміку',
     ogSub: 'Подарунковий сертифікат на майстер-клас з кераміки: формати, термін дії, електронні сертифікати',
-    metaTitle: (c) => `Сертифікат на гончарство: ${places(c.n)} в Україні, ціни 2026`,
+    metaTitle: (c) => `Сертифікат на гончарство 2026/27: ${places(c.n)} в Україні, ціни`,
     metaDescription: (c) => `Подарунковий сертифікат на майстер-клас з кераміки: ${places(c.n)} ${where(c)}${priceRange(c) ? `, ціни ${priceRange(c)}` : ''}. Формати, термін дії, електронні сертифікати.`,
     lead: (c) => `У каталозі — ${places(c.n)} ${where(c)}, які продають подарункові сертифікати на майстер-класи з кераміки.${priceRange(c) ? ` У прайсах студій сертифікати коштують здебільшого ${priceRange(c)}.` : ''} Сертифікат можна взяти на заняття на колі, ліплення, розпис чи побачення для двох; найчастіше він діє 3–6 місяців.`,
     verse: verses.certificates,
@@ -283,8 +284,8 @@ export const masterClassTopics: Record<string, Topic> = {
     ],
     faq: (c) => [
       { q: 'Скільки коштує сертифікат на гончарство?', a: priceRange(c) ? `У прайсах студій каталогу — здебільшого ${priceRange(c)}; ціна залежить від формату й тривалості заняття.` : 'Ціни уточнюйте у студій; ціна залежить від формату й тривалості заняття.' },
-      { q: 'Скільки діє сертифікат?', a: 'Зазвичай 3–6 місяців; деякі студії продають безстрокові сертифікати. Термін указують на самому сертифікаті.' },
-      { q: 'Чи можна купити сертифікат в останній день?', a: 'Так, електронний сертифікат більшість студій надсилає в день оплати.' },
+      { q: 'Скільки діє сертифікат?', a: 'У прайсах 2026 року — від 45 днів до 12 місяців: у Ceramics Khanna 45 днів, у Хаосі 2 місяці, у Katartsys, Осонні й Glinland 3 місяці, у Ro.Ro Project і Світі ремесел 6 місяців, у KUST Ceramics і Glynar 12 місяців. Термін зазвичай рахують від дня купівлі й указують на сертифікаті.' },
+      { q: 'Чи можна купити сертифікат в останній день?', a: 'Так, якщо студія робить електронні сертифікати: Світ ремесел оформлює електронний будь-коли, коли подарунок потрібен терміново; електронні є також у Glinland, Хаосі, майстерні Оксани Сиром\'ятникової, Осонні й Katartsys. Паперовий Glinland надсилає Новою поштою.' },
       { q: 'А для команди?', a: `Для колективу зручніше корпоратив з ліплення з глини: ${c.price('corporate')}. Надішліть запит, і ми передамо його кільком студіям.` },
     ],
     related: [
@@ -293,5 +294,6 @@ export const masterClassTopics: Record<string, Topic> = {
       { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' },
       { label: 'Майстер-класи за містами', href: '/maister-klasy' },
     ],
+    ...freshTops(certificatesFresh),
   },
 }

@@ -8,7 +8,7 @@ import { fillCopy, type WaveCopy } from '@/editorial/copy'
 import type { StudioCard } from '@/lib/catalog'
 import { eventsPageData, museumsPageData } from './events'
 import { careData, materialsData, smokeData } from './guides-data'
-import { businessData, etsyData, newYearData, tablewareBrandsData } from './selections'
+import { businessData, candlesticksData, christmasTableData, etsyData, newYearData, symbolData, tablewareBrandsData } from './selections'
 
 export * from './events'
 export * from './guides-data'
@@ -26,6 +26,9 @@ export type WaveBId =
   | 'dohliad-za-keramikoyu'
   | 'chornodymlena-i-molochena'
   | 'pratsyuyut-z-biznesom'
+  | 'symvol-2027'
+  | 'svichnyky'
+  | 'rizdvianyi-posud'
 
 type Section = 'dobirky' | 'hayidy' | null
 export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: string; kicker: string; form: string }> = {
@@ -38,6 +41,9 @@ export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: st
   'dohliad-za-keramikoyu': { path: '/hayidy/dohliad-za-keramikoyu', section: 'hayidy', crumb: 'Догляд за керамікою', kicker: 'Гайди', form: 'tableware' },
   'chornodymlena-i-molochena': { path: '/hayidy/chornodymlena-i-molochena', section: 'hayidy', crumb: 'Чорнодимлена й молочена', kicker: 'Гайди', form: 'other' },
   'pratsyuyut-z-biznesom': { path: '/dobirky/pratsyuyut-z-biznesom', section: 'dobirky', crumb: 'Хто працює з бізнесом', kicker: 'Добірки', form: 'tableware' },
+  'symvol-2027': { path: '/dobirky/symvol-2027-roku', section: 'dobirky', crumb: 'Символ 2027 року', kicker: 'Добірки', form: 'corporate-gifts' },
+  svichnyky: { path: '/dobirky/keramichni-svichnyky', section: 'dobirky', crumb: 'Керамічні свічники', kicker: 'Добірки', form: 'corporate-gifts' },
+  'rizdvianyi-posud': { path: '/dobirky/rizdvianyi-posud', section: 'dobirky', crumb: 'Різдвяний посуд', kicker: 'Добірки', form: 'tableware' },
 }
 export const WAVE_B_IDS = Object.keys(WAVE_B) as WaveBId[]
 
@@ -53,6 +59,9 @@ export type WaveBData =
   | ({ id: 'dohliad-za-keramikoyu' } & Awaited<ReturnType<typeof careData>>)
   | ({ id: 'chornodymlena-i-molochena' } & Awaited<ReturnType<typeof smokeData>>)
   | ({ id: 'pratsyuyut-z-biznesom' } & Awaited<ReturnType<typeof businessData>>)
+  | ({ id: 'symvol-2027' } & Awaited<ReturnType<typeof symbolData>>)
+  | ({ id: 'svichnyky' } & Awaited<ReturnType<typeof candlesticksData>>)
+  | ({ id: 'rizdvianyi-posud' } & Awaited<ReturnType<typeof christmasTableData>>)
 
 export async function waveBData(id: WaveBId): Promise<WaveBData> {
   switch (id) {
@@ -65,12 +74,15 @@ export async function waveBData(id: WaveBId): Promise<WaveBData> {
     case 'dohliad-za-keramikoyu': return { id, ...(await careData()) }
     case 'chornodymlena-i-molochena': return { id, ...(await smokeData()) }
     case 'pratsyuyut-z-biznesom': return { id, ...(await businessData()) }
+    case 'symvol-2027': return { id, ...(await symbolData()) }
+    case 'svichnyky': return { id, ...(await candlesticksData()) }
+    case 'rizdvianyi-posud': return { id, ...(await christmasTableData()) }
   }
 }
 
 /** Studios a page lists (for the ItemList JSON-LD). */
 export const waveBStudios = (d: WaveBData): StudioCard[] =>
-  d.id === 'brendy-posudu' || d.id === 'yalynkovi-prykrasy' || d.id === 'pratsyuyut-z-biznesom' || d.id === 'dohliad-za-keramikoyu'
+  d.id === 'brendy-posudu' || d.id === 'yalynkovi-prykrasy' || d.id === 'pratsyuyut-z-biznesom' || d.id === 'dohliad-za-keramikoyu' || d.id === 'symvol-2027' || d.id === 'svichnyky' || d.id === 'rizdvianyi-posud'
     ? d.studios
     : d.id === 'chornodymlena-i-molochena'
       ? [...new Map([...d.black, ...d.milk].map((s) => [s.id, s])).values()]

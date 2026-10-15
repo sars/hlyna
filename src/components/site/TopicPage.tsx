@@ -5,6 +5,7 @@ import { BoldFacts, Block, InnerCols, InnerHero, InnerMain, Related } from '@/co
 import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
+import { isBusinessTop, TopList } from '@/components/site/TopList'
 import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
 import { ChipGroup } from '@/components/ui/ChipGroup'
@@ -25,8 +26,8 @@ import { site } from '@/content/site'
 import type { Topic } from '@/content/topics'
 import { evidenceFor, evidenceLine, topicCityLinks, type Evidence, type TopicData } from '@/editorial/topics'
 import { fixPriceRef, mergeFaq, type PlaceContent } from '@/editorial/places'
-import { groupByCity, latestUpdate, MIN_LIST, pluralUk, type StudioCard } from '@/lib/catalog'
-import { ldStudio } from '@/lib/ld'
+import { getAllWithShops, groupByCity, latestUpdate, MIN_LIST, pluralUk, type StudioCard } from '@/lib/catalog'
+import { ldStudio, ldTopList } from '@/lib/ld'
 import { fmt } from '@/lib/money'
 import { displayName } from '@/lib/present'
 import { MobileRequestBar } from './MobileRequestBar.client'
@@ -125,6 +126,11 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
   const firstList = lists.findIndex((l) => l.studios.length)
   const firstByCity = lists.findIndex((x) => x.byCity && x.studios.length)
   const request = topic.form ? '#zapyt-forma' : REQUEST_HREF
+  // Fresh ranked offers (content/topics/fresh/*.json) lead the page; city pages built from the same topic show none.
+  const tops = ctx.place ? [] : (topic.tops ?? []).filter((c) => c.items.length)
+  const topsKnown = tops.length ? (known ?? new Map((await getAllWithShops()).map((s) => [s.slug!, s]))) : undefined
+  // One request band after the last business category, unless the prices band follows right away (a page without sections).
+  const bandAfter = topic.sections.length ? tops.filter(isBusinessTop).at(-1)?.id : undefined
   // The numbers of the page, all from the live catalogue: studios, cities, the price range.
   const strip =
     ctx.n > 0 && ctx.cities > 1 && ctx.min && ctx.max
@@ -137,6 +143,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
 
   return (
     <InnerMain>
+      {topsKnown && tops.map((c) => <JsonLd key={c.id} data={ldTopList(c, topsKnown)} />)}
       <JsonLd data={{ '@context': 'https://schema.org', '@type': 'ItemList', name: title, numberOfItems: all.length, itemListElement: all.map((s, i) => ({ '@type': 'ListItem', position: i + 1, item: ldStudio(s) })) }} />
       <InnerHero
         crumbs={[...topic.parents, ...extraParents, { label: crumb ?? topic.crumb }]}
@@ -194,6 +201,14 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
         }
       >
         {topic.verse.length > 0 && <Epigraph lines={topic.verse} />}
+        {topsKnown && tops.length > 0 && topic.topsNote && <p className="m-0 max-w-read font-mono text-xs leading-normal text-ink-2">{topic.topsNote}</p>}
+        {topsKnown &&
+          tops.map((c) => (
+            <React.Fragment key={c.id}>
+              <TopList cat={c} known={topsKnown} />
+              {c.id === bandAfter && <CtaBand tone="cobalt" title="Один запит — кільком студіям одразу" text="Вкажіть, що потрібно, скільки і до якої дати." cta={{ label: 'Отримати пропозиції', href: request }} />}
+            </React.Fragment>
+          ))}
         {place && known && <PlaceStory c={place} known={known} title="Хто що робить зараз" />}
         {place && known && <PlacePicks c={place} known={known} title="Що обрати для чого" />}
 
