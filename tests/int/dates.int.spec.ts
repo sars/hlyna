@@ -6,7 +6,7 @@ import { describe, expect, it } from 'vitest'
 import { fillCopy, type WaveCopy } from '@/editorial/copy'
 import { eventsPageData, eventWhen, type EventItem } from '@/editorial/wave-b/events'
 import { currentDates, dropStale, isStale, newYearSeason, sentences } from '@/lib/dates'
-import { currentLine, currentNote } from '@/lib/present'
+import { currentLine, currentNews, currentNote } from '@/lib/present'
 
 // Audit cause 7 (15.10.2026): dates never aged. Pages are ISR with a daily refresh, so these rules run every day.
 describe('dates: a past date never reads as current', () => {
@@ -55,6 +55,34 @@ describe('dates: a past date never reads as current', () => {
     expect(currentLine('МК з ліплення 2 год — 900 грн (сайт, 2026)', '2027-05-01')).not.toBe('')
     expect(currentNote('Виставка триває до 11.10. Нова колекція чашок, жовтень 2026.', '2026-10-01', '2026-10-15')).toBe('Нова колекція чашок, жовтень 2026.')
     expect(currentDates('Виставка триває до 11.10.', 2026)[0]).toMatchObject({ end: '2026-10-11', yearFrom: 'context' })
+  })
+
+  // Review of 1f26eca, 16.10.2026: four bugs found before deploy.
+  it('keeps paragraphs and line breaks: a profile description is split on blank lines', () => {
+    const text = 'Перший абзац, ціни 2026 року.\n\nНа 17 жовтня 2026 року анонсовано МК.\n\nТретій абзац.\nДругий рядок.'
+    expect(dropStale(text, '2026-10-20')).toBe('Перший абзац, ціни 2026 року.\n\nТретій абзац.\nДругий рядок.')
+    expect(dropStale(text, '2026-10-16')).toBe(text)
+  })
+
+  it('an undated day before the source month is next year’s (New Year classes, news in December)', () => {
+    expect(currentLine('Новорічні МК 27.12, 3.01 — 900 грн (Instagram, 10.2026)', '2026-12-28')).not.toBe('')
+    expect(currentLine('Новорічні МК 27.12, 3.01 — 900 грн (Instagram, 10.2026)', '2027-01-04')).toBe('')
+    expect(currentNews('Запрошуємо на МК 10 січня!', '2026-12-20', '2026-12-21')).toBe('Запрошуємо на МК 10 січня!')
+    expect(currentNews('Запрошуємо на МК 10 січня!', '2026-12-20', '2027-01-11')).toBe('')
+    // A September schedule in an October post is still this year's.
+    expect(currentLine('Розклад: 18.09, 19.09 (Instagram, 10.2026)', '2026-10-16')).toBe('')
+  })
+
+  it('nouns in -ив and states («залишилось», «відкрито») are not history', () => {
+    expect(isStale('Зимовий інтенсив 12–14 грудня 2025 року.', '2026-10-16')).toBe(true)
+    expect(isStale('МК 10 жовтня 2026 — залишилось 3 місця.', '2026-10-16')).toBe(true)
+    expect(isStale('Набір відкрито на курс 1 жовтня 2026 року.', '2026-10-16')).toBe(true)
+    expect(isStale('Студія запустила курс 1 жовтня 2026 року.', '2026-10-16')).toBe(false)
+  })
+
+  it('a sentence with several dates stays until the last of them', () => {
+    expect(isStale('Записатися можна на 12.10 або 20.10.', '2026-10-13', 2026)).toBe(false)
+    expect(isStale('Записатися можна на 12.10 або 20.10.', '2026-10-21', 2026)).toBe(true)
   })
 
   it('takes seasonal titles from the coming season, or the running one until 6 January', () => {

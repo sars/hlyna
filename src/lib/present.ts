@@ -2,7 +2,7 @@
 // keeps everything; these functions decide what a visitor (and an LLM) sees.
 import type { City, Studio } from '@/types/catalog'
 
-import { dropStale, kyivToday } from './dates'
+import { type DateContext, dropStale, kyivToday, sourceDate } from './dates'
 import { amountsIn, groupMoney } from './money'
 
 // ---------- text lists ----------
@@ -404,8 +404,14 @@ const MONTH_STEMS: [RegExp, number][] = [
 const NEWS_TTL = 183 * 24 * 3600 * 1000
 
 /** A profile line as shown today: a sentence whose date has passed goes («розклад на вересень: 18.09, 19.09 (Instagram,
- *  09.2026)»); an undated «18.09» takes the year of the line's source. */
-export const currentLine = (raw: string, today = kyivToday()) => dropStale(raw, today, splitSource(raw).year)
+ *  09.2026)»); an undated «18.09» is dated by the line's source, «3.01» in a line from 10.2026 being next January. */
+export function currentLine(raw: string, today = kyivToday()): string {
+  const line = splitSource(raw)
+  return dropStale(raw, today, sourceDate(line.source) ?? line.year)
+}
+
+// A YYYY-MM-DD (or ISO) date as the context of an undated «10 січня» written then.
+const writtenAt = (iso: string): DateContext => ({ y: Number(iso.slice(0, 4)), m: Number(iso.slice(5, 7)) || undefined })
 
 /** The studio's own news is dated by the owner's save; like «Що нового», it goes after about six months. */
 export const newsIsFresh = (at: string, now = Date.now()) => now - new Date(at).getTime() < NEWS_TTL
@@ -427,15 +433,15 @@ export function noteIsFresh(note: string, lastPostDate?: string | null, now = Da
 const yearIn = (t: string, now: number) => Math.max(0, ...[...t.matchAll(/(?<!\d)(20\d\d)(?!\d)/g)].map((m) => Number(m[1])).filter((y) => y <= now))
 
 /** «Що нового» as shown today: nothing once it is stale (noteIsFresh), and no sentence whose date has passed. An undated
- *  «10 жовтня» in it is of the note's newest year, else of the last post's. */
+ *  «10 жовтня» in it is of the note's newest year, else of the last post's date. */
 export function currentNote(note: string, lastPostDate?: string | null, today = kyivToday()): string {
   if (!note || !noteIsFresh(note, lastPostDate, Date.parse(today))) return ''
-  const year = yearIn(note, Number(today.slice(0, 4))) || (lastPostDate ? Number(lastPostDate.slice(0, 4)) : undefined)
-  return dropStale(note, today, year)
+  const year = yearIn(note, Number(today.slice(0, 4)))
+  return dropStale(note, today, year || (lastPostDate ? writtenAt(lastPostDate) : undefined))
 }
 
 /** The studio's own news as shown today: until it is stale (newsIsFresh), without sentences whose date has passed. */
 export function currentNews(text: string, at: string, today = kyivToday()): string {
   if (!text || !newsIsFresh(at, Date.parse(today))) return ''
-  return dropStale(text, today, Number(at.slice(0, 4)))
+  return dropStale(text, today, writtenAt(at))
 }

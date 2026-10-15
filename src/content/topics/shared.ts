@@ -142,6 +142,11 @@ export const certTerms = (c: TopicCtx) => {
   const named = (c.local?.certs ?? []).filter((x) => x.valid)
   return named.length ? `Термін дії ${verb(named.length, 'вказує', 'вказують')} ${fmt(named.length)} з ${ofPlaces(c.n)}: ${nameList(named.map((x) => `${x.name} — ${termOf(x.valid!)}`), 4)}` : null
 }
+/** The term sentence of a certificate page: who states which term, and for the rest only «ask the studio» — no data says
+ *  what is printed on a certificate (pre-deploy review, 16.10.2026). */
+export const certTermLead = (c: TopicCtx) => (certTerms(c) ? `${certTerms(c)}.` : 'Термін дії в профілях не вказано — уточніть його в студії, коли купуватимете сертифікат.')
+export const certTermAnswer = (c: TopicCtx) =>
+  certTerms(c) ? `${certTerms(c)}. В інших студій термін уточніть при купівлі.` : 'У профілях студій цієї сторінки термін не вказано — уточніть його в студії, коли купуватимете сертифікат.'
 /** Who says the certificate comes by email or messenger («згадує Хаос»); null if no one. */
 export const certOnline = (c: TopicCtx) => {
   const online = (c.local?.certs ?? []).filter((x) => x.electronic)

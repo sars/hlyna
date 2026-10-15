@@ -144,7 +144,9 @@ const CERT = /сертифікат/iu
 const NOT_GIFT_CERT = /сертифікат\p{L}* (?:якості|відповідності)|сертифікован/iu
 const CERT_VALID = /(?:дійсн\p{L}*|ді[єюя]\p{L}*|термін\p{L}*(?: дії)?)\D{0,20}?(\d{1,2})\s*(міс|рок|рік)/iu
 const CERT_FOREVER = /без\s+термін|безстроков|необмежен/iu
-const CERT_ONLINE = /електронн|онлайн|на пошту|e-mail|email|у месенджер|pdf/iu
+// Electronic only when the certificate itself is: «електронний сертифікат», «паперовий або електронний», PDF, sent by
+// e-mail or messenger. Paying online («оплатити онлайн») is not.
+const CERT_ONLINE = /електронн\p{L}*\s+(?:сертифікат|вигляд|формат|варіант)|сертифікат\p{L}*[^.;]{0,60}?електронн|(?<!\p{L})pdf(?!\p{L})|(?:на|в|у)\s+(?:пошту|e-?mail|месенджер|телеграм|telegram|вайбер|viber)(?!\p{L})/iu
 export const NO_TERM = 'без терміну'
 export function giftCertificate(s: Studio): { valid: string | null; electronic: boolean } | null {
   const sentences = ownSentences(s).filter((t) => CERT.test(t) && !NOT_GIFT_CERT.test(t))
@@ -159,9 +161,11 @@ export function giftCertificate(s: Studio): { valid: string | null; electronic: 
 export const certTerm = (c: { valid: string | null }) => (c.valid === NO_TERM ? 'без терміну дії' : c.valid ? `дійсний ${c.valid}` : null)
 
 // When a piece from a class can be collected, as the studio's own sentence says it («забирають через 3–4 тижні», «готові за
-// п'ять тижнів»): the phrase as written and its span in weeks. Coworking, subscriptions, a glazing visit and orders are other terms.
+// п'ять тижнів»): the phrase as written and its span in weeks. Coworking, subscriptions, courses, a glazing visit and orders
+// are other terms.
 const PICKUP = /забира|забрати|забер|віддают|видают|готов|отрима/iu
-const NOT_PICKUP = /коворк|абонемент|виготовлен|сертифікат|візит|замовлен/iu
+// A course or a programme runs «за 2 місяці»: that is how long it lasts, not when a piece is ready.
+const NOT_PICKUP = /коворк|абонемент|виготовлен|сертифікат|візит|замовлен|(?<!\p{L})курс|\d+\s*занят|програм|навчан/iu
 const NUM_WORDS: Record<string, number> = { один: 1, одного: 1, два: 2, двох: 2, три: 3, трьох: 3, чотири: 4, чотирьох: 4, пять: 5, шість: 6, півтора: 1.5, півтори: 1.5 }
 const SPAN = /(?:через|за|займа\p{L}*)\s+(?:приблизно\s+|близько\s+)?(\d+(?:[.,]\d)?(?:\s*[–-]\s*\d+(?:[.,]\d)?)?|один|одного|два|двох|три|трьох|чотири|чотирьох|п.ять|шість|півтора|півтори)\s+(тиж\p{L}*|дн\p{L}*|міс\p{L}*)/giu
 export function pickupTime(s: Studio): { text: string; weeks: [number, number]; unfired: boolean } | null {

@@ -39,6 +39,8 @@ const MENTION = new RegExp(
 // Words that make a clause history. Ukrainian past forms end in -в/-ла/-ло/-ли (тривав, пройшла, відбулося, були) or are
 // impersonal -но/-то forms (знято, відкрито); nouns with the same endings are listed out.
 const PAST_END = /(?:[аиоуя]в|[аиоуяі]вся|ла|ло|ли|лась|лася|лось|лося|лись|лися)$/u
+// Nouns in -ив: «інтенсив», «колектив», «креатив», «курсив» (verbs end in -стив, -бив, -рив…, never these).
+const NOUN_IV = /(?:ктив|атив|итив|отив|ентив|нсив|рсив)$/u
 const NOT_PAST = new Set(
   'коло кола село села скло скла тло світло світла тепло тепла джерело джерела число числа крило крила сила сили мило тіло тіла діло ремесло ремесла весло житло крісла крісло масло мало чимало сало жало чоло дупло пекло шило осло школа школи смола смоли бджола зала зали коли столи стола зло зла ангела ярослав станіслав мирослав святослав вячеслав прав держав застав мотив мотивів колектив актив креатив перспектив позитив негатив наратив остров розмов умов основ мов слов'.split(' '),
 )
@@ -46,6 +48,8 @@ const PAST_WORDS = /^(?:(?:при|про|від|пере|за|з|роз|ви|у|
 // Announcing or planning: history when the date is the day it was announced («9 жовтня оголосила передзамовлення»),
 // current when the date is the one announced («на 17 жовтня анонсував МК», «заплановано на листопад 2026 року»).
 const ANNOUNCE = /^(?:анонс|оголош|оголос|заплан|призначен|чека)/u
+// Past in form, present in meaning: what is left or open now («залишилось 3 місця», «набір відкрито»).
+const STATE = /^(?:за)?лишил\p{L}*$|^відкрит\p{L}*$/u
 const IMPERSONAL = /^\p{L}{2,}(?:ано|яно|ено|єно|ито|ято|уто)$/u
 const NOT_IMPERSONAL = new Set('рано погано свято сито'.split(' '))
 // Words that keep a month or season current: present verbs («веде», «коштує», «ідуть») and schedule words.
@@ -57,8 +61,10 @@ const AS_OF = /(?:станом на|на момент|перевірено|за 
 
 const words = (t: string) => t.toLowerCase().replace(/'/g, '’').split(/[^\p{L}’-]+/u).filter(Boolean)
 const isPastWord = (w: string, target: boolean) =>
-  !(target && ANNOUNCE.test(w)) && ((PAST_END.test(w) && w.length > 2 && !NOT_PAST.has(w)) || PAST_WORDS.test(w) || (IMPERSONAL.test(w) && !NOT_IMPERSONAL.has(w)))
-const isPresentWord = (w: string) => PRESENT_WORDS.test(w) || ANNOUNCE.test(w) || (PRESENT_END.test(w) && !NOT_PRESENT.has(w))
+  !(target && ANNOUNCE.test(w)) &&
+  !STATE.test(w) &&
+  ((PAST_END.test(w) && w.length > 2 && !NOT_PAST.has(w) && !NOUN_IV.test(w)) || PAST_WORDS.test(w) || (IMPERSONAL.test(w) && !NOT_IMPERSONAL.has(w)))
+const isPresentWord = (w: string) => PRESENT_WORDS.test(w) || ANNOUNCE.test(w) || STATE.test(w) || (PRESENT_END.test(w) && !NOT_PRESENT.has(w))
 
 type Mention = { start: number; end: number; y?: number; m: number; d?: number; level: 'day' | 'month'; to?: string }
 
@@ -124,10 +130,34 @@ const YEAR = /(?<!\d)(20\d\d)(?!\d)/g
 
 export type DatedPart = { text: string; end: string; yearFrom: 'text' | 'context' }
 
+/** When an undated «3.01» was written: a year, or a year and month (a source «(Instagram, 10.2026)», a news date). */
+export type DateContext = number | { y: number; m?: number }
+
+/** The year of an undated day in a text written at `ctx`: a month well before the writing month is the next year's
+ *  («Новорічні МК 27.12, 3.01 (Instagram, 10.2026)» → 3 January 2027; «10 січня» in news of 20 December → January). */
+function yearFor(m: number, ctx: DateContext): number {
+  if (typeof ctx === 'number') return ctx
+  return ctx.m && m < ctx.m - 2 ? ctx.y + 1 : ctx.y
+}
+
+const MONTH_YEAR = new RegExp(`(?<!${L})(${MONTH_ANY})\\s+(20\\d\\d)`, 'iu')
+/** The date a source note names: «11.10.2026», «10.2026», «жовтень 2026», «2026». */
+export function sourceDate(src?: string | null): DateContext | undefined {
+  if (!src) return undefined
+  const dmy = src.match(/(?<!\d)\d{1,2}\.(\d{1,2})\.(20\d\d)(?!\d)/)
+  if (dmy) return { y: Number(dmy[2]), m: Number(dmy[1]) }
+  const my = src.match(/(?<![\d.])(\d{1,2})\.(20\d\d)(?!\d)/)
+  if (my && Number(my[1]) <= 12) return { y: Number(my[2]), m: Number(my[1]) }
+  const named = src.match(MONTH_YEAR)
+  if (named) return { y: Number(named[2]), m: monthOf(named[1]) }
+  const y = src.match(/(?<!\d)(20\d\d)(?!\d)/)
+  return y ? Number(y[1]) : undefined
+}
+
 /** The dates of a sentence that it presents as current, with the day each one ends. Dates told in the past tense, in
  *  parentheses, «станом на …» or «з …» (a start) are left out. A «10 жовтня» takes its year from its own clause, else
- *  from `contextYear` (a profile line's source year); with neither it is a yearly date («Різдво — 25 грудня») and stays. */
-export function currentDates(sentence: string, contextYear?: number): DatedPart[] {
+ *  from `context` (a profile line's source date); with neither it is a yearly date («Різдво — 25 грудня») and stays. */
+export function currentDates(sentence: string, context?: DateContext): DatedPart[] {
   const parens = parenthesised(sentence)
   const inParens = (i: number) => parens.some(([a, b]) => i > a && i < b)
   const list = mentions(sentence).filter((x) => !inParens(x.start))
@@ -164,8 +194,8 @@ export function currentDates(sentence: string, contextYear?: number): DatedPart[
       const ys = yearsIn(k)
       y = ys.find((v) => v.at > x.end)?.y ?? ys.filter((v) => v.at < x.start).at(-1)?.y
     }
-    if (!y && contextYear) {
-      y = contextYear
+    if (!y && context) {
+      y = yearFor(x.m, context)
       yearFrom = 'context'
     }
     if (!y) continue
@@ -174,8 +204,12 @@ export function currentDates(sentence: string, contextYear?: number): DatedPart[
   return out
 }
 
-/** A sentence that presents a date before today as current. */
-export const isStale = (sentence: string, today = kyivToday(), contextYear?: number) => currentDates(sentence, contextYear).some((p) => p.end < today)
+/** A sentence whose dates, all of them, have passed while it still presents them as current («на 12.10 або 20.10» stays
+ *  until 20.10). */
+export function isStale(sentence: string, today = kyivToday(), context?: DateContext): boolean {
+  const parts = currentDates(sentence, context)
+  return parts.length > 0 && parts.every((p) => p.end < today)
+}
 
 // Sentence ends: . ! ? before a capital, a digit, a quote or a link, but not after «вул.», «ім.», «пл.» or inside «…».
 const ABBR = /(?:^|[\s(])(?:вул|ім|пл|просп|пров|бул|ч|ст|р|рр|м|с|смт|див|обл|тис|млн|напр|акад|проф|ін|т|д|н|е|пп)$/iu
@@ -197,10 +231,23 @@ export function sentences(text: string): string[] {
   return out.map((s) => s.trim()).filter(Boolean)
 }
 
-/** The text without the sentences that sell a past date as current; '' when nothing is left. */
-export function dropStale(text: string, today = kyivToday(), contextYear?: number): string {
+/** The text without the sentences that sell a past date as current; '' when nothing is left. Line breaks and paragraphs
+ *  stay as written: each line is filtered on its own, a line left empty goes with its break. */
+export function dropStale(text: string, today = kyivToday(), context?: DateContext): string {
   if (!text || !/\d/.test(text)) return text
-  return sentences(text)
-    .filter((s) => !isStale(s, today, contextYear))
-    .join(' ')
+  const parts = text.split(/(\s*\n\s*)/)
+  let out = ''
+  let gap = ''
+  let changed = false
+  for (let i = 0; i < parts.length; i += 2) {
+    const all = sentences(parts[i])
+    const kept = all.filter((s) => !isStale(s, today, context))
+    if (kept.length < all.length) changed = true
+    // Between two kept lines, the widest break of those in between (a dropped paragraph leaves one blank line).
+    if (i > 0 && (parts[i - 1].match(/\n/g)?.length ?? 0) > (gap.match(/\n/g)?.length ?? 0)) gap = parts[i - 1]
+    if (!kept.length) continue
+    out += (out ? gap : '') + (kept.length === all.length ? parts[i].trim() : kept.join(' '))
+    gap = ''
+  }
+  return changed ? out : text
 }
