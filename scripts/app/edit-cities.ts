@@ -2,17 +2,18 @@
 //   EDITS=path pnpm exec tsx scripts/app/edit-cities.ts   (PROD=1 for production, DRY=1 to preview)
 // EDITS is a JSON array: [{ "slug": "kosiv", "why": "…", "set": { "oblast": "Івано-Франківська", "locative": "у Косові" } }]
 // Fields: name, slug, oblast, locative. The oblast decides which centre's page lists the city (OBLAST_CENTRES).
+// "create": true adds a new city with the slug and the fields in set (name is required).
 import fs from 'node:fs'
 import { eq } from 'drizzle-orm'
 
 import { guard, revalidateSite } from './_guard'
 import { db, pool } from '../../src/server/db'
 import { cities } from '../../src/server/db/schema/catalog'
-import { saveCity, type CityInput } from '../../src/server/services/cities'
+import { createCity, saveCity, type CityInput } from '../../src/server/services/cities'
 import { finishRun, scriptActor, startRun } from '../../src/server/services/imports/runs'
 
 type Field = 'name' | 'slug' | 'oblast' | 'locative'
-type Edit = { slug: string; why?: string; set: Partial<Record<Field, string>> }
+type Edit = { slug: string; why?: string; create?: boolean; set: Partial<Record<Field, string>> }
 
 const { dry } = guard('edit-cities')
 const edits = JSON.parse(fs.readFileSync(process.env.EDITS || '/tmp/hlyna-city-edits.json', 'utf8')) as Edit[]
@@ -24,6 +25,16 @@ const missing: string[] = []
 for (const e of edits) {
   // a city the file renamed earlier is found by its new slug, so the file can be re-run
   const [c] = (await db.select().from(cities).where(eq(cities.slug, e.slug)).limit(1)).concat(e.set.slug ? await db.select().from(cities).where(eq(cities.slug, e.set.slug)).limit(1) : [])
+  if (!c && e.create) {
+    if (!e.set.name) throw new Error(`${e.slug}: a new city needs a name`)
+    const input: CityInput = { name: e.set.name, slug: e.slug, oblast: e.set.oblast ?? null, locative: e.set.locative ?? null, population: null, isOver100k: null }
+    console.log(`${e.slug}: new city ${JSON.stringify(input)}${e.why ? `\n  why: ${e.why}` : ''}`)
+    if (!dry) {
+      await createCity(db, input, actor)
+      saved++
+    }
+    continue
+  }
   if (!c) {
     missing.push(e.slug)
     continue

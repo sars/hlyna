@@ -1,7 +1,7 @@
 // Studio field edits through the panel's editor (version check, revision, slug history with 301, audit):
 //   EDITS=path pnpm exec tsx scripts/app/edit-studios.ts   (PROD=1 for production, DRY=1 to preview)
 //   [{ "slug": "…", "why"?: "reason, printed with the change", "set"?: { "name"?, "shortName"?, "slug"?, "type"? (one of STUDIO_TYPES), "status"? (one of STUDIO_STATUSES),
-//      "visibility"? ("public" | "hidden"), "address"?, "summary"?, "publicDescription"?, "recentNote"?, "website"?, "instagram"?, "facebook"? ("" clears; otherwise an absolute http(s) URL) },
+//      "visibility"? ("public" | "hidden"), "address"?, "summary"?, "publicDescription"?, "recentNote"?, "website"?, "instagram"?, "facebook"? ("" clears; otherwise an absolute http(s) URL), "city"? (a city slug) },
 //      "replace"?: [["from", "to"], …], "dropFormats"?: ["courses", …], "addNames"?: ["…"], "mergeInto"?: "kept-slug",
 //      "b2b"?: { "minOrder"?, "leadTime"? ("" clears), "logoMethods"?: ["…"], "worksWithHoreca"?, "worksWithCorporate"?, "foodSafe"?, "dishwasherSafe"? (true | false | null) } }]
 //   replace runs over name, address, summary, publicDescription, recentNote; dropFormats removes format tags the profile does not support (tags
@@ -13,7 +13,7 @@ import { eq } from 'drizzle-orm'
 
 import { guard, revalidateSite } from './_guard'
 import { db, pool } from '../../src/server/db'
-import { studios, studioSlugHistory } from '../../src/server/db/schema/catalog'
+import { cities, studios, studioSlugHistory } from '../../src/server/db/schema/catalog'
 import { audit } from '../../src/server/services/audit'
 import { STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY } from '../../src/shared/options'
 import { webUrl } from '../../src/lib/present'
@@ -23,7 +23,7 @@ import { finishRun, scriptActor, startRun } from '../../src/server/services/impo
 type Field = 'name' | 'shortName' | 'slug' | 'type' | 'status' | 'visibility' | 'address' | 'summary' | 'publicDescription' | 'recentNote' | LinkField
 type LinkField = 'website' | 'instagram' | 'facebook'
 type B2b = { minOrder?: string; leadTime?: string; logoMethods?: string[]; worksWithHoreca?: boolean | null; worksWithCorporate?: boolean | null; foodSafe?: boolean | null; dishwasherSafe?: boolean | null }
-type Edit = { slug: string; why?: string; set?: Partial<Record<Field, string>>; replace?: [string, string][]; dropFormats?: string[]; addNames?: string[]; mergeInto?: string; b2b?: B2b }
+type Edit = { slug: string; why?: string; set?: Partial<Record<Field | 'city', string>>; replace?: [string, string][]; dropFormats?: string[]; addNames?: string[]; mergeInto?: string; b2b?: B2b }
 // b2b keys → editor form fields.
 const B2B = { minOrder: 'b2bMinOrder', leadTime: 'b2bLeadTime', logoMethods: 'b2bLogoMethods', worksWithHoreca: 'b2bWorksWithHoreca', worksWithCorporate: 'b2bWorksWithCorporate', foodSafe: 'b2bFoodSafe', dishwasherSafe: 'b2bDishwasherSafe' } as const
 
@@ -62,7 +62,14 @@ for (const e of edits) {
     const v = e.set?.[f]
     if (v && webUrl(v) !== v) throw new Error(`${e.slug}: ${f} must be an absolute http(s) URL, got ${JSON.stringify(v)}`)
   }
-  Object.assign(form, e.set ?? {}, ...LINKS.filter((f) => e.set?.[f] === '').map((f) => ({ [f]: null })))
+  const { city, ...set } = e.set ?? {}
+  Object.assign(form, set, ...LINKS.filter((f) => set[f] === '').map((f) => ({ [f]: null })))
+  if (city) {
+    const [c] = await db.select({ id: cities.id }).from(cities).where(eq(cities.slug, city)).limit(1)
+    if (!c) throw new Error(`${e.slug}: unknown city ${city} (create it with edit-cities.ts first)`)
+    form.cityId = c.id
+  }
+  const cityChanged = form.cityId !== toEditForm(s).cityId
   const dropped = (e.dropFormats ?? []).filter((f) => form.formats.includes(f as never))
   if (dropped.length) form.formats = form.formats.filter((f) => !dropped.includes(f))
   for (const [k, f] of Object.entries(e.b2b ?? {}) as [keyof B2b, B2b[keyof B2b]][]) {
@@ -77,6 +84,7 @@ for (const e of edits) {
   const redirect = into && history?.studioId !== into.id
   const lines = [
     ...changed.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f])?.slice(0, 80)} → ${JSON.stringify(form[f])?.slice(0, 80)}`),
+    ...(cityChanged ? [`city: ${toEditForm(s).cityId} → ${city} (${form.cityId})`] : []),
     ...(dropped.length ? [`formats: −${dropped.join(', −')}`] : []),
     ...b2bChanged.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f] ?? null)} → ${JSON.stringify(form[f] ?? null)}`),
     ...(names.length ? [`names: +${names.join(', +')}`] : []),
@@ -84,7 +92,7 @@ for (const e of edits) {
   ]
   console.log(`${e.slug}: ${lines.join('\n  ') || 'no change'}${e.why && lines.length ? `\n  why: ${e.why}` : ''}`)
   if (dry || !lines.length) continue
-  if (changed.length || dropped.length || names.length || b2bChanged.length) await saveStudio(db, row.id, form, actor, 'Виправлення (скрипт)')
+  if (changed.length || cityChanged || dropped.length || names.length || b2bChanged.length) await saveStudio(db, row.id, form, actor, 'Виправлення (скрипт)')
   if (redirect)
     await db.transaction(async (tx) => {
       await tx.insert(studioSlugHistory).values({ oldSlug: e.slug, studioId: into!.id }).onConflictDoUpdate({ target: studioSlugHistory.oldSlug, set: { studioId: into!.id } })

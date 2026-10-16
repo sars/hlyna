@@ -12,17 +12,6 @@
  },
  {
   "slugs": [
-   "olena-tsvietkova",
-   "studiia-keramiky-obiednani-vohnem"
-  ],
-  "labels": [
-   "Студія, яку співзаснувала Олена Цвєткова",
-   "Співзасновниця студії"
-  ],
-  "why": "співзасновниці Цвєткова й Марія Рязанова, 03.2023 (1.zt.ua)"
- },
- {
-  "slugs": [
    "ubodecor",
    "nayu-ceramic-tiles"
   ],
@@ -53,17 +42,6 @@
    "Художниця, яка веде тут майстер-класи на колі"
   ],
   "why": "IG YARKA 2026: заняття на колі «в просторі @etno_chary», 1 800 грн"
- },
- {
-  "slugs": [
-   "creating-comfort-lab-etera",
-   "guculiya"
-  ],
-  "labels": [
-   "Бренд Данути Кріль, чиї колекції продає ETERA",
-   "Бренд, що продає колекції Guculiya у США"
-  ],
-  "why": "code-380.com: Guculiya заснувала Данута Кріль; Wescover: вироби Guculia «by creating comfort lab»"
  },
  {
   "slugs": [
@@ -185,5 +163,16 @@
    "Співзасновник бренду, автор кераміки з Полтави"
   ],
   "why": "біо Білоконя: «Co-founder of @irsad.eternal.objects»"
+ },
+ {
+  "slugs": [
+   "kulko-keramichne-namysto",
+   "vasyl-perehinets-ve-per-ceramics"
+  ],
+  "labels": [
+   "Майстерня Василя Перегінця, з чиїх намистин зроблено намиста",
+   "Керамічні намиста Kulko з намистин майстра"
+  ],
+  "why": "report.if.ua, 09.01.2024: донька Юлія робить прикраси з керамічних намистин батька; @kulko_by_ve.per — акаунт намист (останній пост 11.10.2026)"
  }
 ]

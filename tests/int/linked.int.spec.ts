@@ -7,11 +7,11 @@ describe('linked profiles («Також»): shown both ways, counted once (owner
   it('each side shows the other with what it is to it', () => {
     expect(alsoFor('ubodecor')).toEqual([{ slug: 'nayu-ceramic-tiles', label: 'Плиткова марка бренду UBO' }])
     expect(alsoFor('nayu-ceramic-tiles')).toEqual([{ slug: 'ubodecor', label: 'Бренд, який створив NAYU' }])
-    expect(alsoFor('olena-tsvietkova').map((a) => a.slug)).toEqual(['studiia-keramiky-helena', 'studiia-keramiky-obiednani-vohnem'])
+    expect(alsoFor('tetiana-shpak').map((a) => a.slug)).toEqual(['muzei-sadyba-brativ-herasymenkiv', 'bubnivska-keramika'])
   })
   it('a group of linked profiles counts as one place', () => {
     const s = (slug: string) => ({ slug })
-    expect(countPlaces([s('olena-tsvietkova'), s('studiia-keramiky-helena'), s('studiia-keramiky-obiednani-vohnem'), s('sofika')])).toBe(2)
+    expect(countPlaces([s('tetiana-shpak'), s('muzei-sadyba-brativ-herasymenkiv'), s('bubnivska-keramika'), s('sofika')])).toBe(2)
     expect(countPlaces([s('ubodecor'), s('sofika')])).toBe(2)
   })
   it('every entry has two slugs, two labels and a source', () => {

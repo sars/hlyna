@@ -1,0 +1,50 @@
+[
+ {
+  "slug": "pottery-island-honcharnyi-ostriv",
+  "why": "@potteryisland живий: 3 902 пости 07–08.10.2026 і 3 908 на 16.10.2026 (6 нових за 9 днів); Шкаліков на симпозіумі «Витоки. Форма традиції», 21–23.08.2026 (zprz.city)",
+  "set": {
+   "status": "active"
+  }
+ },
+ {
+  "slug": "studiia-keramiky-obiednani-vohnem",
+  "why": "джерела лише 2023 року (виставка 02.2023, 1.zt.ua 05.2023), власного приміщення не мала; @fireofunity і facebook.com/fireofunity зникли (скан 10.10 і 16.10.2026), новин 2024–2026 немає. Співзасновниця Олена Цвєткова має власний чинний профіль",
+  "set": {
+   "visibility": "hidden",
+   "instagram": ""
+  }
+ },
+ {
+  "slug": "vasyl-perehinets-ve-per-ceramics",
+  "why": "акаунта @ve.per.ceramics немає; чинний — @ve.per («ceramics▪pottery▪art … Kosiv, Ukraine»); роботи підписує «ve.per.» (report.if.ua, 09.01.2024)",
+  "set": {
+   "instagram": "https://www.instagram.com/ve.per/"
+  },
+  "replace": [
+   [
+    "Василь Перегінець (ve.per.ceramics)",
+    "Василь Перегінець (ve.per)"
+   ]
+  ]
+ },
+ {
+  "slug": "the-code-ceramics",
+  "why": "основний акаунт студії — @ceramics_studio_ternopil (біо «The Code ceramics… Тернопіль», майстер-класи й сертифікати, сторіс 15.10.2026); @thecode.ceramics — сплячий акаунт виробів (останній пост 21.12.2024)",
+  "set": {
+   "instagram": "https://www.instagram.com/ceramics_studio_ternopil/"
+  }
+ },
+ {
+  "slug": "handmade-ceramics",
+  "why": "прихований дубль The CODE: той самий Instagram @thecode.ceramics, той самий бізнес",
+  "mergeInto": "the-code-ceramics"
+ },
+ {
+  "slug": "creating-comfort-lab-etera",
+  "why": "американський бренд: «founded in New York, USA, in 2017» (eterahome.com), Майамі за Wescover, «Florida-based» (Cap Times, 10.2023); виробництво — замовлення в Україні (Farfor LLC зі Слов'янська, Дар'я Птіцамі), а не власна майстерня; «Львів» у каталозі без джерела. Названа майстриня має свій профіль dasha-ptitsami",
+  "set": {
+   "visibility": "hidden",
+   "instagram": "https://www.instagram.com/etera.home/"
+  }
+ }
+]
