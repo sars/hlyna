@@ -151,6 +151,12 @@ function LiveBlock({ d }: { d: WaveBData }) {
       return <EvidenceList items={d.lines} title="Хто робить керамічні свічники" id="who" />
     case 'rizdvianyi-posud':
       return <EvidenceList items={d.lines} title="Хто робить посуд до різдвяного столу" id="who" />
+    case 'patriotychni-podarunky':
+      return <EvidenceList items={d.lines} title="Хто робить кераміку з українською символікою" id="who" />
+    case 'chaini-tseremonii':
+      return <EvidenceList items={d.lines} title="Хто робить посуд для чаю" id="who" />
+    case 'vesillia':
+      return <EvidenceList items={d.lines} title="Хто робить весільну кераміку" id="who" />
     case 'vydy-keramiky':
       return (
         <Block id="who" title="Хто з українських майстрів працює з чим">
@@ -207,6 +213,9 @@ const RELATED: Record<WaveBId, { label: string; href: string }[]> = {
   'symvol-2027': [{ label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Різдвяний посуд', href: '/dobirky/rizdvianyi-posud' }, { label: 'Новий рік і Різдво', href: '/novyi-rik-i-rizdvo' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }],
   svichnyky: [{ label: 'Різдвяний посуд', href: '/dobirky/rizdvianyi-posud' }, { label: 'Символ 2027 року', href: '/dobirky/symvol-2027-roku' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Новий рік і Різдво', href: '/novyi-rik-i-rizdvo' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }],
   'rizdvianyi-posud': [{ label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }, { label: 'Символ 2027 року', href: '/dobirky/symvol-2027-roku' }, { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Новий рік і Різдво', href: '/novyi-rik-i-rizdvo' }, { label: 'Посуд для ресторанів', href: '/dlya-biznesu/posud-dlya-restoraniv' }],
+  'patriotychni-podarunky': [{ label: 'Подарунки партнерам і колегам', href: '/dlya-biznesu/korporatyvni-podarunky' }, { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Косів і Опішне сьогодні', href: '/dobirky/kosiv-i-opishne' }, { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }],
+  'chaini-tseremonii': [{ label: 'Чашки', href: '/vyrobnyky/vyrib/chashky' }, { label: 'Бренди посуду', href: '/dobirky/brendy-posudu' }, { label: 'Посуд для кав’ярень', href: '/dlya-biznesu/posud-dlya-kavyaren' }, { label: 'Види кераміки', href: '/hayidy/vydy-keramiky' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }],
+  vesillia: [{ label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Гончарство для двох', href: '/maister-klasy/dlya-dvokh' }, { label: 'Як замовити партію', href: '/hayidy/yak-zamovyty-partiyu' }],
 }
 
 export async function WaveBRoute({ id }: { id: WaveBId }) {
@@ -222,7 +231,7 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
   const studios = waveBStudios(p.data)
   // Selections of makers link to the makers pages of the cities they cover.
   const makerSlugs = new Set((await makerCities()).map((g) => g.city.slug))
-  const cityLinks = ['brendy-posudu', 'pratsyuyut-z-biznesom', 'yalynkovi-prykrasy', 'symvol-2027', 'svichnyky', 'rizdvianyi-posud'].includes(id)
+  const cityLinks = ['brendy-posudu', 'pratsyuyut-z-biznesom', 'yalynkovi-prykrasy', 'symvol-2027', 'svichnyky', 'rizdvianyi-posud', 'patriotychni-podarunky', 'chaini-tseremonii', 'vesillia'].includes(id)
     ? groupByCity(studios).filter((g) => g.studios.length >= 2 && makerSlugs.has(g.city.slug)).map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}` }))
     : []
   return (

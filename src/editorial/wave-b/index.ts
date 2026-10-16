@@ -8,7 +8,7 @@ import { fillCopy, type WaveCopy } from '@/editorial/copy'
 import type { StudioCard } from '@/lib/catalog'
 import { eventsPageData, museumsPageData } from './events'
 import { careData, materialsData, smokeData } from './guides-data'
-import { businessData, candlesticksData, christmasTableData, etsyData, newYearData, symbolData, tablewareBrandsData } from './selections'
+import { businessData, candlesticksData, christmasTableData, etsyData, newYearData, patrioticData, symbolData, tablewareBrandsData, teaData, weddingData } from './selections'
 
 export * from './events'
 export * from './guides-data'
@@ -29,6 +29,9 @@ export type WaveBId =
   | 'symvol-2027'
   | 'svichnyky'
   | 'rizdvianyi-posud'
+  | 'patriotychni-podarunky'
+  | 'chaini-tseremonii'
+  | 'vesillia'
 
 type Section = 'dobirky' | 'hayidy' | null
 export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: string; kicker: string; form: string }> = {
@@ -44,6 +47,9 @@ export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: st
   'symvol-2027': { path: '/dobirky/symvol-2027-roku', section: 'dobirky', crumb: 'Символ 2027 року', kicker: 'Добірки', form: 'corporate-gifts' },
   svichnyky: { path: '/dobirky/keramichni-svichnyky', section: 'dobirky', crumb: 'Керамічні свічники', kicker: 'Добірки', form: 'corporate-gifts' },
   'rizdvianyi-posud': { path: '/dobirky/rizdvianyi-posud', section: 'dobirky', crumb: 'Різдвяний посуд', kicker: 'Добірки', form: 'tableware' },
+  'patriotychni-podarunky': { path: '/dobirky/patriotychni-podarunky', section: 'dobirky', crumb: 'Патріотичні подарунки', kicker: 'Добірки', form: 'corporate-gifts' },
+  'chaini-tseremonii': { path: '/dobirky/posud-dlya-chainoi-tseremonii', section: 'dobirky', crumb: 'Посуд для чайної церемонії', kicker: 'Добірки', form: 'tableware' },
+  vesillia: { path: '/dobirky/podarunky-gostyam-na-vesillia', section: 'dobirky', crumb: 'Подарунки гостям на весілля', kicker: 'Добірки', form: 'corporate-gifts' },
 }
 export const WAVE_B_IDS = Object.keys(WAVE_B) as WaveBId[]
 
@@ -62,6 +68,9 @@ export type WaveBData =
   | ({ id: 'symvol-2027' } & Awaited<ReturnType<typeof symbolData>>)
   | ({ id: 'svichnyky' } & Awaited<ReturnType<typeof candlesticksData>>)
   | ({ id: 'rizdvianyi-posud' } & Awaited<ReturnType<typeof christmasTableData>>)
+  | ({ id: 'patriotychni-podarunky' } & Awaited<ReturnType<typeof patrioticData>>)
+  | ({ id: 'chaini-tseremonii' } & Awaited<ReturnType<typeof teaData>>)
+  | ({ id: 'vesillia' } & Awaited<ReturnType<typeof weddingData>>)
 
 export async function waveBData(id: WaveBId): Promise<WaveBData> {
   switch (id) {
@@ -77,12 +86,15 @@ export async function waveBData(id: WaveBId): Promise<WaveBData> {
     case 'symvol-2027': return { id, ...(await symbolData()) }
     case 'svichnyky': return { id, ...(await candlesticksData()) }
     case 'rizdvianyi-posud': return { id, ...(await christmasTableData()) }
+    case 'patriotychni-podarunky': return { id, ...(await patrioticData()) }
+    case 'chaini-tseremonii': return { id, ...(await teaData()) }
+    case 'vesillia': return { id, ...(await weddingData()) }
   }
 }
 
 /** Studios a page lists (for the ItemList JSON-LD). */
 export const waveBStudios = (d: WaveBData): StudioCard[] =>
-  d.id === 'brendy-posudu' || d.id === 'yalynkovi-prykrasy' || d.id === 'pratsyuyut-z-biznesom' || d.id === 'dohliad-za-keramikoyu' || d.id === 'symvol-2027' || d.id === 'svichnyky' || d.id === 'rizdvianyi-posud'
+  d.id === 'brendy-posudu' || d.id === 'yalynkovi-prykrasy' || d.id === 'pratsyuyut-z-biznesom' || d.id === 'dohliad-za-keramikoyu' || d.id === 'symvol-2027' || d.id === 'svichnyky' || d.id === 'rizdvianyi-posud' || d.id === 'patriotychni-podarunky' || d.id === 'chaini-tseremonii' || d.id === 'vesillia'
     ? d.studios
     : d.id === 'chornodymlena-i-molochena'
       ? [...new Map([...d.black, ...d.milk].map((s) => [s.id, s])).values()]

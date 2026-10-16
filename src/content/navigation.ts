@@ -65,6 +65,9 @@ const WAVE_HREFS: Record<string, string> = {
   '/dobirky/symvol-2027-roku': 'symvol-2027',
   '/dobirky/keramichni-svichnyky': 'svichnyky',
   '/dobirky/rizdvianyi-posud': 'rizdvianyi-posud',
+  '/dobirky/patriotychni-podarunky': 'patriotychni-podarunky',
+  '/dobirky/posud-dlya-chainoi-tseremonii': 'chaini-tseremonii',
+  '/dobirky/podarunky-gostyam-na-vesillia': 'vesillia',
   // Wave C (src/content/waveC, scripts/sync-wave-c.mjs)
   '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi': 'richnytsya-kompaniyi',
   '/dlya-biznesu/podarunky-spivrobitnykam': 'podarunky-spivrobitnykam',

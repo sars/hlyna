@@ -50,6 +50,19 @@ export const candlesticksData = () => mentionData(CANDLESTICKS)
 export const CHRISTMAS_TABLE = /святвеч|макітр|кут[яію]|узвар|різдвян\p{L}* (?:посуд|набір|тарел|тарі|горнят|чаш)|трійц/iu
 export const christmasTableData = () => mentionData(CHRISTMAS_TABLE)
 
+// Gifts with Ukrainian symbols (for foreigners, partners abroad): тризуб, the map, yellow-and-blue. Not «вишиван» or
+// «петриків» alone: those catch embroidered shirts and painting classes.
+export const PATRIOTIC = /тризуб|мап[аиіу] україн|карт[аиіу] україн|патріот|жовто-?блакит|синьо-?жовт|українськ\p{L}* символ/iu
+export const patrioticData = () => mentionData(PATRIOTIC)
+
+// Tea ware: bowls (піала, чаван), pitchers (чахай), gaiwans, teapots, tea sets.
+export const TEA = /піал|чаван|чахай|ґайван|гайван|чайн\p{L}* (?:церемон|пар|набір|сервіз)|чайник|tea ?bowl|teapot/iu
+export const teaData = () => mentionData(TEA)
+
+// Weddings: guest gifts, sets for the couple.
+export const WEDDING = /весіл|весільн|наречен|молодят|гостям/iu
+export const weddingData = () => mentionData(WEDDING)
+
 export async function businessData() {
   const all = (await makers()).filter((s) => ['brand', 'studio', 'maker'].includes(s.type ?? ''))
   const horeca = all.filter(confirmedForVenues)

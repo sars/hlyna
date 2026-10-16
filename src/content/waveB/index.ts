@@ -2,6 +2,7 @@
 import type { WaveCopy } from '@/editorial/copy'
 
 import c_brendy_posudu from './brendy-posudu.json'
+import c_chaini_tseremonii from './chaini-tseremonii.json'
 import c_chornodymlena_i_molochena from './chornodymlena-i-molochena.json'
 import c_dohliad_za_keramikoyu from './dohliad-za-keramikoyu.json'
 import c_etsy from './etsy.json'
@@ -16,6 +17,7 @@ import c_yalynkovi_prykrasy from './yalynkovi-prykrasy.json'
 
 export const copies: Record<string, WaveCopy> = {
   'brendy-posudu': c_brendy_posudu,
+  'chaini-tseremonii': c_chaini_tseremonii,
   'chornodymlena-i-molochena': c_chornodymlena_i_molochena,
   'dohliad-za-keramikoyu': c_dohliad_za_keramikoyu,
   'etsy': c_etsy,
