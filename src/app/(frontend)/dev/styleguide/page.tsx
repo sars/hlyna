@@ -40,6 +40,7 @@ import { SectionHead } from '@/components/ui/SectionHead'
 import { SideBox } from '@/components/ui/SideBox'
 import { Stat } from '@/components/ui/Stat'
 import { IndexCell, StudioCell, StudioCells } from '@/components/ui/StudioCell'
+import { StudioGallery } from '@/components/ui/StudioGallery'
 import { StudioRow, StudioRows } from '@/components/ui/StudioRow'
 import { Term } from '@/components/ui/Term'
 import { Updated } from '@/components/ui/Updated'
@@ -548,6 +549,14 @@ export default async function StyleguidePage() {
             <PhotosDemo mode={mode} urls={[sitePhotos.cardClass.src, sitePhotos.cardGifts.src, sitePhotos.cardPair.src, sitePhotos.cardCertificate.src, sitePhotos.vesselPlate.src]} />
           </div>
         ))}
+      </Block>
+
+      <Block id="sg-gallery" title="25 · StudioGallery">
+        <Cap>6 фото: головне 2×2 і чотири плитки 4:3 (від md), стрічка зі свайпом і лічильником (на телефоні); клік відкриває переглядач. 1–2 фото — по половині ширини, 3–4 — головне і дві. Фото — з сайту, лише для показу</Cap>
+        <StudioGallery
+          name="Студія"
+          photos={[sitePhotos.forStudios, sitePhotos.cardGifts, sitePhotos.cardPair, sitePhotos.market, sitePhotos.cardLogo, sitePhotos.cardClass].map((p) => ({ url: p.src, full: p.src, alt: '', width: p.width, height: p.height }))}
+        />
       </Block>
     </main>
   )

@@ -564,6 +564,46 @@
     .ui-pcard-go { margin-top: 6px; font-size: 12px; }
   }
 
+  /* StudioGallery (§4.1): 4:3 tiles, the main photo 2×2 from md; a scroll-snap strip with a peek on the phone. */
+  .ui-gallery-tiles { display: grid; gap: 10px; }
+  .ui-gallery-tiles > a { position: relative; display: block; aspect-ratio: 4 / 3; overflow: hidden; background: var(--color-paper-2); }
+  .ui-gallery-tiles > a img { object-fit: cover; transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1); }
+  .ui-gallery-tiles > a[data-tall] img { object-position: 50% 40%; }
+  @media (hover: hover) { .ui-gallery-tiles > a:hover img { transform: scale(1.03); } }
+  @media (max-width: 49.99rem) {
+    .ui-gallery-tiles { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(-1 * var(--spacing-gutter)); padding-inline: var(--spacing-gutter); scroll-padding-inline: var(--spacing-gutter); scrollbar-width: none; overscroll-behavior-x: contain; }
+    .ui-gallery-tiles::-webkit-scrollbar { display: none; }
+    .ui-gallery-tiles > a { flex: 0 0 calc(100% - 28px); scroll-snap-align: start; }
+    .ui-gallery-tiles[data-layout='1'] > a { flex-basis: 100%; }
+  }
+  @media (min-width: 50rem) {
+    .ui-gallery-tiles[data-layout='1'], .ui-gallery-tiles[data-layout='2'] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .ui-gallery-tiles[data-layout='3'] { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .ui-gallery-tiles[data-layout='5'] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .ui-gallery-tiles[data-layout='3'] > a:first-child, .ui-gallery-tiles[data-layout='5'] > a:first-child { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
+    .ui-gallery-tiles[data-layout='3'] > a:nth-child(n + 4), .ui-gallery-tiles[data-layout='5'] > a:nth-child(n + 6) { display: none; }
+  }
+  @media (min-width: 60rem) { .ui-gallery-tiles { gap: 14px; } }
+
+  /* Its viewer: a full-screen native <dialog> on ink; slides are a scroll-snap track (swipe), the photo is contained. */
+  .ui-gallery-dlg { position: fixed; inset: 0; z-index: 50; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; background: var(--color-ink); color: var(--color-paper); overscroll-behavior: contain; }
+  .ui-gallery-dlg::backdrop { background: transparent; }
+  .ui-gallery-dlg[open] { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+  .ui-gallery-bar { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: calc(10px + env(safe-area-inset-top, 0px)) var(--spacing-gutter) 10px; border-bottom: 1px solid var(--color-rule-on-dark); font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; color: var(--color-on-ink-2); font-variant-numeric: tabular-nums; }
+  .ui-gallery-stage { position: relative; min-height: 0; }
+  .ui-gallery-track { height: 100%; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: smooth; scrollbar-width: none; overscroll-behavior-x: contain; }
+  .ui-gallery-track::-webkit-scrollbar { display: none; }
+  .ui-gallery-slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: center; scroll-snap-stop: always; padding: 12px var(--spacing-gutter); }
+  .ui-gallery-slide > figure { position: relative; width: 100%; height: 100%; margin: 0; }
+  .ui-gallery-arrow { position: absolute; top: 50%; translate: 0 -50%; width: 44px; height: 44px; display: none; place-items: center; border: 0; border-radius: var(--radius-btn); background: transparent; color: var(--color-paper); box-shadow: inset 0 0 0 2px currentColor; font-family: var(--font-mono); font-size: 18px; line-height: 1; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
+  .ui-gallery-arrow:hover { background: var(--color-paper); color: var(--color-ink); }
+  .ui-gallery-arrow[data-dir='prev'] { left: var(--spacing-gutter); }
+  .ui-gallery-arrow[data-dir='next'] { right: var(--spacing-gutter); }
+  @media (min-width: 50rem) { .ui-gallery-arrow { display: grid; } }
+  .ui-gallery-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; min-height: 44px; padding: 10px var(--spacing-gutter) calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--color-rule-on-dark); font-size: 14.5px; line-height: 1.45; color: var(--color-paper); }
+  .ui-gallery-foot a { margin-left: auto; font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-on-ink-2); text-decoration: none; white-space: nowrap; }
+  .ui-gallery-foot a:hover { color: var(--color-paper); }
+
 
   /* Header, mega menu and phone drawer (§4.2). Presentation only; the menu data is src/content/navigation.ts. */
   .nav-top { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 8px; padding-block: 12px; }
@@ -752,7 +792,7 @@
     .ui-vessel small { align-self: start; }
   }
 
-  @media (prefers-reduced-motion: reduce) { .ui-arrow, .ui-pcard img, .ui-vessel img, .nav-caret { transition: none; } }
+  @media (prefers-reduced-motion: reduce) { .ui-arrow, .ui-pcard img, .ui-vessel img, .nav-caret, .ui-gallery-tiles > a img, .ui-gallery-arrow { transition: none; } .ui-gallery-track { scroll-behavior: auto; } }
 }
 
 /* Phone: pages with the fixed request bar keep room for it at the end of the footer (not as padding of <main>). */

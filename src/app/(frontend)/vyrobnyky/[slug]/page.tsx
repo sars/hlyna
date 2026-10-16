@@ -21,7 +21,7 @@ import React from 'react'
 
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 
-import Image from 'next/image'
+import { StudioGallery } from '@/components/ui/StudioGallery'
 
 import { JsonLd } from '@/components/site/JsonLd'
 import { RequestForm } from '@/components/site/RequestForm.client'
@@ -302,23 +302,7 @@ export default async function StudioPage({ params }: Args) {
         </section>
       </div>
 
-      {photos.length > 0 && (
-        <section aria-label="Фото студії" className="grid gap-2 pt-[clamp(24px,3vw,40px)]">
-          <Image src={photos[0].url} alt={photos[0].alt} width={photos[0].width} height={photos[0].height} sizes="(min-width:1200px) 760px, 100vw" className="aspect-[3/2] w-full max-w-[760px] object-cover" />
-          {photos.length > 1 && (
-            <ul className="m-0 grid max-w-[760px] list-none grid-cols-3 gap-2 p-0 sm:grid-cols-5">
-              {photos.slice(1).map((p) => (
-                <li key={p.url}>
-                  <a href={p.full} target="_blank" rel="noopener">
-                    <Image src={p.url} alt={p.alt} width={p.width} height={p.height} loading="lazy" sizes="(min-width:640px) 150px, 33vw" className="aspect-square w-full object-cover" />
-                  </a>
-                </li>
-              ))}
-            </ul>
-          )}
-          <p className="m-0 text-[12.5px] text-ink-2">Фото: {name}, публікуються зі згоди студії.</p>
-        </section>
-      )}
+      <StudioGallery photos={photos} name={name} />
 
       <InnerCols
         aside={
