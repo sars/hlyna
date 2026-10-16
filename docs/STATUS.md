@@ -3,7 +3,7 @@
 Updated 2026-10-12.
 
 ## Now
-- **Live** at https://hlyna.com.ua on the owner's VPS (Docker Compose: app + db + caddy; `deploy/`); deploy from the Mac with `bash deploy/push.sh`.
+- **Live** at https://hlyna.com.ua on the owner's VPS (Docker Compose: app + db; HTTPS from the host's shared edge Caddy, see `deploy/README.md`); deploy from the Mac with `bash deploy/push.sh`.
 - **Stack:** Next.js 16, Postgres schema `app` via Drizzle, Better Auth, admin panel at `/panel`, studio cabinet at `/kabinet`, Telegram bot buttons. Payload CMS was removed on 2026-10-12 (`docs/archive/replace-payload-cutover.md`).
 - **Design:** the «реєстр» system is live on every page since 2026-10-12 (`docs/design/SYSTEM.md`; palette 1A gone).
 - **Repo cleanup (2026-10-12):** `docs/reviews/2026-10-12-repo-cleanup-fable.md` — what was removed, what is left for the owner. `pnpm knip` reports dead files, exports and dependencies; keep it clean.

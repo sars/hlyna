@@ -1,4 +1,6 @@
-# Production: app + Postgres + Caddy (HTTPS) on one VPS.
+# Production: app + Postgres on one VPS. HTTPS comes from the host's shared
+# edge Caddy (network `edge`, config in the private-finances repository's
+# deploy/edge), which reaches this app as `hlyna:3000`.
 #   docker compose up -d --build
 # Secrets live in .env next to this file (see .env.example and deploy/README.md).
 
@@ -46,6 +48,12 @@ services:
       resources:
         limits:
           memory: 1536M
+    networks:
+      default: {}
+      # The host's shared edge proxy proxies hlyna.com.ua to this alias.
+      edge:
+        aliases:
+          - hlyna
     logging: &logging
       driver: json-file
       options:
@@ -71,33 +79,20 @@ services:
       start_period: 30s
     logging: *logging
 
-  caddy:
-    image: caddy:2
-    restart: unless-stopped
-    ports:
-      - '80:80'
-      - '443:443'
-      - '443:443/udp'
-    volumes:
-      - ./Caddyfile:/etc/caddy/Caddyfile:ro
-      # Serves /media/* directly (read-only).
-      - media:/srv/media:ro
-      # Certificates. Losing this means re-issuing from Let's Encrypt (rate-limited).
-      - caddy_data:/data
-      - caddy_config:/config
-    # service_started: Caddy keeps answering while the app restarts.
-    depends_on:
-      app:
-        condition: service_started
-    logging: *logging
-
 secrets:
   # postgres://hlyna:…@<db container IP>:5432/hlyna, exported by deploy/push.sh for `docker compose build`.
   build_database_url:
     environment: BUILD_DATABASE_URL
 
+networks:
+  edge:
+    external: true
+    name: edge
+
 volumes:
   pgdata: # the database; backed up by deploy/backup.sh
-  media: # uploaded photos (/media/*); backed up by deploy/backup.sh
-  caddy_data:
-  caddy_config:
+  media: # uploaded photos (/media/*); backed up by deploy/backup.sh; the edge Caddy serves it read-only
+  # caddy_data and caddy_config stayed on the host under their old names
+  # (hlyna_caddy_data, hlyna_caddy_config) and are mounted by the edge Caddy:
+  # the certificates and the access log. Not declared here so that
+  # `docker compose down -v` can never remove them.

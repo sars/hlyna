@@ -49,8 +49,7 @@ DB_IP="$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{e
 export BUILD_DATABASE_URL="postgres://hlyna:$(grep ^POSTGRES_PASSWORD= .env | cut -d= -f2-)@${DB_IP}:5432/hlyna"
 docker compose up -d --build </dev/null
 sleep 15
-docker compose exec -T caddy cat /etc/caddy/Caddyfile </dev/null | cmp -s - Caddyfile || docker compose restart caddy </dev/null
-sleep 3
+# HTTPS is the host's shared edge Caddy (/opt/edge); its Caddyfile is not part of this deploy.
 curl -sf -o /dev/null --resolve hlyna.com.ua:443:127.0.0.1 https://hlyna.com.ua/health
 # Pick up edits made while the image was building (stale-while-revalidate: readers never wait).
 S="$(grep ^REVALIDATE_SECRET= .env | cut -d= -f2)"

@@ -1,6 +1,6 @@
 # Deploy: fresh Ubuntu VPS (Hostinger)
 
-Three containers from `compose.yaml`: `app` (Next.js: site, /panel, /kabinet, APIs), `db` (Postgres 16, not exposed), `caddy` (HTTPS for hlyna.com.ua; www and hlyna.com redirect to it). The app lives in `/opt/hlyna`.
+Two containers from `compose.yaml`: `app` (Next.js: site, /panel, /kabinet, APIs) and `db` (Postgres 16, not exposed). HTTPS for hlyna.com.ua (www and hlyna.com redirect to it) is the host's shared edge Caddy in `/opt/edge`, one stack for every project on the VPS; its Caddyfile, with this site's block, lives in the private-finances repository under `deploy/edge/`. The app joins the `edge` network as `hlyna`. The app lives in `/opt/hlyna`.
 
 ## 1. DNS (at the registrar)
 A records, all pointing to the VPS IPv4 (add AAAA too if the VPS has IPv6):
@@ -52,7 +52,7 @@ Fill in:
 ```bash
 docker compose up -d --build
 docker compose ps                     # app should become "healthy"
-docker compose logs -f caddy          # watch certificates being issued
+(cd /opt/edge && docker compose logs -f caddy)   # watch certificates being issued
 curl -I https://hlyna.com.ua          # 200
 curl -I https://hlyna.com             # 301 -> https://hlyna.com.ua/
 ```
