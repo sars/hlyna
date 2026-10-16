@@ -79,7 +79,8 @@ export function PhotoManager({ slug, initial, sectionState, onStudio: setStudio,
   const [over, setOver] = useState(false)
   const [drag, setDrag] = useState<{ x: number; y: number; url: string; to: number | null; from: number } | null>(null)
   const uid = React.useId()
-  const inputId = `${uid}-file`
+  const capId = `${uid}-cap`
+  const fileInput = useRef<HTMLInputElement>(null)
   const grid = useRef<HTMLUListElement>(null)
   const focusKey = useRef<string | null>(null)
   const xhrs = useRef(new Map<string, XMLHttpRequest>())
@@ -463,11 +464,20 @@ export function PhotoManager({ slug, initial, sectionState, onStudio: setStudio,
   const numbered = [...shown.map((t) => t.key), ...inFlight.map((t) => t.key)]
   const numberOf = (key: string) => numbered.indexOf(key) + 1
 
+  // A real button that opens the file dialog itself (a <label for> on the hidden input did not open it for an owner on a
+  // laptop, 16.10.2026); a click anywhere on the drop zone opens it too.
+  const pick = () => fileInput.current?.click()
   const picker = (variant: 'zone' | 'bottom') => (
-    <div className="ui-pz" data-zone={variant === 'zone' ? '' : undefined} data-bottom={variant === 'bottom' ? '' : undefined} data-over={variant === 'zone' && over ? '' : undefined}>
-      <label htmlFor={inputId} className="ui-btn ui-pick" data-variant="ghost">
+    <div
+      className="ui-pz"
+      data-zone={variant === 'zone' ? '' : undefined}
+      data-bottom={variant === 'bottom' ? '' : undefined}
+      data-over={variant === 'zone' && over ? '' : undefined}
+      onClick={variant === 'zone' ? (e) => !(e.target as Element).closest('button') && pick() : undefined}
+    >
+      <button type="button" className="ui-btn ui-pick" data-variant="ghost" onClick={pick}>
         {variant === 'zone' || shown.length + uploads.length === 0 ? 'Вибрати фото' : 'Додати ще фото'}
-      </label>
+      </button>
       {variant === 'zone' ? (
         <p className="ui-pz-hint m-0">або перетягніть сюди · JPG, PNG, HEIC · великі зменшимо самі</p>
       ) : (
@@ -558,7 +568,7 @@ export function PhotoManager({ slug, initial, sectionState, onStudio: setStudio,
           addFiles(Array.from(e.dataTransfer.files))
         }}
       >
-        <input id={inputId} className="ui-pick-input" type="file" accept="image/*,.heic,.heif" multiple disabled={full} onChange={onFiles} />
+        <input ref={fileInput} className="ui-pick-input" type="file" accept="image/*,.heic,.heif" multiple disabled={full} tabIndex={-1} aria-hidden onChange={onFiles} />
         <p className="sr-only" aria-live="polite">{announce}</p>
 
         {tiles.length === 0 && (
@@ -679,18 +689,18 @@ export function PhotoManager({ slug, initial, sectionState, onStudio: setStudio,
 
         {captionTile && (
           <div className="ui-pt-capf" ref={capField}>
-            <label htmlFor={`${inputId}-cap`} className="text-[14px] leading-[1.3] font-medium">
+            <label htmlFor={capId} className="text-[14px] leading-[1.3] font-medium">
               Підпис до {numberOf(captionTile.key) === 1 ? 'головного фото' : `фото ${numberOf(captionTile.key)}`}
               <span className="ui-opt">необов’язково</span>
             </label>
             <input
-              id={`${inputId}-cap`}
+              id={capId}
               ref={capInput}
               key={captionTile.key}
               className="ui-box"
               data-size="sm"
               autoComplete="off"
-              aria-describedby={`${inputId}-cap-h`}
+              aria-describedby={`${capId}-h`}
               value={captions[captionTile.photo.id] ?? captionTile.photo.caption ?? ''}
               placeholder="Що на фото: напр. миска після другого випалу"
               onChange={(e) => setCaptions((c) => ({ ...c, [captionTile.photo.id]: e.target.value }))}
@@ -716,7 +726,7 @@ export function PhotoManager({ slug, initial, sectionState, onStudio: setStudio,
                 }
               }}
             />
-            <span className="ui-hint" id={`${inputId}-cap-h`}>
+            <span className="ui-hint" id={`${capId}-h`}>
               Якщо не підпишете — підпише редактор.
             </span>
           </div>

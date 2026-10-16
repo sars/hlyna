@@ -413,10 +413,9 @@
   .ui-pz-consent { font-size: 13px; line-height: 1.4; color: var(--color-ink-2); }
   .ui-pz[data-zone] { display: none; }
   .ui-pick { width: 100%; height: 56px; cursor: pointer; }
-  .ui-photos:has(.ui-pick-input:focus-visible) .ui-pick { outline: 3px solid var(--color-cobalt); outline-offset: 3px; }
   .ui-pick-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   @media (min-width: 40rem) {
-    .ui-pz[data-zone] { display: grid; justify-items: center; padding: 26px 24px; box-shadow: inset 0 0 0 2px var(--color-ink); text-align: center; }
+    .ui-pz[data-zone] { display: grid; justify-items: center; padding: 26px 24px; cursor: pointer; box-shadow: inset 0 0 0 2px var(--color-ink); text-align: center; }
     .ui-pz[data-zone][data-over] { box-shadow: inset 0 0 0 2px var(--color-cobalt); background: var(--color-paper-2); }
     .ui-pz[data-bottom] { display: none; }
     .ui-pz .ui-pick { width: auto; }
