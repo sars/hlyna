@@ -193,6 +193,17 @@ export async function certificateCities() {
   return groupByCity(studios).filter((g) => g.studios.length >= MIN_LIST).map((g) => g.city)
 }
 
+/** How many places each city's page of a topic lists (`topicData(topic, city).all.length`), in one pass over the
+ *  catalogue: eligibility does not depend on the city, so this skips topicData's price and facts work. */
+export function topicCountsByCity(topic: Topic, studios: StudioCard[]) {
+  const counts = new Map<string, number>()
+  for (const s of studios) {
+    const city = s.cityDoc?.slug
+    if (city && topic.lists.some((l) => eligible(topic, l, s))) counts.set(city, (counts.get(city) ?? 0) + 1)
+  }
+  return counts
+}
+
 /** City chips for a whole-Ukraine topic page: its format × city pages, city certificate pages, or the makers
  *  pages of cities with at least MIN_LIST entries on the page. Empty on a city-scoped page. */
 export async function topicCityLinks(topic: Topic, data: TopicData): Promise<{ label: string; href: string; count?: number }[]> {

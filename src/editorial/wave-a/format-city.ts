@@ -1,7 +1,7 @@
 // Format × city master-class pages (/maister-klasy/<city>/<format>): live only with MIN_LIST places and copy.
 import { topics, type Topic } from '@/content/topics'
 import { priceVars, type WaveVars } from '@/editorial/copy'
-import { topicData } from '@/editorial/topics'
+import { topicCountsByCity, topicData } from '@/editorial/topics'
 import { getAllStudios, groupByCity, MIN_LIST, offersMasterClasses, pluralUk } from '@/lib/catalog'
 import { fmt } from '@/lib/money'
 import { inCity } from '@/lib/present'
@@ -33,15 +33,18 @@ export async function formatCityData(city: string, format: FormatSlug) {
   return { topic, data, vars, place }
 }
 
-/** Every format × city pair with at least MIN_LIST places (whether or not copy exists). */
+/** Every format × city pair with at least MIN_LIST places (whether or not copy exists). Counted, not built: a full
+ *  topicData per city × format took ~13 s of CPU and froze the whole server (every request) while a page re-rendered. */
 export async function formatCityCandidates() {
   const studios = await getAllStudios()
   const cities = groupByCity(studios.filter(offersMasterClasses)).map((g) => g.city)
+  const formats = Object.keys(FORMAT_PAGES) as FormatSlug[]
+  const counts = new Map(formats.map((f) => [f, topicCountsByCity(topics[FORMAT_PAGES[f].topic], studios)]))
   const out: { city: string; cityName: string; format: FormatSlug; count: number }[] = []
   for (const c of cities) {
-    for (const format of Object.keys(FORMAT_PAGES) as FormatSlug[]) {
-      const d = await topicData(topics[FORMAT_PAGES[format].topic], c.slug!)
-      if (d.all.length >= MIN_LIST) out.push({ city: c.slug!, cityName: c.name, format, count: d.all.length })
+    for (const format of formats) {
+      const count = counts.get(format)!.get(c.slug!) ?? 0
+      if (count >= MIN_LIST) out.push({ city: c.slug!, cityName: c.name, format, count })
     }
   }
   return out

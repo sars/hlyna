@@ -108,20 +108,31 @@ export const isStudio = (s: { type?: string | null; name?: string | null }) => s
 /** Not closed and not unverified: the records lists may show. */
 export const isOpen = (s: Pick<StudioCard, 'status' | 'unverified'>) => s.status !== 'closed' && !s.unverified
 
+// Lists derived from the joined catalogue are kept with it (by its array): outside a render (see sharedJoin) they would
+// otherwise be refiltered on every call, and so would everything built on them (the price index).
+const fromCatalog = <T>(derive: (all: StudioCard[]) => T) => {
+  const kept = new WeakMap<StudioCard[], T>()
+  return cache(async () => {
+    const all = await getCatalog()
+    if (!kept.has(all)) kept.set(all, derive(all))
+    return kept.get(all)!
+  })
+}
+
 /** Open records of every kind, shops included: for the pages where shops belong. */
-export const getAllWithShops = cache(async () => (await getCatalog()).filter(isOpen))
+export const getAllWithShops = fromCatalog((all) => all.filter(isOpen))
 
 /** What lists, counts, the map and the price index use: open studios and makers, no shops. */
-export const getAllStudios = cache(async () => (await getAllWithShops()).filter(isStudio))
+export const getAllStudios = fromCatalog((all) => all.filter(isOpen).filter(isStudio))
 
 /** Open shops and galleries only. */
-export const getShops = cache(async () => (await getAllWithShops()).filter((s) => s.type === 'shop'))
+export const getShops = fromCatalog((all) => all.filter(isOpen).filter((s) => s.type === 'shop'))
 
 /** Open museums, traditions and memorial pages only. */
-export const getLegacy = cache(async () => (await getAllWithShops()).filter((s) => s.type === 'legacy'))
+export const getLegacy = fromCatalog((all) => all.filter(isOpen).filter((s) => s.type === 'legacy'))
 
 /** Open universities, academies and colleges (a block of their own on a city page). */
-export const getAcademies = cache(async () => (await getAllWithShops()).filter((s) => s.type !== 'shop' && s.type !== 'legacy' && isAcademic(s)))
+export const getAcademies = fromCatalog((all) => all.filter(isOpen).filter((s) => s.type !== 'shop' && s.type !== 'legacy' && isAcademic(s)))
 
 export const getStudioBySlug = cache(async (slug: string) => (await getCatalog()).find((s) => s.slug === slug) ?? null)
 

@@ -141,9 +141,9 @@ export function localPrices(studios: StudioCard[]) {
   })
 }
 
-export const priceIndex = cache(async function priceIndex() {
+function buildPriceIndex(all: StudioCard[]) {
   // Studio prices only: a shop's retail price carries a resale markup, and the pages say «за прайсами студій».
-  const studios = (await getAllStudios()).filter((s) => s.type !== 'supplier')
+  const studios = all.filter((s) => s.type !== 'supplier')
   const { values, sources, years: found } = studioValues(studios)
   const years = found.sort()
   const stats: CategoryStats[] = []
@@ -176,4 +176,13 @@ export const priceIndex = cache(async function priceIndex() {
     })
     .sort((a, b) => b.n - a.n)
   return { stats, cities, studios: sources.size, years: years.length ? { from: years[0], to: years[years.length - 1] } : null }
+}
+
+// Built once per catalogue (getAllStudios keeps its array while the joined catalogue lasts): the search index, llms.txt
+// and the sitemap ask for it once per page they list, outside a render where `cache` alone does not memoize.
+const built = new WeakMap<StudioCard[], ReturnType<typeof buildPriceIndex>>()
+export const priceIndex = cache(async function priceIndex() {
+  const all = await getAllStudios()
+  if (!built.has(all)) built.set(all, buildPriceIndex(all))
+  return built.get(all)!
 })
