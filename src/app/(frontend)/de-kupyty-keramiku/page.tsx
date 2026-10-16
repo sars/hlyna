@@ -71,6 +71,54 @@ export default async function Page() {
         ))}
       </Block>
 
+      {p.stock.length > 0 && (
+        <Block
+          id="stockists"
+          title="Магазини й концепт-стори: чиї роботи там є"
+          note={<>Місця, де продають роботи майстрів і брендів із нашого каталогу. Перелік зібрано зі сторінок магазинів самих брендів і з каталогів крамниць, перевірено {p.stockUpdated}. Що саме з асортименту бренду є на полицях сьогодні, уточнюйте в магазині.</>}
+        >
+          {p.stock.map((g) => (
+            <div key={g.id}>
+              <CityHead id={`kupyty-${g.id}`} name={g.name} count={g.places.length} />
+              <InfoList
+                columns={2}
+                items={g.places.map((x) => ({
+                  kicker: x.kind,
+                  title: x.shop ? <Link href={`/vyrobnyky/${x.shop.slug}`}>{x.place}</Link> : x.place,
+                  lines: [
+                    x.address ?? null,
+                    <span key="makers">
+                      Чиї роботи:{' '}
+                      {x.makers.map((m, i) => (
+                        <React.Fragment key={m.id}>
+                          {i > 0 && ', '}
+                          <Link href={`/vyrobnyky/${m.slug}`} className="text-cobalt underline underline-offset-[3px]">
+                            {displayName(m)}
+                          </Link>
+                        </React.Fragment>
+                      ))}
+                    </span>,
+                    x.note ?? null,
+                    <span key="src" className="font-mono text-xs">
+                      Джерело:{' '}
+                      {x.sources.map((src, i) => (
+                        <React.Fragment key={src.url}>
+                          {i > 0 && '; '}
+                          <a href={src.url} target="_blank" rel="noopener nofollow" className="text-ink-2 underline underline-offset-[3px]">
+                            {src.label}
+                          </a>
+                          , {src.seen}
+                        </React.Fragment>
+                      ))}
+                    </span>,
+                  ],
+                }))}
+              />
+            </div>
+          ))}
+        </Block>
+      )}
+
       {p.etsy.length > 0 && (
         <Block id="etsy" title="Українські керамісти на Etsy" note={<>Магазини з локацією в Україні; кількість продажів і відгуків — з вітрини Etsy на момент перевірки.</>}>
           <InfoList
