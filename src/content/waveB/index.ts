@@ -7,11 +7,13 @@ import c_chornodymlena_i_molochena from './chornodymlena-i-molochena.json'
 import c_dohliad_za_keramikoyu from './dohliad-za-keramikoyu.json'
 import c_etsy from './etsy.json'
 import c_muzei_keramiky from './muzei-keramiky.json'
+import c_patriotychni_podarunky from './patriotychni-podarunky.json'
 import c_podiyi from './podiyi.json'
 import c_pratsyuyut_z_biznesom from './pratsyuyut-z-biznesom.json'
 import c_rizdvianyi_posud from './rizdvianyi-posud.json'
 import c_svichnyky from './svichnyky.json'
 import c_symvol_2027 from './symvol-2027.json'
+import c_vesillia from './vesillia.json'
 import c_vydy_keramiky from './vydy-keramiky.json'
 import c_yalynkovi_prykrasy from './yalynkovi-prykrasy.json'
 
@@ -22,11 +24,13 @@ export const copies: Record<string, WaveCopy> = {
   'dohliad-za-keramikoyu': c_dohliad_za_keramikoyu,
   'etsy': c_etsy,
   'muzei-keramiky': c_muzei_keramiky,
+  'patriotychni-podarunky': c_patriotychni_podarunky,
   'podiyi': c_podiyi,
   'pratsyuyut-z-biznesom': c_pratsyuyut_z_biznesom,
   'rizdvianyi-posud': c_rizdvianyi_posud,
   'svichnyky': c_svichnyky,
   'symvol-2027': c_symvol_2027,
+  'vesillia': c_vesillia,
   'vydy-keramiky': c_vydy_keramiky,
   'yalynkovi-prykrasy': c_yalynkovi_prykrasy,
 }

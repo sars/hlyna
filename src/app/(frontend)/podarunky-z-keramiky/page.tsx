@@ -81,6 +81,9 @@ export default async function Page() {
         { label: 'Чашки', href: '/vyrobnyky/vyrib/chashky' },
         { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' },
         { label: 'Символ 2027 року', href: '/dobirky/symvol-2027-roku' },
+        { label: 'Патріотичні подарунки', href: '/dobirky/patriotychni-podarunky' },
+        { label: 'Подарунки гостям на весілля', href: '/dobirky/podarunky-gostyam-na-vesillia' },
+        { label: 'Посуд для чаю', href: '/dobirky/posud-dlya-chainoi-tseremonii' },
       ]}
     >
       <Block id="budget" kicker="За бюджетом" title="Що є в прайсах студій" note={<>Роздрібні ціни з сайтів, Instagram і маркетплейсів студій; по одному найдешевшому варіанту від студії в кожному діапазоні. Наявність уточнюйте в студії.</>}>
