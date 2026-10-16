@@ -15,7 +15,7 @@ import { displayName } from '@/lib/present'
 import { ogImage } from '@/lib/ogImage'
 import { fmt } from '@/lib/money'
 
-export const revalidate = 3600
+export const revalidate = 86400
 
 export const metadata: Metadata = {
   title: 'Мапа керамічних студій України: майстер-класи і посуд',

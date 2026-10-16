@@ -7,7 +7,7 @@ import { certificateCities } from '@/editorial/topics'
 import { liveWrittenPages } from '@/editorial/registry'
 
 // Every public catalogue page: hubs, topic and product pages, master-class, certificate and maker cities, studio profiles.
-export const revalidate = 3600
+export const revalidate = 86400
 
 const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/vyrobnyky/misto', '/vyrobnyky/vyrib', '/dlya-biznesu', '/tsiny-2026', '/hayidy', '/dlya-studiy', '/pro-nas', '/dobirky', '/dobirky/suchasni-keramisty', '/dobirky/kosiv-i-opishne', '/mapa', '/llms.txt']
 

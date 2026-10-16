@@ -10,7 +10,7 @@ import { certificateCities, topicData } from '@/editorial/topics'
 
 // llms.txt: a plain-text map of the site for AI assistants (https://llmstxt.org).
 // Only existing pages, each with its factual lead (live counts), so assistants can cite them.
-export const revalidate = 3600
+export const revalidate = 86400
 
 export async function GET() {
   const lines: string[] = [

@@ -98,8 +98,8 @@ export async function buildSearchIndex(): Promise<SearchIndex> {
   return { v: 1, at: new Date().toISOString(), cities: [...cities], docs: [...docs.values()] }
 }
 
-/** The index as served: cached with the catalogue (a studio edit refreshes it), at most an hour old. */
-export const getSearchIndex = unstable_cache(buildSearchIndex, ['search-index-v1'], { revalidate: 3600, tags: ['studios'] })
+/** The index as served: cached with the catalogue (a studio edit refreshes it), at most a day old. */
+export const getSearchIndex = unstable_cache(buildSearchIndex, ['search-index-v1'], { revalidate: 86400, tags: ['studios'] })
 
 // The prepared index of this server process, rebuilt when the cached index changes.
 let prepared: { at: string; p: ReturnType<typeof prepare> } | null = null
