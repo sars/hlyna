@@ -199,6 +199,8 @@ export default async function StudioPage({ params }: Args) {
 
   // Profiles that cannot take a request get a box with what we know and a request to studios that work now.
   const showForm = acceptsRequests(s)
+  // A school that is a project of a studio (its own page has no site or Instagram) sends people to that studio.
+  const host = s.type === 'school' ? also.find((a) => a.s.type === 'studio')?.s : undefined
   const otherStudios = `/zapyt?${new URLSearchParams({ what: formFor(s), ...(city?.slug ? { misto: city.slug } : {}) })}`
   // Only an old data date says something in these boxes («останні відомі дані — 2019»).
   const lastData = oldDataLabel(s)
@@ -212,7 +214,7 @@ export default async function StudioPage({ params }: Args) {
         : s.type === 'shop'
           ? { title: 'Де купити', text: `Це магазин: тут купують готові вироби${cleanAddress(s.address) ? ` (${cleanAddress(s.address)})` : ''}${channels.length ? `; канали: ${channels.join(', ')}` : ''}.` }
           : s.type === 'school' || s.type === 'supplier'
-            ? { title: 'Як записатися', text: via ? `Записуються напряму в закладі: ${via} — у блоці «Коротко».` : 'Записуються напряму в закладі; посилань на його сторінки ми не знайшли.' }
+            ? { title: 'Як записатися', text: via ? `Записуються напряму в закладі: ${via} — у блоці «Коротко».` : host ? `Записуються через організаторів: контакти — у профілі «${displayName(host)}», блок «Також».` : 'Записуються напряму в закладі; посилань на його сторінки ми не знайшли.' }
             : exhibiting
               ? { title: 'Де побачити роботи', text: channels.length ? `${channels.join(', ').replace(/^./, (c) => c.toUpperCase())}.` : 'Замовлень і занять у відкритих джерелах ми не знайшли.' }
               : { title: 'Як зв’язатися', text: 'Контактів ми не знайшли, тому запит сюди не надсилаємо.' }
