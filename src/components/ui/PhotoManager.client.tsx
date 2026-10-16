@@ -471,7 +471,7 @@ export function PhotoManager({ slug, initial, sectionState, onStudio: setStudio,
       {variant === 'zone' ? (
         <p className="ui-pz-hint m-0">або перетягніть сюди · JPG, PNG, HEIC · великі зменшимо самі</p>
       ) : (
-        <p className="ui-pz-hint m-0">JPG, PNG, HEIC · до {max} · завантажуючи, ви дозволяєте показувати їх на сайті з підписом студії</p>
+        <p className="ui-pz-consent m-0">Завантажуючи фото, ви дозволяєте показ на сайті.</p>
       )}
     </div>
   )

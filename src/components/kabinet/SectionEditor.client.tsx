@@ -129,6 +129,8 @@ function goTo(key: string) {
 export function SectionEditor({ slug, section, initial, extras, next }: { slug: string; section: TextSection; initial: TextValues; extras: SectionExtras[TextSection]; next: { href: string; label: string } }) {
   const { studio, setStudio } = useStudio()
   const [values, setValues] = useState<TextValues>(initial)
+  // Bumped when a draft is restored: the fields remount, so their own state (e.g. the «Інше» chip) starts from the values.
+  const [restored, setRestored] = useState(0)
   const [baseline, setBaseline] = useState<TextValues>(initial)
   const [errors, setErrors] = useState<Errors>({})
   const [problem, setProblem] = useState<null | { kind: 'net' } | { kind: 'fail'; text: string; login?: boolean }>(null)
@@ -292,6 +294,7 @@ export function SectionEditor({ slug, section, initial, extras, next }: { slug: 
             type="button"
             onClick={() => {
               setValues({ ...initial, ...draft.v })
+              setRestored((n) => n + 1)
               setAnswered(true)
             }}
           >
@@ -364,7 +367,7 @@ export function SectionEditor({ slug, section, initial, extras, next }: { slug: 
             <p>До того на сайті лишається попередня версія. Можна редагувати далі — нові зміни додадуться до цієї ж перевірки.</p>
           </div>
         )}
-        <SectionFields section={section} values={values} set={set} errors={errors} extras={extras} />
+        <SectionFields key={restored} section={section} values={values} set={set} errors={errors} extras={extras} />
       </div>
       <SaveBar
         busy={saving}
