@@ -1,0 +1,2 @@
+Unbounded, Golos Text, Playfair Display, JetBrains Mono and Inter are licensed under the SIL Open Font License 1.1 (https://openfontlicense.org).
+The woff2 files come from Google Fonts (fonts.gstatic.com), copied through next/font on 16.10.2026; their @font-face rules are in src/app/fonts.css and src/app/(panel)/panel/inter.css.

@@ -19,11 +19,11 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 - **Language:** Ukrainian only; English later via `/en` routes; never Russian.
 - **Scope:** studio-scale ceramics made in Ukraine. Makers who now work abroad, suppliers, factories, media, course platforms and gift-certificate aggregators stay as drafts.
 - **Photos:** only with the maker's consent; stock photos (`public/images/stock`, CC0) only for site chrome.
-- **Mobile first and fast:** server components by default, client components only for interaction, `next/image`, fonts self-hosted by `next/font`.
+- **Mobile first and fast:** server components by default, client components only for interaction, `next/image`, fonts self-hosted from committed files (`public/fonts`, rules in `src/app/fonts.css`; the build never downloads them).
 - **No paid services** without the owner's explicit approval. No GitHub Actions/CI (paid minutes) — checks run locally (Stop hook, `pnpm lint`, `pnpm knip`, `pnpm test:int`, `pnpm build`).
 
 ## Stack
-Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Auth (staff in `/panel`, studio owners in `/kabinet`) + Hono for `/api/panel` + Tailwind 4 with tokens by role from `docs/design/SYSTEM.md`, defined in `src/app/(frontend)/globals.css` (`bg-paper`, `text-ink`, `text-ink-2`, `bg-cobalt`, `text-terracotta-text`, `border-rule`, `font-display/body/serif/mono`); primitives in `src/components/ui/`. Fonts: Unbounded + Golos Text preloaded, Playfair Display italic + JetBrains Mono lazy (`next/font`).
+Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Auth (staff in `/panel`, studio owners in `/kabinet`) + Hono for `/api/panel` + Tailwind 4 with tokens by role from `docs/design/SYSTEM.md`, defined in `src/app/(frontend)/globals.css` (`bg-paper`, `text-ink`, `text-ink-2`, `bg-cobalt`, `text-terracotta-text`, `border-rule`, `font-display/body/serif/mono`); primitives in `src/components/ui/`. Fonts: Unbounded + Golos Text preloaded, Playfair Display italic + JetBrains Mono lazy (`src/app/fonts.ts`).
 
 ## Where things are
 - `src/content/` — site facts (`site.ts`) and navigation (`navigation.ts`). Copy and menus are edited here, by an LLM.
@@ -40,6 +40,7 @@ Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Aut
 - `pnpm shots /path` — screenshots to `.shots/` (dev server must run). Look once per finished screen.
 - Schema changes: edit `src/server/db/schema`, `pnpm db:generate`, review the SQL in `drizzle/`, commit; apply with `pnpm db:migrate` (see deploy/README.md). `pnpm exec tsc --noEmit` before finishing (the Stop hook runs it).
 - `pnpm build` — production build (needs the database reachable).
+- `pnpm test:int` uses one shared test database (`hlyna_apptest`): sessions run it one at a time; a deadlock or a vanished test user means another run overlapped, so rerun before suspecting the code.
 - Deploy and production data edits: only with the owner, step by step in `deploy/README.md` («Deploy from the Mac»).
 
 ## How to work

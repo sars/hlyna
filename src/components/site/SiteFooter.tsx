@@ -20,6 +20,9 @@ export function SiteFooter() {
           <p className="m-0">{site.description}</p>
           <p className="m-0">Дані оновлено: {site.dataUpdated}</p>
           <p className="m-0">{site.model}</p>
+          <p className="m-0">
+            <a href={`mailto:${site.email}`}>{site.email}</a>
+          </p>
         </div>
         {footerColumns.map((c) => (
           <div key={c.title}>

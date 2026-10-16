@@ -1,14 +1,15 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
+import { preload } from 'react-dom'
 import type { ReactNode } from 'react'
 
 import { PanelProviders } from '@/components/panel/shell/providers'
+import './inter.css'
 import './panel.css'
 
 // The panel's own root layout: its own <html>, stylesheet and JavaScript. Nothing here is imported by the public
 // site (ESLint rule + scripts/check-bundles.mjs), and the public site's layout is not used here.
 
-const inter = Inter({ subsets: ['latin', 'cyrillic'], variable: '--font-inter', display: 'swap' })
+// Inter: committed woff2 files in public/fonts with their @font-face rules in inter.css (the build never asks Google).
 
 export const metadata: Metadata = {
   title: { default: 'Панель · Глина', template: '%s · Панель · Глина' },
@@ -31,8 +32,9 @@ export const viewport: Viewport = { width: 'device-width', initialScale: 1, view
 const themeScript = `try{var s=localStorage.getItem('theme');var d=s==='dark'||(s!=='light'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light'}catch(e){}`
 
 export default function PanelRootLayout({ children }: { children: ReactNode }) {
+  for (const f of ['inter-latin', 'inter-cyrillic']) preload(`/fonts/${f}.woff2`, { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' })
   return (
-    <html lang="uk" className={inter.variable} suppressHydrationWarning>
+    <html lang="uk" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>

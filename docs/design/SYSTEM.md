@@ -271,22 +271,14 @@
 
 Числа всюди `font-variant-numeric: tabular-nums` (таблиці, смуги, ціни); текст — `lining-nums`.
 
-### 3.2 `next/font` (`src/app/(frontend)/layout.tsx`)
+### 3.2 Шрифти (`src/app/fonts.ts`, `src/app/fonts.css`, `public/fonts`)
 
-```ts
-import { Golos_Text, JetBrains_Mono, Playfair_Display, Unbounded } from 'next/font/google'
+Файли woff2 лежать у `public/fonts` і закомічені; правила `@font-face` з `unicode-range` і запасні шрифти з метриками (`Unbounded Fallback` тощо, без зсуву макета) — у `src/app/fonts.css`. Їх скопійовано 16.10.2026 з того, що генерував `next/font/google` (Google Fonts, OFL), бо збірка на сервері раз упала, не завантаживши шрифти. Змінні ті самі: `--font-unbounded`, `--font-golos`, `--font-playfair`, `--font-jetbrains` (на `:root`). Ранній preload — `preloadFonts()` у кореневих layout сайту й кабінету: Unbounded і Golos, `latin` + `cyrillic` (Google віддає їх варіативними, тож 4 файли на всі ваги). Панель — Inter у `src/app/(panel)/panel/inter.css`. Новий шрифт чи вага: тимчасово підключити через `next/font/google`, зібрати, скопіювати файли з `.next/static/media` і правила з CSS збірки, дати файлам нові назви (кеш на рік).
 
-const unbounded = Unbounded({ subsets: ['cyrillic', 'latin'], weight: ['600', '800'], variable: '--font-unbounded', display: 'swap' })
-const golos = Golos_Text({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600'], variable: '--font-golos', display: 'swap' })
-const playfair = Playfair_Display({ subsets: ['cyrillic', 'latin'], weight: ['400'], style: ['italic'], variable: '--font-playfair', display: 'swap', preload: false })
-const jetbrains = JetBrains_Mono({ subsets: ['cyrillic', 'latin'], weight: ['500'], variable: '--font-jetbrains', display: 'swap', preload: false })
-// <html className={`${unbounded.variable} ${golos.variable} ${playfair.variable} ${jetbrains.variable}`} lang="uk">
-```
-
-- **Підмножини:** `cyrillic` (покриває ї, є, ґ — U+0490/0491 входить) + `latin` (цифри, пунктуація, латинські назви студій, домен). `latin-ext`/`cyrillic-ext` не вантажити. Preload-посилання генеруються лише для `subsets`, тож `cyrillic` + `latin` × ваги = кількість preload.
-- **Preload:** Unbounded (2 ваги × 2 підмножини = 4) і Golos (3 × 2 = 6) — це 10 preload-файлів. Якщо Lighthouse покаже забагато — перейти на `weight: 'variable'` для обох (по 1 файлу на підмножину, 4 preload; обидва шрифти на Google Fonts варіативні). Playfair і Mono — `preload: false` (нижче першого екрана; Mono в меню з'являється зі `swap`, це прийнятно).
+- **Підмножини:** `cyrillic` (покриває ї, є, ґ — U+0490/0491 входить) + `latin` (цифри, пунктуація, латинські назви студій, домен). `latin-ext`, `cyrillic-ext` та інші оголошені з `unicode-range` і завантажуються, лише коли на сторінці є такі символи.
+- **Preload:** Unbounded і Golos — по одному варіативному файлу на підмножину, 4 файли (`preloadFonts()`); Playfair і Mono без preload (нижче першого екрана; Mono в меню з'являється зі `swap`).
 - **Ваги:** Unbounded 600/800 (400 ніде не потрібен; 700 для OG береться окремо з `src/assets/fonts`). Mono — лише 500 (використати і для 400-ролей; різниця в 12px непомітна). Playfair — лише italic 400 (500 з макета не потрібен).
-- `adjustFontFallback` — за замовчуванням (true).
+- Запасні шрифти з метриками (`… Fallback`) — у `fonts.css`, як їх генерував `next/font`.
 - Для OG/Satori — окремі статичні TTF у `src/assets/fonts` (Unbounded ExtraBold з репозиторію googlefonts/unbounded, Golos Text Regular і JetBrains Mono Regular з Google Fonts; OFL, `OFL.txt`). Raleway і Unbounded Bold прибрано. Статичні файли з `@fontsource` для Satori не підійшли: накладені контури дають діри в «E», «К».
 
 ---

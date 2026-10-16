@@ -160,7 +160,7 @@ export default async function HomePage() {
         <ol className="m-0 mt-[clamp(28px,4vw,52px)] grid list-none grid-cols-1 border-t border-rule-on-dark p-0 md:grid-cols-3">
           {[
             ['Опишіть замовлення', 'Що потрібно, скільки штук, до якої дати, місто й бюджет за одиницю.'],
-            ['Ми підберемо студії', 'Передамо запит 3–5 студіям, які роблять такі вироби й працюють з такими обсягами.'],
+            ['Ми підберемо студії', 'Передамо запит до 5 студій, які роблять такі вироби й працюють з такими обсягами.'],
             ['Порівняйте пропозиції', 'Студії відповідають напряму. Ви обираєте за ціною, терміном і стилем.'],
           ].map(([t, d], i) => (
             <li key={t} className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-[18px] border-b border-rule-on-dark pt-6 pb-7 md:border-b-0 md:border-r md:pr-7 md:[&:not(:first-child)]:pl-7 md:last:border-r-0">

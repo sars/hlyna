@@ -3,6 +3,8 @@ export const site = {
   name: 'Глина',
   legalName: 'Глина',
   domain: 'hlyna.com.ua',
+  // Public contact for buyers and studios (owner, 16.10.2026); requests still go through the form.
+  email: 'hello@hlyna.com',
   url: process.env.NEXT_PUBLIC_SERVER_URL || 'https://hlyna.com.ua',
   description:
     'Каталог українських керамічних студій і майстрів. Посуд і подарунки ручної роботи для бізнесу, майстер-класи та сертифікати.',

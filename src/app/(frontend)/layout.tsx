@@ -7,13 +7,14 @@ import { SiteFooter } from '@/components/site/SiteFooter'
 import { SiteHeader } from '@/components/site/SiteHeader'
 import { site } from '@/content/site'
 
-import { fontVars } from '../fonts'
+import { preloadFonts } from '../fonts'
 
 import './globals.css'
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  preloadFonts()
   return (
-    <html className={fontVars} lang="uk">
+    <html lang="uk">
       <head>
         <link href="/favicon.ico" rel="icon" sizes="48x48" />
         <link href="/favicon-16.png" rel="icon" type="image/png" sizes="16x16" />
@@ -24,7 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           data={{
             '@context': 'https://schema.org',
             '@graph': [
-              { '@type': 'Organization', name: site.name, url: site.url, description: site.description, areaServed: 'UA' },
+              { '@type': 'Organization', name: site.name, url: site.url, description: site.description, areaServed: 'UA', email: site.email },
               { '@type': 'WebSite', name: site.name, url: site.url, inLanguage: 'uk' },
             ],
           }}

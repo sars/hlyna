@@ -4,7 +4,7 @@ import React from 'react'
 
 import { KabinetFooter, KabinetHeader } from '@/components/kabinet/KabinetChrome'
 
-import { fontVars } from '../../fonts'
+import { preloadFonts } from '../../fonts'
 
 import '../../(frontend)/globals.css'
 
@@ -30,10 +30,11 @@ export const metadata: Metadata = {
 export const viewport: Viewport = { themeColor: '#efe9de', width: 'device-width', initialScale: 1, viewportFit: 'cover' }
 
 export default async function KabinetLayout({ children }: { children: React.ReactNode }) {
+  preloadFonts()
   // Only whether a session cookie exists decides if «Вийти» shows; the pages check the session itself.
   const signedIn = (await cookies()).getAll().some((c) => c.name.endsWith('hlyna.session_token'))
   return (
-    <html className={fontVars} lang="uk">
+    <html lang="uk">
       <body className="flex min-h-dvh flex-col">
         <KabinetHeader signedIn={signedIn} />
         {children}
