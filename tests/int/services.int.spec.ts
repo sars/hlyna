@@ -114,6 +114,23 @@ describe('imports', () => {
     expect(s!.formats).toEqual(['kids'])
   })
 
+  it('posts and highlights: a row that read another account than the profile links is skipped', async () => {
+    // studio A links @studio_a (beforeEach); the scan read @4rom_people, an initiative's account that was once linked by mistake
+    const other = await importIgNotes(db, [{ slug: 'a', handle: '4rom_people', followers: 58, note: 'Чужий акаунт' }], { imported: {} }, script)
+    expect(other.counts).toMatchObject({ updated: 0, skippedAccount: 1 })
+    const hl = await importHighlights(db, [{ slug: 'a', handle: '4rom_people', prices: ['МК — 1 000 грн (Instagram, 09.2026)'] }], {}, script)
+    expect(hl.counts).toMatchObject({ updated: 0, skippedAccount: 1 })
+    const [s0] = await db.select().from(studios).where(eq(studios.id, studioA))
+    expect(s0!.activityFollowers).toBeNull()
+    expect(s0!.recentNote).toBeNull()
+    // its own account (any case, with the @) is imported; a profile whose Instagram was cleared takes nothing from any scan
+    const own = await importIgNotes(db, [{ slug: 'a', handle: '@Studio_A', followers: 10 }], { imported: {} }, script)
+    expect(own.counts).toMatchObject({ updated: 1, skippedAccount: 0 })
+    await db.update(studios).set({ instagram: null }).where(eq(studios.id, studioA))
+    const cleared = await importIgNotes(db, [{ slug: 'a', handle: 'studio_a', followers: 99 }], { imported: {} }, script)
+    expect(cleared.counts).toMatchObject({ updated: 0, skippedAccount: 1 })
+  })
+
   it('tag rules only propose (with the phrase); only accepted tags are written', async () => {
     await db.update(studios).set({ summary: 'Майстер-класи на гончарному колі для дітей' }).where(eq(studios.id, studioA))
     const list = await tagProposals(db, new Map())

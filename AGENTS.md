@@ -38,6 +38,7 @@ Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Aut
 ## Commands
 - `pnpm dev` — site on http://localhost:3000, panel on /panel (local Postgres, `DATABASE_URL`; invite yourself with `USER_ID=<email> BASE=http://localhost:3000 pnpm exec tsx scripts/app/invite.ts`).
 - `pnpm shots /path` — screenshots to `.shots/` (dev server must run). Look once per finished screen.
+- `pnpm exec tsx scripts/app/check-data.ts` — read-only data check (heritage/legacy, birthplace written as a workplace, Instagram links); run it after an edits file, an import or a copy sync, before data goes to production.
 - Schema changes: edit `src/server/db/schema`, `pnpm db:generate`, review the SQL in `drizzle/`, commit; apply with `pnpm db:migrate` (see deploy/README.md). `pnpm exec tsc --noEmit` before finishing (the Stop hook runs it).
 - `pnpm build` — production build (needs the database reachable).
 - `pnpm test:int` uses one shared test database (`hlyna_apptest`): sessions run it one at a time; a deadlock or a vanished test user means another run overlapped, so rerun before suspecting the code.

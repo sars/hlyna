@@ -1,11 +1,14 @@
 // Studio field edits through the panel's editor (version check, revision, slug history with 301, audit):
 //   EDITS=path pnpm exec tsx scripts/app/edit-studios.ts   (PROD=1 for production, DRY=1 to preview)
 //   [{ "slug": "…", "why"?: "reason, printed with the change", "set"?: { "name"?, "shortName"?, "slug"?, "type"? (one of STUDIO_TYPES), "status"? (one of STUDIO_STATUSES),
-//      "visibility"? ("public" | "hidden"), "address"?, "summary"?, "publicDescription"?, "recentNote"?, "website"?, "instagram"?, "facebook"? ("" clears; otherwise an absolute http(s) URL), "city"? (a city slug) },
-//      "replace"?: [["from", "to"], …], "dropFormats"?: ["courses", …], "addNames"?: ["…"], "mergeInto"?: "kept-slug",
+//      "visibility"? ("public" | "hidden"), "address"?, "summary"?, "publicDescription"?, "recentNote"?, "descriptionInternal"?, "website"?, "instagram"?, "facebook"? ("" clears; otherwise an absolute http(s) URL), "city"? (a city slug) },
+//      "replace"?: [["from", "to"], …], "dropFormats"?: ["courses", …], "addNames"?: ["…"], "dropNames"?: ["…"], "addSources"?: ["https://…"],
+//      "clear"?: ["instagramPosts" (embedded posts), "activity" (last post date and followers: they came from an account that is not the profile's)], "mergeInto"?: "kept-slug",
 //      "b2b"?: { "minOrder"?, "leadTime"? ("" clears), "logoMethods"?: ["…"], "worksWithHoreca"?, "worksWithCorporate"?, "foodSafe"?, "dishwasherSafe"? (true | false | null) } }]
-//   replace runs over name, address, summary, publicDescription, recentNote; dropFormats removes format tags the profile does not support (tags
-//   are added only through tag-studios proposals); addNames appends alternate names; mergeInto hides a duplicate and points its slug at the kept
+//   replace runs over name, address, summary, publicDescription, recentNote, descriptionInternal; dropFormats removes format tags the profile does not support (tags
+//   are added only through tag-studios proposals); addNames appends alternate names, dropNames removes wrong ones; addSources appends source links
+//   (shown on the profile); a changed slug keeps the old one in app.studio_slug_history, which answers 308 (saveStudio does it; the run prints it);
+//   mergeInto hides a duplicate and points its slug at the kept
 //   public profile (the proxy answers its old URL with a redirect, docs/decisions.md 2026-10-15) — move any facts into the kept profile first;
 //   a profile made public again (set.visibility "public", no mergeInto) that was merged earlier takes its slug back: the history row that sent
 //   its own slug to the kept profile is deleted, so the URL answers 200 again;
@@ -20,18 +23,18 @@ import { audit } from '../../src/server/services/audit'
 import { STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY } from '../../src/shared/options'
 import { webUrl } from '../../src/lib/present'
 import { getStudioForEdit, saveStudio, toEditForm } from '../../src/server/services/studioEditor'
-import { finishRun, scriptActor, startRun } from '../../src/server/services/imports/runs'
+import { finishRun, scriptActor, startRun, writeStudio } from '../../src/server/services/imports/runs'
 
-type Field = 'name' | 'shortName' | 'slug' | 'type' | 'status' | 'visibility' | 'address' | 'summary' | 'publicDescription' | 'recentNote' | LinkField
+type Field = 'name' | 'shortName' | 'slug' | 'type' | 'status' | 'visibility' | 'address' | 'summary' | 'publicDescription' | 'recentNote' | 'descriptionInternal' | LinkField
 type LinkField = 'website' | 'instagram' | 'facebook'
 type B2b = { minOrder?: string; leadTime?: string; logoMethods?: string[]; worksWithHoreca?: boolean | null; worksWithCorporate?: boolean | null; foodSafe?: boolean | null; dishwasherSafe?: boolean | null }
-type Edit = { slug: string; why?: string; set?: Partial<Record<Field | 'city', string>>; replace?: [string, string][]; dropFormats?: string[]; addNames?: string[]; mergeInto?: string; b2b?: B2b }
+type Edit = { slug: string; why?: string; set?: Partial<Record<Field | 'city', string>>; replace?: [string, string][]; dropFormats?: string[]; addNames?: string[]; dropNames?: string[]; addSources?: string[]; clear?: ('instagramPosts' | 'activity')[]; mergeInto?: string; b2b?: B2b }
 // b2b keys → editor form fields.
 const B2B = { minOrder: 'b2bMinOrder', leadTime: 'b2bLeadTime', logoMethods: 'b2bLogoMethods', worksWithHoreca: 'b2bWorksWithHoreca', worksWithCorporate: 'b2bWorksWithCorporate', foodSafe: 'b2bFoodSafe', dishwasherSafe: 'b2bDishwasherSafe' } as const
 
 const { dry } = guard('edit-studios')
 const edits = JSON.parse(fs.readFileSync(process.env.EDITS || '/tmp/hlyna-edits.json', 'utf8')) as Edit[]
-const TEXT: Exclude<Field, 'slug' | 'type' | 'status' | 'visibility' | LinkField>[] = ['name', 'address', 'summary', 'publicDescription', 'recentNote']
+const TEXT: Exclude<Field, 'slug' | 'type' | 'status' | 'visibility' | LinkField>[] = ['name', 'address', 'summary', 'publicDescription', 'recentNote', 'descriptionInternal']
 const LINKS: LinkField[] = ['website', 'instagram', 'facebook']
 const actor = scriptActor('edit-studios')
 const run = dry ? 0 : await startRun(db, 'edit-studios', `${edits.length} edits`)
@@ -80,7 +83,15 @@ for (const e of edits) {
   }
   const b2bChanged = Object.values(B2B).filter((f) => JSON.stringify(form[f] ?? null) !== JSON.stringify(toEditForm(s)[f] ?? null))
   const names = (e.addNames ?? []).filter((n) => !form.alternateNames.includes(n))
-  if (names.length) form.alternateNames = [...form.alternateNames, ...names]
+  const droppedNames = (e.dropNames ?? []).filter((n) => form.alternateNames.includes(n))
+  if (names.length || droppedNames.length) form.alternateNames = [...form.alternateNames.filter((n) => !droppedNames.includes(n)), ...names]
+  const sources = (e.addSources ?? []).filter((u) => !form.sources.includes(u))
+  for (const u of sources) if (webUrl(u) !== u) throw new Error(`${e.slug}: source must be an absolute http(s) URL, got ${JSON.stringify(u)}`)
+  if (sources.length) form.sources = [...form.sources, ...sources]
+  const clearPosts = (e.clear ?? []).includes('instagramPosts') && form.instagramPosts.length > 0
+  if (clearPosts) form.instagramPosts = []
+  const [act] = await db.select({ lastPost: studios.activityLastPostDate, followers: studios.activityFollowers }).from(studios).where(eq(studios.id, row.id)).limit(1)
+  const clearActivity = (e.clear ?? []).includes('activity') && (act?.lastPost != null || act?.followers != null)
   const changed = (['slug', 'shortName', 'type', 'status', 'visibility', ...TEXT, ...LINKS] as Field[]).filter((f) => form[f] !== toEditForm(s)[f])
   const [history] = into ? await db.select({ studioId: studioSlugHistory.studioId }).from(studioSlugHistory).where(eq(studioSlugHistory.oldSlug, e.slug)).limit(1) : []
   const redirect = into && history?.studioId !== into.id
@@ -93,12 +104,18 @@ for (const e of edits) {
     ...(dropped.length ? [`formats: −${dropped.join(', −')}`] : []),
     ...b2bChanged.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f] ?? null)} → ${JSON.stringify(form[f] ?? null)}`),
     ...(names.length ? [`names: +${names.join(', +')}`] : []),
+    ...(droppedNames.length ? [`names: −${droppedNames.join(', −')}`] : []),
+    ...(sources.length ? [`sources: +${sources.join(', +')}`] : []),
+    ...(clearPosts ? ['instagramPosts: cleared'] : []),
+    ...(clearActivity ? ['activity: last post date and followers cleared'] : []),
+    ...(changed.includes('slug') ? [`slug history: /vyrobnyky/${s.row.slug} → /vyrobnyky/${form.slug} (308)`] : []),
     ...(redirect ? [`redirect → ${into!.slug}`] : []),
     ...(merged ? [`unmerge: ${form.slug} no longer redirects to ${keptSlug}`] : []),
   ]
   console.log(`${e.slug}: ${lines.join('\n  ') || 'no change'}${e.why && lines.length ? `\n  why: ${e.why}` : ''}`)
   if (dry || !lines.length) continue
-  if (changed.length || cityChanged || dropped.length || names.length || b2bChanged.length) await saveStudio(db, row.id, form, actor, 'Виправлення (скрипт)')
+  if (changed.length || cityChanged || dropped.length || names.length || droppedNames.length || sources.length || clearPosts || b2bChanged.length) await saveStudio(db, row.id, form, actor, 'Виправлення (скрипт)')
+  if (clearActivity) await writeStudio(db, row.id, { activityLastPostDate: null, activityFollowers: null }, undefined, actor, 'Виправлення (скрипт): дані чужого акаунта прибрано')
   if (redirect)
     await db.transaction(async (tx) => {
       await tx.insert(studioSlugHistory).values({ oldSlug: e.slug, studioId: into!.id }).onConflictDoUpdate({ target: studioSlugHistory.oldSlug, set: { studioId: into!.id } })
