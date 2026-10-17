@@ -197,7 +197,7 @@
        "url": "https://gavahandmade.com.ua"
       }
      ],
-     "note": "Ще в каталозі сайту: Olha Mukha, NADRA, Bigla Kizka, Irman.shop, Teper ceramica, Лідія Кольченко, Marharyta Kopylova, Mych Objects."
+     "note": "Ще в каталозі сайту: Olha Mukha, NADRA, Irman.shop, Teper ceramica, Лідія Кольченко, Marharyta Kopylova, Mych Objects."
     },
     {
      "place": "Щось Цікаве",
@@ -208,8 +208,6 @@
       "dasha-ptitsami",
       "imho-ceramics",
       "spadok",
-      "parasolia-parasolya-kafe-y-keramichna-studiia",
-      "olha-pylnyk",
       "ok-ceramics",
       "guculiya",
       "riaba-vosh",
@@ -234,14 +232,6 @@
        "url": "https://www.shchos-tsikave.ua/shop/namisto-keramichne-praznikove-blakitne/"
       },
       {
-       "label": "Parasolya (товар)",
-       "url": "https://www.shchos-tsikave.ua/shop/miska-dots-zelena/"
-      },
-      {
-       "label": "Pylnyk (товар)",
-       "url": "https://www.shchos-tsikave.ua/shop/keramichna-banka-konik/"
-      },
-      {
        "label": "OK.CERAMICS (товар)",
        "url": "https://www.shchos-tsikave.ua/shop/keramichniy-svichnik-z-serii-kandelyabri-1/"
       },
@@ -262,7 +252,7 @@
        "url": "https://www.shchos-tsikave.ua/shop/chayna-piala-z-serii-floramica-no-1/"
       }
      ],
-     "note": "Ще в каталозі крамниці з полем «Бренд»: Art room, Quite form, Богдан Кухарський, Morkva ceramics, Оne person ceramics, Odud Art."
+     "note": "Ще в каталозі крамниці з полем «Бренд»: Art room, Богдан Кухарський, One person ceramics."
     },
     {
      "place": "Керамікос",
@@ -431,6 +421,7 @@
      "place": "KULT",
      "slug": "kult-kult-dim-kultur-kontsept-prostir",
      "kind": "Концепт-простір українських брендів",
+     "address": "просп. Волі, 57",
      "slugs": [
       "gunia-project",
       "nadiia",
