@@ -354,8 +354,9 @@ export function staleNote(s: { activity?: { lastPostDate?: string | null } | nul
 }
 
 // The newest dated fact a profile rests on: the last Instagram post, the studio's own news, a price's year or a year
-// named in the text. Year-only facts count as the end of that year. Null when nothing is dated.
-export function dataDate(s: Studio, now = Date.now()): { at: number; label: string } | null {
+// named in the text. Year-only facts count as the end of that year and carry no source. Null when nothing is dated.
+export type DataDate = { at: number; label: string; source?: 'instagram' | 'news' }
+export function dataDate(s: Studio, now = Date.now()): DataDate | null {
   const thisYear = new Date(now).getUTCFullYear()
   const fmt = (d: string) =>
     new Intl.DateTimeFormat('uk-UA', { month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' })
@@ -363,15 +364,44 @@ export function dataDate(s: Studio, now = Date.now()): { at: number; label: stri
       .filter((x) => x.type === 'month' || x.type === 'year')
       .map((x) => x.value)
       .join(' ')
-  const facts = [s.activity?.lastPostDate, s.ownerNewsAt]
-    .filter((d): d is string => Boolean(d) && Number.isFinite(new Date(d!).getTime()))
-    .map((d) => ({ at: new Date(d).getTime(), label: fmt(d) }))
+  const dated = (d: string | null | undefined): d is string => Boolean(d) && Number.isFinite(new Date(d!).getTime())
+  const facts: DataDate[] = [
+    ...(dated(s.activity?.lastPostDate) ? [{ at: new Date(s.activity!.lastPostDate!).getTime(), label: fmt(s.activity!.lastPostDate!), source: 'instagram' as const }] : []),
+    ...(dated(s.ownerNewsAt) ? [{ at: new Date(s.ownerNewsAt!).getTime(), label: fmt(s.ownerNewsAt!), source: 'news' as const }] : []),
+  ]
   const text = [s.summary, s.publicDescription, s.description, s.recentNote, ...(s.prices ?? []).map((p) => p.text)].filter(Boolean).join(' ')
   for (const m of text.matchAll(/(?<!\d)(19[5-9]\d|20\d\d)(?!\d|\s*(?:грн|₴|мл|см|шт))/g)) {
     const y = Number(m[1])
     if (y <= thisYear) facts.push({ at: Date.UTC(y, 11, 31), label: String(y) })
   }
-  return facts.reduce<{ at: number; label: string } | null>((a, f) => (!a || f.at > a.at ? f : a), null)
+  const best = facts.reduce<DataDate | null>((a, f) => (!a || f.at > a.at ? f : a), null)
+  // A bare year from the text counts as its end, so it would beat a dated post of the same year; the sourced,
+  // month-precise sign is the better fact («жовтень 2023 (Instagram)», not «2023»).
+  if (best && !best.source) {
+    const sameYear = facts.filter((f) => f.source && f.label.endsWith(best.label)).sort((a, b) => b.at - a.at)[0]
+    if (sameYear) return sameYear
+  }
+  return best
+}
+
+/**
+ * The plain sentence a dormant profile («м'який»: status unclear or relocated with no fresher sign; or closed) opens with
+ * (owner, 17.10.2026): the newest dated sign the record holds, with its source when known and never a guessed date; that
+ * we see no activity now (or that work has stopped); and where the working studios of the same city are: the list
+ * «Інші студії та майстри» when the city has any, else the button «Запит іншим студіям».
+ */
+export function dormantLine(s: Studio, where: { city?: string | null; hasNearby: boolean }, now = Date.now()): string {
+  const d = dataDate(s, now)
+  const sign = !d
+    ? 'Дати останнього знаку активності в наших даних немає.'
+    : d.source === 'instagram'
+      ? `Останній знак активності — ${d.label} (Instagram).`
+      : d.source === 'news'
+        ? `Останній знак активності — ${d.label} (новини від студії).`
+        : `Останній знак активності в наших даних — ${d.label} рік.`
+  const state = s.status === 'closed' ? 'За нашими даними, роботу припинено' : 'Ознак роботи зараз ми не бачимо'
+  const next = where.hasNearby && where.city ? `нижче — студії та майстри, які працюють ${inCity(where.city)}` : 'запит варто надіслати іншим студіям — кнопка нижче'
+  return `${sign} ${state}; ${next}.`
 }
 
 /** The data date of a profile whose newest fact is more than a year old («2019», «березень 2021»), else ''. */

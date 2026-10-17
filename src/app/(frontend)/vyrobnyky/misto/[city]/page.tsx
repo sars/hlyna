@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Block, InnerCols, InnerHero, InnerMain } from '@/components/site/Inner'
+import { Block, InfoList, InnerCols, InnerHero, InnerMain } from '@/components/site/Inner'
 import { Button } from '@/components/ui/Button'
 import { CtaBand } from '@/components/ui/CtaBand'
 import { DataTable } from '@/components/ui/DataTable'
@@ -20,6 +20,7 @@ import { RequestForm } from '@/components/site/RequestForm.client'
 import { site } from '@/content/site'
 import { centreOf, cityPages, getAllStudios, getAcademies, getAllWithShops, getLegacy, getShops, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { CityStudioLinks } from '@/components/ui/CityList'
+import { cityMasters, sourceDateLabel } from '@/lib/cityMasters'
 import { cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { aboutCity, displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
@@ -94,6 +95,10 @@ export default async function CityMakersPage({ params }: Args) {
   const known = new Map((await getAllWithShops()).map((s) => [s.slug as string, s]))
   const prices = localPrices(studios)
   const priceWhere = prices.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
+  // Makers with a hidden profile but a real record (title, prize, school, years of work): one sourced line each, after the
+  // working studios (owner, 17.10.2026; src/content/city-masters.json). On a centre's page the oblast's towns follow, each with its town.
+  const worked = [city, ...towns.map((t) => t.city)].flatMap((c) => cityMasters(c.slug as string).map((m) => ({ ...m, place: c.slug === city.slug ? '' : c.name })))
+  const workedWhere = worked.some((m) => m.place) ? where : inCity(city.name)
 
   // Where to buy, counted from the profiles' own links (audit 15.10.2026, cause 6: no «most sell via Instagram» guess).
   const ig = studios.filter((s) => s.instagram).length
@@ -134,6 +139,17 @@ export default async function CityMakersPage({ params }: Args) {
           })),
         }}
       />
+      {worked.length > 0 && (
+        <JsonLd
+          data={{
+            '@context': 'https://schema.org',
+            '@type': 'ItemList',
+            name: `Майстри, які працювали ${workedWhere}`,
+            numberOfItems: worked.length,
+            itemListElement: worked.map((m, i) => ({ '@type': 'ListItem', position: i + 1, item: { '@type': 'Person', name: m.name, description: m.line } })),
+          }}
+        />
+      )}
       <InnerHero
         crumbs={[{ label: 'Головна', href: '/' }, { label: 'Виробники', href: '/vyrobnyky' }, { label: 'За містами', href: '/vyrobnyky/misto' }, ...(hub ? [{ label: pageName(hub), href: `/vyrobnyky/misto/${hub.city.slug}` }] : []), { label: name }]}
         modified={latestUpdate(studios)}
@@ -248,6 +264,27 @@ export default async function CityMakersPage({ params }: Args) {
         {academies.length > 0 && (
           <Block id="academies" title={`Навчальні заклади · ${academies.length}`} note="Кафедри, академії й коледжі, де вчать кераміки; це не студії, тому окремо від списків вище.">
             <CityStudioLinks studios={academies.map((s) => ({ id: s.id, name: linkName(s), href: `/vyrobnyky/${s.slug}` }))} />
+          </Block>
+        )}
+
+        {worked.length > 0 && (
+          <Block id="worked" title={`Майстри, які працювали ${workedWhere}`} note="Майстри з іменем і доробком, у яких ми не знайшли чинних контактів чи адреси, тому окремої сторінки в каталозі вони не мають. Біля кожного — джерело і його дата.">
+            <InfoList
+              items={worked.map((m) => ({
+                kicker: m.place || undefined,
+                title: m.name,
+                lines: [
+                  m.line,
+                  <React.Fragment key="src">
+                    Джерело:{' '}
+                    <a href={m.source.url} target="_blank" rel="noopener nofollow" className="text-ink-2 underline underline-offset-[3px] hover:text-cobalt">
+                      {m.source.title}
+                    </a>
+                    , {sourceDateLabel(m)}
+                  </React.Fragment>,
+                ],
+              }))}
+            />
           </Block>
         )}
 

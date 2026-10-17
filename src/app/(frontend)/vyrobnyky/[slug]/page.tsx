@@ -34,7 +34,7 @@ import { makerCities } from '@/lib/makers'
 import { productChips } from '@/lib/products'
 import { centreOf, cityPages, getAllStudios, getCatalog, getStudioBySlug, getStudioPhotos, confirmedForCompanies, confirmedForVenues, igHandle, offersMasterClasses, TYPE_LABEL, type CityPage } from '@/lib/catalog'
 import { dropStale } from '@/lib/dates'
-import { cleanAddress, cleanPublic, dedupeTexts, displayName, firstAddress, inCity, currentLine, currentNews, currentNote, isDomainLike, isExhibitingOnly, oldDataLabel, pageName, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
+import { cleanAddress, cleanPublic, dedupeTexts, displayName, dormantLine, firstAddress, inCity, currentLine, currentNews, currentNote, isDomainLike, isExhibitingOnly, oldDataLabel, pageName, profileUrls, publicPrices, stripPersonal, withoutPriceMention } from '@/lib/present'
 import { studioTitle } from '@/lib/title'
 import { amountsIn, groupMoney, typicalRange } from '@/lib/money'
 import { alsoFor } from '@/lib/linked'
@@ -161,9 +161,9 @@ export default async function StudioPage({ params }: Args) {
   const recentNote = studioNews ? '' : stripPersonal(currentNote(s.recentNote || '', s.activity?.lastPostDate))
   const lastPost = monthYear(s.activity?.lastPostDate)
   const igPosts = (s.activity?.instagramPosts ?? []).map((x) => x.url)
-  // «Оновлено» is the catalogue's date while the profile's newest fact is under a year old; an older profile says
-  // when its data is from, and when we last looked.
-  const staleData = s.type !== 'legacy' ? oldDataLabel(s) : ''
+  // A dormant profile opens with a plain sentence (owner, 17.10.2026): the newest dated sign the record holds, that we
+  // see no activity now, and where the city's working studios are. Its «Перевірено» date says when we last looked.
+  const dormantNote = dormant && s.type !== 'legacy' ? dormantLine(s, { city: city?.name, hasNearby: nearby.length > 0 }) : ''
   const checked = monthYear(s.activity?.checkedAt)
   const inTops = s.slug ? topsForStudio(s.slug) : []
   const facts: [string, React.ReactNode][] = [
@@ -256,6 +256,7 @@ export default async function StudioPage({ params }: Args) {
           </h1>
           {s.ownerVerified && <p className="m-0 text-sm font-semibold text-ink-2">✓ Профіль підтверджено студією</p>}
           {shownAlt.length > 0 && <p className="m-0 text-sm break-words text-ink-2">Також відомі як: {shownAlt.slice(0, 4).join(' · ')}</p>}
+          {dormantNote && <Note>{dormantNote}</Note>}
           <div className="grid max-w-read gap-3 text-body">
             {description.split(/\n{2,}/).map((para, i) => (
               <p key={i} className="m-0">
@@ -291,8 +292,8 @@ export default async function StudioPage({ params }: Args) {
               {showForm ? 'Запит цій студії' : 'Запит іншим студіям'}
             </Button>
           </div>
-          {/* An inactive profile without any dated fact says when we looked, not «Оновлено» (it would read as fresh). */}
-          {staleData ? <Updated label="Дані" date={`${staleData}${checked ? ` · перевірено: ${checked}` : ''}`} /> : dormant && s.type !== 'legacy' ? <Updated label="Перевірено" {...(checked ? { date: checked } : {})} /> : <Updated />}
+          {/* A dormant profile says when we looked, not «Оновлено» (it would read as fresh); its data date is in the note above. */}
+          {dormant && s.type !== 'legacy' ? <Updated label="Перевірено" {...(checked ? { date: checked } : {})} /> : <Updated />}
         </div>
         <section aria-labelledby="facts" className="min-w-0">
           <Kicker as="p">

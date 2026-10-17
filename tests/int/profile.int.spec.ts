@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { confirmedForCompanies, confirmedForVenues, offersMasterClasses, type StudioCard } from '@/lib/catalog'
-import { dataDate, splitSource, withoutPriceMention } from '@/lib/present'
+import { dataDate, dormantLine, splitSource, withoutPriceMention } from '@/lib/present'
 import { acceptsRequests, dedupePrices, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 
 const lines = (...raw: string[]) => raw.map(splitSource)
@@ -78,6 +78,30 @@ describe('profile lead and date', () => {
     expect(dataDate({ description: 'Член НСХУ з 1993 року, виставка 2018 року.' } as never, now)?.label).toBe('2018')
     expect(dataDate({ description: 'МК — 2025 грн.', activity: { lastPostDate: '2021-03-10T00:00:00Z' } } as never, now)?.label).toBe('березень 2021')
     expect(dataDate({ description: 'Без дат.' } as never, now)).toBeNull()
+  })
+  it('a dated post beats a bare year of the same year from the text; a later year from the text still wins', () => {
+    const now = Date.UTC(2026, 9, 17)
+    expect(dataDate({ recentNote: 'У 2023 році показувала тарелі.', activity: { lastPostDate: '2023-10-27T00:00:00Z' } } as never, now)).toMatchObject({ label: 'жовтень 2023', source: 'instagram' })
+    expect(dataDate({ description: 'Виставка 2025 року.', activity: { lastPostDate: '2023-10-27T00:00:00Z' } } as never, now)?.label).toBe('2025')
+  })
+})
+
+describe('a dormant profile opens with the last sign and where the working studios are (owner, 17.10.2026)', () => {
+  const now = Date.UTC(2026, 9, 17)
+  it('names the source of a dated sign: Instagram, the studio’s news', () => {
+    expect(dormantLine({ status: 'unclear', activity: { lastPostDate: '2023-10-27T00:00:00Z' } } as never, { city: 'Житомир', hasNearby: true }, now)).toBe(
+      'Останній знак активності — жовтень 2023 (Instagram). Ознак роботи зараз ми не бачимо; нижче — студії та майстри, які працюють у Житомирі.',
+    )
+    expect(dormantLine({ status: 'unclear', ownerNewsAt: '2025-02-10T00:00:00Z', description: 'Відкрилися 2019 року.' } as never, { city: 'Київ', hasNearby: true }, now)).toMatch(/^Останній знак активності — лютий 2025 \(новини від студії\)\./u)
+  })
+  it('a year from the text has no source and is said so; no date at all says so too', () => {
+    expect(dormantLine({ status: 'unclear', description: 'Виставка 2015 року в Чернігові.' } as never, { city: 'Київ', hasNearby: true }, now)).toMatch(/^Останній знак активності в наших даних — 2015 рік\./u)
+    expect(dormantLine({ status: 'unclear', description: 'Без дат.' } as never, { city: 'Київ', hasNearby: true }, now)).toMatch(/^Дати останнього знаку активності в наших даних немає\./u)
+  })
+  it('closed says work has stopped; a city without other studios points to the button', () => {
+    expect(dormantLine({ status: 'closed', description: 'Працювала до 2021 року.' } as never, { city: 'Суми', hasNearby: false }, now)).toBe(
+      'Останній знак активності в наших даних — 2021 рік. За нашими даними, роботу припинено; запит варто надіслати іншим студіям — кнопка нижче.',
+    )
   })
 })
 

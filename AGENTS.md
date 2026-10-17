@@ -26,7 +26,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 Next.js 16 (App Router) + Postgres (schema `app`, Drizzle ORM, Zod) + Better Auth (staff in `/panel`, studio owners in `/kabinet`) + Hono for `/api/panel` + Tailwind 4 with tokens by role from `docs/design/SYSTEM.md`, defined in `src/app/(frontend)/globals.css` (`bg-paper`, `text-ink`, `text-ink-2`, `bg-cobalt`, `text-terracotta-text`, `border-rule`, `font-display/body/serif/mono`); primitives in `src/components/ui/`. Fonts: Unbounded + Golos Text preloaded, Playfair Display italic + JetBrains Mono lazy (`src/app/fonts.ts`).
 
 ## Where things are
-- `src/content/` — site facts (`site.ts`) and navigation (`navigation.ts`). Copy and menus are edited here, by an LLM.
+- `src/content/` — site facts (`site.ts`), navigation (`navigation.ts`) and curated lists (`linked.json`, `shop-makers.json`, `city-masters.json` — hidden makers' lines on city pages). Copy and menus are edited here, by an LLM.
 - `src/components/site/` — header, mega menu, footer, request form, JSON-LD.
 - `src/app/(frontend)/` — public pages; `llms.txt`, `health`, `sitemap.xml` + `catalog-sitemap.xml` routes; `src/app/robots.ts` and `manifest.ts`.
 - `src/server/` — data layer: `db/schema` (Drizzle, schema `app`), `services/*` (all writes: requests, claims, owner changes, studio editor, imports — each audited), `auth/` (Better Auth, guards), `api/panel.ts` (Hono), `telegram/` (bot client and buttons → same services), `publicCatalog.ts` + `publicShape.ts` (rows → the record shapes in `src/types/catalog.ts` that pages render).

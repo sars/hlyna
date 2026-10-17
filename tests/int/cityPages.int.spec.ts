@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
+import data from '@/content/city-masters.json'
 import { cityPages, onPages, type StudioCard } from '@/lib/catalog'
+import { cityMasters, sourceDateLabel } from '@/lib/cityMasters'
 import { hiddenProfileTarget } from '@/lib/makers'
 import { pageName, pageWhere } from '@/lib/present'
 
@@ -61,5 +63,28 @@ describe('a hidden profile goes to the makers nearby', () => {
     expect(hiddenProfileTarget({ slug: 'bucha', oblast: 'Київська' }, pages)).toBe('/vyrobnyky/misto/kyiv')
     expect(hiddenProfileTarget({ slug: 'myrhorod', oblast: 'Полтавська' }, pages)).toBe('/vyrobnyky/misto')
     expect(hiddenProfileTarget(null, pages)).toBe('/vyrobnyky/misto')
+  })
+})
+
+describe('«Майстри, які працювали в місті» (owner, 17.10.2026): curated lines, no profile links, no guessed dates', () => {
+  it('every entry has a name, one line of fact, a source with a URL and when we read it; no birth dates', () => {
+    const all = Object.values(data).flat()
+    expect(all.length).toBeGreaterThan(0)
+    for (const m of all) {
+      expect(m.name).toBeTruthy()
+      expect(m.line).toMatch(/\S{10,}/u)
+      expect(m.source.url).toMatch(/^https:\/\//u)
+      expect(m.source.title).toBeTruthy()
+      expect(m.seen).toMatch(/^\d{4}-\d{2}$/u)
+      if ('date' in m) expect(m.date).toMatch(/^\d{4}(-\d{2})?$/u)
+      expect(m.line).not.toMatch(/народи|р\. н\./iu)
+      expect(m.line).not.toMatch(/\/vyrobnyky\//u)
+    }
+  })
+  it('a city without entries gets none; the source date is the source’s own, else «без дати; переглянуто …»', () => {
+    expect(cityMasters('no-such-city')).toEqual([])
+    expect(sourceDateLabel({ date: '2013-03', seen: '2026-10' })).toBe('березень 2013')
+    expect(sourceDateLabel({ date: '2015', seen: '2026-10' })).toBe('2015')
+    expect(sourceDateLabel({ seen: '2026-10' })).toBe('без дати; переглянуто у жовтні 2026')
   })
 })
