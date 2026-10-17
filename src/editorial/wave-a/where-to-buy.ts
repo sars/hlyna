@@ -17,7 +17,7 @@ export type StockPlace = {
   note?: string
   shop?: StudioCard
   makers: StudioCard[]
-  sources: { label: string; url: string; seen: string }[]
+  sources: { label: string; url: string }[]
 }
 export type StockGroup = { id: string; name: string; places: StockPlace[] }
 type RawPlace = { place: string; slug?: string; kind?: string; address?: string; note?: string; slugs: string[]; sources: StockPlace['sources'] }
@@ -66,5 +66,5 @@ export async function whereToBuyData() {
     stockPlaces: stockPlaces.length,
     stockMakers: new Set(stockPlaces.flatMap((p) => p.makers.map((m) => m.slug))).size,
   }
-  return { shops, shopCities, online, etsy, stockists, stock, stockUpdated: shopMakers.updated, vars }
+  return { shops, shopCities, online, etsy, stockists, stock, stockUpdated: shopMakers.updated, stockAbroad: shopMakers.abroad, vars }
 }

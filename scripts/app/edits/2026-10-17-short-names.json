@@ -1,0 +1,12 @@
+[
+  {
+    "slug": "nadiia-nadiia-world-nadiia-shapoval",
+    "why": "власник 17.10.2026: коротка назва «Nadiia» (була «Nadiia (Nadiia World, Надія Шаповал)»); slug від короткої назви, старий адресує 308",
+    "set": { "shortName": "Nadiia", "slug": "nadiia" }
+  },
+  {
+    "slug": "tsvite-teren-tsvite-teren",
+    "why": "власник 17.10.2026: коротка назва «Цвіте Терен» (була «Tsvite Teren»); slug від короткої назви, старий адресує 308",
+    "set": { "shortName": "Цвіте Терен", "slug": "tsvite-teren" }
+  }
+]

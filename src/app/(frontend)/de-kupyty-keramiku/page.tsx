@@ -41,7 +41,6 @@ export default async function Page() {
   const p = await load()
   if (!p) notFound()
   const known = new Map((await getAllWithShops()).map((s) => [s.slug!, s]))
-  const brandsBySlug = new Map(p.stockists.filter((x) => x.slug).map((x) => [x.slug!, x.brands]))
   return (
     <WavePage
       copy={p.copy}
@@ -65,7 +64,7 @@ export default async function Page() {
             <CityHead id={`misto-${g.city.slug}`} name={g.city.name} />
             <InfoList
               columns={2}
-              items={g.studios.map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{displayName(s)}</Link>, lines: [firstAddress(s.address) || null, brandsBySlug.get(s.slug!) || null] }))}
+              items={g.studios.map((s) => ({ title: <Link href={`/vyrobnyky/${s.slug}`}>{displayName(s)}</Link>, lines: [firstAddress(s.address) || null] }))}
             />
           </div>
         ))}
@@ -75,7 +74,7 @@ export default async function Page() {
         <Block
           id="stockists"
           title="Магазини й концепт-стори: чиї роботи там є"
-          note={<>Місця, де продають роботи майстрів і брендів із нашого каталогу. Перелік зібрано зі сторінок магазинів самих брендів, з каталогів крамниць і з профілів в Instagram; кожне джерело відкрито {p.stockUpdated}. Що саме з асортименту бренду є на полицях сьогодні, уточнюйте в магазині.</>}
+          note={<>Місця, де продають роботи майстрів і брендів із нашого каталогу. Перелік зібрано зі сторінок магазинів самих брендів, з каталогів крамниць і з профілів в Instagram; кожне джерело відкрито {p.stockUpdated}. Що саме з асортименту бренду є на полицях сьогодні, уточнюйте в магазині. Цвіте Терен — бренд порцелянових прикрас; на сторінці його магазинів є й розділ «Декор для дому» (свічки, тарілки, чашки).</>}
         >
           {p.stock.map((g) => (
             <div key={g.id}>
@@ -107,15 +106,27 @@ export default async function Page() {
                           <a href={src.url} target="_blank" rel="noopener nofollow" className="text-ink-2 underline underline-offset-[3px]">
                             {src.label}
                           </a>
-                          , {src.seen}
                         </React.Fragment>
                       ))}
+                      , відкрито {p.stockUpdated}
                     </span>,
                   ],
                 }))}
               />
             </div>
           ))}
+          <p className="m-0 max-w-read text-sm text-ink-2">
+            GUNIA Project, Nadiia і Цвіте Терен продаються й за кордоном: точки перелічено на сторінках{' '}
+            {p.stockAbroad.map((src, i) => (
+              <React.Fragment key={src.url}>
+                {i > 0 && (i === p.stockAbroad.length - 1 ? ' і ' : ', ')}
+                <a href={src.url} target="_blank" rel="noopener nofollow" className="text-cobalt underline underline-offset-[3px]">
+                  {src.label.replace(/,.*/, '')}
+                </a>
+              </React.Fragment>
+            ))}{' '}
+            (відкрито {p.stockUpdated}).
+          </p>
         </Block>
       )}
 
