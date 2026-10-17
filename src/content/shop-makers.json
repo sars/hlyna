@@ -7,36 +7,91 @@
    "places": [
     {
      "place": "AROMATEQUE",
-     "kind": "Мережа концепт-сторів",
+     "kind": "Мережа парфумерних магазинів",
      "address": "Київ (3 точки: ТРЦ Blockbuster Mall, бул. Лесі Українки, 7А, ТРЦ River Mall), Львів (2), Одеса, Дніпро, Харків (вул. Сумська, 118)",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "aromateque.com.ua",
+       "url": "https://aromateque.com.ua",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "TWLV",
-     "kind": "Мережа концепт-магазинів",
+     "kind": "Салон сучасного сервірування (раніше «12 Персон»)",
      "address": "Київ (вул. Велика Васильківська, 43/16; Столичне шосе, 101), Одеса (вул. Грецька, 26/28), Дніпро (бул. Кольський, 2)",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "twlv.ua",
+       "url": "https://twlv.ua",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "PERSONALITY",
-     "kind": "Мережа магазинів українських дизайнерів",
+     "kind": "Мережа магазинів брендового одягу й взуття",
      "address": "Львів (вул. Стецька, 6), Рівне",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "personality.ua",
+       "url": "https://personality.ua",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "TVOI",
      "slug": "tvoi-kontsept-stor",
      "kind": "Мережа концепт-сторів",
      "address": "Чернівці (вул. Шиллера, 5), Тернопіль (вул. Кардинала Йосипа Сліпого, 5), Вінниця (вул. Магістратська, 50)",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval", "tsvite-teren-tsvite-teren", "gunia-project"],
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval",
+      "tsvite-teren-tsvite-teren",
+      "gunia-project"
+     ],
      "note": "У Чернівцях TVOI називають усі три бренди; у Вінниці — Nadiia; у Тернополі — «Цвіте Терен».",
      "sources": [
-      { "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" },
-      { "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" },
-      { "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      }
      ]
     }
    ]
@@ -46,52 +101,96 @@
    "name": "Київ",
    "places": [
     {
-     "place": "Всі.Свої",
-     "slug": "vsi-svoi-vsi-svoi",
-     "kind": "Мультибрендовий магазин українських виробників",
-     "slugs": ["kerra", "rattleclay", "ubodecor", "zguro-ceramics", "yaglyna-olha-khasanshyn", "pokutska-keramika-pokutska-ceramics", "riaba-vosh"],
-     "sources": [{ "label": "vsisvoi.ua, посуд", "url": "https://vsisvoi.ua/posud", "seen": "2026" }]
-    },
-    {
-     "place": "ImaginePoint Gallery",
-     "slug": "imaginepoint-gallery",
-     "kind": "Галерея сучасного українського мистецтва",
-     "note": "У розділі «Ceramics & objects» 29 робіт.",
-     "slugs": ["olesia-dvorak-halyk-olesia-dvorak-halyk", "beata-korn"],
-     "sources": [{ "label": "imaginepoint.gallery, кераміка", "url": "https://imaginepoint.gallery/en/category/ceramic-objects", "seen": "10.2026" }]
+     "place": "ЦУМ",
+     "kind": "Універмаг",
+     "address": "вул. Хрещатик, 38; Цвіте Терен називає 3 поверх",
+     "slugs": [
+      "gunia-project",
+      "tsvite-teren-tsvite-teren"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "Goodwine Home",
-     "kind": "Відділ товарів для дому в гастрономічному маркеті",
      "address": "вул. Мечникова, 9",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval"],
-     "sources": [{ "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" }]
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval"
+     ],
+     "sources": [
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "CUT24/25",
      "address": "вул. Саксаганського, 24/25",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval"],
-     "sources": [{ "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" }]
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval"
+     ],
+     "sources": [
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "One Tea Tree",
-     "kind": "Чайна крамниця",
      "address": "вул. Рейтарська, 30",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval"],
-     "sources": [{ "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" }]
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval"
+     ],
+     "sources": [
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "Kendi",
      "address": "вул. Рейтарська, 9Б",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval"],
-     "sources": [{ "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" }]
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval"
+     ],
+     "sources": [
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "Le Privé",
-     "kind": "Бутик у готелі Hyatt Regency Kyiv",
+     "kind": "У готелі Hyatt Regency Kyiv",
      "address": "вул. Алли Тарасової, 5",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval"],
-     "sources": [{ "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" }]
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval"
+     ],
+     "sources": [
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      }
+     ]
     }
    ]
   },
@@ -103,47 +202,94 @@
      "place": "ҐАVA",
      "slug": "gava-halereia-ukrainskykh-remesel",
      "kind": "Галерея-крамниця українських ремесел",
-     "slugs": ["ceramic-jewelry", "hanna-holomei", "zola"],
-     "sources": [{ "label": "gavahandmade.com.ua, каталог", "url": "https://gavahandmade.com.ua", "seen": "07.10.2026" }]
+     "slugs": [
+      "ceramic-jewelry",
+      "hanna-holomei",
+      "zola"
+     ],
+     "sources": [
+      {
+       "label": "gavahandmade.com.ua, бренд товару в каталозі",
+       "url": "https://gavahandmade.com.ua",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "Щось Цікаве",
      "slug": "shchos-tsikave",
      "kind": "Крамниця українського хендмейду",
-     "note": "У каталозі крамниці 39 керамічних марок і авторів.",
-     "slugs": ["zguro-ceramics", "dasha-ptitsami", "imho-ceramics", "spadok", "parasolia-parasolya-kafe-y-keramichna-studiia", "olha-pylnyk", "ok-ceramics", "guculiya", "riaba-vosh", "yaglyna-olha-khasanshyn", "daryna-khozieieva"],
-     "sources": [{ "label": "shchos-tsikave.ua, каталог", "url": "https://www.shchos-tsikave.ua", "seen": "07.10.2026" }]
+     "slugs": [
+      "zguro-ceramics",
+      "dasha-ptitsami",
+      "imho-ceramics",
+      "spadok",
+      "parasolia-parasolya-kafe-y-keramichna-studiia",
+      "olha-pylnyk",
+      "ok-ceramics",
+      "guculiya",
+      "riaba-vosh",
+      "yaglyna-olha-khasanshyn",
+      "daryna-khozieieva"
+     ],
+     "sources": [
+      {
+       "label": "shchos-tsikave.ua, поле «Бренд» у каталозі",
+       "url": "https://www.shchos-tsikave.ua",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "Керамікос",
      "slug": "keramikos",
-     "kind": "Магазин української кераміки, гурт і роздріб",
-     "slugs": ["ivanna-kozak-dileta-i-bohdan-dileta-kozak", "ivan-lukovskyi", "lidiia-ta-andrii-ulianytski", "dobra-hlyna-keramichna-maisternia-nahurnykh"],
-     "sources": [{ "label": "keramikos.com.ua, авторська кераміка", "url": "https://keramikos.com.ua/avtorska-keram-ka-ukra-ni/", "seen": "10.2026" }]
-    },
-    {
-     "place": "Mercury Art Center",
-     "slug": "mercury-art-center-merkurii",
-     "kind": "Арт-центр і аукціонний дім",
-     "note": "На виставці-ярмарку кераміки «Ґлей» 30.08–21.09.2025 було понад 300 робіт 30+ авторів, серед них родина Берез; роботи продавали із сертифікатом автентичності.",
-     "slugs": ["ihor-bereza"],
-     "sources": [{ "label": "mercuryartcenter.com, «Ґлей»", "url": "https://mercuryartcenter.com/glei/", "seen": "10.2026" }]
+     "kind": "Магазин української художньої кераміки",
+     "slugs": [
+      "ivanna-kozak-dileta-i-bohdan-dileta-kozak",
+      "ivan-lukovskyi",
+      "dobra-hlyna-keramichna-maisternia-nahurnykh"
+     ],
+     "sources": [
+      {
+       "label": "keramikos.com.ua, авторська кераміка",
+       "url": "https://keramikos.com.ua/avtorska-keram-ka-ukra-ni/",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "ZELEN' showroom & coffee",
      "kind": "Шоурум і кав’ярня",
      "address": "вул. Братів Рогатинців, 12",
-     "slugs": ["tarilochky-dlia-prykras-podarunky"],
+     "slugs": [
+      "tarilochky-dlia-prykras-podarunky"
+     ],
      "sources": [
-      { "label": "Instagram Kotiko", "url": "https://www.instagram.com/kotiko_ceramic/", "seen": "10.2026" },
-      { "label": "Forgotten Galicia, шопінг-гід", "url": "https://forgottengalicia.com/lviv-shopping-guide", "seen": "10.2026" }
+      {
+       "label": "Instagram Kotiko",
+       "url": "https://www.instagram.com/kotiko_ceramic/",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Forgotten Galicia, шопінг-гід",
+       "url": "https://forgottengalicia.com/lviv-shopping-guide",
+       "seen": "17.10.2026"
+      }
      ]
     },
     {
      "place": "Jam Factory",
      "address": "вул. Богдана Хмельницького, 124",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval"],
-     "sources": [{ "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" }]
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval"
+     ],
+     "sources": [
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      }
+     ]
     }
    ]
   },
@@ -153,20 +299,43 @@
    "places": [
     {
      "place": "HRAM",
-     "kind": "Концепт-стор",
      "address": "просп. Дмитра Яворницького, 33",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval", "tsvite-teren-tsvite-teren"],
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval",
+      "tsvite-teren-tsvite-teren"
+     ],
      "sources": [
-      { "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" },
-      { "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" }
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      }
      ]
     },
     {
      "place": "MA.FASHION ART",
-     "kind": "Магазин одягу й мистецтва",
+     "kind": "Ательє й магазин одягу, офіційний представник GUNIA",
      "address": "вул. Вернадського, 16",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Instagram MA.FASHION ART",
+       "url": "https://www.instagram.com/ma.moda_art/",
+       "seen": "17.10.2026"
+      }
+     ]
     }
    ]
   },
@@ -176,10 +345,23 @@
    "places": [
     {
      "place": "SOKOLROOM",
-     "kind": "Концепт-стор",
+     "kind": "Концепт-стор українських дизайнерів",
      "address": "вул. Рішельєвська, 27",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Instagram SOKOLROOM",
+       "url": "https://www.instagram.com/sokolroom/",
+       "seen": "17.10.2026"
+      }
+     ]
     }
    ]
   },
@@ -189,13 +371,27 @@
    "places": [
     {
      "place": "FÓLK",
-     "kind": "Кураторський простір понад 40 українських брендів",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval", "tsvite-teren-tsvite-teren", "gunia-project"],
-     "note": "У жовтні 2026 року простір анонсував в Instagram нову колекцію GUNIA Project «Рябчик».",
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval",
+      "tsvite-teren-tsvite-teren",
+      "gunia-project"
+     ],
      "sources": [
-      { "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" },
-      { "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" },
-      { "label": "Instagram FÓLK", "url": "https://www.instagram.com/folk.select/", "seen": "10.2026" }
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Instagram FÓLK (назва профілю)",
+       "url": "https://www.instagram.com/folk.select/",
+       "seen": "17.10.2026"
+      }
      ]
     }
    ]
@@ -208,10 +404,21 @@
      "place": "SOMIDE Concept Store",
      "kind": "Концепт-стор",
      "address": "вул. 16-го Липня",
-     "slugs": ["gunia-project", "tsvite-teren-tsvite-teren"],
+     "slugs": [
+      "gunia-project",
+      "tsvite-teren-tsvite-teren"
+     ],
      "sources": [
-      { "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" },
-      { "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" }
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      }
      ]
     }
    ]
@@ -224,11 +431,32 @@
      "place": "KULT",
      "slug": "kult-kult-dim-kultur-kontsept-prostir",
      "kind": "Концепт-простір українських брендів",
-     "slugs": ["gunia-project", "nadiia-nadiia-world-nadiia-shapoval", "tsvite-teren-tsvite-teren"],
+     "slugs": [
+      "gunia-project",
+      "nadiia-nadiia-world-nadiia-shapoval",
+      "tsvite-teren-tsvite-teren"
+     ],
      "sources": [
-      { "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" },
-      { "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" },
-      { "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" }
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Instagram KULT (назва профілю)",
+       "url": "https://www.instagram.com/kult.prostir/",
+       "seen": "17.10.2026"
+      }
      ]
     }
    ]
@@ -240,12 +468,22 @@
     {
      "place": "BADO",
      "slug": "bado-kontsept-stor",
-     "kind": "Концепт-стор з розділом посуду",
-     "note": "У розділі «Посуд» 31 позиція: тарілки й чайники GUNIA, піали clay kyiv.",
-     "slugs": ["gunia-project", "clay-kyiv", "tsvite-teren-tsvite-teren"],
+     "kind": "Магазин брендового одягу й взуття з розділом посуду",
+     "slugs": [
+      "gunia-project",
+      "tsvite-teren-tsvite-teren"
+     ],
      "sources": [
-      { "label": "bado.ua, посуд", "url": "https://bado.ua/dlya-domu/posud", "seen": "10.2026" },
-      { "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" }
+      {
+       "label": "bado.ua, посуд",
+       "url": "https://bado.ua/dlya-domu/posud",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      }
      ]
     }
    ]
@@ -256,11 +494,18 @@
    "places": [
     {
      "place": "Clôt",
-     "kind": "Концепт-стор",
      "address": "вул. Кардинала Йосипа Сліпого, 5",
      "note": "За тією самою адресою Цвіте Терен називає концепт-стор TVOI.",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      }
+     ]
     }
    ]
   },
@@ -272,10 +517,20 @@
      "place": "The Room",
      "slug": "shourum-ukrainskykh-brendiv-mykolaiv",
      "kind": "Шоурум українських брендів",
-     "slugs": ["tarilochky-dlia-prykras-podarunky"],
+     "slugs": [
+      "tarilochky-dlia-prykras-podarunky"
+     ],
      "sources": [
-      { "label": "Instagram The Room", "url": "https://www.instagram.com/the.room.showroom/", "seen": "10.2026" },
-      { "label": "Instagram Kotiko", "url": "https://www.instagram.com/kotiko_ceramic/", "seen": "10.2026" }
+      {
+       "label": "Instagram Kotiko",
+       "url": "https://www.instagram.com/kotiko_ceramic/",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Instagram The Room",
+       "url": "https://www.instagram.com/the.room.showroom/",
+       "seen": "17.10.2026"
+      }
      ]
     }
    ]
@@ -288,8 +543,18 @@
      "place": "КЕРАМОкрамниця",
      "slug": "keramokramnytsia",
      "kind": "Крамниця Національного музею-заповідника українського гончарства",
-     "slugs": ["nina-dubynka", "yana-kutsenko", "mykhailo-kytrysh"],
-     "sources": [{ "label": "shop.opishne-museum.gov.ua", "url": "https://shop.opishne-museum.gov.ua/", "seen": "10.2026" }]
+     "slugs": [
+      "nina-dubynka",
+      "yana-kutsenko",
+      "mykhailo-kytrysh"
+     ],
+     "sources": [
+      {
+       "label": "shop.opishne-museum.gov.ua, автор у назві товару",
+       "url": "https://shop.opishne-museum.gov.ua/",
+       "seen": "17.10.2026"
+      }
+     ]
     }
    ]
   },
@@ -299,32 +564,77 @@
    "places": [
     {
      "place": "KOIBIRD",
-     "kind": "Концепт-стор",
+     "kind": "Магазин дизайнерського одягу й аксесуарів",
      "address": "Лондон, 62 Marylebone Lane",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "koibird.com",
+       "url": "https://www.koibird.com",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "White Label Project",
      "kind": "Концепт-стор",
      "address": "Берлін, Kleine Hamburger Straße 15",
-     "slugs": ["gunia-project"],
-     "sources": [{ "label": "GUNIA Project, магазини", "url": "https://guniaproject.com/pages/stores", "seen": "17.10.2026" }]
+     "slugs": [
+      "gunia-project"
+     ],
+     "sources": [
+      {
+       "label": "GUNIA Project, магазини",
+       "url": "https://guniaproject.com/pages/stores",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "whitelabel-project.com",
+       "url": "https://whitelabel-project.com",
+       "seen": "17.10.2026"
+      }
+     ]
     },
     {
      "place": "I AM VOLYA",
      "address": "Лондон, 152–153 Fleet Street",
-     "slugs": ["nadiia-nadiia-world-nadiia-shapoval", "tsvite-teren-tsvite-teren"],
+     "slugs": [
+      "nadiia-nadiia-world-nadiia-shapoval",
+      "tsvite-teren-tsvite-teren"
+     ],
      "sources": [
-      { "label": "Nadiia, стокісти", "url": "https://nadiia.world/uk/pages/stockists", "seen": "17.10.2026" },
-      { "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" }
+      {
+       "label": "Nadiia, стокісти",
+       "url": "https://nadiia.world/uk/pages/stockists",
+       "seen": "17.10.2026"
+      },
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      }
      ]
     },
     {
      "place": "Code 380",
      "address": "Сан-Франциско, 875 Sansome Street",
-     "slugs": ["tsvite-teren-tsvite-teren"],
-     "sources": [{ "label": "Цвіте Терен, магазини", "url": "https://tsviteteren.com/pages/stores-and-partners", "seen": "17.10.2026" }]
+     "slugs": [
+      "tsvite-teren-tsvite-teren"
+     ],
+     "sources": [
+      {
+       "label": "Цвіте Терен, магазини",
+       "url": "https://tsviteteren.com/pages/stores-and-partners",
+       "seen": "17.10.2026"
+      }
+     ]
     }
    ]
   }
