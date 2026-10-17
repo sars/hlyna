@@ -157,6 +157,8 @@ function LiveBlock({ d }: { d: WaveBData }) {
       return <EvidenceList items={d.lines} title="Хто робить посуд для чаю" id="who" />
     case 'vesillia':
       return <EvidenceList items={d.lines} title="Хто робить весільну кераміку" id="who" />
+    case 'khellovin':
+      return <EvidenceList items={d.lines} title="Хто ще робить кераміку до Хелловіна" id="who" />
     case 'vydy-keramiky':
       return (
         <Block id="who" title="Хто з українських майстрів працює з чим">
@@ -216,6 +218,7 @@ const RELATED: Record<WaveBId, { label: string; href: string }[]> = {
   'patriotychni-podarunky': [{ label: 'Подарунки партнерам і колегам', href: '/dlya-biznesu/korporatyvni-podarunky' }, { label: 'Новорічні подарунки', href: '/dlya-biznesu/novorichni-podarunky-2026' }, { label: 'Косів і Опішне сьогодні', href: '/dobirky/kosiv-i-opishne' }, { label: 'Чашки з логотипом', href: '/dlya-biznesu/chashky-z-lohotypom' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }],
   'chaini-tseremonii': [{ label: 'Чашки', href: '/vyrobnyky/vyrib/chashky' }, { label: 'Бренди посуду', href: '/dobirky/brendy-posudu' }, { label: 'Посуд для кав’ярень', href: '/dlya-biznesu/posud-dlya-kavyaren' }, { label: 'Види кераміки', href: '/hayidy/vydy-keramiky' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }],
   vesillia: [{ label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Гончарство для двох', href: '/maister-klasy/dlya-dvokh' }, { label: 'Як замовити партію', href: '/hayidy/yak-zamovyty-partiyu' }],
+  'khellovin': [{ label: 'Майстер-класи для дітей', href: '/maister-klasy/dlya-ditey' }, { label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }],
 }
 
 export async function WaveBRoute({ id }: { id: WaveBId }) {
@@ -231,7 +234,7 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
   const studios = waveBStudios(p.data)
   // Selections of makers link to the makers pages of the cities they cover.
   const makerSlugs = new Set((await makerCities()).map((g) => g.city.slug))
-  const cityLinks = ['brendy-posudu', 'pratsyuyut-z-biznesom', 'yalynkovi-prykrasy', 'symvol-2027', 'svichnyky', 'rizdvianyi-posud', 'patriotychni-podarunky', 'chaini-tseremonii', 'vesillia'].includes(id)
+  const cityLinks = ['brendy-posudu', 'pratsyuyut-z-biznesom', 'yalynkovi-prykrasy', 'symvol-2027', 'svichnyky', 'rizdvianyi-posud', 'patriotychni-podarunky', 'chaini-tseremonii', 'vesillia', 'khellovin'].includes(id)
     ? groupByCity(studios).filter((g) => g.studios.length >= 2 && makerSlugs.has(g.city.slug)).map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}` }))
     : []
   return (

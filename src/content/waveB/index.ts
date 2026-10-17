@@ -6,6 +6,7 @@ import c_chaini_tseremonii from './chaini-tseremonii.json'
 import c_chornodymlena_i_molochena from './chornodymlena-i-molochena.json'
 import c_dohliad_za_keramikoyu from './dohliad-za-keramikoyu.json'
 import c_etsy from './etsy.json'
+import c_khellovin from './khellovin.json'
 import c_muzei_keramiky from './muzei-keramiky.json'
 import c_patriotychni_podarunky from './patriotychni-podarunky.json'
 import c_podiyi from './podiyi.json'
@@ -23,6 +24,7 @@ export const copies: Record<string, WaveCopy> = {
   'chornodymlena-i-molochena': c_chornodymlena_i_molochena,
   'dohliad-za-keramikoyu': c_dohliad_za_keramikoyu,
   'etsy': c_etsy,
+  'khellovin': c_khellovin,
   'muzei-keramiky': c_muzei_keramiky,
   'patriotychni-podarunky': c_patriotychni_podarunky,
   'podiyi': c_podiyi,

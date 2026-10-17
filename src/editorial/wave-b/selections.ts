@@ -63,6 +63,10 @@ export const teaData = () => mentionData(TEA)
 export const WEDDING = /весіл|весільн|наречен|молодят|гостям/iu
 export const weddingData = () => mentionData(WEDDING)
 
+// Halloween: pumpkins, ghosts, bats in ceramics; the same rule lists studios for the Halloween classes page.
+export const HALLOWEEN = /хел+овін|гел+овін|halloween|гарбуз|привид|кажан/iu
+export const halloweenData = () => mentionData(HALLOWEEN)
+
 export async function businessData() {
   const all = (await makers()).filter((s) => ['brand', 'studio', 'maker'].includes(s.type ?? ''))
   const horeca = all.filter(confirmedForVenues)
