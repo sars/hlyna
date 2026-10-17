@@ -3,7 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
-import { KhellovinPromo } from '@/components/site/KhellovinPromo'
+import { SeasonPromo } from '@/components/site/SeasonPromo'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { Button } from '@/components/ui/Button'
@@ -144,7 +144,7 @@ export default async function HomePage() {
 
       {/* Seasonal pointer (renders nothing after its date) */}
       <div className={wrap}>
-        <KhellovinPromo place="home" />
+        <SeasonPromo place="home" />
       </div>
 
       {/* Paths */}

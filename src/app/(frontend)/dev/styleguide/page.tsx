@@ -8,7 +8,7 @@ import { PasswordInput } from '@/components/ui/PasswordInput.client'
 import { SaveBar } from '@/components/ui/SaveBar'
 import { StatusTag } from '@/components/ui/StatusTag'
 import { SearchAnswer, SearchField, SearchRow } from '@/components/site/search/SearchRow'
-import { KhellovinPromo } from '@/components/site/KhellovinPromo'
+import { SeasonPromo } from '@/components/site/SeasonPromo'
 import { TopList } from '@/components/site/TopList'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { Button } from '@/components/ui/Button'
@@ -562,8 +562,8 @@ export default async function StyleguidePage() {
       </Block>
 
       <Block id="sg-promo" title="26 · PromoStrip">
-        <Cap>Сезонний вказівник на одну сторінку: ряд між 1px лінійками, фото 1:1, кікер, назва, рядок фактів, стрілка; увесь ряд — одне посилання з data-promo для GA4 (promo_click). Нижче — живий KhellovinPromo (порожній після 31.10.2026) і сам примітив</Cap>
-        <KhellovinPromo place="mk-city" city="sumy" />
+        <Cap>Сезонний вказівник на одну сторінку: ряд між 1px лінійками, фото 1:1, кікер, назва, рядок фактів, стрілка; увесь ряд — одне посилання з data-promo для GA4 (promo_click). Нижче — живий SeasonPromo (порожній, коли в src/content/promos.ts немає чинної кампанії) і сам примітив</Cap>
+        <SeasonPromo place="mk-city" city="sumy" />
         <PromoStrip href="/dobirky" photo={sitePhotos.promoKhellovin} kicker="Добірка · до 31 жовтня" title="Кераміка на Хелловін" text="Гарбузи 595–1 300 грн і чашки з привидами 650–2 300 грн від 13 українських майстерень; майстер-класи з глини до 31 жовтня у шести містах." cta="Відкрити добірку" promo="styleguide" place="styleguide" />
       </Block>
     </main>

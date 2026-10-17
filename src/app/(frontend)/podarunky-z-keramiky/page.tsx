@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { Block, InfoList } from '@/components/site/Inner'
-import { KhellovinPromo } from '@/components/site/KhellovinPromo'
+import { SeasonPromo } from '@/components/site/SeasonPromo'
 import { CityHead } from '@/components/ui/CityHead'
 import { MoreLink } from '@/components/ui/MoreLink'
 import { WavePage } from '@/components/site/WavePage'
@@ -87,7 +87,7 @@ export default async function Page() {
         { label: 'Посуд для чаю', href: '/dobirky/posud-dlya-chainoi-tseremonii' },
       ]}
     >
-      <KhellovinPromo place="gifts" />
+      <SeasonPromo place="gifts" />
       <Block id="budget" kicker="За бюджетом" title="Що є в прайсах студій" note={<>Роздрібні ціни з сайтів, Instagram і маркетплейсів студій; по одному найдешевшому варіанту від студії в кожному діапазоні. Наявність уточнюйте в студії.</>}>
         {p.tiers.map((t) =>
           t.items.length ? (

@@ -10,7 +10,7 @@ import { cx } from './layout'
 // A seasonal pointer to one page: a ruled row (1px rules, no background) with a square photo, kicker, title, one line of
 // facts and the arrow cue. The whole row is one link, so one tap on a phone; the request CTA of the page stays the only
 // button. `promo` and `place` land in `data-promo` / `data-promo-place`, which Analytics.tsx turns into the GA4 event
-// `promo_click` (promo_id, promo_place). Temporary by nature: the composite that uses it (KhellovinPromo) decides the dates.
+// `promo_click` (promo_id, promo_place). Campaigns and their dates live in src/content/promos.ts; components/site/SeasonPromo.tsx places them.
 export function PromoStrip({ href, photo, kicker, title, text, cta, promo, place, className }: { href: string; photo: SitePhoto; kicker: string; title: string; text: string; cta: string; promo: string; place: string; className?: string }) {
   return (
     <Link
