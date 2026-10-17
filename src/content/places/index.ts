@@ -23,7 +23,6 @@ import cities_opishne from './cities/opishne.json'
 import cities_poltava from './cities/poltava.json'
 import cities_rivne from './cities/rivne.json'
 import cities_sloviansk from './cities/sloviansk.json'
-import cities_sosnivka from './cities/sosnivka.json'
 import cities_sumy from './cities/sumy.json'
 import cities_ternopil from './cities/ternopil.json'
 import cities_uzhhorod from './cities/uzhhorod.json'
@@ -60,7 +59,6 @@ export const cities: Record<string, PlaceContent> = {
   'poltava': cities_poltava,
   'rivne': cities_rivne,
   'sloviansk': cities_sloviansk,
-  'sosnivka': cities_sosnivka,
   'sumy': cities_sumy,
   'ternopil': cities_ternopil,
   'uzhhorod': cities_uzhhorod,
