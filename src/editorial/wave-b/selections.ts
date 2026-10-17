@@ -67,6 +67,11 @@ export const weddingData = () => mentionData(WEDDING)
 export const HALLOWEEN = /хел+овін|гел+овін|halloween|гарбуз|привид|кажан/iu
 export const halloweenData = () => mentionData(HALLOWEEN)
 
+// Services for people who make ceramics themselves: firing other people's work, ceramic coworking or free practice,
+// renting a wheel or the studio.
+export const KILN_COWORK = /коворк|послуг\p{L}* випал|випал (?:робіт|виробів|чужих|сторонніх)|сторонніх робіт|доступ до печі|вільн\p{L}* практик|самостійн\p{L}* робот|оренд\p{L}* (?:круга|кола|студії|майстерні)|оренда круга/iu
+export const kilnData = () => mentionData(KILN_COWORK)
+
 export async function businessData() {
   const all = (await makers()).filter((s) => ['brand', 'studio', 'maker'].includes(s.type ?? ''))
   const horeca = all.filter(confirmedForVenues)

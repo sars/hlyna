@@ -15,6 +15,8 @@ export type WaveCopy = {
   tops?: TopCategory[]
   faq: { q: string; a: string }[]
   sources: string[]
+  /** When the copy last changed (YYYY-MM-DD): the page's lastmod in the sitemap; without it, site.contentUpdated. */
+  updated?: string
 }
 
 export type TopItem = {

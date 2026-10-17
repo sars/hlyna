@@ -18,7 +18,7 @@ const urlset = (urls: { loc: string; lastmod: string }[]) =>
 export async function GET() {
   const studios = await getAllStudios()
   // lastmod = when the data behind the page last changed, not the build time: the newest studio update for
-  // catalogue pages, the content date for editorial pages (guides, selections, wave pages).
+  // catalogue pages, the copy's own `updated` date for written pages that carry one, else the content date.
   const latest = (xs: { updatedAt?: string | null }[]) => xs.reduce((m, x) => (x.updatedAt && x.updatedAt > m ? x.updatedAt : m), site.contentUpdated)
   const now = latest(studios)
   const content = site.contentUpdated
@@ -27,7 +27,7 @@ export async function GET() {
     ...HUBS.map((p) => ({ loc: site.url + p, lastmod: now })),
     ...topicList.map((t) => ({ loc: site.url + t.path, lastmod: now })),
     ...guides.map((g) => ({ loc: site.url + g.path, lastmod: content })),
-    ...(await liveWrittenPages()).map((p) => ({ loc: site.url + p.path, lastmod: content })),
+    ...(await liveWrittenPages()).map((p) => ({ loc: site.url + p.path, lastmod: p.updated ?? content })),
     ...(await certificateCities()).map((c) => ({ loc: `${site.url}/sertyfikaty/${c.slug}`, lastmod: latest(studios.filter((s) => s.cityDoc?.slug === c.slug)) })),
     ...cities.map((g) => ({ loc: `${site.url}/maister-klasy/${g.city.slug}`, lastmod: latest(g.studios) })),
     ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: latest(g.studios) })),

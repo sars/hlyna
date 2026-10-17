@@ -69,6 +69,7 @@ const WAVE_HREFS: Record<string, string> = {
   '/dobirky/posud-dlya-chainoi-tseremonii': 'chaini-tseremonii',
   '/dobirky/podarunky-gostyam-na-vesillia': 'vesillia',
   '/dobirky/keramika-na-khellovin': 'khellovin',
+  '/dobirky/de-vypalyty-keramiku': 'vypal',
   // Wave C (src/content/waveC, scripts/sync-wave-c.mjs)
   '/dlya-biznesu/yak-vidsvyatkuvaty-richnytsyu-kompaniyi': 'richnytsya-kompaniyi',
   '/dlya-biznesu/podarunky-spivrobitnykam': 'podarunky-spivrobitnykam',

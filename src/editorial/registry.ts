@@ -6,7 +6,7 @@ import { liveWaveBPages } from './wave-b'
 import { liveWaveCPages } from './wave-c'
 import { liveCasePages } from './cases'
 
-export type WrittenPage = { id?: string; path: string; section?: string | null; title: string; summary: string }
+export type WrittenPage = { id?: string; path: string; section?: string | null; title: string; summary: string; updated?: string }
 
 export async function liveWrittenPages(): Promise<WrittenPage[]> {
   return [...(await liveWavePages()), ...(await liveWaveBPages()), ...(await liveWaveCPages()), ...liveCasePages()]

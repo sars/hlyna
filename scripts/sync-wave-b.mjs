@@ -30,7 +30,12 @@ const warn = (f, m) => {
 
 const dir = path.join(SRC, 'copy')
 const ids = []
-for (const old of fs.readdirSync(OUT).filter((f) => f.endsWith('.json') && f !== 'events.json' && f !== 'museums.json')) fs.unlinkSync(path.join(OUT, old))
+// The copies now in the repo, read before they are cleared: an unchanged page keeps its `updated` date.
+const before = new Map()
+for (const old of fs.readdirSync(OUT).filter((f) => f.endsWith('.json') && f !== 'events.json' && f !== 'museums.json')) {
+  try { before.set(old.replace(/\.json$/, ''), JSON.parse(fs.readFileSync(path.join(OUT, old), 'utf8'))) } catch {}
+  fs.unlinkSync(path.join(OUT, old))
+}
 for (const file of fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.endsWith('.json')).sort() : []) {
   const id = file.replace(/\.json$/, '')
   if (!known.has(id)) {
@@ -97,7 +102,15 @@ for (const file of fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.ends
     const linked = [...all.matchAll(LINK)].map((m) => m[2]).filter((s) => !s.startsWith('/'))
     for (const s of [...linked, ...out.picks.flatMap((p) => p.slugs), ...(out.tops ?? []).flatMap((c) => c.items.map((x) => x.slug).filter(Boolean))]) if (!published.has(s)) warn(file, `unknown studio slug "${s}" (renders as plain text)`)
   }
-  fs.writeFileSync(path.join(OUT, `${id}.json`), JSON.stringify(out, null, 1) + '\n')
+  // `updated` (the page's lastmod in the sitemap): today in Kyiv when the copy differs from what is in the repo,
+  // else the date the repo file already carries; a date written in the research copy wins.
+  const dst = path.join(OUT, `${id}.json`)
+  const prev = before.get(id) ?? null
+  const same = prev && JSON.stringify({ ...prev, updated: undefined }) === JSON.stringify({ ...out, updated: undefined })
+  const today = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Kyiv' }).format(new Date())
+  out.updated = /^\d{4}-\d{2}-\d{2}$/.test(d.updated ?? '') ? d.updated : same && prev.updated ? prev.updated : same ? undefined : today
+  if (!out.updated) delete out.updated
+  fs.writeFileSync(dst, JSON.stringify(out, null, 1) + '\n')
   ids.push(id)
 }
 
