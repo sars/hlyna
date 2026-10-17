@@ -161,6 +161,8 @@ function LiveBlock({ d }: { d: WaveBData }) {
       return <EvidenceList items={d.lines} title="Хто ще робить кераміку до Хелловіна" id="who" />
     case 'vypal':
       return <EvidenceList items={d.lines} title="Студії, що згадують випал, коворкінг чи оренду" id="who" />
+    case 'interyer':
+      return <EvidenceList items={d.lines} title="Хто ще робить плитку, кахлі, панно й світильники" id="who" />
     case 'vydy-keramiky':
       return (
         <Block id="who" title="Хто з українських майстрів працює з чим">
@@ -222,6 +224,7 @@ const RELATED: Record<WaveBId, { label: string; href: string }[]> = {
   vesillia: [{ label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Гончарство для двох', href: '/maister-klasy/dlya-dvokh' }, { label: 'Як замовити партію', href: '/hayidy/yak-zamovyty-partiyu' }],
   'khellovin': [{ label: 'Майстер-класи для дітей', href: '/maister-klasy/dlya-ditey' }, { label: 'Керамічні свічники', href: '/dobirky/keramichni-svichnyky' }, { label: 'Подарунки з кераміки', href: '/podarunky-z-keramiky' }, { label: 'Ялинкові прикраси', href: '/dobirky/yalynkovi-prykrasy' }],
   vypal: [{ label: 'Курси гончарства', href: '/maister-klasy/kursy' }, { label: 'Гончарне коло', href: '/maister-klasy/honcharne-kolo' }, { label: 'Для студій', href: '/dlya-studiy' }, { label: 'Мапа студій', href: '/mapa' }],
+  interyer: [{ label: 'Плитка й панно', href: '/vyrobnyky/vyrib/plytka-i-panno' }, { label: 'Світильники', href: '/vyrobnyky/vyrib/svitylnyky' }, { label: 'Посуд для ресторанів', href: '/dlya-biznesu/posud-dlya-restoraniv' }, { label: 'Посуд для готелів', href: '/dlya-biznesu/posud-dlya-hoteliv' }, { label: 'Як замовити партію', href: '/hayidy/yak-zamovyty-partiyu' }],
 }
 
 export async function WaveBRoute({ id }: { id: WaveBId }) {
@@ -237,7 +240,7 @@ export async function WaveBRoute({ id }: { id: WaveBId }) {
   const studios = waveBStudios(p.data)
   // Selections of makers link to the makers pages of the cities they cover.
   const makerSlugs = new Set((await makerCities()).map((g) => g.city.slug))
-  const cityLinks = ['brendy-posudu', 'pratsyuyut-z-biznesom', 'yalynkovi-prykrasy', 'symvol-2027', 'svichnyky', 'rizdvianyi-posud', 'patriotychni-podarunky', 'chaini-tseremonii', 'vesillia', 'khellovin', 'vypal'].includes(id)
+  const cityLinks = ['brendy-posudu', 'pratsyuyut-z-biznesom', 'yalynkovi-prykrasy', 'symvol-2027', 'svichnyky', 'rizdvianyi-posud', 'patriotychni-podarunky', 'chaini-tseremonii', 'vesillia', 'khellovin', 'vypal', 'interyer'].includes(id)
     ? groupByCity(studios).filter((g) => g.studios.length >= 2 && makerSlugs.has(g.city.slug)).map((g) => ({ label: g.city.name, href: `/vyrobnyky/misto/${g.city.slug}` }))
     : []
   return (

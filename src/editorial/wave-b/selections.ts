@@ -70,6 +70,10 @@ export const halloweenData = () => mentionData(HALLOWEEN)
 // Services for people who make ceramics themselves: firing other people's work, ceramic coworking or free practice,
 // renting a wheel or the studio.
 export const KILN_COWORK = /коворк|послуг\p{L}* випал|випал (?:робіт|виробів|чужих|сторонніх)|сторонніх робіт|доступ до печі|вільн\p{L}* практик|самостійн\p{L}* робот|оренд\p{L}* (?:круга|кола|студії|майстерні)|оренда круга/iu
+// Interior and architectural ceramics: tiles, stove tiles, panels, mosaics, lamps, sinks.
+export const INTERIOR = /плитк|кахл|кахел|панно|мозаїк|світильник|умивальник|раковин|архітектурн/iu
+export const interiorData = () => mentionData(INTERIOR)
+
 // A studio that only plans such a service («плани», «плануються») is left out.
 export async function kilnData() {
   const d = await mentionData(KILN_COWORK)
