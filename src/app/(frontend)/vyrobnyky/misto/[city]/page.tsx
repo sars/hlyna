@@ -97,7 +97,7 @@ export default async function CityMakersPage({ params }: Args) {
   const priceWhere = prices.length ? 'у розділі «Ціни» на цій сторінці' : 'на сторінці «Ціни 2026»'
   // Makers with a hidden profile but a real record (title, prize, school, years of work): one sourced line each, after the
   // working studios (owner, 17.10.2026; src/content/city-masters.json). On a centre's page the oblast's towns follow, each with its town.
-  const worked = [city, ...towns.map((t) => t.city)].flatMap((c) => cityMasters(c.slug as string).map((m) => ({ ...m, place: c.slug === city.slug ? '' : c.name })))
+  const worked = [city, ...towns.map((t) => t.city)].flatMap((c) => cityMasters(c.slug as string).map((m) => ({ ...m, place: m.place ?? (c.slug === city.slug ? '' : c.name) })))
   const workedWhere = worked.some((m) => m.place) ? where : inCity(city.name)
 
   // Where to buy, counted from the profiles' own links (audit 15.10.2026, cause 6: no «most sell via Instagram» guess).

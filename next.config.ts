@@ -13,11 +13,14 @@ const nextConfig: NextConfig = {
     qualities: [75, 100],
     formats: ['image/avif', 'image/webp'],
   },
-  // The former CMS admin lived at /admin; old bookmarks land on the panel.
+  // The former CMS admin lived at /admin; old bookmarks land on the panel. ChatGPT once rebuilt /vyrobnyky/vyrib/… from
+  // memory as /vyrobnyky/vyrob/… (log 17.10.2026): the likeliest misspelling of «виріб» goes to the real list.
   async redirects() {
     return [
       { source: '/admin', destination: '/panel', statusCode: 301 },
       { source: '/admin/:path*', destination: '/panel', statusCode: 301 },
+      { source: '/vyrobnyky/vyrob', destination: '/vyrobnyky/vyrib', statusCode: 308 },
+      { source: '/vyrobnyky/vyrob/:path*', destination: '/vyrobnyky/vyrib/:path*', statusCode: 308 },
     ]
   },
   // Font files in public/fonts never change in place (a new version gets a new name), so browsers keep them for a year,

@@ -5,9 +5,11 @@ import data from '@/content/city-masters.json'
  * record holds real substance — a title, a prize, a school, years of work. One curated line of fact each, with its sources,
  * in src/content/city-masters.json keyed by city slug. No link to the hidden profile; no birth dates (privacy rule).
  * A source's `date` is its own date (YYYY or YYYY-MM) when it has one; `seen` is when we read the sources (YYYY-MM), never guessed.
+ * `place` names the town or village when a maker from the oblast sits on its centre's page (Опішне on Полтава): the town
+ * may have no page or no listed studio of its own, and the block's heading must not say they worked in the centre.
  */
 export type CityMasterSource = { title: string; url: string; date?: string }
-export type CityMaster = { name: string; line: string; sources: CityMasterSource[]; seen: string }
+export type CityMaster = { name: string; line: string; sources: CityMasterSource[]; seen: string; place?: string }
 
 export const cityMasters = (citySlug: string): CityMaster[] => (data as Record<string, CityMaster[]>)[citySlug] ?? []
 
