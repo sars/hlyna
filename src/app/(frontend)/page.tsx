@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 
+import { KhellovinPromo } from '@/components/site/KhellovinPromo'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { Button } from '@/components/ui/Button'
@@ -140,6 +141,11 @@ export default async function HomePage() {
           <RequestForm sourcePage="/" compact />
         </div>
       </section>
+
+      {/* Seasonal pointer (renders nothing after its date) */}
+      <div className={wrap}>
+        <KhellovinPromo place="home" />
+      </div>
 
       {/* Paths */}
       <section className={cx(wrap, section)} aria-labelledby="paths">

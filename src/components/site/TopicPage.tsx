@@ -2,6 +2,7 @@ import Link from 'next/link'
 import React from 'react'
 
 import { BoldFacts, Block, InnerCols, InnerHero, InnerMain, Related } from '@/components/site/Inner'
+import { KhellovinPromo } from '@/components/site/KhellovinPromo'
 import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
 import { RequestForm } from '@/components/site/RequestForm.client'
@@ -200,6 +201,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
           </>
         }
       >
+        {topic.section === 'mk' && <KhellovinPromo place="mk-topic" />}
         {topic.verse.length > 0 && <Epigraph lines={topic.verse} />}
         {topsKnown && tops.length > 0 && topic.topsNote && <p className="m-0 max-w-read font-mono text-xs leading-normal text-ink-2">{topic.topsNote}</p>}
         {topsKnown &&

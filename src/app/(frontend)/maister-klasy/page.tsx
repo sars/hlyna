@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Block, HeroRequest, InnerHero, InnerMain, RequestBand } from '@/components/site/Inner'
+import { KhellovinPromo } from '@/components/site/KhellovinPromo'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { CityList, SmallCities } from '@/components/ui/CityList'
 import { Chip } from '@/components/ui/Chip'
@@ -51,6 +52,7 @@ export default async function MasterClassesIndex() {
         actions={<HeroRequest path="/maister-klasy" />}
       />
       <div className="grid gap-block pt-[clamp(24px,3vw,40px)]">
+        <KhellovinPromo place="mk-index" />
         <Block id="formats" title="Формати">
           <ChipGroup>
             {topicList

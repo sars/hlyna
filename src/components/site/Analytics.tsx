@@ -7,7 +7,10 @@ import { site } from '@/content/site'
 // No ads: advertising storage and signals are off, so no cookie banner is needed for analytics alone.
 // Page views on client-side navigation come from GA4 enhanced measurement («page changes based on browser history»).
 // Events: `generate_lead` / `studio_signup` from RequestForm (src/lib/track.ts), `contact_click` below for
-// phone, email, Telegram, Viber and Instagram links (contacting a studio directly is a lead too).
+// phone, email, Telegram, Viber and Instagram links (contacting a studio directly is a lead too), and `promo_click`
+// for any link with `data-promo="<id>"` (+ optional `data-promo-place="<placement>"`): parameters `promo_id`,
+// `promo_place`. Used by PromoStrip (src/components/ui/PromoStrip.tsx); ids so far: `khellovin-2026`
+// (places home, mk-index, mk-city, mk-topic, gifts). No personal data in either event.
 export function Analytics() {
   const id = site.analytics.ga4
   if (!id || process.env.NODE_ENV !== 'production') return null
@@ -23,6 +26,8 @@ if (location.hostname === ${JSON.stringify(site.domain)}) {
   document.addEventListener('click', function (e) {
     var a = e.target && e.target.closest ? e.target.closest('a[href]') : null;
     if (!a) return;
+    var p = a.getAttribute('data-promo');
+    if (p) gtag('event', 'promo_click', { promo_id: p, promo_place: a.getAttribute('data-promo-place') || '' });
     var h = a.getAttribute('href') || '';
     var t = /^tel:/.test(h) ? 'phone' : /^mailto:/.test(h) ? 'email' : /^viber:/.test(h) ? 'viber'
       : /\\/\\/(t\\.me|telegram\\.me)\\//.test(h) ? 'telegram' : /\\/\\/(www\\.)?instagram\\.com\\//.test(h) ? 'instagram' : '';

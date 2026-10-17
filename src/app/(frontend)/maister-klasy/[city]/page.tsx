@@ -12,6 +12,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import React from 'react'
 
+import { KhellovinPromo } from '@/components/site/KhellovinPromo'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 
 import { latestUpdate } from '@/lib/catalog'
@@ -231,6 +232,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
           </>
         }
       >
+        <KhellovinPromo place="mk-city" city={city.slug as string} />
         {studios.length >= 8 && <Epigraph lines={pickVerse(city.slug as string)} />}
 
         <Block id="list" title={`Де пройти майстер-клас ${inCity(city.name)}`} note={r ? 'Ціна — разове групове заняття для дорослих з прайсу студії.' : undefined}>

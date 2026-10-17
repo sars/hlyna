@@ -8,6 +8,7 @@ import { PasswordInput } from '@/components/ui/PasswordInput.client'
 import { SaveBar } from '@/components/ui/SaveBar'
 import { StatusTag } from '@/components/ui/StatusTag'
 import { SearchAnswer, SearchField, SearchRow } from '@/components/site/search/SearchRow'
+import { KhellovinPromo } from '@/components/site/KhellovinPromo'
 import { TopList } from '@/components/site/TopList'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { Button } from '@/components/ui/Button'
@@ -34,6 +35,7 @@ import { NumberedList } from '@/components/ui/NumberedList'
 import { Panel } from '@/components/ui/Panel'
 import { PhotoCard } from '@/components/ui/PhotoCard'
 import { PriceList } from '@/components/ui/PriceList'
+import { PromoStrip } from '@/components/ui/PromoStrip'
 import { QuoteBlock } from '@/components/ui/QuoteBlock'
 import { Rule } from '@/components/ui/Rule'
 import { SectionHead } from '@/components/ui/SectionHead'
@@ -180,7 +182,7 @@ export default async function StyleguidePage() {
         </p>
         <Updated />
         <nav aria-label="Розділи стайлгайду" className="flex flex-wrap gap-1.5">
-          {['colors', 'type', 'rules', 'buttons', 'heads', 'panels', 'facts', 'cards', 'tables', 'chips', 'faq', 'term', 'epi', 'forms', 'lists', 'studios', 'marks', 'wordmark', 'vessels'].map((k) => (
+          {['colors', 'type', 'rules', 'buttons', 'heads', 'panels', 'facts', 'cards', 'tables', 'chips', 'faq', 'term', 'epi', 'forms', 'lists', 'studios', 'marks', 'wordmark', 'vessels', 'promo'].map((k) => (
             <Chip key={k} href={`#sg-${k}`} size="sm" as="a">{k}</Chip>
           ))}
         </nav>
@@ -557,6 +559,12 @@ export default async function StyleguidePage() {
           name="Студія"
           photos={[sitePhotos.forStudios, sitePhotos.cardGifts, sitePhotos.cardPair, sitePhotos.market, sitePhotos.cardLogo, sitePhotos.cardClass].map((p) => ({ url: p.src, full: p.src, alt: '', width: p.width, height: p.height }))}
         />
+      </Block>
+
+      <Block id="sg-promo" title="26 · PromoStrip">
+        <Cap>Сезонний вказівник на одну сторінку: ряд між 1px лінійками, фото 1:1, кікер, назва, рядок фактів, стрілка; увесь ряд — одне посилання з data-promo для GA4 (promo_click). Нижче — живий KhellovinPromo (порожній після 31.10.2026) і сам примітив</Cap>
+        <KhellovinPromo place="mk-city" city="sumy" />
+        <PromoStrip href="/dobirky" photo={sitePhotos.promoKhellovin} kicker="Добірка · до 31 жовтня" title="Кераміка на Хелловін" text="Гарбузи 595–1 300 грн і чашки з привидами 650–2 300 грн від 13 українських майстерень; майстер-класи з глини до 31 жовтня у шести містах." cta="Відкрити добірку" promo="styleguide" place="styleguide" />
       </Block>
     </main>
   )

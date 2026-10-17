@@ -64,6 +64,8 @@ export const sitePhotos = {
   guideGlaze: { src: '/images/site/guide-glaze-1.jpg', width: 1200, height: 825, alt: 'Миску занурюють щипцями в блакитну поливу' }, // 503
   shopShelf: { src: '/images/site/shop-shelf-1.jpg', width: 1200, height: 825, alt: 'Полиця крамнички з керамікою ручної роботи: чашки з ліпленими метеликами й квітами' }, // 12
   giftCertificates: { src: '/images/site/gift-cert-1.jpg', width: 1200, height: 825, alt: 'Дві руки передають свіжу глиняну чашку в сутінках' }, // 425
+  // Seasonal promo strip (1:1, 800×800): the owner's photo, experiments/promo/khellovin-source.jpg; cut with sharp, no EXIF.
+  promoKhellovin: { src: '/images/site/promo-khellovin-1.jpg', width: 800, height: 800, alt: 'Керамічна чашка-гарбуз із зеленою ручкою, миска й дві маленькі мисочки-гарбузи на світлому столі' },
 } satisfies Record<string, SitePhoto>
 
 // A photo at the top of an inner page: a Wikimedia/stock photo with its credit, or an archive photo without one.
