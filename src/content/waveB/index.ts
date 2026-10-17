@@ -16,6 +16,7 @@ import c_svichnyky from './svichnyky.json'
 import c_symvol_2027 from './symvol-2027.json'
 import c_vesillia from './vesillia.json'
 import c_vydy_keramiky from './vydy-keramiky.json'
+import c_vypal from './vypal.json'
 import c_yalynkovi_prykrasy from './yalynkovi-prykrasy.json'
 
 export const copies: Record<string, WaveCopy> = {
@@ -34,5 +35,6 @@ export const copies: Record<string, WaveCopy> = {
   'symvol-2027': c_symvol_2027,
   'vesillia': c_vesillia,
   'vydy-keramiky': c_vydy_keramiky,
+  'vypal': c_vypal,
   'yalynkovi-prykrasy': c_yalynkovi_prykrasy,
 }

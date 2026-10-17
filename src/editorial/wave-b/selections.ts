@@ -70,7 +70,14 @@ export const halloweenData = () => mentionData(HALLOWEEN)
 // Services for people who make ceramics themselves: firing other people's work, ceramic coworking or free practice,
 // renting a wheel or the studio.
 export const KILN_COWORK = /коворк|послуг\p{L}* випал|випал (?:робіт|виробів|чужих|сторонніх)|сторонніх робіт|доступ до печі|вільн\p{L}* практик|самостійн\p{L}* робот|оренд\p{L}* (?:круга|кола|студії|майстерні)|оренда круга/iu
-export const kilnData = () => mentionData(KILN_COWORK)
+// A studio that only plans such a service («плани», «плануються») is left out.
+export async function kilnData() {
+  const d = await mentionData(KILN_COWORK)
+  const lines = d.lines.filter((l) => !/план/iu.test(l.line ?? ''))
+  const studios = lines.map((l) => l.s)
+  const groups = groupByCity(studios)
+  return { studios, lines, groups, vars: { count: studios.length, cities: groups.length } as WaveVars }
+}
 
 export async function businessData() {
   const all = (await makers()).filter((s) => ['brand', 'studio', 'maker'].includes(s.type ?? ''))
