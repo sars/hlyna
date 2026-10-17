@@ -67,24 +67,28 @@ describe('a hidden profile goes to the makers nearby', () => {
 })
 
 describe('«Майстри, які працювали в місті» (owner, 17.10.2026): curated lines, no profile links, no guessed dates', () => {
-  it('every entry has a name, one line of fact, a source with a URL and when we read it; no birth dates', () => {
+  it('every entry has a name, one line of fact, at least one source with a URL and when we read it; no birth dates', () => {
     const all = Object.values(data).flat()
     expect(all.length).toBeGreaterThan(0)
     for (const m of all) {
       expect(m.name).toBeTruthy()
       expect(m.line).toMatch(/\S{10,}/u)
-      expect(m.source.url).toMatch(/^https:\/\//u)
-      expect(m.source.title).toBeTruthy()
+      expect(m.sources.length).toBeGreaterThan(0)
+      for (const src of m.sources) {
+        expect(src.url).toMatch(/^https:\/\//u)
+        expect(src.title).toBeTruthy()
+        if ('date' in src) expect(src.date).toMatch(/^\d{4}(-\d{2})?$/u)
+      }
       expect(m.seen).toMatch(/^\d{4}-\d{2}$/u)
-      if ('date' in m) expect(m.date).toMatch(/^\d{4}(-\d{2})?$/u)
       expect(m.line).not.toMatch(/народи|р\. н\./iu)
       expect(m.line).not.toMatch(/\/vyrobnyky\//u)
     }
+    expect(cityMasters('kyiv').find((m) => m.name === 'Петро Печорний')?.sources).toHaveLength(2)
   })
   it('a city without entries gets none; the source date is the source’s own, else «без дати; переглянуто …»', () => {
     expect(cityMasters('no-such-city')).toEqual([])
-    expect(sourceDateLabel({ date: '2013-03', seen: '2026-10' })).toBe('березень 2013')
-    expect(sourceDateLabel({ date: '2015', seen: '2026-10' })).toBe('2015')
-    expect(sourceDateLabel({ seen: '2026-10' })).toBe('без дати; переглянуто у жовтні 2026')
+    expect(sourceDateLabel({ date: '2013-03' }, '2026-10')).toBe('березень 2013')
+    expect(sourceDateLabel({ date: '2015' }, '2026-10')).toBe('2015')
+    expect(sourceDateLabel({}, '2026-10')).toBe('без дати; переглянуто у жовтні 2026')
   })
 })

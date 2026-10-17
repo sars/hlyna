@@ -98,6 +98,16 @@ describe('a dormant profile opens with the last sign and where the working studi
     expect(dormantLine({ status: 'unclear', description: 'Виставка 2015 року в Чернігові.' } as never, { city: 'Київ', hasNearby: true }, now)).toMatch(/^Останній знак активності в наших даних — 2015 рік\./u)
     expect(dormantLine({ status: 'unclear', description: 'Без дат.' } as never, { city: 'Київ', hasNearby: true }, now)).toMatch(/^Дати останнього знаку активності в наших даних немає\./u)
   })
+  it('relocated: the move’s year from the record’s own sentence and the new place; no year when the record has none', () => {
+    const moved = { type: 'brand', status: 'relocated', publicDescription: 'Засноване у Слов’янську в 1990-х роках. У серпні 2025 року родина почала переїзд під Кам’янець-Подільський.', address: 'околиці Кам’янця-Подільського (до 2025 — Слов’янськ)' }
+    expect(dormantLine(moved as never, { city: 'Кам’янець-Подільський', hasNearby: true }, now)).toBe(
+      'Бренд переїхав у 2025 році, нове місце — Кам’янець-Подільський; про запуск на новому місці даних немає; нижче — студії та майстри, які працюють у Кам’янці-Подільському.',
+    )
+    const undated = { type: 'maker', status: 'relocated', publicDescription: 'Переїхав із Криму до Києва; майстер-клас коштує 300 доларів з особи (2026).' }
+    expect(dormantLine(undated as never, { city: 'Київ', hasNearby: true }, now)).toBe(
+      'Майстерня переїхала, нове місце — Київ; останній знак активності в наших даних — 2026 рік; нижче — студії та майстри, які працюють у Києві.',
+    )
+  })
   it('closed says work has stopped; a city without other studios points to the button', () => {
     expect(dormantLine({ status: 'closed', description: 'Працювала до 2021 року.' } as never, { city: 'Суми', hasNearby: false }, now)).toBe(
       'Останній знак активності в наших даних — 2021 рік. За нашими даними, роботу припинено; запит варто надіслати іншим студіям — кнопка нижче.',

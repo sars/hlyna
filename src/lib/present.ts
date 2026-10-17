@@ -393,15 +393,38 @@ export function dataDate(s: Studio, now = Date.now()): DataDate | null {
 export function dormantLine(s: Studio, where: { city?: string | null; hasNearby: boolean }, now = Date.now()): string {
   const d = dataDate(s, now)
   const sign = !d
-    ? 'Дати останнього знаку активності в наших даних немає.'
+    ? 'дати останнього знаку активності в наших даних немає'
     : d.source === 'instagram'
-      ? `Останній знак активності — ${d.label} (Instagram).`
+      ? `останній знак активності — ${d.label} (Instagram)`
       : d.source === 'news'
-        ? `Останній знак активності — ${d.label} (новини від студії).`
-        : `Останній знак активності в наших даних — ${d.label} рік.`
-  const state = s.status === 'closed' ? 'За нашими даними, роботу припинено' : 'Ознак роботи зараз ми не бачимо'
+        ? `останній знак активності — ${d.label} (новини від студії)`
+        : `останній знак активності в наших даних — ${d.label} рік`
   const next = where.hasNearby && where.city ? `нижче — студії та майстри, які працюють ${inCity(where.city)}` : 'запит варто надіслати іншим студіям — кнопка нижче'
-  return `${sign} ${state}; ${next}.`
+  const cap = (t: string) => t.charAt(0).toUpperCase() + t.slice(1)
+  if (s.status === 'relocated') {
+    // A move the record dates and places (owner, 17.10.2026): «Студія переїхала у 2025 році, нове місце — Кам’янець-Подільський;
+    // про запуск на новому місці даних немає». The year comes from the record's own sentence about the move, never guessed;
+    // the new place is the record's city. A dated sign other than the move itself is named instead of «даних немає».
+    const who = s.type === 'brand' ? 'Бренд переїхав' : s.type === 'maker' || s.type === 'heritage' ? 'Майстерня переїхала' : 'Студія переїхала'
+    const year = moveYear(s)
+    const moved = `${who}${year ? ` у ${year} році` : ''}${where.city ? `, нове місце — ${where.city}` : ''}`
+    const after = d && (d.source || d.label !== year) ? sign : 'про запуск на новому місці даних немає'
+    return `${moved}; ${after}; ${next}.`
+  }
+  const state = s.status === 'closed' ? 'За нашими даними, роботу припинено' : 'Ознак роботи зараз ми не бачимо'
+  return `${cap(sign)}. ${state}; ${next}.`
+}
+
+// The year of a relocated profile's move, from the record's own sentence about it («У серпні 2025 року родина почала
+// переїзд…», «(до 2025 — Слов'янськ)»); '' when no such sentence carries a year.
+const MOVE = /переїзд|переїха|переїжджа|перебра\p{L}*ся|до 20\d\d\s*—/iu
+function moveYear(s: Studio): string {
+  const years = [s.summary, s.publicDescription, s.description, s.address]
+    .filter(Boolean)
+    .flatMap((t) => t!.split(/(?<=[.!?;])\s+|\n+/))
+    .filter((sentence) => MOVE.test(sentence))
+    .flatMap((sentence) => [...sentence.matchAll(/(?<!\d)(20\d\d)(?!\d)/g)].map((m) => m[1]))
+  return years.sort().at(-1) ?? ''
 }
 
 /** The data date of a profile whose newest fact is more than a year old («2019», «березень 2021»), else ''. */

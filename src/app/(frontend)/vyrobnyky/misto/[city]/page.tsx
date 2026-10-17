@@ -276,11 +276,16 @@ export default async function CityMakersPage({ params }: Args) {
                 lines: [
                   m.line,
                   <React.Fragment key="src">
-                    Джерело:{' '}
-                    <a href={m.source.url} target="_blank" rel="noopener nofollow" className="text-ink-2 underline underline-offset-[3px] hover:text-cobalt">
-                      {m.source.title}
-                    </a>
-                    , {sourceDateLabel(m)}
+                    {m.sources.length > 1 ? 'Джерела' : 'Джерело'}:{' '}
+                    {m.sources.map((src, j) => (
+                      <React.Fragment key={src.url}>
+                        {j > 0 && '; '}
+                        <a href={src.url} target="_blank" rel="noopener nofollow" className="text-ink-2 underline underline-offset-[3px] hover:text-cobalt">
+                          {src.title}
+                        </a>
+                        , {sourceDateLabel(src, m.seen)}
+                      </React.Fragment>
+                    ))}
                   </React.Fragment>,
                 ],
               }))}
