@@ -74,6 +74,10 @@ export const KILN_COWORK = /коворк|послуг\p{L}* випал|випа�
 export const INTERIOR = /плитк|кахл|кахел|панно|мозаїк|світильник|умивальник|раковин|архітектурн/iu
 export const interiorData = () => mentionData(INTERIOR)
 
+// Souvenirs: small things to bring from a region (whistles, bells, magnets, pendants, souvenir ware).
+export const SOUVENIR = /сувенір|свищ|свистун|дзвіноч|магніт/iu
+export const souvenirData = () => mentionData(SOUVENIR)
+
 // A studio that only plans such a service («плани», «плануються») is left out.
 export async function kilnData() {
   const d = await mentionData(KILN_COWORK)

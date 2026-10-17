@@ -13,6 +13,7 @@ import c_patriotychni_podarunky from './patriotychni-podarunky.json'
 import c_podiyi from './podiyi.json'
 import c_pratsyuyut_z_biznesom from './pratsyuyut-z-biznesom.json'
 import c_rizdvianyi_posud from './rizdvianyi-posud.json'
+import c_suveniry from './suveniry.json'
 import c_svichnyky from './svichnyky.json'
 import c_symvol_2027 from './symvol-2027.json'
 import c_vesillia from './vesillia.json'
@@ -33,6 +34,7 @@ export const copies: Record<string, WaveCopy> = {
   'podiyi': c_podiyi,
   'pratsyuyut-z-biznesom': c_pratsyuyut_z_biznesom,
   'rizdvianyi-posud': c_rizdvianyi_posud,
+  'suveniry': c_suveniry,
   'svichnyky': c_svichnyky,
   'symvol-2027': c_symvol_2027,
   'vesillia': c_vesillia,

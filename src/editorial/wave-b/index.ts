@@ -8,7 +8,7 @@ import { fillCopy, type WaveCopy } from '@/editorial/copy'
 import type { StudioCard } from '@/lib/catalog'
 import { eventsPageData, museumsPageData } from './events'
 import { careData, materialsData, smokeData } from './guides-data'
-import { businessData, candlesticksData, christmasTableData, etsyData, halloweenData, interiorData, kilnData, newYearData, patrioticData, symbolData, tablewareBrandsData, teaData, weddingData } from './selections'
+import { businessData, candlesticksData, christmasTableData, etsyData, halloweenData, interiorData, kilnData, newYearData, patrioticData, souvenirData, symbolData, tablewareBrandsData, teaData, weddingData } from './selections'
 
 export * from './events'
 export * from './guides-data'
@@ -35,6 +35,7 @@ export type WaveBId =
   | 'khellovin'
   | 'vypal'
   | 'interyer'
+  | 'suveniry'
 
 type Section = 'dobirky' | 'hayidy' | null
 export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: string; kicker: string; form: string }> = {
@@ -55,6 +56,7 @@ export const WAVE_B: Record<WaveBId, { path: string; section: Section; crumb: st
   vesillia: { path: '/dobirky/podarunky-gostyam-na-vesillia', section: 'dobirky', crumb: 'Подарунки гостям на весілля', kicker: 'Добірки', form: 'corporate-gifts' },
   khellovin: { path: '/dobirky/keramika-na-khellovin', section: 'dobirky', crumb: 'Кераміка на Хелловін', kicker: 'Добірки', form: 'corporate-gifts' },
   vypal: { path: '/dobirky/de-vypalyty-keramiku', section: 'dobirky', crumb: 'Де випалити кераміку', kicker: 'Добірки', form: 'other' },
+  suveniry: { path: '/dobirky/suveniry-z-ukrainy', section: 'dobirky', crumb: 'Сувеніри з України', kicker: 'Добірки', form: 'corporate-gifts' },
   interyer: { path: '/dobirky/keramika-dlya-interyeru', section: 'dobirky', crumb: 'Кераміка для інтер’єру', kicker: 'Добірки', form: 'other' },
 }
 export const WAVE_B_IDS = Object.keys(WAVE_B) as WaveBId[]
@@ -80,6 +82,7 @@ export type WaveBData =
   | ({ id: 'khellovin' } & Awaited<ReturnType<typeof halloweenData>>)
   | ({ id: 'vypal' } & Awaited<ReturnType<typeof kilnData>>)
   | ({ id: 'interyer' } & Awaited<ReturnType<typeof interiorData>>)
+  | ({ id: 'suveniry' } & Awaited<ReturnType<typeof souvenirData>>)
 
 export async function waveBData(id: WaveBId): Promise<WaveBData> {
   switch (id) {
@@ -101,12 +104,13 @@ export async function waveBData(id: WaveBId): Promise<WaveBData> {
     case 'khellovin': return { id, ...(await halloweenData()) }
     case 'vypal': return { id, ...(await kilnData()) }
     case 'interyer': return { id, ...(await interiorData()) }
+    case 'suveniry': return { id, ...(await souvenirData()) }
   }
 }
 
 /** Studios a page lists (for the ItemList JSON-LD). */
 export const waveBStudios = (d: WaveBData): StudioCard[] =>
-  d.id === 'brendy-posudu' || d.id === 'yalynkovi-prykrasy' || d.id === 'pratsyuyut-z-biznesom' || d.id === 'dohliad-za-keramikoyu' || d.id === 'symvol-2027' || d.id === 'svichnyky' || d.id === 'rizdvianyi-posud' || d.id === 'patriotychni-podarunky' || d.id === 'chaini-tseremonii' || d.id === 'vesillia' || d.id === 'khellovin' || d.id === 'vypal' || d.id === 'interyer'
+  d.id === 'brendy-posudu' || d.id === 'yalynkovi-prykrasy' || d.id === 'pratsyuyut-z-biznesom' || d.id === 'dohliad-za-keramikoyu' || d.id === 'symvol-2027' || d.id === 'svichnyky' || d.id === 'rizdvianyi-posud' || d.id === 'patriotychni-podarunky' || d.id === 'chaini-tseremonii' || d.id === 'vesillia' || d.id === 'khellovin' || d.id === 'vypal' || d.id === 'interyer' || d.id === 'suveniry'
     ? d.studios
     : d.id === 'chornodymlena-i-molochena'
       ? [...new Map([...d.black, ...d.milk].map((s) => [s.id, s])).values()]
