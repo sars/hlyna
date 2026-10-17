@@ -1,0 +1,63 @@
+[
+  {
+    "slug": "artglina",
+    "why": "власник 17.10.2026 (перевірка Instagram через акаунт Глини): останній пост @artglina — 11.10.2026",
+    "set": {
+      "status": "active"
+    }
+  },
+  {
+    "slug": "buzkova",
+    "why": "власник 17.10.2026 (перевірка Instagram через акаунт Глини): останній пост @buzkova.ceramics — 15.10.2026",
+    "set": {
+      "status": "active"
+    }
+  },
+  {
+    "slug": "dobra-hlyna-keramichna-maisternia-nahurnykh",
+    "why": "власник 17.10.2026 (перевірка Instagram через акаунт Глини): майстерня працює в Запоріжжі з 2024 року, останній пост @glinka.zp.ua__pologi — 17.10.2026",
+    "set": {
+      "status": "active"
+    }
+  },
+  {
+    "slug": "irsad",
+    "why": "власник 17.10.2026 (перевірка Instagram через акаунт Глини): останній пост @irsad.eternal.objects — 10.05.2026",
+    "set": {
+      "status": "active"
+    }
+  },
+  {
+    "slug": "lisova-ceramica-yuliia-lisova",
+    "why": "власник 17.10.2026 (перевірка Instagram через акаунт Глини): останній пост @lisovaceramica — 10.12.2025",
+    "set": {
+      "status": "active"
+    }
+  },
+  {
+    "slug": "art-studiia-tsiatka-snizhana-chornii",
+    "why": "власник 17.10.2026: м'який профіль за правилом 17.10 (назва, Instagram, Facebook, телефон і факти з джерелами); останній пост @dot.if.ua — 08.11.2021, акаунт живий",
+    "set": {
+      "visibility": "public"
+    }
+  },
+  {
+    "slug": "kharkiv-workshops",
+    "why": "власник 17.10.2026: м'який профіль за правилом 17.10 (назва, Instagram, телефон, адреса); останній пост @mashamee_ceramics — 27.02.2022, акаунт живий",
+    "set": {
+      "visibility": "public"
+    }
+  },
+  {
+    "slug": "majolica-studio",
+    "why": "власник 17.10.2026: м'який профіль за правилом 17.10 (назва, адреса, Instagram); останній пост @majolica_studio — 20.12.2022 (зимова перерва), акаунт живий",
+    "set": {
+      "visibility": "public"
+    }
+  },
+  {
+    "slug": "kust-kust-lviv-kustceramics",
+    "why": "перевірка Instagram 17.10.2026: @kust_lviv зник, а @kustceramics — київська студія на Подолі (Спаська, 36/31), яка вже є в каталогі; схований запис — дубль",
+    "mergeInto": "kust-ceramics-kustceramics"
+  }
+]
