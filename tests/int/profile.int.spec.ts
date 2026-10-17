@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { confirmedForCompanies, confirmedForVenues, type StudioCard } from '@/lib/catalog'
+import { confirmedForCompanies, confirmedForVenues, offersMasterClasses, type StudioCard } from '@/lib/catalog'
 import { dataDate, splitSource, withoutPriceMention } from '@/lib/present'
 import { acceptsRequests, dedupePrices, groupPrices, offerItem, relatedStudios } from '@/lib/profile'
 
@@ -118,5 +118,13 @@ describe('business badges rest on the b2b terms, not on format tags', () => {
     expect(confirmedForCompanies(card({}))).toBe(false)
     expect(confirmedForVenues(card({ b2b: { worksWithHoreca: true } }))).toBe(true)
     expect(confirmedForCompanies(card({ b2b: { worksWithCorporate: true } }))).toBe(true)
+  })
+})
+
+describe('a course for one group is not a place to book a class (16.10.2026)', () => {
+  const school = (summary: string) => ({ type: 'school', summary, formats: ['courses', 'wheel'] }) as unknown as StudioCard
+  it('«Гончарство в темряві» stays out of master-class lists, an open school stays in', () => {
+    expect(offersMasterClasses(school('Безоплатний 45-денний курс гончарства для ветеранів, які втратили зір на війні.'))).toBe(false)
+    expect(offersMasterClasses(school('Школа кераміки: курси для дорослих і дітей.'))).toBe(true)
   })
 })

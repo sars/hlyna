@@ -7,9 +7,11 @@
 //   replace runs over name, address, summary, publicDescription, recentNote; dropFormats removes format tags the profile does not support (tags
 //   are added only through tag-studios proposals); addNames appends alternate names; mergeInto hides a duplicate and points its slug at the kept
 //   public profile (the proxy answers its old URL with a redirect, docs/decisions.md 2026-10-15) — move any facts into the kept profile first;
+//   a profile made public again (set.visibility "public", no mergeInto) that was merged earlier takes its slug back: the history row that sent
+//   its own slug to the kept profile is deleted, so the URL answers 200 again;
 //   b2b sets the terms for venues and companies (only facts with a source: the profile shows them and its badges rest on them).
 import fs from 'node:fs'
-import { eq } from 'drizzle-orm'
+import { and, eq, ne } from 'drizzle-orm'
 
 import { guard, revalidateSite } from './_guard'
 import { db, pool } from '../../src/server/db'
@@ -82,6 +84,9 @@ for (const e of edits) {
   const changed = (['slug', 'shortName', 'type', 'status', 'visibility', ...TEXT, ...LINKS] as Field[]).filter((f) => form[f] !== toEditForm(s)[f])
   const [history] = into ? await db.select({ studioId: studioSlugHistory.studioId }).from(studioSlugHistory).where(eq(studioSlugHistory.oldSlug, e.slug)).limit(1) : []
   const redirect = into && history?.studioId !== into.id
+  // a merged profile made public again: its own slug must stop redirecting to the profile it was merged into
+  const [merged] = !into && form.visibility === 'public' ? await db.select({ studioId: studioSlugHistory.studioId }).from(studioSlugHistory).where(and(eq(studioSlugHistory.oldSlug, form.slug ?? ''), ne(studioSlugHistory.studioId, row.id))).limit(1) : []
+  const keptSlug = merged ? (await db.select({ slug: studios.slug }).from(studios).where(eq(studios.id, merged.studioId)).limit(1))[0]?.slug : undefined
   const lines = [
     ...changed.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f])?.slice(0, 80)} → ${JSON.stringify(form[f])?.slice(0, 80)}`),
     ...(cityChanged ? [`city: ${toEditForm(s).cityId} → ${city} (${form.cityId})`] : []),
@@ -89,6 +94,7 @@ for (const e of edits) {
     ...b2bChanged.map((f) => `${f}: ${JSON.stringify(toEditForm(s)[f] ?? null)} → ${JSON.stringify(form[f] ?? null)}`),
     ...(names.length ? [`names: +${names.join(', +')}`] : []),
     ...(redirect ? [`redirect → ${into!.slug}`] : []),
+    ...(merged ? [`unmerge: ${form.slug} no longer redirects to ${keptSlug}`] : []),
   ]
   console.log(`${e.slug}: ${lines.join('\n  ') || 'no change'}${e.why && lines.length ? `\n  why: ${e.why}` : ''}`)
   if (dry || !lines.length) continue
@@ -97,6 +103,11 @@ for (const e of edits) {
     await db.transaction(async (tx) => {
       await tx.insert(studioSlugHistory).values({ oldSlug: e.slug, studioId: into!.id }).onConflictDoUpdate({ target: studioSlugHistory.oldSlug, set: { studioId: into!.id } })
       await audit(tx, actor, 'studio', row.id, 'merge', { into: { from: null, to: into!.slug } })
+    })
+  if (merged)
+    await db.transaction(async (tx) => {
+      await tx.delete(studioSlugHistory).where(and(eq(studioSlugHistory.oldSlug, form.slug ?? ''), eq(studioSlugHistory.studioId, merged.studioId)))
+      await audit(tx, actor, 'studio', row.id, 'unmerge', { from: { from: keptSlug ?? null, to: null } })
     })
   saved++
 }

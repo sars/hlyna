@@ -217,8 +217,11 @@ const CLASS_TAGS: Format[] = ['wheel', 'handbuilding', 'painting', 'kids', 'coup
 const CLASS_ONLY_TAGS: Format[] = ['kids', 'couples', 'courses', 'corporate-workshop']
 const CLASS_WORDS = /майстер-клас|(?<!\p{L})мк(?!\p{L})|заняття|урок|навчан|гурт[оі]к/iu
 
+// A school whose course is for one group only («Гончарство в темряві»: ветерани, які втратили зір) is not a place anyone books a class.
+const closedGroup = (s: Studio) => s.type === 'school' && /для ветеранів, які втратили зір/iu.test(s.summary ?? '')
+
 export const offersMasterClasses = (s: Studio) => {
-  if (isAcademic(s)) return false
+  if (isAcademic(s) || closedGroup(s)) return false
   if (s.type === 'studio' || s.type === 'school') return CLASS_TAGS.some((f) => hasFormat(s, f)) || CLASS_WORDS.test(texts(s))
   if (!s.formats?.length) return false
   if (s.type === 'shop' || s.type === 'supplier') return false
