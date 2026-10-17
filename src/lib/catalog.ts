@@ -57,6 +57,8 @@ const joinCatalog = async (shard: (i: number) => Promise<CachedStudio[]>, cityLi
 let scriptLoad: Promise<StudioCard[]> | null = null
 const cachedShard = unstable_cache(loadShard, ['studios-shard-v2'], { revalidate: false, tags: TAGS })
 const cachedCities = unstable_cache(loadPublicCities, ['cities-v1'], { revalidate: false, tags: TAGS })
+/** Every city row, with or without published studios (old URLs of towns whose page went). */
+export const getCities = cache(() => (process.env.HLYNA_SCRIPT === '1' ? loadPublicCities() : cachedCities()))
 // Outside a React render (route handlers: catalog-sitemap.xml, llms.txt, /poshuk/index.json) `cache` below does not
 // memoize, and those builds ask for the catalogue hundreds of times (once per city × format). The joined catalogue is
 // kept for a few seconds per process; a write's revalidateTag is seen at most that much later. Nothing mutates it.

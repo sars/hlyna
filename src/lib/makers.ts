@@ -1,4 +1,4 @@
-import { centreOf, cityPages, getAllStudios, getAllWithShops, isOpen, isStudio, confirmedForVenues, offersMasterClasses, type StudioCard } from './catalog'
+import { centreOf, cityPages, getAllStudios, getAllWithShops, getCities, isOpen, isStudio, confirmedForVenues, offersMasterClasses, type StudioCard } from './catalog'
 
 // Everyone in the studio lists except suppliers (hidden for now): studios, brands, makers, schools. Shops and galleries are not
 // studios: they have their own block on a city page (getShops).
@@ -34,6 +34,17 @@ export async function droppedCityTarget(slug: string): Promise<string | null> {
   if (!inCity.some((s) => !isStudio(s))) return null
   const legacy = inCity.filter((s) => s.type === 'legacy')
   return legacy.length === 1 ? `/vyrobnyky/${legacy[0].slug}` : '/vyrobnyky/misto'
+}
+
+/**
+ * A town whose page went because its makers were hidden or merged (Соснівка, 17.10.2026): its old URL goes to its oblast
+ * centre's page, where those makers keep their lines in «Майстри, які працювали в місті». Null when the town is a centre
+ * itself, has no oblast, or the centre has no page.
+ */
+export async function centreCityTarget(slug: string): Promise<string | null> {
+  const centre = centreOf((await getCities()).find((c) => c.slug === slug))
+  if (!centre || centre === slug) return null
+  return (await makerCity(centre)) ? `/vyrobnyky/misto/${centre}` : null
 }
 
 export async function makerCity(slug: string) {

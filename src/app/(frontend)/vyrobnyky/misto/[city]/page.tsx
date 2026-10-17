@@ -21,7 +21,7 @@ import { site } from '@/content/site'
 import { centreOf, cityPages, getAllStudios, getAcademies, getAllWithShops, getLegacy, getShops, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { CityStudioLinks } from '@/components/ui/CityList'
 import { cityMasters, sourceDateLabel } from '@/lib/cityMasters'
-import { cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
+import { centreCityTarget, cityStats, droppedCityTarget, makerCities, makerCity, TYPE_GROUPS } from '@/lib/makers'
 import { aboutCity, displayName, firstAddress, inCity, oblastGen, oblastLabel, pageName, pageWhere } from '@/lib/present'
 import { cityContent, fixPriceRef, mergeFaq } from '@/editorial/places'
 import { localPrices, scopeSpan } from '@/lib/priceIndex'
@@ -65,7 +65,7 @@ export default async function CityMakersPage({ params }: Args) {
   const g = await makerCity(citySlug)
   if (!g) {
     await redirectOldCitySlug(citySlug, (c) => `/vyrobnyky/misto/${c}`)
-    const dropped = await droppedCityTarget(citySlug)
+    const dropped = (await droppedCityTarget(citySlug)) ?? (await centreCityTarget(citySlug))
     if (dropped) permanentRedirect(dropped)
     notFound()
   }
