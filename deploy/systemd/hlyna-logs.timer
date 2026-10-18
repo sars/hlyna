@@ -1,0 +1,9 @@
+[Unit]
+Description=Run the Hlyna access-log digest daily, after midnight Kyiv time
+
+[Timer]
+OnCalendar=*-*-* 00:15:00 Europe/Kyiv
+Persistent=true
+
+[Install]
+WantedBy=timers.target

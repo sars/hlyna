@@ -1,0 +1,10 @@
+[Unit]
+Description=Hlyna access-log digest (archive + per-day digests in /opt/hlyna-logs)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/hlyna
+Environment=LOGS_DIR=/opt/hlyna-logs
+ExecStart=/opt/hlyna/deploy/logs-digest.sh

@@ -3,6 +3,7 @@
 //
 //   node scripts/logs/digest.mjs                       pull over ssh (host «hlyna», container edge-caddy-1), merge into raw/, rebuild all digests
 //   node scripts/logs/digest.mjs --file path.log[.gz]  read a local log instead of ssh (repeatable)
+//   (on the server it runs daily from deploy/logs-digest.sh with --file over Caddy's logs and LOGS_DIR=/opt/hlyna-logs; deploy/README.md 5a)
 //   node scripts/logs/digest.mjs --days 2026-10-17     rebuild only these digests (comma list or repeat); raw/ is still updated for every pulled day
 //
 // Output (LOGS_DIR, default /Users/rodik/Claude/hlyna-logs):

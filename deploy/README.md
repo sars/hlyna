@@ -58,6 +58,16 @@ curl -I https://hlyna.com             # 301 -> https://hlyna.com.ua/
 ```
 Then issue yourself a panel login link: `USER_ID=<email> BASE=https://hlyna.com.ua PROD=1 DATABASE_URL=<tunnel> pnpm exec tsx scripts/app/invite.ts` (see «Database migrations» for the tunnel) and open it to set the password for `/panel`.
 
+## 5a. Access-log digest (daily, kept forever)
+```bash
+cp deploy/systemd/hlyna-logs.* /etc/systemd/system/
+systemctl daemon-reload
+systemctl enable --now hlyna-logs.timer
+systemctl start hlyna-logs.service && journalctl -u hlyna-logs -n 5   # test run
+ls /opt/hlyna-logs/days | tail -3; tail -3 /opt/hlyna-logs/summary.csv
+```
+Daily at 00:15 Kyiv time (`Persistent=true` catches up after downtime) `deploy/logs-digest.sh` runs `scripts/logs/digest.mjs` in the app image (no Node on the host): it reads Caddy's logs read-only from the `hlyna_caddy_data` volume and writes `/opt/hlyna-logs` — `raw/` (every line per Kyiv day, kept after Caddy drops its ~60 days), `days/<date>.json|md` (people with journeys, bot passes, AI fetches, scanners, 404s), `summary.csv`. The folder is outside the deployed tree and nothing there is deleted; not in backups (owner, 18.10.2026). Read from the Mac: `rsync -a hlyna:/opt/hlyna-logs/days/ ../hlyna-logs/days/` or `ssh hlyna cat /opt/hlyna-logs/days/<date>.md`.
+
 ## 5. Backups (nightly, 14 days)
 ```bash
 cp deploy/systemd/hlyna-backup.* /etc/systemd/system/
