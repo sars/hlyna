@@ -18,7 +18,7 @@ Catalogue of Ukrainian handmade ceramics. Goal: **requests and traffic, mainly v
 - **Voice:** `docs/voice/README.md` — factual lead, then at most one short verse epigraph (`Epigraph`, `src/content/verses.ts`; none on pages where a business buys a batch), then warm, clear potters' prose. Never explain the verse.
 - **Language:** Ukrainian only; English later via `/en` routes; never Russian.
 - **Scope:** studio-scale ceramics made in Ukraine. Makers who now work abroad, suppliers, factories, media, course platforms and gift-certificate aggregators stay as drafts.
-- **Photos:** only with the maker's consent; stock photos (`public/images/stock`, CC0) only for site chrome.
+- **Photos:** only with the maker's consent, and always with their credit on the page (`StudioGallery`, `TopPhotos`; rules in `docs/decisions.md` 2026-10-19); stock photos (`public/images/stock`, CC0) only for site chrome.
 - **Mobile first and fast:** server components by default, client components only for interaction, `next/image`, fonts self-hosted from committed files (`public/fonts`, rules in `src/app/fonts.css`; the build never downloads them).
 - **No paid services** without the owner's explicit approval. No GitHub Actions/CI (paid minutes) — checks run locally (Stop hook, `pnpm lint`, `pnpm knip`, `pnpm test:int`, `pnpm build`).
 
