@@ -189,9 +189,9 @@ app.post('/media', async (c) => {
 app.get('/media/:id', zValidator('param', id), async (c) => {
   const [m] = await db.select().from(mediaTable).where(eq(mediaTable.id, c.req.valid('param').id)).limit(1)
   if (!m) return c.json({ error: 'Фото не знайдено.' }, 404)
-  return c.json({ id: m.id, fileName: m.fileName, alt: m.alt, thumb: m.variants?.thumbnail?.file ?? null, status: m.status })
+  return c.json({ id: m.id, fileName: m.fileName, alt: m.alt, thumb: m.variants?.thumbnail?.file ?? null, status: m.status, focalY: m.focalY })
 })
-app.patch('/media/:id', zValidator('param', id), zValidator('json', z.object({ alt: z.string().max(300).optional(), caption: z.string().max(1000).nullable().optional() })), async (c) =>
+app.patch('/media/:id', zValidator('param', id), zValidator('json', z.object({ alt: z.string().max(300).optional(), caption: z.string().max(1000).nullable().optional(), focalY: z.number().min(0).max(100).nullable().optional() })), async (c) =>
   c.json(await updateMedia(db, c.req.valid('param').id, c.req.valid('json'), c.get('actor'))),
 )
 app.delete('/media/:id', zValidator('param', id), async (c) => {

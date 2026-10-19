@@ -6,6 +6,7 @@ import { and, desc, eq, sql } from 'drizzle-orm'
 
 import type { Db } from '../db'
 import { media, studioPhotos, studios } from '../db/schema/catalog'
+import { revalidateStudios } from '../revalidate'
 import { audit, type Actor } from '../services/audit'
 import { NotFound } from '../services/requests'
 import { Invalid } from '../services/studioEditor'
@@ -151,17 +152,23 @@ export async function listMedia(db: Db, f: { filter?: 'unused' | 'pending' | 'us
 }
 
 /** Which profiles show a photo. */
-export async function updateMedia(db: Db, id: number, patch: { alt?: string; caption?: string | null }, actor: Actor) {
+export async function updateMedia(db: Db, id: number, patch: { alt?: string; caption?: string | null; focalY?: number | null }, actor: Actor) {
   const [cur] = await db.select().from(media).where(eq(media.id, id)).limit(1)
   if (!cur) throw new NotFound('Фото не знайдено.')
   if (patch.alt !== undefined && !patch.alt.trim()) throw new Invalid('Опис фото (alt) не може бути порожнім.')
-  const next = { alt: patch.alt?.trim() ?? cur.alt, caption: patch.caption === undefined ? cur.caption : patch.caption }
+  const next = {
+    alt: patch.alt?.trim() ?? cur.alt,
+    caption: patch.caption === undefined ? cur.caption : patch.caption,
+    focalY: patch.focalY === undefined ? cur.focalY : patch.focalY,
+  }
   const changes = Object.fromEntries(
-    (['alt', 'caption'] as const).filter((k) => (cur[k] ?? null) !== (next[k] ?? null)).map((k) => [k, { from: cur[k], to: next[k] }]),
+    (['alt', 'caption', 'focalY'] as const).filter((k) => (cur[k] ?? null) !== (next[k] ?? null)).map((k) => [k, { from: cur[k], to: next[k] }]),
   )
   if (!Object.keys(changes).length) return { changes }
   await db.update(media).set({ ...next, updatedAt: sql`now()`, updatedBy: actor.id }).where(eq(media.id, id))
   await audit(db, actor, 'media', id, 'update', changes)
+  // Alt and crop show on public pages: refresh the profiles that use the photo (and, through the tag, the collections).
+  await revalidateStudios(db, (await mediaUsage(db, id)).map((u) => u.id))
   return { changes }
 }
 

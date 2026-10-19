@@ -10,6 +10,7 @@ import { StatusTag } from '@/components/ui/StatusTag'
 import { SearchAnswer, SearchField, SearchRow } from '@/components/site/search/SearchRow'
 import { SeasonPromo } from '@/components/site/SeasonPromo'
 import { TopList } from '@/components/site/TopList'
+import { TopPhotos } from '@/components/site/TopPhotos'
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs'
 import { Button } from '@/components/ui/Button'
 import { Checkbox, Field, FieldRow, Input, Select, Textarea } from '@/components/ui/Fields'
@@ -444,6 +445,17 @@ export default async function StyleguidePage() {
       <Block id="sg-tops" title="20 · TopList">
         <Cap>Топ за категоріями (хвилі B/C): номер, ціна праворуч від sm, виробник з посиланням, пост в Instagram за запитом</Cap>
         {tops.map((c) => <TopList key={c.id} cat={c} known={new Map(all.map((s) => [s.slug!, s]))} />)}
+        <Cap>TopPhotos: фото студії замість посту (3 фото, одне ландшафтне; потім одне фото) — лише для показу</Cap>
+        <div className="max-w-[520px]">
+          <TopPhotos
+            name="Глина"
+            source="https://www.instagram.com/p/example/"
+            photos={[sitePhotos.market, sitePhotos.bizCafes, sitePhotos.forStudios].map((p) => ({ url: p.src, full: p.src, alt: p.alt, width: p.width, height: p.height }))}
+          />
+          <div className="mt-6">
+            <TopPhotos name="Глина" photos={[sitePhotos.cardPair].map((p) => ({ url: p.src, full: p.src, alt: p.alt, width: p.width, height: p.height }))} />
+          </div>
+        </div>
       </Block>
 
       <Block id="sg-search" title="21 · SearchRow, SearchAnswer, SearchField">

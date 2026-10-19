@@ -4,6 +4,7 @@ import { Upload } from 'lucide-react'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
 
+import { Choice } from '@/components/panel/inhouse/choice'
 import { api } from '@/components/panel/lib/api'
 import { t } from '@/components/panel/lib/i18n'
 import { Button } from '@/components/panel/ui/button'
@@ -11,7 +12,15 @@ import { Input } from '@/components/panel/ui/input'
 import { FilePick } from './file-pick'
 import { OrderedRows } from './list-editors'
 
-export type PhotoItem = { id: number; fileName: string; alt: string | null; thumb: string | null; status?: string }
+export type PhotoItem = { id: number; fileName: string; alt: string | null; thumb: string | null; status?: string; focalY?: number | null }
+
+// Where a cropped tile keeps the photo (media.focal_y, % from the top); «авто» leaves it to the layout.
+const CROPS = [
+  { value: '', label: t('editor.cropAuto') },
+  { value: '10', label: t('editor.cropTop') },
+  { value: '50', label: t('editor.cropCenter') },
+  { value: '90', label: t('editor.cropBottom') },
+]
 
 const src = (p: PhotoItem) => `/media/${encodeURIComponent(p.thumb ?? p.fileName)}`
 
@@ -56,6 +65,17 @@ export function PhotoManager({ value, onChange, studioSlug }: { value: PhotoItem
     }
   }
 
+  async function saveCrop(p: PhotoItem, next: string, set: (p: PhotoItem) => void) {
+    const focalY = next === '' ? null : Number(next)
+    try {
+      await api(`/media/${p.id}`, { method: 'PATCH', body: { focalY } })
+      set({ ...p, focalY })
+      toast.success(t('editor.saved'))
+    } catch (e) {
+      toast.error((e as Error).message)
+    }
+  }
+
   async function saveAlt(p: PhotoItem, next: string) {
     if ((p.alt ?? '') === next.trim()) return
     try {
@@ -88,10 +108,20 @@ export function PhotoManager({ value, onChange, studioSlug }: { value: PhotoItem
                 }}
                 className="h-9"
               />
-              <p className="truncate text-xs text-muted-foreground">
-                {i === 0 ? '★ ' : ''}
-                {p.fileName}
-              </p>
+              <div className="flex items-center gap-2">
+                <p className="min-w-0 flex-1 truncate text-xs text-muted-foreground">
+                  {i === 0 ? '★ ' : ''}
+                  {p.fileName}
+                </p>
+                <Choice
+                  size="sm"
+                  aria-label={t('editor.crop')}
+                  value={p.focalY == null ? '' : String(p.focalY)}
+                  onChange={(v) => void saveCrop(p, v, set)}
+                  options={CROPS}
+                  className="w-32"
+                />
+              </div>
             </div>
           </div>
         )}

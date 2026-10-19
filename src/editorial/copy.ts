@@ -35,8 +35,13 @@ export type TopItem = {
   terms?: string
   /** When the facts were seen: «сезон 2026/27», «грудень 2025». */
   seen: string
-  /** Instagram post that shows the item (embedded lazily). */
+  /** Instagram post that shows the item (embedded lazily); with `photos` it stays as the source link. */
   embed?: string
+  /**
+   * The studio's own photos of the item, shown instead of the embed: sha256 of each file as uploaded in the panel
+   * (`shasum -a 256 file`, first 12 hex are enough). Used only while the studio (`slug`) has photo consent.
+   */
+  photos?: string[]
 }
 
 export type TopCategory = { id: string; heading: string; intro?: string; items: TopItem[] }

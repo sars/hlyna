@@ -129,7 +129,7 @@ export async function getStudioForEdit(db: Db, id: number) {
     photos: snap.photos
       .map((mid) => byId.get(mid))
       .filter((m): m is NonNullable<typeof m> => Boolean(m))
-      .map((m) => ({ id: m.id, fileName: m.fileName, alt: m.alt, width: m.width, height: m.height, thumb: m.variants?.thumbnail?.file ?? null, status: m.status })),
+      .map((m) => ({ id: m.id, fileName: m.fileName, alt: m.alt, width: m.width, height: m.height, thumb: m.variants?.thumbnail?.file ?? null, status: m.status, focalY: m.focalY })),
   }
 }
 
@@ -381,7 +381,7 @@ export async function restoreRevision(db: Db, studioId: number, revisionId: numb
     row: { ...snap.row, revision: expectedRevision },
     prices: snap.prices,
     city: null,
-    photos: snap.photos.filter((p) => photos.includes(p)).map((pid) => ({ id: pid, fileName: '', alt: null, width: null, height: null, thumb: null, status: 'active' })),
+    photos: snap.photos.filter((p) => photos.includes(p)).map((pid) => ({ id: pid, fileName: '', alt: null, width: null, height: null, thumb: null, status: 'active', focalY: null })),
   })
   const res = await saveStudio(db, studioId, form, actor, `Відновлено версію ${r.revision}`)
   if (Object.keys(res.changes).length) await audit(db, actor, 'studio', studioId, 'restored', { revision: { from: null, to: r.revision } })

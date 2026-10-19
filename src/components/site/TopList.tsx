@@ -3,14 +3,16 @@ import React from 'react'
 
 import { Block } from '@/components/site/Inner'
 import { InstagramPosts } from '@/components/site/InstagramPosts.client'
+import { TopPhotos } from '@/components/site/TopPhotos'
 import { nobreak } from '@/components/ui/NoBreak'
 import type { TopCategory, TopItem } from '@/editorial/copy'
-import { igHandle, type StudioCard } from '@/lib/catalog'
+import { getItemPhotos, igHandle, type StudioCard, type StudioPhoto } from '@/lib/catalog'
 
 // «Топ за категоріями» on written pages (SYSTEM.md §4.2): one `Block` per category, ranked rows like `NumberedList`
 // (terracotta number 1–5), the price as the most visible line (cobalt, the right column from sm), the maker linked to
-// its profile or, when it has none, to its Instagram. The Instagram post is shown open under the row; the embed loads
-// lazily as it nears the viewport (a compact link card stands in until then).
+// its profile or, when it has none, to its Instagram. Under the row: the studio's own photos (`photos`, with consent) as a
+// `TopPhotos` strip, else the Instagram post shown open; the embed loads lazily as it nears the viewport (a compact link
+// card stands in until then).
 
 type Known = Map<string, StudioCard>
 
@@ -30,7 +32,7 @@ function Maker({ it, known }: { it: TopItem; known: Known }) {
   return <>{it.maker}</>
 }
 
-function Row({ it, n, known }: { it: TopItem; n: number; known: Known }) {
+function Row({ it, n, known, photos }: { it: TopItem; n: number; known: Known; photos: StudioPhoto[] }) {
   const s = it.slug ? known.get(it.slug) : undefined
   const handle = igHandle(s?.instagram ?? it.href) || undefined
   return (
@@ -49,25 +51,34 @@ function Row({ it, n, known }: { it: TopItem; n: number; known: Known }) {
         <p className="m-0 mt-1.5 max-w-read text-[15px] leading-normal sm:col-start-1">{it.details}</p>
         {it.terms && <p className="m-0 mt-1 max-w-read text-sm leading-normal text-ink-2 sm:col-start-1">{it.terms}</p>}
         <p className="m-0 mt-2 font-mono text-[11.5px] leading-[1.4] tracking-[.04em] text-ink-2 uppercase sm:col-start-1">Дані: {it.seen}</p>
-        {it.embed && (
-          // Shown open: the embed loads lazily near the viewport (a compact link card until then). On a phone it takes
-          // the full column (it needs ~320px), stepping out of the number's indent.
-          <div className="mt-3 max-w-[480px] pb-1 sm:col-start-1 max-sm:-ml-[54px]">
-            <InstagramPosts urls={[it.embed]} handle={handle} columns={1} />
+        {photos.length ? (
+          <div className="mt-3 max-w-[520px] sm:col-start-1 max-sm:-ml-[54px]">
+            <TopPhotos photos={photos} name={it.maker} source={it.embed} />
           </div>
+        ) : (
+          it.embed && (
+            // Shown open: the embed loads lazily near the viewport (a compact link card until then). On a phone it takes
+            // the full column (it needs ~320px), stepping out of the number's indent.
+            <div className="mt-3 max-w-[480px] pb-1 sm:col-start-1 max-sm:-ml-[54px]">
+              <InstagramPosts urls={[it.embed]} handle={handle} columns={1} />
+            </div>
+          )
         )}
       </div>
     </li>
   )
 }
 
-export function TopList({ cat, known }: { cat: TopCategory; known: Known }) {
+export async function TopList({ cat, known }: { cat: TopCategory; known: Known }) {
   if (!cat.items.length) return null
+  const items = cat.items.slice(0, 5)
+  // An item's photos only for a studio in the catalogue; none (or no consent) → the embed stays.
+  const photos = await Promise.all(items.map((it) => (it.photos?.length && it.slug ? getItemPhotos(it.slug, it.photos) : Promise.resolve([]))))
   return (
     <Block id={`top-${cat.id}`} kicker="Топ за категоріями" title={cat.heading} note={cat.intro}>
       <ol className="ui-toprule m-0 grid list-none border-t border-rule p-0">
-        {cat.items.slice(0, 5).map((it, i) => (
-          <Row key={`${it.maker}-${it.title}`} it={it} n={i + 1} known={known} />
+        {items.map((it, i) => (
+          <Row key={`${it.maker}-${it.title}`} it={it} n={i + 1} known={known} photos={photos[i]} />
         ))}
       </ol>
     </Block>

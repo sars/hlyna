@@ -50,7 +50,8 @@ export async function loadPublicCities(): Promise<City[]> {
   return rows.map((c) => toPublicCity(c) as unknown as City)
 }
 
-export type PublicPhoto = { url: string; full: string; alt: string; width: number; height: number }
+/** `focalY`: where a cropped tile keeps the photo, 0 (top) to 100 (bottom); null lets the layout decide. */
+export type PublicPhoto = { url: string; full: string; alt: string; width: number; height: number; focalY: number | null }
 
 // Approved photos of a public studio with photo consent, in profile order. Served from /media/* (Caddy; the old
 // /api/media/file/* path 301s there).
@@ -61,7 +62,7 @@ export async function loadPublicPhotos(studioId: number): Promise<PublicPhoto[]>
     .where(eq(studios.id, studioId))
   if (!s?.consent || s.visibility !== 'public') return []
   const rows = await db
-    .select({ fileName: media.fileName, alt: media.alt, width: media.width, height: media.height, variants: media.variants })
+    .select({ fileName: media.fileName, alt: media.alt, width: media.width, height: media.height, variants: media.variants, focalY: media.focalY })
     .from(studioPhotos)
     .innerJoin(media, eq(media.id, studioPhotos.mediaId))
     .where(and(eq(studioPhotos.studioId, studioId), eq(media.status, 'active')))
@@ -69,7 +70,7 @@ export async function loadPublicPhotos(studioId: number): Promise<PublicPhoto[]>
   return rows.map((m) => {
     const large = m.variants?.large
     const big = large?.file ? { file: large.file, width: large.width, height: large.height } : { file: m.fileName, width: m.width, height: m.height }
-    return { url: `/media/${big.file}`, full: `/media/${m.fileName}`, alt: m.alt || '', width: big.width || 1400, height: big.height || 933 }
+    return { url: `/media/${big.file}`, full: `/media/${m.fileName}`, alt: m.alt || '', width: big.width || 1400, height: big.height || 933, focalY: m.focalY }
   })
 }
 
@@ -90,4 +91,28 @@ export async function currentCitySlug(oldSlug: string): Promise<string | null> {
     .innerJoin(cities, eq(cities.id, citySlugHistory.cityId))
     .where(eq(citySlugHistory.oldSlug, oldSlug))
   return r && r.slug !== oldSlug ? r.slug : null
+}
+
+// Photos a collection item names by the sha256 of the uploaded file (first 12+ hex, the same in every database copy),
+// in the given order. Shown only for a public studio with photo consent and only active media; anything else is
+// skipped, so the item falls back to its Instagram embed.
+export async function loadItemPhotos(slug: string, shas: string[]): Promise<PublicPhoto[]> {
+  const keys = shas.map((h) => h.toLowerCase()).filter((h) => /^[0-9a-f]{12,64}$/.test(h))
+  if (!keys.length) return []
+  const [s] = await db
+    .select({ consent: studios.consentPhotos, visibility: studios.visibility })
+    .from(studios)
+    .where(eq(studios.slug, slug))
+  if (!s?.consent || s.visibility !== 'public') return []
+  const rows = await db
+    .select({ sha256: media.sha256, fileName: media.fileName, alt: media.alt, width: media.width, height: media.height, variants: media.variants, focalY: media.focalY })
+    .from(media)
+    .where(and(eq(media.status, 'active'), sql`left(${media.sha256}, 12) in (${sql.join(keys.map((k) => k.slice(0, 12)), sql`, `)})`))
+  return keys.flatMap((k) => {
+    const m = rows.find((r) => r.sha256?.startsWith(k))
+    if (!m) return []
+    const med = m.variants?.medium
+    const pic = med?.file ? { file: med.file, width: med.width, height: med.height } : { file: m.fileName, width: m.width, height: m.height }
+    return [{ url: `/media/${pic.file}`, full: `/media/${m.fileName}`, alt: m.alt || '', width: pic.width || 900, height: pic.height || 1200, focalY: m.focalY }]
+  })
 }

@@ -70,7 +70,7 @@ describe('public catalogue on schema app', () => {
   it('serves photos only with consent, active media, in order, from /media', async () => {
     const { db } = dbm
     const [m1] = await db.insert(s.media).values({ fileName: 'one.jpg', width: 2000, height: 1500, alt: 'Один', variants: { large: { file: 'one-1400x1050.jpg', width: 1400, height: 1050, size: 1, mime: 'image/jpeg' } } }).returning()
-    const [m2] = await db.insert(s.media).values({ fileName: 'two.jpg', width: 800, height: 600, alt: null }).returning()
+    const [m2] = await db.insert(s.media).values({ fileName: 'two.jpg', width: 800, height: 600, alt: null, focalY: 10, sha256: 'ab'.repeat(32) }).returning()
     const [m3] = await db.insert(s.media).values({ fileName: 'pending.jpg', status: 'pending' }).returning()
     await db.insert(s.studioPhotos).values([
       { studioId: b, mediaId: m2.id, position: 1 },
@@ -79,10 +79,16 @@ describe('public catalogue on schema app', () => {
       { studioId: a, mediaId: m1.id, position: 0 },
     ])
     expect(await pc.loadPublicPhotos(b)).toEqual([
-      { url: '/media/one-1400x1050.jpg', full: '/media/one.jpg', alt: 'Один', width: 1400, height: 1050 },
-      { url: '/media/two.jpg', full: '/media/two.jpg', alt: '', width: 800, height: 600 },
+      { url: '/media/one-1400x1050.jpg', full: '/media/one.jpg', alt: 'Один', width: 1400, height: 1050, focalY: null },
+      { url: '/media/two.jpg', full: '/media/two.jpg', alt: '', width: 800, height: 600, focalY: 10 },
     ])
     expect(await pc.loadPublicPhotos(a)).toEqual([]) // no photo consent
+    // A collection item names photos by sha256 prefix: same consent rule, active media only, unknown keys skipped.
+    await db.insert(s.media).values({ fileName: 'held.jpg', status: 'pending', sha256: 'cd'.repeat(32) })
+    expect(await pc.loadItemPhotos('b', ['ABABABABABAB', 'cdcdcdcdcdcd', 'not-a-hash', 'ef'.repeat(6)])).toEqual([
+      { url: '/media/two.jpg', full: '/media/two.jpg', alt: '', width: 800, height: 600, focalY: 10 },
+    ])
+    expect(await pc.loadItemPhotos('a', ['ab'.repeat(6)])).toEqual([])
   })
 
   it('resolves old studio and city slugs to the current ones', async () => {

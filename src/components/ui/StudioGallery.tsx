@@ -3,10 +3,10 @@ import React from 'react'
 
 import { GalleryViewer } from './GalleryViewer.client'
 
-type Photo = { url: string; full: string; alt: string; width: number; height: number }
+type Photo = { url: string; full: string; alt: string; width: number; height: number; focalY?: number | null }
 
 // The owner's caption; the default alt a photo gets without one («Фото від студії — {name}») says nothing.
-const captionOf = (p: Photo) => (/^Фото(?: від студії)? — /.test(p.alt) ? '' : p.alt.trim())
+export const captionOf = (p: { alt: string }) => (/^Фото(?: від студії)? — /.test(p.alt) ? '' : p.alt.trim())
 
 // Tiles shown from md: 1, 2, 3 (of 3–4) or 5 (of 5+); the rest open in the viewer. The phone strip shows all of them.
 const layoutFor = (n: number) => (n >= 5 ? '5' : n >= 3 ? '3' : String(n))
@@ -33,7 +33,15 @@ export function StudioGallery({ photos, name }: { photos: Photo[]; name: string 
       <div data-gallery-tiles="" data-layout={layout} className="ui-gallery-tiles">
         {photos.map((p, i) => (
           <a key={p.full} href={p.full} target="_blank" rel="noopener" data-photo={i} data-tall={p.height > p.width ? '' : undefined}>
-            <Image src={p.url} alt={alt(p, i)} fill sizes={sizesFor(layout, i)} {...(i === 0 ? { priority: true } : { loading: 'lazy' as const })} />
+            <Image
+              src={p.url}
+              alt={alt(p, i)}
+              fill
+              sizes={sizesFor(layout, i)}
+              // The crop set in the panel («Кадр»); without it a tall photo keeps 40% from the top (globals.css).
+              style={p.focalY == null ? undefined : { objectPosition: `50% ${p.focalY}%` }}
+              {...(i === 0 ? { priority: true } : { loading: 'lazy' as const })}
+            />
           </a>
         ))}
       </div>

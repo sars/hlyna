@@ -5,7 +5,7 @@ import type { City, Studio } from '@/types/catalog'
 import { OBLAST_CENTRES } from '@/shared/options'
 import { cleanAddress, cleanPublic } from './present'
 import { wholeAmountsIn } from './money'
-import { loadPublicCities, loadPublicPhotos, loadPublicStudios } from '@/server/publicCatalog'
+import { loadItemPhotos, loadPublicCities, loadPublicPhotos, loadPublicStudios } from '@/server/publicCatalog'
 
 // Read-only data layer for public pages. Pages are pre-rendered HTML; they re-render only after a write
 // (revalidateTag('studios')) or the page's daily refresh, and then read the catalogue from the data cache.
@@ -138,7 +138,7 @@ export const getAcademies = fromCatalog((all) => all.filter(isOpen).filter((s) =
 
 export const getStudioBySlug = cache(async (slug: string) => (await getCatalog()).find((s) => s.slug === slug) ?? null)
 
-export type StudioPhoto = { url: string; full: string; alt: string; width: number; height: number }
+export type StudioPhoto = { url: string; full: string; alt: string; width: number; height: number; focalY: number | null }
 
 // Published photos of one studio (owner uploads, shown only with photo consent). Separate from the catalogue
 // query so the big cached list stays small.
@@ -146,9 +146,15 @@ export const getStudioPhotos = unstable_cache(
   async (id: number): Promise<StudioPhoto[]> => {
     return loadPublicPhotos(id)
   },
-  ['studio-photos-v2'],
+  ['studio-photos-v3'],
   { revalidate: false, tags: TAGS },
 )
+
+// A collection item's own photos (TopItem.photos), refreshed with the catalogue (consent or media changes).
+export const getItemPhotos = unstable_cache(async (slug: string, shas: string[]): Promise<StudioPhoto[]> => loadItemPhotos(slug, shas), ['item-photos-v1'], {
+  revalidate: false,
+  tags: TAGS,
+})
 
 export const texts = (s: Studio) =>
   [s.description, ...(s.services ?? []).map((x) => x.text), ...(s.products ?? []).map((x) => x.text), ...(s.prices ?? []).map((x) => x.text)]

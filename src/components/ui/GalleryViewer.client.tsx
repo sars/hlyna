@@ -21,7 +21,21 @@ const outsidePhoto = (e: React.MouseEvent, box: DOMRect, p: ViewerPhoto) => {
 // The interactive half of `StudioGallery` (SYSTEM.md §4.1). Tiles stay server links to the originals; a plain click opens a
 // native <dialog> on ink at that photo: swipe and trackpad through scroll-snap, ← → Home End, Escape, a counter. Only the
 // current photo and its neighbours are rendered, so a profile with 30 photos loads three. Also counts the phone strip.
-export function GalleryViewer({ photos, name, consent, children }: { photos: ViewerPhoto[]; name: string; consent: string; children: React.ReactNode }) {
+// `compact` (TopPhotos): only the children and the viewer — no section, heading, «Усі фото» or consent row; the consent
+// line stands in the viewer's foot instead of an empty caption.
+export function GalleryViewer({
+  photos,
+  name,
+  consent,
+  compact = false,
+  children,
+}: {
+  photos: ViewerPhoto[]
+  name: string
+  consent: string
+  compact?: boolean
+  children: React.ReactNode
+}) {
   const n = photos.length
   const root = useRef<HTMLElement>(null)
   const dialog = useRef<HTMLDialogElement>(null)
@@ -96,6 +110,70 @@ export function GalleryViewer({ photos, name, consent, children }: { photos: Vie
   const near = (j: number) => open && (Math.abs(j - at) <= 1 || Math.abs(j - at) === n - 1)
   const current = photos[at]
 
+  const viewer = (
+    <dialog ref={dialog} className="ui-gallery-dlg" data-tone="ink" aria-label={`Фото студії ${name}`} onClose={onClose} onKeyDown={onKeyDown}>
+      <div className="ui-gallery-bar">
+        <p className="m-0" aria-live="polite">
+          <span aria-hidden>
+            {at + 1} / {n}
+          </span>
+          <span className="sr-only">
+            Фото {at + 1} з {n}
+          </span>
+        </p>
+        <Button variant="ghost" size="sm" onClick={() => dialog.current?.close()}>
+          Закрити
+        </Button>
+      </div>
+      <div className="ui-gallery-stage">
+        <div ref={track} className="ui-gallery-track" onScroll={onTrackScroll}>
+          {photos.map((p, j) => (
+            // A click beside the photo closes; the keyboard has Escape and «Закрити».
+            <div
+              key={p.full}
+              className="ui-gallery-slide"
+              aria-hidden={j !== at || undefined}
+              onClick={(e) => {
+                const fig = e.currentTarget.firstElementChild
+                if (!fig || outsidePhoto(e, fig.getBoundingClientRect(), p)) dialog.current?.close()
+              }}
+            >
+              {near(j) && (
+                <figure>
+                  <Image src={p.full} alt={p.alt} fill sizes="100vw" className="object-contain" {...(j === at ? { priority: true } : {})} />
+                </figure>
+              )}
+            </div>
+          ))}
+        </div>
+        {n > 1 && (
+          <>
+            <button type="button" className="ui-gallery-arrow" data-dir="prev" aria-label="Попереднє фото" onClick={() => go(at - 1)}>
+              ←
+            </button>
+            <button type="button" className="ui-gallery-arrow" data-dir="next" aria-label="Наступне фото" onClick={() => go(at + 1)}>
+              →
+            </button>
+          </>
+        )}
+      </div>
+      <div className="ui-gallery-foot">
+        <span>{current.caption || (compact ? consent : '')}</span>
+        <a href={current.full} target="_blank" rel="noopener" aria-label="Відкрити оригінал фото в новій вкладці">
+          Оригінал ↗
+        </a>
+      </div>
+    </dialog>
+  )
+
+  if (compact)
+    return (
+      <div ref={root as React.RefObject<HTMLDivElement | null>} className="ui-gallery" onClickCapture={onTileClick}>
+        {children}
+        {viewer}
+      </div>
+    )
+
   return (
     <section ref={root} id="foto" aria-labelledby="foto-h" className="ui-gallery pt-[clamp(24px,3vw,40px)]" onClickCapture={onTileClick} onScrollCapture={onStripScroll}>
       <div className="mb-3 flex items-baseline justify-between gap-4">
@@ -118,59 +196,7 @@ export function GalleryViewer({ photos, name, consent, children }: { photos: Vie
         )}
       </div>
 
-      <dialog ref={dialog} className="ui-gallery-dlg" data-tone="ink" aria-label={`Фото студії ${name}`} onClose={onClose} onKeyDown={onKeyDown}>
-        <div className="ui-gallery-bar">
-          <p className="m-0" aria-live="polite">
-            <span aria-hidden>
-              {at + 1} / {n}
-            </span>
-            <span className="sr-only">
-              Фото {at + 1} з {n}
-            </span>
-          </p>
-          <Button variant="ghost" size="sm" onClick={() => dialog.current?.close()}>
-            Закрити
-          </Button>
-        </div>
-        <div className="ui-gallery-stage">
-          <div ref={track} className="ui-gallery-track" onScroll={onTrackScroll}>
-            {photos.map((p, j) => (
-              // A click beside the photo closes; the keyboard has Escape and «Закрити».
-              <div
-                key={p.full}
-                className="ui-gallery-slide"
-                aria-hidden={j !== at || undefined}
-                onClick={(e) => {
-                  const fig = e.currentTarget.firstElementChild
-                  if (!fig || outsidePhoto(e, fig.getBoundingClientRect(), p)) dialog.current?.close()
-                }}
-              >
-                {near(j) && (
-                  <figure>
-                    <Image src={p.full} alt={p.alt} fill sizes="100vw" className="object-contain" {...(j === at ? { priority: true } : {})} />
-                  </figure>
-                )}
-              </div>
-            ))}
-          </div>
-          {n > 1 && (
-            <>
-              <button type="button" className="ui-gallery-arrow" data-dir="prev" aria-label="Попереднє фото" onClick={() => go(at - 1)}>
-                ←
-              </button>
-              <button type="button" className="ui-gallery-arrow" data-dir="next" aria-label="Наступне фото" onClick={() => go(at + 1)}>
-                →
-              </button>
-            </>
-          )}
-        </div>
-        <div className="ui-gallery-foot">
-          <span>{current.caption}</span>
-          <a href={current.full} target="_blank" rel="noopener" aria-label="Відкрити оригінал фото в новій вкладці">
-            Оригінал ↗
-          </a>
-        </div>
-      </dialog>
+      {viewer}
     </section>
   )
 }
