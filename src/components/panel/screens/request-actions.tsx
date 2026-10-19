@@ -49,7 +49,7 @@ export function StatusPicker({ id, status }: { id: number; status: RequestStatus
   )
 }
 
-/** Notes and the deal amount; the 5 % commission shows as you type (Postgres computes the stored value). */
+/** Notes and the deal amount; the 10 % commission shows as you type (Postgres computes the stored value). */
 export function RequestNotes({ id, notes, dealAmountKop }: { id: number; notes: string | null; dealAmountKop: number | null }) {
   const router = useRouter()
   const [busy, setBusy] = useState(false)
@@ -80,7 +80,7 @@ export function RequestNotes({ id, notes, dealAmountKop }: { id: number; notes: 
         <FormField
           id="deal"
           label={t('requests.deal')}
-          hint={uah != null && Number.isFinite(uah) && uah > 0 ? t('requests.commission', { amount: formatAmount(Math.round(uah * 5), 'UAH') }) : undefined}
+          hint={uah != null && Number.isFinite(uah) && uah > 0 ? t('requests.commission', { amount: formatAmount(Math.round(uah * 10), 'UAH') }) : undefined}
         >
           <Input id="deal" inputMode="decimal" value={amount} onChange={(e) => setAmount(e.target.value)} className="sm:w-48" />
         </FormField>

@@ -50,6 +50,13 @@
       "when": 1792100049086,
       "tag": "0006_change_sets_photos_notify_at",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792425531579,
+      "tag": "0007_items",
+      "breakpoints": true
     }
   ]
 }

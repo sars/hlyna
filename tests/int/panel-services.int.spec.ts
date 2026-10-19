@@ -50,12 +50,12 @@ describe('requests', () => {
     expect((await getRequest(db, id))!.status).toBe('in_progress')
   })
 
-  it('deal amount stores kopecks and Postgres computes the 5 % commission', async () => {
+  it('deal amount stores kopecks and Postgres computes the 10 % commission', async () => {
     const [{ id }] = await db.insert(requests).values({ what: 'logo-mugs' }).returning({ id: requests.id })
     await updateRequest(db, id, { dealAmountUah: 12345.67, notes: 'тест' }, panel)
     const r = await getRequest(db, id)
     expect(r!.dealAmountKop).toBe(1234567)
-    expect(r!.commissionKop).toBe(61728)
+    expect(r!.commissionKop).toBe(123457)
     expect(r!.notes).toBe('тест')
   })
 

@@ -117,7 +117,7 @@ export const uk = {
   'requests.notes': 'Нотатки',
   'requests.notesHint': 'Лише для нас. Видно в журналі змін.',
   'requests.deal': 'Сума угоди, грн',
-  'requests.commission': 'Комісія 5 %: {amount}',
+  'requests.commission': 'Комісія 10 %: {amount}',
   'requests.studios': 'Кому передано',
   'requests.addStudio': 'Знайти студію за назвою або Instagram',
   'requests.noStudios': 'Ще нікому не передано.',

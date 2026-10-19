@@ -29,6 +29,20 @@ export const CHANGE_SET_STATUS = ['pending', 'applied', 'partially_applied', 're
 export const USER_ROLES = ['admin', 'editor', 'owner'] as const
 export const MEDIA_STATUS = ['active', 'pending', 'orphan'] as const
 
+// Items: one piece or series a studio offers (app.items). The rule that shows and hides them: src/server/services/items.ts.
+/** Item categories = the product topic pages (/vyrobnyky/vyrib/<slug>, src/content/topics/products.ts). */
+export const ITEM_CATEGORIES = ['chashky', 'tarilky-i-mysky', 'vazy-i-dekor', 'svitylnyky', 'prykrasy', 'plytka-i-panno'] as const
+/** Where an item was read: an Instagram post or highlight (every studio), or the shop of a studio that agreed to the 10 % (partners only). */
+export const ITEM_SOURCES = ['instagram', 'shop'] as const
+/** piece — one of a kind; series — the studio repeats it; to_order — made when someone orders. */
+export const ITEM_KINDS = ['piece', 'series', 'to_order'] as const
+export const ITEM_AVAILABILITY = ['in_stock', 'to_order', 'unknown', 'sold'] as const
+export const ITEM_HIDDEN_REASONS = ['stale', 'no_date', 'sold', 'gone', 'season_over', 'studio_hidden', 'manual'] as const
+/** What one check of an item saw (app.item_checks). */
+export const ITEM_SIGNALS = ['none', 'available', 'sold', 'gone', 'price_changed', 'caption_changed', 'reposted'] as const
+/** Seasonal items show until the season's end, whatever the post's age: the month and day of the first hidden day. */
+export const ITEM_SEASON_END = { halloween: '11-01', xmas: '01-08' } as const
+
 export type StudioType = (typeof STUDIO_TYPES)[number]
 export type StudioStatus = (typeof STUDIO_STATUSES)[number]
 export type Confidence = (typeof CONFIDENCE)[number]

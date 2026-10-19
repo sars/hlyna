@@ -1,5 +1,6 @@
 export * from './base'
 export * from './catalog'
+export * from './items'
 export * from './auth'
 export * from './requests'
 export * from './history'

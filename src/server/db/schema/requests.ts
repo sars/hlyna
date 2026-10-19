@@ -3,6 +3,7 @@ import { bigint, boolean, index, integer, primaryKey, serial, text, timestamp } 
 
 import { app, claimStatus, requestStatus, requestWhat, withTracking } from './base'
 import { studios } from './catalog'
+import { items } from './items'
 import { user } from './auth'
 
 const ts = (name: string) => timestamp(name, { withTimezone: true, mode: 'string' })
@@ -26,11 +27,13 @@ export const requests = app.table(
     contactEmail: text('contact_email'),
     sourcePage: text('source_page'),
     status: requestStatus('status').notNull().default('new'),
-    // Deal amount in kopecks; the 5 % commission is derived by Postgres (same rule as Payload's computeCommission:
-    // round to the kopeck, null when there is no positive amount).
+    // The item a request is about (an order of one piece from a partner's catalogue); null for every other request.
+    itemId: integer('item_id').references(() => items.id, { onDelete: 'set null' }),
+    // Deal amount in kopecks; the 10 % commission (site.model) is derived by Postgres: round to the kopeck,
+    // null when there is no positive amount.
     dealAmountKop: bigint('deal_amount_kop', { mode: 'number' }),
     commissionKop: bigint('commission_kop', { mode: 'number' }).generatedAlwaysAs(
-      sql`CASE WHEN deal_amount_kop > 0 THEN round(deal_amount_kop * 5 / 100.0)::bigint ELSE NULL END`,
+      sql`CASE WHEN deal_amount_kop > 0 THEN round(deal_amount_kop * 10 / 100.0)::bigint ELSE NULL END`,
     ),
     notes: text('notes'),
     ipHash: text('ip_hash'),
