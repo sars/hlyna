@@ -119,6 +119,12 @@ It also checks every studio link in the copy (`src/content`, `src/editorial`) ag
    kill %1
    ```
    Scripts refuse production without `PROD=1` (port 15432 counts as production).
+   **Studio photos** (studio's consent, `scripts/app/studio-photos.ts`): the script writes the files where it runs, so run it with `MEDIA_DIR` set to an empty folder, then copy that folder into the volume at once:
+   ```bash
+   PROD=1 MEDIA_DIR=/tmp/hlyna-media-new SLUG=<slug> PROFILE=<dir> EXTRA=<dir> NOTE="<date: consent, scope>" pnpm exec tsx scripts/app/studio-photos.ts
+   tar -C /tmp/hlyna-media-new -cf - . | ssh hlyna 'cd /opt/hlyna && docker compose exec -T app tar -C /app/public/media -xf -'
+   ```
+   then `POST /revalidate` (below) so the profile shows them.
 3. **Ship:** `git fetch origin`, merge if `origin/main` moved, `git push origin main`, then `bash deploy/push.sh`.
 4. **After:** open the pages the change touched on https://hlyna.com.ua (or `curl` them) and confirm the change is there. Pages re-render in the background after `/revalidate`, so the first request may still show the old HTML; ask again a few seconds later.
 
