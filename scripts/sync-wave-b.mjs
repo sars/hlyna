@@ -75,7 +75,11 @@ for (const file of fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.ends
               ...(str(c.intro) ? { intro: c.intro.trim() } : {}),
               items: c.items
                 .filter((x) => x && str(x.title) && str(x.maker) && str(x.details) && str(x.seen))
-                .map((x) => Object.fromEntries(['title', 'maker', 'slug', 'href', 'city', 'price', 'details', 'terms', 'seen', 'embed'].filter((k) => str(x[k])).map((k) => [k, x[k].trim()]))),
+                .map((x) => ({
+                  ...Object.fromEntries(['title', 'maker', 'slug', 'href', 'city', 'price', 'details', 'terms', 'seen', 'embed'].filter((k) => str(x[k])).map((k) => [k, x[k].trim()])),
+                  // The studio's own photos (sha256 prefixes of uploaded media, TopItem.photos).
+                  ...(Array.isArray(x.photos) && x.photos.some(str) ? { photos: x.photos.filter(str).map((h) => h.trim()) } : {}),
+                })),
             }))
             .filter((c) => c.items.length),
         }
@@ -94,6 +98,7 @@ for (const file of fs.existsSync(dir) ? fs.readdirSync(dir).filter((f) => f.ends
       if (x.href && !/^https:\/\/(www\.)?instagram\.com\/[\w.]+\/?$/.test(x.href)) warn(file, `top item «${x.title}»: href must be an Instagram profile URL`)
       if (x.embed && !/^https:\/\/www\.instagram\.com\/(p|reel)\/[\w-]+\/$/.test(x.embed)) warn(file, `top item «${x.title}»: embed must be an Instagram post URL`)
       if (x.slug && x.href) warn(file, `top item «${x.title}»: slug and href both set (slug wins)`)
+      if (x.photos?.some((h) => !/^[0-9a-f]{12,64}$/.test(h))) warn(file, `top item «${x.title}»: photos must be sha256 prefixes (12+ hex)`)
     }
   }
   const all = JSON.stringify(out)
