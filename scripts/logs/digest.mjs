@@ -291,8 +291,9 @@ const IN_APP_SOURCES = [
   [/Instagram/, 'instagram'],
   [/Barcelona/, 'threads'],
   [/FBAN|FBAV/, 'facebook'],
+  [/\bGemini\w*\//, 'gemini'], // Gemini app web view (GoogleWv … GeminiiOS/…), sends no referrer
 ]
-const SUMMARY_SOURCES = ['google', 'chatgpt', 'perplexity', 'instagram', 'direct'] // everything else -> «other»
+const SUMMARY_SOURCES = ['google', 'chatgpt', 'perplexity', 'gemini', 'instagram', 'direct'] // everything else -> «other»
 
 // Paths that are not pages.
 const ASSET =
@@ -1074,6 +1075,7 @@ const SUMMARY_COLUMNS = [
   'src_google',
   'src_chatgpt',
   'src_perplexity',
+  'src_gemini',
   'src_instagram',
   'src_direct',
   'src_other',
@@ -1142,7 +1144,7 @@ function writeMarkdown(d, file) {
       .join(', ')}.`,
   )
   L.push(
-    `Люди: ${s.people} (сесій ${s.sessions}, повернулись ${s.returning}); джерела: google ${s.src_google}, chatgpt ${s.src_chatgpt}, perplexity ${s.src_perplexity}, instagram ${s.src_instagram}, напряму ${s.src_direct}, інше ${s.src_other}.`,
+    `Люди: ${s.people} (сесій ${s.sessions}, повернулись ${s.returning}); джерела: google ${s.src_google}, chatgpt ${s.src_chatgpt}, perplexity ${s.src_perplexity}, gemini ${s.src_gemini}, instagram ${s.src_instagram}, напряму ${s.src_direct}, інше ${s.src_other}.`,
   )
   L.push(
     `Форма: відкрили ${s.zapyt_open}, надіслали ${s.zapyt_submit}; заявки студій: відкрили ${s.claim_open}, надіслали ${s.claims}; пошук ${s.searches}; ШІ-відповіді (fetch) ${s.ai_answer_fetches}; 5xx ${s.err_5xx}; повільних (>${SLOW_SECONDS} с) ${s.slow}.`,
