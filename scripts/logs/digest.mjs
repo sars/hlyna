@@ -2,6 +2,8 @@
 // and writes a compact, analysable digest per day. Output is private (IPs) and lives OUTSIDE the repo.
 //
 //   node scripts/logs/digest.mjs                       pull over ssh (host «hlyna», container edge-caddy-1), merge into raw/, rebuild all digests
+//                                                      (rotated logs come once, listed in pulled-files.json; the live log every run; all gzipped)
+//   node scripts/logs/digest.mjs --full                fetch the rotated logs again too (e.g. after raw/ was lost)
 //   node scripts/logs/digest.mjs --file path.log[.gz]  read a local log instead of ssh (repeatable)
 //   (on the server it runs daily from deploy/logs-digest.sh with --file over Caddy's logs and LOGS_DIR=/opt/hlyna-logs; deploy/README.md 5a)
 //   node scripts/logs/digest.mjs --days 2026-10-17     rebuild only these digests (comma list or repeat); raw/ is still updated for every pulled day
@@ -11,6 +13,7 @@
 //   days/YYYY-MM-DD.json      the digest (classes, bot passes, ai_answers, scanners, ours, people with journeys, 404s, unknown agents)
 //   days/YYYY-MM-DD.md        the short human version
 //   summary.csv               one row per day (rebuilt from days/*.json)
+//   pulled-files.json         rotated Caddy files already merged into raw/ (fetched once)
 //   people-index.json         person key (ip|os|browser) -> first day seen; used to mark returning visitors
 // Digests are always recomputed from raw/, so a re-run is idempotent. Run without --days once if people-index.json is missing,
 // so «returning» sees earlier days. Nothing here talks to the site's database or changes anything on the server.
@@ -25,7 +28,9 @@ import zlib from 'node:zlib'
 
 const SITE_HOST = 'hlyna.com.ua'
 const SSH_HOST = process.env.LOG_SSH_HOST || 'hlyna'
-const REMOTE_CMD = `docker exec edge-caddy-1 sh -c 'for f in /data/access/*.gz; do [ -e "$f" ] && zcat "$f"; done; cat /data/access/hlyna.log'`
+const REMOTE_DIR = '/data/access' // in container edge-caddy-1: rotated hlyna-*.log.gz (never change) + the live hlyna.log
+// Fail instead of hanging when the link drops; files travel gzipped (the link does ~0.5 MB/s, the logs unpacked are ~100 MB a file).
+const SSH_OPTS = ['-o', 'ConnectTimeout=15', '-o', 'ServerAliveInterval=15', '-o', 'ServerAliveCountMax=4']
 const OUT_DIR = process.env.LOGS_DIR || '/Users/rodik/Claude/hlyna-logs'
 
 const SESSION_GAP = 30 * 60 // seconds: a person's session and a bot's pass end after this much silence
@@ -1208,10 +1213,11 @@ function writeMarkdown(d, file) {
 // ───────────────────────────── Input and raw storage ─────────────────────────────
 
 function parseArgs(argv) {
-  const out = { files: [], days: null }
+  const out = { files: [], days: null, full: false }
   for (let i = 0; i < argv.length; i++) {
     if (argv[i] === '--file') out.files.push(argv[++i])
     else if (argv[i] === '--days') (out.days ??= []).push(...argv[++i].split(','))
+    else if (argv[i] === '--full') out.full = true
     else throw new Error(`Unknown argument ${argv[i]}`)
   }
   return out
@@ -1222,23 +1228,42 @@ async function eachLine(stream, fn) {
     if (line) fn(line)
 }
 
+function ssh(cmd) {
+  const child = spawn('ssh', [...SSH_OPTS, SSH_HOST, cmd], { stdio: ['ignore', 'pipe', 'inherit'] })
+  const done = new Promise((resolve, reject) => {
+    child.on('error', reject)
+    child.on('close', (code) => (code === 0 ? resolve() : reject(new Error(`ssh exited with ${code}: ${cmd}`))))
+  })
+  return { stdout: child.stdout, done }
+}
+
+// Rotated files already merged into raw/ (names only): they never change, so they are fetched once. --full fetches them again.
+const pulledFile = () => path.join(OUT_DIR, 'pulled-files.json')
+
 async function pull(args, onLine) {
   if (args.files.length) {
     for (const f of args.files) {
       const raw = fs.createReadStream(f)
       await eachLine(f.endsWith('.gz') ? raw.pipe(zlib.createGunzip()) : raw, onLine)
     }
-    return
+    return []
   }
-  const child = spawn('ssh', [SSH_HOST, REMOTE_CMD], { stdio: ['ignore', 'pipe', 'inherit'] })
-  const done = new Promise((resolve, reject) => {
-    child.on('error', reject)
-    child.on('close', (code) =>
-      code === 0 ? resolve() : reject(new Error(`ssh exited with ${code}`)),
-    )
-  })
-  await eachLine(child.stdout, onLine)
-  await done
+  const list = ssh(`docker exec edge-caddy-1 ls ${REMOTE_DIR}`)
+  let names = ''
+  for await (const chunk of list.stdout) names += chunk
+  await list.done
+  const seen = new Set(args.full || !fs.existsSync(pulledFile()) ? [] : JSON.parse(fs.readFileSync(pulledFile(), 'utf8')))
+  const rotated = names.split('\n').filter((n) => /^hlyna-.*\.log\.gz$/.test(n) && !seen.has(n))
+  const jobs = [
+    ...rotated.map((n) => `docker exec edge-caddy-1 cat ${REMOTE_DIR}/${n}`),
+    `docker exec edge-caddy-1 gzip -c ${REMOTE_DIR}/hlyna.log`,
+  ]
+  for (const cmd of jobs) {
+    const { stdout, done } = ssh(cmd)
+    await Promise.all([eachLine(stdout.pipe(zlib.createGunzip()), onLine), done])
+    console.log(`pulled ${cmd.split('/').pop()}`)
+  }
+  return [...seen, ...rotated]
 }
 
 const rawFile = (day) => path.join(OUT_DIR, 'raw', `${day}.jsonl.gz`)
@@ -1267,7 +1292,7 @@ async function main() {
 
   const pulled = new Map() // day -> Map(key -> rec)
   let total = 0
-  await pull(args, (line) => {
+  const pulledNames = await pull(args, (line) => {
     const r = parseLine(line)
     if (!r) return
     total++
@@ -1286,6 +1311,8 @@ async function main() {
     merged.set(day, all)
     console.log(`raw ${day}: ${all.size} lines (+${all.size - before})`)
   }
+  // Only now are the rotated files safely in raw/; a failed run above fetches them again next time.
+  if (pulledNames.length) fs.writeFileSync(pulledFile(), JSON.stringify(pulledNames.sort(), null, 1) + '\n')
 
   const allDays = [
     ...new Set([
