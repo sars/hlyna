@@ -1,6 +1,6 @@
 # Production: app + Postgres on one VPS. HTTPS comes from the host's shared
-# edge Caddy (network `edge`, config in the private-finances repository's
-# deploy/edge), which reaches this app as `hlyna:3000`.
+# edge Caddy (network `edge`, config in the `edge` repository, folder
+# hlyna/), which reaches this app as `hlyna:3000`.
 #   docker compose up -d --build
 # Secrets live in .env next to this file (see .env.example and deploy/README.md).
 
