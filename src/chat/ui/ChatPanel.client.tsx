@@ -23,6 +23,7 @@ export type ChatPanelProps = {
 }
 
 export const OPEN_EVENT = 'hl:chat-open'
+const TEMP_ID = 1e9
 
 type Role = PublicMessage['role']
 const WHO: Record<Role, string> = { visitor: 'Ви', assistant: 'Глина · помічник', human: 'Людина з Глини', system: '' }
@@ -113,8 +114,13 @@ export function ChatPanel(p: ChatPanelProps) {
 
   // ---------- state helpers
   const append = useCallback((m: PublicMessage) => {
-    setMessages((prev) => (prev.some((x) => x.id === m.id) ? prev : [...prev, m].sort((a, b) => a.id - b.id)))
-    if (m.id > lastId.current) lastId.current = m.id
+    setMessages((prev) => {
+      if (prev.some((x) => x.id === m.id)) return prev
+      // The stored copy of a line shown optimistically (temp id) replaces it, whichever stream brings it first.
+      const rest = m.role === 'visitor' ? prev.filter((x) => !(x.id >= TEMP_ID && x.role === 'visitor' && x.text === m.text)) : prev
+      return [...rest, m].sort((a, b) => a.id - b.id)
+    })
+    if (m.id > lastId.current && m.id < TEMP_ID) lastId.current = m.id
   }, [])
   const applyState = useCallback(
     (c: PublicConversation) => {
@@ -225,7 +231,7 @@ export function ChatPanel(p: ChatPanelProps) {
           track('chat_open', { page_kind: p.kind, where: 'first_message' })
         }
         if (!messages.some((m) => m.role === 'visitor')) track('chat_first_message', { page_kind: p.kind })
-        const temp: PublicMessage = { id: 1e9 + Date.now(), role: 'visitor', text: clean, at: new Date().toISOString() }
+        const temp: PublicMessage = { id: TEMP_ID + Date.now(), role: 'visitor', text: clean, at: new Date().toISOString() }
         setMessages((prev) => [...prev, temp])
         setStreaming('')
         const res = await fetch(`${api}/${c.id}/message`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: clean, page: p.page }) })
@@ -242,7 +248,6 @@ export function ChatPanel(p: ChatPanelProps) {
             acc += (data as { text: string }).text
             setStreaming(acc)
           } else if (event === 'visitor') {
-            setMessages((prev) => prev.filter((m) => m.id !== temp.id))
             append(data as PublicMessage)
           } else if (event === 'done') {
             const d = data as { assistant: PublicMessage | null; conversation: PublicConversation }
@@ -272,6 +277,17 @@ export function ChatPanel(p: ChatPanelProps) {
   const autosize = (el: HTMLTextAreaElement) => {
     el.style.height = 'auto'
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`
+  }
+
+  const startNew = async () => {
+    if (!conv || busy) return
+    await fetch(`${api}/${conv.id}/close`, { method: 'POST', credentials: 'same-origin' }).catch(() => {})
+    setConv(null)
+    setMessages([])
+    setStreaming(null)
+    setError(null)
+    lastId.current = 0
+    seenState.current = { waiting: false, contact: false, request: false }
   }
 
   const saveContact = async () => {
@@ -308,9 +324,26 @@ export function ChatPanel(p: ChatPanelProps) {
         : conv.status === 'human'
           ? 'Людина з Глини на зв’язку'
           : 'Розмову завершено. Напишіть, якщо з’явиться питання'
+  const hasThread = messages.length > 0 || streaming !== null
+  // The thread came from another page: say so, the assistant is told where the visitor is on the next line.
+  const movedHere = Boolean(conv && messages.length && conv.lastPage !== p.page)
+
+  const opener = (
+    <li className="hl-chat-row" data-role="assistant">
+      <div className="hl-chat-who">{WHO.assistant}</div>
+      <p className="hl-chat-text">
+        <strong id={`${uid}-h`} className="font-semibold">
+          {p.title}
+        </strong>
+        <br />
+        {p.intro}
+      </p>
+    </li>
+  )
 
   const thread = (
     <ol className="hl-chat-thread m-0 list-none p-0" aria-live="polite" aria-relevant="additions">
+      {opener}
       {messages.map((m) => (
         <li key={m.id} className="hl-chat-row" data-role={m.role}>
           {m.role !== 'system' && (
@@ -323,6 +356,11 @@ export function ChatPanel(p: ChatPanelProps) {
           </p>
         </li>
       ))}
+      {movedHere && streaming === null && (
+        <li className="hl-chat-row" data-role="system">
+          <p className="hl-chat-text">Ви перейшли на іншу сторінку. Розмова триває, помічник знає, де ви.</p>
+        </li>
+      )}
       {streaming !== null && (
         <li className="hl-chat-row" data-role="assistant">
           <div className="hl-chat-who">
@@ -362,7 +400,7 @@ export function ChatPanel(p: ChatPanelProps) {
           }}
         >
           <textarea rows={1} value={contactDraft} onChange={(e) => setContactDraft(e.target.value)} placeholder="Телефон, @telegram або пошта" aria-label="Контакт для відповіді" inputMode="text" autoComplete="tel" />
-          <button type="submit" className="ui-btn" data-variant="paper" data-size="sm" disabled={contactBusy || contactDraft.trim().length < 4}>
+          <button type="submit" className="ui-btn" data-variant="ink" data-size="sm" disabled={contactBusy || contactDraft.trim().length < 4}>
             Зберегти
           </button>
         </form>
@@ -384,7 +422,7 @@ export function ChatPanel(p: ChatPanelProps) {
         name="text"
         rows={1}
         value={draft}
-        placeholder={conv?.status === 'human' ? 'Людині з Глини…' : 'Ваше питання…'}
+        placeholder={conv?.status === 'human' ? 'Людині з Глини…' : 'Повідомлення…'}
         aria-label="Ваше повідомлення"
         maxLength={2000}
         onChange={(e) => {
@@ -395,14 +433,19 @@ export function ChatPanel(p: ChatPanelProps) {
         onFocus={where === 'inline' ? openDialog : undefined}
         disabled={busy && where === 'inline' && expanded}
       />
-      <button type="submit" className="ui-btn" data-auto="" data-size="sm" disabled={busy || !draft.trim()}>
-        {busy ? '…' : 'Надіслати'}
+      <button type="submit" className="ui-btn" data-variant="ink" disabled={busy} aria-label="Надіслати">
+        {busy ? '…' : (
+          <>
+            <span className="max-sm:hidden">Надіслати</span>
+            <span className="sm:hidden" aria-hidden>→</span>
+          </>
+        )}
       </button>
     </form>
   )
 
-  const chips = !messages.length && streaming === null && p.chips.length > 0 && (
-    <div className="flex flex-wrap gap-2">
+  const chips = !hasThread && p.chips.length > 0 && (
+    <div className="hl-chips">
       {p.chips.map((c) => (
         <button key={c} type="button" className="hl-chip" onClick={() => void send(c)} disabled={busy}>
           {c}
@@ -420,30 +463,36 @@ export function ChatPanel(p: ChatPanelProps) {
     </p>
   )
 
+  const footNote = (
+    <p className="hl-chat-note m-0">
+      Для замовника безкоштовно · <a href={p.fallbackHref}>форма замість чату</a>
+      {conv && messages.length > 0 && (
+        <>
+          {' '}
+          ·{' '}
+          <button type="button" onClick={() => void startNew()}>
+            нова розмова
+          </button>
+        </>
+      )}
+    </p>
+  )
+
   return (
     <>
-      <section id="zapyt-forma" data-chat="" data-tone="cobalt" aria-labelledby={`${uid}-h`} className="group/tone grid gap-3 bg-cobalt p-[clamp(18px,2.4vw,28px)] text-paper">
-        <div className="grid gap-1.5">
+      <section id="zapyt-forma" data-chat="" data-tone="cobalt" aria-labelledby={`${uid}-h`} className="group/tone grid gap-3.5 bg-cobalt p-[clamp(18px,2.4vw,28px)] text-paper">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
           <span className="font-mono text-kicker leading-[1.4] uppercase text-on-cobalt-2">{p.kicker}</span>
-          <h2 id={`${uid}-h`} className="m-0 font-display text-[19px] leading-[1.15] font-semibold [overflow-wrap:anywhere] sm:text-xl">
-            {p.title}
-          </h2>
-          {!messages.length && <p className="m-0 text-[15px] leading-normal text-on-cobalt-2">{p.intro}</p>}
+          <span className="hl-chat-note">{status}</span>
         </div>
-        {(messages.length > 0 || streaming !== null) && <p className="hl-chat-note m-0">{status}</p>}
-        {(messages.length > 0 || streaming !== null) && (
-          <div ref={inlineScroll} className="hl-chat-scroll">
-            {thread}
-          </div>
-        )}
+        <div ref={inlineScroll} className={hasThread ? 'hl-chat-scroll' : undefined}>
+          {thread}
+        </div>
         {chips}
         {!expanded && waitingExtras}
         {composer(inlineArea, 'inline')}
         {errorLine}
-        <p className="hl-chat-note m-0">
-          Для замовника безкоштовно. Не хочете чату?{' '}
-          <a href={p.fallbackHref}>Надішліть форму</a>.
-        </p>
+        {footNote}
         <noscript>
           <p className="m-0 text-[15px]">
             Чат працює з JavaScript. <a href={p.fallbackHref} className="underline">Напишіть через форму запиту</a>.
@@ -456,7 +505,7 @@ export function ChatPanel(p: ChatPanelProps) {
           <>
             <div className="hl-chat-dlg-top">
               <div className="grid min-w-0 gap-0.5">
-                <strong className="truncate font-display text-[15px] font-semibold">{p.title}</strong>
+                <strong className="truncate font-display text-[15px] font-semibold">{p.kicker}</strong>
                 <span className="hl-chat-note truncate">{status}</span>
               </div>
               <button type="button" onClick={closeDialog}>
@@ -464,7 +513,6 @@ export function ChatPanel(p: ChatPanelProps) {
               </button>
             </div>
             <div ref={dialogScroll} className="hl-chat-dlg-body">
-              {!messages.length && streaming === null && <p className="m-0 mb-3 text-[15px] leading-normal text-on-cobalt-2">{p.intro}</p>}
               {thread}
               {chips && <div className="mt-3">{chips}</div>}
             </div>

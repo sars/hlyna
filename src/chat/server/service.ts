@@ -88,12 +88,13 @@ export function createChat(cfg: ChatConfig) {
   }
 
   /** The visitor wrote. Relays to the person when one is in; otherwise the assistant answers (streamed through onDelta). */
-  async function send(c0: Conversation, text: string, opts: { ip: string; via: 'site' | 'telegram'; page?: string; onDelta?: (t: string) => void }): Promise<SendResult> {
+  async function send(c0: Conversation, text: string, opts: { ip: string; via: 'site' | 'telegram'; page?: string; onDelta?: (t: string) => void; onVisitor?: (m: Message) => void }): Promise<SendResult> {
     const clean = text.trim().slice(0, MESSAGE_MAX)
     let c = c0.status === 'closed' ? await setStatus(db, c0.id, 'ai', { reopened: true }) : c0
     if (opts.page && opts.page !== c.lastPage) c = await updateConversation(db, c.id, { lastPage: opts.page })
     const before = await listMessages(db, c.id, { limit: CONVERSATION_MAX_MESSAGES + 1 })
     const visitor = await addMessage(db, c.id, 'visitor', clean, { meta: { via: opts.via, page: opts.page ?? c.lastPage } })
+    opts.onVisitor?.(visitor)
     const first = before.find((m) => m.role === 'visitor')?.text ?? clean
     c = await ensureHead(db, c, transport, first)
 
@@ -142,6 +143,11 @@ export function createChat(cfg: ChatConfig) {
     if (presence.online && Date.now() - new Date(c.handoffAt).getTime() < CONTACT_NUDGE_MS) return null
     await updateConversation(db, c.id, { contactAskedAt: new Date().toISOString() })
     return addMessage(db, c.id, 'assistant', TEXT.askContact, { meta: { nudge: true } })
+  }
+
+  /** «Нова розмова»: the visitor closes the thread; the next message opens a fresh one. */
+  async function close(c: Conversation) {
+    return closeConversation(db, c, transport)
   }
 
   async function contact(c: Conversation, type: string, value: string) {
@@ -249,6 +255,7 @@ export function createChat(cfg: ChatConfig) {
     send,
     nudge,
     contact,
+    close,
     telegramLink,
     presence: () => getPresence(db),
     messagesAfter: (c: Conversation, afterId: number) => listMessages(db, c.id, { afterId }),

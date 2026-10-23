@@ -348,7 +348,7 @@ describe('http', () => {
     const r2 = await http.message(json({ text: '50 тарілок', page: '/dlya-biznesu/posud' }, cookieHeader), d1.conversation.id)
     expect(r2.headers.get('content-type')).toContain('text/event-stream')
     const evs = await readSse(r2)
-    expect(evs.map((e) => e.event)).toEqual(['delta', 'delta', 'delta', 'visitor', 'done'])
+    expect(evs.map((e) => e.event)).toEqual(['visitor', 'delta', 'delta', 'delta', 'done'])
     expect((evs.at(-1)!.data as { assistant: { text: string } }).assistant.text).toBe('Партія 3–8 тижнів')
     expect((await getById(db, 1))?.lastPage).toBe('/dlya-biznesu/posud')
 

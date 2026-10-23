@@ -22,6 +22,8 @@ export type PublicConversation = {
   telegram: boolean
   telegramLink: string | null
   humanOnline: boolean
+  /** Where the visitor last wrote from (the page shows a line when they moved on). */
+  lastPage: string
 }
 export type PublicMessage = { id: number; role: Message['role']; text: string; at: string }
 
@@ -58,7 +60,7 @@ export function chatHttp(deps: HttpDeps) {
   async function pub(c: Conversation): Promise<PublicConversation> {
     const chat = deps.chat()
     const [link, presence] = await Promise.all([chat.telegramLink(c), chat.presence()])
-    return { id: c.publicId, status: c.status, kind: c.kind, hasContact: Boolean(c.contact), requestId: c.requestId, telegram: Boolean(c.visitorTgChatId), telegramLink: link, humanOnline: presence.online }
+    return { id: c.publicId, status: c.status, kind: c.kind, hasContact: Boolean(c.contact), requestId: c.requestId, telegram: Boolean(c.visitorTgChatId), telegramLink: link, humanOnline: presence.online, lastPage: c.lastPage ?? c.page }
   }
 
   /** The conversation a request may touch: by public id, and only the visitor whose cookie opened it. */
@@ -120,8 +122,7 @@ export function chatHttp(deps: HttpDeps) {
         async start(controller) {
           const push = (event: string, data: unknown) => controller.enqueue(encoder.encode(sse(event, data)))
           try {
-            const r = await chat.send(c, text, { ip, via: 'site', page, onDelta: (d) => push('delta', { text: d }) })
-            push('visitor', pubMsg(r.visitor))
+            const r = await chat.send(c, text, { ip, via: 'site', page, onVisitor: (m) => push('visitor', pubMsg(m)), onDelta: (d) => push('delta', { text: d }) })
             push('done', { assistant: r.assistant ? pubMsg(r.assistant) : null, conversation: await pub(r.conversation) })
           } catch (e) {
             console.error(`chat message error: ${String(e).slice(0, 300)}`)
@@ -191,6 +192,15 @@ export function chatHttp(deps: HttpDeps) {
         },
       })
       return new Response(stream, { headers: SSE_HEADERS })
+    },
+
+    /** POST: «Нова розмова» closes this thread. */
+    async close(req: Request, publicId: string) {
+      if (!deps.enabled()) return json({ error: 'off' }, { status: 503 })
+      const c = await own(req, publicId)
+      if (!c) return json({ error: 'Розмову не знайдено.' }, { status: 404 })
+      await deps.chat().close(c)
+      return json({ ok: true })
     },
 
     /** POST {type, value}: a contact typed into the panel's own field (outside the model). */
