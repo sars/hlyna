@@ -4,6 +4,7 @@ import React from 'react'
 import { Block, FaqRich, InnerCols, InnerHero, InnerMain, Related } from '@/components/site/Inner'
 import { JsonLd } from '@/components/site/JsonLd'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { RequestForm } from '@/components/site/RequestForm.client'
 import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
@@ -88,7 +89,7 @@ export function GuidePage({ guide, ctx, parents }: { guide: Guide; ctx: GuideCtx
           </Button>
         }
       />
-      <InnerCols aside={guide.form ? <RequestForm sourcePage={guide.path} defaultWhat={guide.form.what} forStudio={guide.form.studio} /> : undefined}>
+      <InnerCols aside={guide.form ? guide.form.studio ? <RequestForm sourcePage={guide.path} defaultWhat={guide.form.what} forStudio /> : <RequestBlock page={guide.path} kind={guide.form.what === 'master-class' ? 'classes' : 'business'} form={{ defaultWhat: guide.form.what }} /> : undefined}>
         {guide.verse && <Epigraph lines={guide.verse} />}
         {guide.sections.length > 2 && (
           <nav aria-label="Зміст" className="grid gap-2">

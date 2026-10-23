@@ -4,7 +4,7 @@ import React from 'react'
 import { Block, FaqRich, InfoList, InnerCols, InnerHero, InnerMain, Related, RequestBand } from '@/components/site/Inner'
 import { JsonLd } from '@/components/site/JsonLd'
 import { RichText } from '@/components/site/PlaceContent'
-import { RequestForm } from '@/components/site/RequestForm.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { isBusinessTop, TopList } from '@/components/site/TopList'
 import { Button } from '@/components/ui/Button'
@@ -118,7 +118,7 @@ export function WavePage({
         }
       />
 
-      <InnerCols aside={<RequestForm sourcePage={path} defaultWhat={form} defaultCity={city} />}>
+      <InnerCols aside={<RequestBlock page={path} kind={form === 'master-class' ? 'classes' : 'business'} city={city} form={{ defaultWhat: form, defaultCity: city }} />}>
         {copy.epigraph && copy.epigraph.length > 0 && <Epigraph lines={copy.epigraph} />}
         {first && <CopySection s={first} k={0} known={known} />}
         {tops.map((c) => (

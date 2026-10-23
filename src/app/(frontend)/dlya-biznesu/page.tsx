@@ -7,7 +7,7 @@ import { IndexCell, StudioCells } from '@/components/ui/StudioCell'
 import React from 'react'
 
 import { JsonLd } from '@/components/site/JsonLd'
-import { RequestForm } from '@/components/site/RequestForm.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { mainNav } from '@/content/navigation'
 import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
@@ -81,7 +81,7 @@ export default async function BusinessIndex() {
           </Button>
         }
       />
-      <InnerCols aside={<RequestForm sourcePage="/dlya-biznesu" />}>
+      <InnerCols aside={<RequestBlock page="/dlya-biznesu" kind="business" />}>
         {biz.columns.map((c) => (
           <section key={c.title} className="grid gap-2">
             <Kicker as="p">{c.title}</Kicker>

@@ -18,7 +18,7 @@ import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { latestUpdate } from '@/lib/catalog'
 
 import { JsonLd } from '@/components/site/JsonLd'
-import { RequestForm } from '@/components/site/RequestForm.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { facts } from '@/lib/facts'
 import { site } from '@/content/site'
 import { ogImage } from '@/lib/ogImage'
@@ -223,7 +223,7 @@ export default async function CityMasterClassesPage({ params }: Args) {
       <InnerCols
         aside={
           <>
-            <RequestForm sourcePage={`/maister-klasy/${city.slug}`} defaultWhat="master-class" defaultCity={city.name} />
+            <RequestBlock page={`/maister-klasy/${city.slug}`} kind="classes" city={city.name} form={{ defaultWhat: 'master-class', defaultCity: city.name }} />
             <SideBox title="Для команди">
               <p className="m-0">
                 <Link href="/dlya-biznesu/korporatyv-lipennya-z-hlyny">Корпоратив з ліплення з глини: у студії або в офісі, по Україні {f.range('corporate')}. →</Link>

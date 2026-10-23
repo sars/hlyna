@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import '../../chat/ui/chat.css';
 
 /* The /panel has its own stylesheet; keep its classes out of the public site's CSS. */
 @source not '../../components/panel';

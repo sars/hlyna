@@ -16,7 +16,7 @@ import { latestUpdate } from '@/lib/catalog'
 
 import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
-import { RequestForm } from '@/components/site/RequestForm.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { site } from '@/content/site'
 import { centreOf, cityPages, getAllStudios, getAcademies, getAllWithShops, getLegacy, getShops, offersMasterClasses, pluralUk, type StudioCard } from '@/lib/catalog'
 import { CityStudioLinks } from '@/components/ui/CityList'
@@ -178,7 +178,7 @@ export default async function CityMakersPage({ params }: Args) {
         }
       />
 
-      <InnerCols aside={<RequestForm sourcePage={`/vyrobnyky/misto/${city.slug}`} defaultWhat="tableware" defaultCity={city.name} />}>
+      <InnerCols aside={<RequestBlock page={`/vyrobnyky/misto/${city.slug}`} kind="other" city={city.name} form={{ defaultWhat: 'tableware', defaultCity: city.name }} />}>
         {content && <PlaceStory c={content} known={known} title={`Кераміка ${inCity(city.name)}: що тут роблять`} />}
         {content && <PlacePicks c={content} known={known} />}
         {prices.length > 0 && (

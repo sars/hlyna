@@ -5,7 +5,7 @@ import React from 'react'
 
 import { SeasonPromo } from '@/components/site/SeasonPromo'
 import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
-import { RequestForm } from '@/components/site/RequestForm.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { Button } from '@/components/ui/Button'
 import { CityList } from '@/components/ui/CityList'
 import { Chip } from '@/components/ui/Chip'
@@ -138,7 +138,7 @@ export default async function HomePage() {
               <Stat value={String(s.masterClassPlaces)} label={`${places} з майстер-класами`} />
             </div>
           </div>
-          <RequestForm sourcePage="/" compact />
+          <RequestBlock page="/" kind="home" form={{ compact: true }} />
         </div>
       </section>
 

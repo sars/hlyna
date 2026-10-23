@@ -24,7 +24,7 @@ import { MobileRequestBar } from '@/components/site/MobileRequestBar.client'
 import { StudioGallery } from '@/components/ui/StudioGallery'
 
 import { JsonLd } from '@/components/site/JsonLd'
-import { RequestForm } from '@/components/site/RequestForm.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { InstagramPosts } from '@/components/site/InstagramPosts.client'
 import { ProfileMap } from '@/components/site/ProfileMap.client'
 import { site } from '@/content/site'
@@ -311,7 +311,7 @@ export default async function StudioPage({ params }: Args) {
         aside={
           <>
             {showForm ? (
-              <RequestForm sourcePage={`/vyrobnyky/${s.slug}`} defaultWhat={formFor(s)} defaultCity={city?.name ?? ''} studioName={name} />
+              <RequestBlock page={`/vyrobnyky/${s.slug}`} kind="profile" studio={{ slug: s.slug ?? '', name }} city={city?.name} classes={mk} business={Boolean(venues || companies)} form={{ defaultWhat: formFor(s), defaultCity: city?.name ?? '', studioName: name }} />
             ) : (
               <SideBox title={box.title}>
                 <p className="m-0">

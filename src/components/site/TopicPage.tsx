@@ -5,7 +5,7 @@ import { BoldFacts, Block, InnerCols, InnerHero, InnerMain, Related } from '@/co
 import { SeasonPromo } from '@/components/site/SeasonPromo'
 import { JsonLd } from '@/components/site/JsonLd'
 import { PlacePicks, PlaceSeeAlso, PlaceSources, PlaceStory } from '@/components/site/PlaceContent'
-import { RequestForm } from '@/components/site/RequestForm.client'
+import { RequestBlock } from '@/components/site/RequestBlock'
 import { isBusinessTop, TopList } from '@/components/site/TopList'
 import { Button } from '@/components/ui/Button'
 import { Chip } from '@/components/ui/Chip'
@@ -181,7 +181,7 @@ export async function TopicPage({ topic, data, h1, crumb, extraParents = [], con
         aside={
           <>
             {topic.form ? (
-              <RequestForm sourcePage={topic.path} defaultWhat={topic.form} defaultCity={ctx.place} />
+              <RequestBlock page={topic.path} kind={topic.section === 'biz' ? 'business' : topic.section === 'mk' || topic.section === 'cert' ? 'classes' : 'other'} city={ctx.place} form={{ defaultWhat: topic.form, defaultCity: ctx.place }} />
             ) : topic.section === 'makers' ? (
               <SideBox title="Купити або замовити">
                 <p className="m-0">Більшість майстрів продають через Instagram, власний сайт чи Etsy — посилання в профілях. Для партії під заклад чи компанію надішліть один запит кільком студіям.</p>
