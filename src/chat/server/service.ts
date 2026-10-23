@@ -1,5 +1,5 @@
 import { runTurn, type TurnResult } from './engine'
-import { closeConversation, ensureHead, handBack, humanReply, linkTelegram, relayVisitor, requestHuman, saveContact, takeOver, threadLabel } from './handoff'
+import { closeConversation, ensureHead, flagBusiness, handBack, humanReply, linkTelegram, relayVisitor, requestHuman, saveContact, takeOver, threadLabel } from './handoff'
 import {
   addMessage,
   bumpUsage,
@@ -98,16 +98,24 @@ export function createChat(cfg: ChatConfig) {
     opts.onVisitor?.(visitor)
     const first = before.find((m) => m.role === 'visitor')?.text ?? clean
     c = await ensureHead(db, c, transport, first)
+    // A business lead is flagged to the owner before the model answers: the person can step in at once.
+    if (cfg.business?.detect(clean, c)) c = await flagBusiness(db, c, clean, transport)
 
     if (before.filter((m) => m.role === 'visitor').length >= CONVERSATION_MAX_MESSAGES) {
       const assistant = await addMessage(db, c.id, 'assistant', TEXT.limit)
       return { visitor, assistant, conversation: c, limited: true }
     }
 
-    if (c.status === 'human' || c.status === 'waiting') {
+    // A person is in: the line goes to them, the assistant stays quiet.
+    if (c.status === 'human') {
+      await relayVisitor(db, c, visitor.id, clean, transport, opts.via)
+      return { visitor, assistant: null, conversation: c }
+    }
+    // Handed over but nobody has answered yet: the owner sees the line, the assistant still answers (and may ask for a contact).
+    if (c.status === 'waiting') {
       await relayVisitor(db, c, visitor.id, clean, transport, opts.via)
       const nudged = await nudge(c)
-      return { visitor, assistant: nudged, conversation: c }
+      if (nudged) return { visitor, assistant: nudged, conversation: c }
     }
 
     const presence = await getPresence(db)
@@ -127,7 +135,8 @@ export function createChat(cfg: ChatConfig) {
       opts.onDelta?.(TEXT.modelDown)
       return { visitor, assistant, conversation: fresh }
     }
-    const fresh = await refresh(c)
+    let fresh = await refresh(c)
+    if (cfg.business?.detectTools?.(turn.toolCalls)) fresh = await flagBusiness(db, fresh, clean, transport)
     const answer = turn.text || (turn.toolCalls.some((t) => t.name === 'call_human') ? TEXT.waitingOffline : '')
     const assistant = answer
       ? await addMessage(db, c.id, 'assistant', answer, { meta: { tools: turn.toolCalls.map((t) => ({ name: t.name, ms: t.ms, args: t.args })), usage: turn.usage, rounds: turn.rounds } })

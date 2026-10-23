@@ -197,6 +197,7 @@ async function context(c: Conversation, extra: { presenceOnline: boolean; otherT
   }
   if (extra.otherThreads.length) lines.push(`Відвідувач має ще розмови на інших сторінках (для розуміння, не переказуй): ${extra.otherThreads.map((o) => `${o.page}: «${o.first.slice(0, 120)}»`).join('; ')}.`)
   lines.push(`Людина з Глини зараз ${extra.presenceOnline ? 'онлайн' : 'офлайн'}.`)
+  if (c.status === 'waiting') lines.push('Розмову вже передано людині з Глини, вона ще не відповіла. Відповідай на нові питання сам, коротко; не обіцяй нічого за людину і не викликай call_human знову.')
   lines.push(`Стан розмови: ${c.status}; контакт ${c.contact ? 'є' : 'ще не збережено'}; запит ${c.requestId ? `№${c.requestId} уже створено` : 'не створено'}${c.visitorTgChatId ? '; відвідувач також у Telegram' : ''}.`)
   return lines.join('\n')
 }
@@ -230,6 +231,10 @@ const transport: Transport = {
   panelUrl: (id) => `${site.url}/panel/chat/${id}`,
 }
 
+const BUSINESS_WORDS = /парті[яії]|логотип|корпоратив|ресторан|кафе|кав['’]ярн|готел|заклад|оптом|тираж|компані[яії]|для команди|співробітник|персонал|бренд(ован|инг)|\b\d{2,}\s*(шт|чаш|круж|тарі|горн|мис|піал|набор|комплект)/iu
+const BUSINESS_NEEDS = new Set(['tableware', 'logo', 'corporate-gifts', 'corporate-workshop'])
+const BUSINESS_WHAT = new Set(['tableware', 'logo-mugs', 'corporate-gifts', 'corporate-workshop'])
+
 const globalForChat = globalThis as unknown as { hlynaChat?: Chat; hlynaOpenAI?: OpenAI }
 
 function openai() {
@@ -252,5 +257,9 @@ function build(): Chat {
     tools,
     transport,
     rateLimited: (key, max, windowMs) => rateLimited(db, key, max, windowMs),
+    business: {
+      detect: (text, c) => c.kind === 'business' || BUSINESS_WORDS.test(text),
+      detectTools: (calls) => calls.some((t) => (t.name === 'search_studios' && BUSINESS_NEEDS.has(String(t.args.need))) || (t.name === 'create_request' && BUSINESS_WHAT.has(String(t.args.what)))),
+    },
   })
 }

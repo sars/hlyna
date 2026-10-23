@@ -83,6 +83,7 @@ const chat = createChat({
     limits.set(key, n)
     return n > max
   },
+  business: { detect: (text, c) => c.kind === 'business' || /парті/i.test(text), detectTools: (calls) => calls.some((t) => t.name === 'echo_tool' && t.args.q === 'biz') },
   log: () => {},
 })
 const OWNER = '777'
@@ -171,6 +172,40 @@ describe('a turn with the assistant', () => {
   })
 })
 
+describe('a business lead', () => {
+  it('is flagged to the owner once, before the model answers, with «Взяти»', async () => {
+    const c = await open()
+    script.push({ text: 'ок' })
+    const order: string[] = []
+    const llmSeen = llm.stream
+    llm.stream = (p) => {
+      order.push('model')
+      return llmSeen(p)
+    }
+    try {
+      await chat.send(c, 'Потрібна партія на 200 тарілок', { ip: '1.1.1.1', via: 'site' })
+    } finally {
+      llm.stream = llmSeen
+    }
+    const flag = sent.find((s) => s.text.startsWith('🏢'))
+    expect(flag?.text).toContain('партія на 200')
+    expect(flag?.replyTo).toBe(101)
+    expect(JSON.stringify(flag?.keyboard)).toContain(`ch:t:${c.id}`)
+    expect(sent.indexOf(flag!)).toBeLessThan(2) // head, then the flag, before any model work
+    expect((await getById(db, c.id))?.context).toMatchObject({ business: true })
+    script.push({ text: 'ок' })
+    await chat.send(c, 'І ще партія чашок', { ip: '1.1.1.1', via: 'site' })
+    expect(sent.filter((s) => s.text.startsWith('🏢'))).toHaveLength(1)
+  })
+
+  it('is also flagged by what the model did (a business tool call)', async () => {
+    const c = await open()
+    script.push({ calls: [{ name: 'echo_tool', args: { q: 'biz' } }] }, { text: 'ок' })
+    await chat.send(c, 'Привіт', { ip: '1.1.1.1', via: 'site' })
+    expect(sent.some((s) => s.text.startsWith('🏢'))).toBe(true)
+  })
+})
+
 describe('handing over to a person', () => {
   it('call_human puts the conversation on hold and asks the owner, with the contact nudge when offline', async () => {
     const c = await open()
@@ -184,13 +219,14 @@ describe('handing over to a person', () => {
     const out = JSON.parse(second.find((i) => i.type === 'function_call_output')!.output!) as { humanOnline: boolean; tellVisitor: string }
     expect(out.humanOnline).toBe(false)
     expect(out.tellVisitor).toContain(TEXT.askContact)
-    // While waiting, the visitor's lines go to the owner and the model is not called.
+    // While waiting, the visitor's lines go to the owner and the assistant still answers.
     sent.length = 0
     seenParams.length = 0
+    script.push({ text: 'поки чекаємо' })
     const r2 = await chat.send(r.conversation, 'Ще питання', { ip: '1.1.1.1', via: 'site' })
-    expect(seenParams).toHaveLength(0)
     expect(sent[0]).toMatchObject({ to: 'owner', text: '👤 Ще питання', replyTo: 101 })
-    expect(r2.assistant).toBeNull()
+    expect(seenParams).toHaveLength(1)
+    expect(r2.assistant?.text).toBe('поки чекаємо')
   })
 
   it('tells the visitor the person is online when the owner was active recently', async () => {

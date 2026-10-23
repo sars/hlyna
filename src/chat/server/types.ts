@@ -42,6 +42,8 @@ export type ChatConfig = {
   transport: Transport
   /** Fixed-window limit shared with the rest of the site; true means over the limit. */
   rateLimited: (key: string, max: number, windowMs: number) => Promise<boolean>
+  /** A business lead (a batch, a logo, a venue, a team): the owner is told at once, before the assistant answers. */
+  business?: { detect: (text: string, c: Conversation) => boolean; detectTools?: (calls: { name: string; args: Record<string, unknown> }[]) => boolean }
   /** The opener the thread shows before the visitor writes (by kind of page). */
   log?: (msg: string) => void
 }

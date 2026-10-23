@@ -14,7 +14,8 @@ Updated 2026-10-12.
 ## Chat instead of the form (2026-10-23)
 - Plan and decisions: `docs/chat/PLAN.md`. Module `src/chat/` (schema `chat`, engine, hand-over, Telegram, HTTP, panel UI) + the site's adapter `src/server/chatAdapter.ts` (tools over the catalogue, the prompt in `chatPrompt.ts`, the Telegram transport). `RequestBlock` shows the chat where the form stood when `OPENAI_API_KEY` is set, else the form; `/zapyt` keeps the form.
 - Telegram: head message per conversation, Reply answers, «Взяти» / «Завершити», `/done`, `/online` `/offline` `/auto`; visitors continue with `t.me/<bot>?start=c_<id>`.
-- Panel: `/panel/chat` (read-only). Tests: `tests/int/chat.int.spec.ts` (fake model, fake Telegram). Try a turn locally: `HLYNA_SCRIPT=1 DATABASE_URL=… pnpm exec tsx experiments/chat-try.ts "питання"`; screenshots of an exchange: `node experiments/chat-shots.mjs /vyrobnyky/<slug>`.
+- Panel: `/panel/chat` (read-only, spend over 30 days). Tests: `tests/int/chat.int.spec.ts` (fake model, fake Telegram). Flows end to end with the real model: `scripts/smoke/chat.mjs` against `scripts/smoke/fake-telegram.mjs` (`TELEGRAM_API_BASE`), 34 checks. Ad-hoc scripts live in `experiments/` (gitignored): `chat-try.ts`, `chat-shots.mjs`, `chat-threads.mjs`.
+- Threads: one per studio, per city's classes, one for business pages, one for home (`thread_key`); the header lists the visitor's open threads, switched in place; «+ нова» starts another. A business lead (business page, or words like партія/логотип/корпоратив, or a business tool call) is flagged to the owner at once, before the answer; while a hand-over waits the assistant keeps answering.
 - Production needs `OPENAI_API_KEY` in `.env` (deploy/README.md) and migration 0008.
 
 ## Next

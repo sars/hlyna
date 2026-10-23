@@ -120,6 +120,16 @@ export async function linkTelegram(db: ChatDb, c: Conversation, chatId: number, 
   return withHead
 }
 
+/** A business lead: one loud note to the owner under the head, once per conversation. */
+export async function flagBusiness(db: ChatDb, c: Conversation, text: string, t: Transport) {
+  if ((c.context as { business?: boolean } | null)?.business) return c
+  const conv = await updateConversation(db, c.id, { context: { ...(c.context ?? {}), business: true } })
+  const presence = await getPresence(db)
+  const id = await t.sendToOwner(`🏢 Чат #${conv.id}: схоже на бізнес-клієнта${presence.online ? '' : ' (ви офлайн)'}\n\n👤 ${clip(text, 600)}\n\n«Взяти» — і ви в розмові; помічник тим часом відповідає сам.`, { replyTo: conv.tgHeadMessageId ?? undefined, keyboard: headKeyboard(conv, t) })
+  await addEvent(db, conv.id, 'business', { tgMessageId: id })
+  return conv
+}
+
 export async function saveContact(db: ChatDb, c: Conversation, type: string, value: string, t: Transport) {
   const conv = await updateConversation(db, c.id, { contactType: type, contact: value })
   await addEvent(db, conv.id, 'contact', { type })
