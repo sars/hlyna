@@ -179,25 +179,25 @@ const tools: ToolDef[] = [
 ]
 
 const KIND_LINE: Record<string, string> = {
-  profile: 'Відвідувач на профілі студії і, найімовірніше, хоче щось саме від неї: запис, виріб, партію.',
-  business: 'Сторінка для бізнесу: партії, логотипи, корпоративи. Тут доречно запропонувати один запит кільком студіям.',
-  classes: 'Сторінка майстер-класів міста: людина обирає, куди піти. Дай 2–3 варіанти з цінами.',
-  home: 'Головна сторінка: спочатку зрозумій, що шукають: майстер-клас, подарунок чи посуд для закладу.',
-  other: '',
+  profile: 'Це сторінка профілю однієї студії: відвідувач бачить на ній опис, формати, ціни, контакти (Instagram, сайт, телефон, адресу) і фото; найімовірніше, хоче щось саме від неї: запис, виріб, партію.',
+  business: 'Це сторінка для бізнесу: на ній орієнтовні ціни, терміни і список студій, які роблять партії, логотипи чи корпоративи. Тут доречно запропонувати один запит кільком студіям.',
+  classes: 'Це сторінка майстер-класів міста: на ній список студій міста з цінами разового заняття. Людина обирає, куди піти; дай 2–3 варіанти з цінами.',
+  home: 'Це головна сторінка каталогу: спочатку зрозумій, що шукають: майстер-клас, подарунок чи посуд для закладу.',
+  other: 'Це одна зі сторінок каталогу (добірка, місто, виріб).',
 }
 
 async function context(c: Conversation, extra: { presenceOnline: boolean; otherThreads: { page: string; first: string }[] }) {
   const ctx = (c.context ?? {}) as { studioSlug?: string; studioName?: string; city?: string }
   const lines = [
     `Сьогодні ${new Intl.DateTimeFormat('uk-UA', { dateStyle: 'long', timeZone: 'Europe/Kyiv' }).format(new Date())}.`,
-    `Відвідувач зараз на сторінці ${site.url}${c.lastPage ?? c.page} (тип: ${c.kind}). ${KIND_LINE[c.kind] ?? ''}`.trim(),
+    `Ти вбудований у сторінку ${site.url}${c.lastPage ?? c.page}${c.lastPage && c.lastPage !== c.page ? ` (розмова почалась на ${site.url}${c.page})` : ''}. ${KIND_LINE[c.kind] ?? ''}`.trim(),
   ]
   if (ctx.city) lines.push(`Місто сторінки: ${ctx.city}.`)
   if (ctx.studioSlug) {
     const s = await getStudioBySlug(ctx.studioSlug)
     if (s) {
       const k = card(s as StudioCard)
-      lines.push(`Студія сторінки: ${JSON.stringify(k)}. ${k.acceptsRequests ? 'Вона приймає запити.' : 'Запити їй не надсилаємо (не працює, не підтверджена або це не студія).'}`)
+      lines.push(`Студія цієї сторінки (її контакти відвідувач бачить вище на сторінці): ${JSON.stringify(k)}. ${k.acceptsRequests ? 'Вона приймає запити.' : 'Запити їй не надсилаємо (не працює, не підтверджена або це не студія).'}`)
     }
   }
   if (extra.otherThreads.length) lines.push(`Відвідувач має ще розмови на інших сторінках (для розуміння, не переказуй): ${extra.otherThreads.map((o) => `${o.page}: «${o.first.slice(0, 120)}»`).join('; ')}.`)
