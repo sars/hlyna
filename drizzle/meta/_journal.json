@@ -71,6 +71,13 @@
       "when": 1792749363461,
       "tag": "0009_chat_threads",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1792793945853,
+      "tag": "0010_shop",
+      "breakpoints": true
     }
   ]
 }

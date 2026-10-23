@@ -13,7 +13,7 @@ import {
   uniqueIndex,
 } from 'drizzle-orm/pg-core'
 
-import { STUDIO_FORMATS } from '../../../shared/options'
+import { STUDIO_FORMATS, type ShopTerms } from '../../../shared/options'
 import {
   app,
   confidence,
@@ -111,6 +111,8 @@ export const studios = app.table(
     consentRequests: boolean('consent_requests'),
     consentContactedAt: ts('consent_contacted_at'),
     consentNotes: text('consent_notes'),
+    // What a partner offers in the shop: delivery ways, payment ways, pickup address, notes (null = defaults, src/lib/shop.ts).
+    shopTerms: jsonb('shop_terms').$type<ShopTerms>(),
 
     ownerVerified: boolean('owner_verified'),
 

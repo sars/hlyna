@@ -1,0 +1,53 @@
+# Крамниця — план і рішення
+
+Почато 24.10.2026 (власник: «побудуй магазин для студій: спільний каталог, товари студій; почнемо з Осоння; сучасно, гарно, добре індексується; покупка, оформлення під українців, оплату потім; студії обробляють замовлення самі; ми бачимо все в адмінці; «додайте свою студію»; не для корпоративних замовлень; без надскладнощів — більшість процесів через Клода»).
+
+Дослідження: `research/design.md`, `research/seo-llm.md`, `research/checkout-ua.md`.
+
+## Що це
+Спільна крамниця виробів українських студій на `/kramnytsia`. Платформа — посередник: договір купівлі студія ↔ покупець, ми беремо 10 % з виконаних замовлень (`site.model`). Товари й наявність беруться з магазинів студій-партнерів (згода на запити = партнер; рішення 19.10.2026) і з файлів правок, які готує Клод. Перший партнер — «Осоння» (Суми, osonnya.shop на Wix, 9 виробів).
+
+## URL
+| URL | Що | Індекс |
+|---|---|---|
+| `/kramnytsia` | головна крамниці: факти, категорії, сітка виробів, «Для студій», FAQ | так |
+| `/kramnytsia/<категорія>` | категорія (`ITEM_CATEGORIES`), лише з ≥ 3 виробами, інакше 404 і без посилань | так |
+| `/kramnytsia/<студія>` | усі вироби студії | так |
+| `/kramnytsia/<студія>/<виріб>` | сторінка виробу | так (продані — лишаються 200 зі станом «продано» і схожими) |
+| `/kramnytsia/koshyk` | кошик (localStorage) | ні |
+| `/kramnytsia/oformlennia` | оформлення | ні |
+| `/kramnytsia/zamovlennia/<token>` | стан замовлення для покупця | ні |
+| `/kramnytsia/feed.xml` | Google Merchant RSS 2.0 (`g:`) | — |
+
+Зарезервовані сегменти (`koshyk`, `oformlennia`, `zamovlennia`, `feed.xml`) і категорії перевіряються раніше за слаг студії.
+
+## Дані (міграція 0010)
+- `items` +: `fulfillment` (`ship` | `digital`, для сертифікатів), `specs jsonb` ([{label, value}] — таблиця характеристик і поля schema.org), `lead_days_min/max` (термін виготовлення для `to_order`), `stock` (кількість, коли відома). Категорії +`svichky`, +`sertyfikaty`.
+- `item_photos (item_id, media_id, position)` — фото через наявний `media` (`uploadImage`, варіанти, `/media/*`). Імпорт з Wix качає файли (локально з `MEDIA_DIR`, на прод — tar у volume, як `studio-photos.ts`). Кредит «Фото: <студія>» завжди.
+- `studios.shop_terms jsonb` — доставка, оплата, самовивіз, примітка; null = типові.
+- `orders`: `studio_id`, `checkout_token` (один чекаут → по замовленню на студію), `token` (публічний для сторінки покупця), `status` (`new → confirmed → in_progress → shipped → done | cancelled`), покупець (`buyer_name`, `buyer_phone` E.164, `buyer_email`, `no_call`, `comment`), доставка (`delivery_method`: `np_branch | np_postomat | np_courier | ukrposhta | pickup | none`, `delivery_city`, `delivery_point`), оплата (`payment_method`: `transfer | on_delivery | card_online`, `payment_status`: `unpaid | paid | refunded`, `payment_provider`, `payment_ref`, `payment_payload`, `paid_at`), суми в копійках (`subtotal_kop`, `delivery_kop` null = за тарифами перевізника, `commission_kop` generated 10 %), `tracking` (ТТН), `studio_note`, `consent_at`, `ip_hash`, tracking-колонки.
+- `order_items`: знімок `title`, `unit_kop`, `qty`, `options jsonb` (сертифікат: отримувач, текст), `item_id` set null.
+- `user` +: `telegram_chat_id`, `telegram_link_token` — власник студії підключає Telegram: `t.me/<bot>?start=k_<token>`.
+- Історія замовлень — `audit_log` (entity `order`).
+
+## Правила
+- **Можна замовити**, коли студія — партнер (`consent_requests`), публічна й активна; виріб публічний, не `sold`, не `source_gone`. `unknown` (магазин не читався 3 дні) — замовити можна, студія підтверджує.
+- **Один чекаут — кілька студій**: кошик ділиться по студіях, кожна відправляє сама; покупець бачить усе на одній сторінці.
+- **Кошик** — у браузері (localStorage), сервер бачить лише оформлене замовлення.
+- **Оплата зараз**: переказ після підтвердження студією або накладений платіж. Поля під провайдера (plata by mono — єдина з задокументованим split для маркетплейсів) готові.
+- **Сповіщення**: нове замовлення → Telegram власнику групи (завжди) і власникам студії, що підключили Telegram; кнопки «Підтвердити», «В кабінеті». Студія змінює статус і ТТН у `/kabinet/studiya/<slug>/zamovlennia`; адмінка бачить усе в `/panel/zamovlennia`.
+- **Покупець** після оформлення бачить сторінку замовлення (номер, склад, стан, ТТН, контакти студії) і те, що студія зв'яжеться протягом робочого дня. SMS/email не шлемо (нема сервісу).
+- **Контент виробу** — наш текст (не копія магазину: дубль між доменами), характеристики таблицею, факти в перших реченнях, ціна в UAH, виробник і місто, термін, «Оновлено». Опис студії з її магазину лишається в `evidence.sourceDescription`.
+- **Керування через Клода**: `scripts/app/read-shops.ts` (щоденно: наявність і ціни; `PHOTOS=1` — фото й описи з магазину), `scripts/app/edit-items.ts` (JSON-правки виробів: опис, категорія, характеристики, термін, вид, приховати) і `shopTerms` студії. Жодного редактора виробів у панелі.
+- **SEO/LLM**: Product + Offer (seller = студія, `shippingDetails`, `hasMerchantReturnPolicy`, `availability`: InStock | PreOrder | SoldOut, `priceCurrency: UAH`), ItemList на списках, BreadcrumbList, `OnlineStore` на головній крамниці; усе в серверному HTML; sitemap з lastmod; feed для Merchant Center; `/kramnytsia/koshyk|oformlennia|zamovlennia` у robots disallow; продані — 200 + схожі; FAQ текстом без розмітки FAQPage.
+- **GA4**: `view_item`, `add_to_cart`, `remove_from_cart`, `begin_checkout`, `purchase` (value, currency UAH, items).
+- **Для студій**: смуга «Хочете розмістити свої вироби? Додайте студію» → `/dlya-studiy` (той самий процес: профіль → згода на запити → партнер).
+
+## Що відкладено
+Онлайн-оплата й split (plata by mono); API Нової пошти (підказка міст і відділень, ТТН); сертифікати як товар (модель готова: `fulfillment=digital`, `options`); Instagram-вироби непартнерів у крамниці; статуси `delivered`/`returned`; email покупцю.
+
+## Питання власнику
+1. Публічна оферта й повернення: яку політику показувати (14 днів за законом; «під замовлення» — без повернення)? Зараз текст типовий, у `src/content/shop.ts`.
+2. Накладений платіж: показувати як варіант для всіх партнерів чи лише коли студія вмикає в `shop_terms`? Зараз — типово ввімкнено.
+3. Чи підключити Telegram для Осоння одразу (власник сам)?
+4. Google Merchant Center: завести акаунт і дати йому `/kramnytsia/feed.xml` — єдина програма для України; потрібен акаунт Google власника.

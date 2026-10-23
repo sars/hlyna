@@ -76,7 +76,8 @@ describe('reading the Instagram scans', () => {
     expect(categoryOf('Горнятка з рельєфним обличчям')).toBe('chashky')
     expect(categoryOf('Ялинкові прикраси з косівським розписом')).toBe('vazy-i-dekor')
     expect(categoryOf('Кулон «Часник»')).toBe('prykrasy')
-    expect(categoryOf('Свічка «Мак»')).toBe('vazy-i-dekor')
+    expect(categoryOf('Свічка «Мак»')).toBe('svichky')
+    expect(categoryOf('Керамічний свічник')).toBe('vazy-i-dekor')
   })
 
   it('a season ends on or after the post day', () => {

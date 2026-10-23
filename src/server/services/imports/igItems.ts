@@ -51,7 +51,8 @@ export function uahRange(s?: string | null): { min: number; max: number } | null
 
 // Order matters: «підставка для прикрас» is decor, not jewellery; a set «тарілка, чашки» goes where the cups are.
 const CATEGORY_RULES: [Category, RegExp][] = [
-  ['vazy-i-dekor', /для прикрас|ялинков|іграшк|дзвоник|магніт|свічк|свічник/i],
+  ['svichky', /свічка|свічки|аромасвічк/i],
+  ['vazy-i-dekor', /для прикрас|ялинков|іграшк|дзвоник|магніт|свічник/i],
   ['svitylnyky', /світильник|ламп|бра\b|абажур/i],
   ['plytka-i-panno', /плитк|панно|кахл/i],
   ['prykrasy', /кулон|сереж|намист|брош|підвіск|каф\b|браслет|прикраса|камінчик/i],

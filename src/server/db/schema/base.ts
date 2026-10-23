@@ -5,14 +5,19 @@ import {
   CHANGE_SET_STATUS,
   CLAIM_STATUS,
   CONFIDENCE,
+  DELIVERY_METHODS,
   GEO_PRECISION,
   ITEM_AVAILABILITY,
   ITEM_CATEGORIES,
+  ITEM_FULFILLMENT,
   ITEM_HIDDEN_REASONS,
   ITEM_KINDS,
   ITEM_SIGNALS,
   ITEM_SOURCES,
   MEDIA_STATUS,
+  ORDER_STATUS,
+  PAYMENT_METHODS,
+  PAYMENT_STATUS,
   REQUEST_STATUS,
   REQUEST_WHAT,
   STUDIO_STATUSES,
@@ -41,6 +46,11 @@ export const itemKind = app.enum('item_kind', ITEM_KINDS)
 export const itemAvailability = app.enum('item_availability', ITEM_AVAILABILITY)
 export const itemHiddenReason = app.enum('item_hidden_reason', ITEM_HIDDEN_REASONS)
 export const itemSignal = app.enum('item_signal', ITEM_SIGNALS)
+export const itemFulfillment = app.enum('item_fulfillment', ITEM_FULFILLMENT)
+export const orderStatus = app.enum('order_status', ORDER_STATUS)
+export const deliveryMethod = app.enum('delivery_method', DELIVERY_METHODS)
+export const paymentMethod = app.enum('payment_method', PAYMENT_METHODS)
+export const paymentStatus = app.enum('payment_status', PAYMENT_STATUS)
 
 // Kit convention: who and when on every row. Actor ids are Better Auth user ids (text) or 'script:<name>'.
 export const withTracking = () => ({

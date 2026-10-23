@@ -27,6 +27,9 @@ export const user = app.table('user', {
   lockUntil: ts('lock_until'),
   lastLoginAt: ts('last_login_at'),
   legacyId: text('legacy_id').unique(), // 'owner:<id>' / 'admin:<id>' of the account before the 2026-10-12 migration; no longer written
+  // Shop orders reach a studio's owner in Telegram once they open t.me/<bot>?start=k_<token> (src/server/services/ownerTelegram.ts).
+  telegramChatId: bigint('telegram_chat_id', { mode: 'number' }),
+  telegramLinkToken: text('telegram_link_token').unique(),
 })
 
 export const session = app.table(

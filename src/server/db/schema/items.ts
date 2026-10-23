@@ -1,10 +1,11 @@
-import { boolean, date, index, integer, jsonb, serial, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
+import { boolean, date, index, integer, jsonb, primaryKey, serial, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
 
 import type { ITEM_SEASON_END } from '../../../shared/options'
 import {
   app,
   itemAvailability,
   itemCategory,
+  itemFulfillment,
   itemHiddenReason,
   itemKind,
   itemSignal,
@@ -12,7 +13,10 @@ import {
   studioVisibility,
   withTracking,
 } from './base'
-import { studios } from './catalog'
+import { media, studios } from './catalog'
+
+/** One row of the spec table on an item page («Об’єм» · «350 мл»); the same values feed schema.org (material, size…). */
+export type ItemSpec = { label: string; value: string }
 
 const ts = (name: string) => timestamp(name, { withTimezone: true, mode: 'string' })
 const day = (name: string) => date(name, { mode: 'string' })
@@ -53,6 +57,13 @@ export const items = app.table(
     photoFact: text('photo_fact'),
     terms: text('terms'),
     embed: text('embed'),
+    // Shop fields (docs/shop/PLAN.md): a parcel or a digital certificate; the spec table; the making time of a
+    // made-to-order piece in days; how many are left when the studio says so.
+    fulfillment: itemFulfillment('fulfillment').notNull().default('ship'),
+    specs: jsonb('specs').$type<ItemSpec[]>(),
+    leadDaysMin: integer('lead_days_min'),
+    leadDaysMax: integer('lead_days_max'),
+    stock: integer('stock'),
     // The post was deleted or the product left the shop.
     sourceGone: boolean('source_gone').notNull().default(false),
     visibility: studioVisibility('visibility').notNull().default('hidden'),
@@ -67,6 +78,22 @@ export const items = app.table(
     uniqueIndex('items_studio_source_key_uq').on(t.studioId, t.sourceKey),
     index('items_category_visibility_idx').on(t.category, t.visibility),
   ],
+)
+
+// Photos of an item in the shop, in order: files in `media` (uploaded, or fetched from a partner's shop by read-shops.ts).
+// Shown with the studio's credit; first one is the card and the share image.
+export const itemPhotos = app.table(
+  'item_photos',
+  {
+    itemId: integer('item_id')
+      .notNull()
+      .references(() => items.id, { onDelete: 'cascade' }),
+    mediaId: integer('media_id')
+      .notNull()
+      .references(() => media.id, { onDelete: 'cascade' }),
+    position: integer('position').notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.itemId, t.mediaId] })],
 )
 
 // Every check of an item: the weekly Instagram pass and the daily shop read.
