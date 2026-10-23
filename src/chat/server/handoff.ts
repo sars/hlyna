@@ -1,3 +1,6 @@
+import { and, eq, inArray, sql } from 'drizzle-orm'
+
+import { events } from '../schema'
 import { addEvent, addMessage, getPresence, listMessages, setStatus, setTgMessageId, updateConversation, type ChatDb, type Conversation } from './store'
 import { TEXT } from './texts'
 import type { TgKeyboard, Transport } from './types'
@@ -7,13 +10,37 @@ import type { TgKeyboard, Transport } from './types'
 
 const clip = (s: string, n: number) => (s.length > n ? `${s.slice(0, n - 1)}…` : s)
 
-export const headKeyboard = (c: Pick<Conversation, 'id' | 'status'>, t: Transport): TgKeyboard => [
-  [
-    ...(c.status !== 'human' ? [{ text: '🙋 Взяти', callback_data: `ch:t:${c.id}` }] : [{ text: '🤖 Повернути помічнику', callback_data: `ch:a:${c.id}` }]),
-    { text: '🗄 Завершити', callback_data: `ch:x:${c.id}` },
-  ],
-  [{ text: '🔗 В панелі', url: t.panelUrl(c.id) }],
-]
+/** The buttons follow the status: closed → only the panel link; a person in → hand back or close; else take or close. */
+export const headKeyboard = (c: Pick<Conversation, 'id' | 'status'>, t: Transport): TgKeyboard =>
+  c.status === 'closed'
+    ? [[{ text: '🔗 В панелі', url: t.panelUrl(c.id) }]]
+    : [
+        [
+          ...(c.status !== 'human' ? [{ text: '🙋 Взяти', callback_data: `ch:t:${c.id}` }] : [{ text: '🤖 Повернути помічнику', callback_data: `ch:a:${c.id}` }]),
+          { text: '🗄 Завершити', callback_data: `ch:x:${c.id}` },
+        ],
+        [{ text: '🔗 В панелі', url: t.panelUrl(c.id) }],
+      ]
+
+const STATUS_LINE: Record<string, string> = { ai: 'відповідає помічник', waiting: 'чекає людину', human: 'відповідає людина', closed: 'завершено' }
+const stamp = () => new Intl.DateTimeFormat('uk-UA', { timeZone: 'Europe/Kyiv', dateStyle: 'short', timeStyle: 'short' }).format(new Date())
+
+/** Telegram follows the status: the head gets a status line and the right buttons; earlier notes (hand-over, lead) get the same buttons. */
+export async function syncTelegram(db: ChatDb, c: Conversation, t: Transport, who?: string) {
+  if (!c.tgHeadMessageId) return
+  const first = (await listMessages(db, c.id, { limit: 1 }))[0]?.text ?? ''
+  const keyboard = headKeyboard(c, t)
+  const line = `— ${STATUS_LINE[c.status] ?? c.status}${who ? ` (${who})` : ''} (${stamp()})`
+  await t.editOwnerMessage(c.tgHeadMessageId, `${headText(c, first)}\n${line}`, keyboard).catch(() => {})
+  const notes = await db
+    .select({ data: events.data })
+    .from(events)
+    .where(and(eq(events.conversationId, c.id), sql`${events.data} ? 'tgMessageId'`, inArray(events.type, ['handoff', 'business'])))
+  for (const n of notes) {
+    const id = Number((n.data as { tgMessageId?: number } | null)?.tgMessageId)
+    if (id) await t.editOwnerKeyboard(id, keyboard).catch(() => {})
+  }
+}
 
 const KIND_LABEL: Record<string, string> = { profile: 'профіль студії', business: 'для бізнесу', classes: 'майстер-класи', home: 'головна', other: 'сторінка' }
 
@@ -72,18 +99,18 @@ export async function requestHuman(db: ChatDb, c: Conversation, reason: string, 
 }
 
 /** «Взяти» in Telegram, or the first human reply: the person is in. */
-export async function takeOver(db: ChatDb, c: Conversation, t: Transport) {
+export async function takeOver(db: ChatDb, c: Conversation, t: Transport, who?: string) {
   if (c.status === 'human') return c
-  const conv = await setStatus(db, c.id, 'human')
+  const conv = await setStatus(db, c.id, 'human', who ? { who } : undefined)
   await addMessage(db, conv.id, 'system', TEXT.humanJoined)
   if (conv.visitorTgChatId) await t.sendTo(conv.visitorTgChatId, TEXT.humanJoined)
-  if (conv.tgHeadMessageId) await t.editOwnerMessage(conv.tgHeadMessageId, headText(conv, (await listMessages(db, conv.id, { limit: 1 }))[0]?.text ?? ''), headKeyboard(conv, t)).catch(() => {})
+  await syncTelegram(db, conv, t, who)
   return conv
 }
 
 /** A person's reply from Telegram lands in the thread (and in the visitor's Telegram, if linked). */
 export async function humanReply(db: ChatDb, c: Conversation, text: string, t: Transport, tgMessageId?: number, who?: string) {
-  const conv = c.status === 'human' ? c : await takeOver(db, c, t)
+  const conv = c.status === 'human' ? c : await takeOver(db, c, t, who)
   const m = await addMessage(db, conv.id, 'human', text, { tgMessageId: tgMessageId ?? null, meta: { via: 'telegram', ...(who ? { who } : {}) } })
   if (conv.visitorTgChatId) await t.sendTo(conv.visitorTgChatId, text)
   return m
@@ -95,6 +122,7 @@ export async function handBack(db: ChatDb, c: Conversation, t: Transport) {
   const conv = await setStatus(db, c.id, 'ai')
   await addMessage(db, conv.id, 'system', TEXT.humanLeft)
   if (conv.visitorTgChatId) await t.sendTo(conv.visitorTgChatId, TEXT.humanLeft)
+  await syncTelegram(db, conv, t)
   return conv
 }
 
@@ -103,6 +131,7 @@ export async function closeConversation(db: ChatDb, c: Conversation, t: Transpor
   const conv = await setStatus(db, c.id, 'closed')
   await addMessage(db, conv.id, 'system', TEXT.closed)
   if (conv.visitorTgChatId) await t.sendTo(conv.visitorTgChatId, TEXT.closed)
+  await syncTelegram(db, conv, t)
   return conv
 }
 

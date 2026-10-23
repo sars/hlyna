@@ -167,7 +167,7 @@ export function createChat(cfg: ChatConfig) {
   // ---------- Telegram: the owner's replies and buttons, and visitors who continued in Telegram
 
   type Msg = { message_id: number; chat: { id: number }; text?: string; reply_to_message?: { message_id: number; text?: string } }
-  type Update = { callback_query?: { id: string; from: { id: number }; data?: string; message?: Msg }; message?: Msg & { from?: { id: number; first_name?: string; username?: string } } }
+  type Update = { callback_query?: { id: string; from: { id: number; first_name?: string; username?: string }; data?: string; message?: Msg }; message?: Msg & { from?: { id: number; first_name?: string; username?: string } } }
 
   /** Returns true when the update was about the chat (so the site's webhook stops there). */
   async function handleTelegramUpdate(update: Update, ownerChatId: string, siteUrl: string): Promise<boolean> {
@@ -185,7 +185,7 @@ export function createChat(cfg: ChatConfig) {
       }
       await touchOwner(db)
       if (action === 't') {
-        await takeOver(db, c, transport)
+        await takeOver(db, c, transport, cq.from.first_name ?? cq.from.username)
         await transport.answerCallback(cq.id, 'Ви в розмові. Відповідайте через Reply.')
       } else if (action === 'a') {
         await handBack(db, c, transport)

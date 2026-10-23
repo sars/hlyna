@@ -19,6 +19,8 @@ export type Transport = {
   /** A message to any Telegram chat (the visitor who continued in Telegram). */
   sendTo(chatId: number, text: string, opts?: { keyboard?: TgKeyboard }): Promise<number | null>
   editOwnerMessage(messageId: number, text: string, keyboard?: TgKeyboard): Promise<void>
+  /** Only the buttons under an earlier message (the hand-over note, the lead alert) follow the status. */
+  editOwnerKeyboard(messageId: number, keyboard: TgKeyboard): Promise<void>
   answerCallback(id: string, text?: string): Promise<void>
   /** The bot's @username for the «Продовжити в Telegram» link; null when the bot is not configured. */
   botUsername(): Promise<string | null>

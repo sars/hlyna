@@ -45,6 +45,7 @@ const llm = {
 
 // ---------- Telegram that remembers what it sent
 const sent: { to: 'owner' | number; text: string; replyTo?: number; keyboard?: unknown }[] = []
+const edits: { id: number; text?: string; keyboard: unknown }[] = []
 let nextId = 100
 const transport: Transport = {
   async sendToOwner(text, opts) {
@@ -55,7 +56,12 @@ const transport: Transport = {
     sent.push({ to: chatId, text })
     return ++nextId
   },
-  async editOwnerMessage() {},
+  async editOwnerMessage(id, text, keyboard) {
+    edits.push({ id, text, keyboard })
+  },
+  async editOwnerKeyboard(id, keyboard) {
+    edits.push({ id, keyboard })
+  },
   async answerCallback() {},
   async botUsername() {
     return 'hlyna_bot'
@@ -94,6 +100,7 @@ beforeEach(async () => {
   script.length = 0
   seenParams.length = 0
   sent.length = 0
+  edits.length = 0
   limits.clear()
   nextId = 100
 })
@@ -245,8 +252,9 @@ describe('handing over to a person', () => {
     script.push({ text: 'ок' })
     await chat.send(c, 'Привіт', { ip: '1.1.1.1', via: 'site' })
     const head = (await getById(db, c.id))!.tgHeadMessageId!
-    const handled = await chat.handleTelegramUpdate({ message: { message_id: 500, chat: { id: Number(OWNER) }, text: 'Вітаю, я з Глини', reply_to_message: { message_id: head } } }, OWNER, 'https://example.test')
+    const handled = await chat.handleTelegramUpdate({ message: { message_id: 500, chat: { id: Number(OWNER) }, from: { id: Number(OWNER), first_name: 'Kateryna' }, text: 'Вітаю, я з Глини', reply_to_message: { message_id: head } } }, OWNER, 'https://example.test')
     expect(handled).toBe(true)
+    expect(edits.find((e) => e.id === head && e.text)?.text).toContain('— відповідає людина (Kateryna)')
     let rows = await listMessages(db, c.id)
     expect(rows.map((m) => m.role)).toEqual(['visitor', 'assistant', 'system', 'human'])
     expect(rows[2]!.text).toBe(TEXT.humanJoined)
@@ -265,9 +273,14 @@ describe('handing over to a person', () => {
     expect((await getById(db, c.id))?.status).toBe('ai')
     rows = await listMessages(db, c.id)
     expect(rows.at(-1)?.text).toBe(TEXT.humanLeft)
-    // «Завершити»
-    await chat.handleTelegramUpdate({ callback_query: { id: 'cq1', from: { id: Number(OWNER) }, data: `ch:x:${c.id}` } }, OWNER, 'https://example.test')
+    // «Завершити»: the head says so and keeps only the panel link; the hand-over note loses its buttons too.
+    edits.length = 0
+    await chat.handleTelegramUpdate({ callback_query: { id: 'cq1', from: { id: Number(OWNER), first_name: 'Kateryna' }, data: `ch:x:${c.id}` } }, OWNER, 'https://example.test')
     expect((await getById(db, c.id))?.status).toBe('closed')
+    const headEdit = edits.find((e) => e.id === head && e.text)
+    expect(headEdit?.text).toContain('— завершено')
+    expect(JSON.stringify(headEdit?.keyboard)).not.toContain('ch:')
+    expect(JSON.stringify(headEdit?.keyboard)).toContain('panel/chat')
     // Writing again reopens for the assistant.
     script.push({ text: 'знову тут' })
     const r = await chat.send((await getById(db, c.id))!, 'ще', { ip: '1.1.1.1', via: 'site' })

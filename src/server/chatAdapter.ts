@@ -222,6 +222,9 @@ const transport: Transport = {
   async editOwnerMessage(messageId, text, keyboard) {
     await tg('editMessageText', { chat_id: ownerChat(), message_id: messageId, text: text.slice(0, 4000), disable_web_page_preview: true, ...(keyboard ? { reply_markup: { inline_keyboard: keyboard } } : {}) })
   },
+  async editOwnerKeyboard(messageId, keyboard) {
+    await tg('editMessageReplyMarkup', { chat_id: ownerChat(), message_id: messageId, reply_markup: { inline_keyboard: keyboard } })
+  },
   async answerCallback(id, text) {
     await tg('answerCallbackQuery', { callback_query_id: id, ...(text ? { text: text.slice(0, 190) } : {}) })
   },
