@@ -12,6 +12,16 @@ export async function revalidateCatalog(paths: string[] = []) {
   }
 }
 
+/** Refresh the shop after an item or order write: every /kramnytsia page reads the one cached list (tag `items`). */
+export async function revalidateItems() {
+  try {
+    const { revalidateTag } = await import('next/cache')
+    revalidateTag('items', 'max')
+  } catch {
+    // not inside a Next request (script or test)
+  }
+}
+
 /** Public URLs that show a studio: its profile and its city's catalogue pages. */
 export const studioPaths = (slug: string, citySlug?: string | null) =>
   [`/vyrobnyky/${slug}`, ...(citySlug ? [`/vyrobnyky/misto/${citySlug}`, `/maister-klasy/${citySlug}`] : [])]

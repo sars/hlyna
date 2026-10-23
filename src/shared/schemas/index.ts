@@ -2,7 +2,7 @@
 // Messages are the Ukrainian texts the forms show.
 import { z } from 'zod'
 
-import { CONFIDENCE, GEO_PRECISION, REQUEST_WHAT, SLUG_RE, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY } from '../options'
+import { CONFIDENCE, DELIVERY_METHODS, GEO_PRECISION, PAYMENT_METHODS, REQUEST_WHAT, SLUG_RE, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY } from '../options'
 
 // ---------- helpers
 /** Trimmed string capped at `max` characters (cap, not reject — the current hooks slice silently). */
@@ -224,3 +224,40 @@ export const studioEdit = z.object({
   expectedRevision: z.number().int().positive(),
 })
 export type StudioEdit = z.output<typeof studioEdit>
+
+// ---------- shop checkout (POST /api/kramnytsia/zamovlennia; src/server/services/orders.ts)
+// The cart comes from the browser: item ids and quantities only. Prices, titles and the studio come from the database.
+export const checkoutCreate = z
+  .object({
+    lines: z
+      .array(
+        z.object({
+          itemId: z.number().int().positive(),
+          qty: z.number().int().min(1).max(20),
+          options: z.object({ recipient: capped(120).optional(), message: capped(300).optional() }).optional(),
+        }),
+      )
+      .min(1, 'Кошик порожній.')
+      .max(30),
+    buyerName: capped(120).pipe(z.string().min(2, 'Вкажіть ім’я та прізвище.')),
+    buyerPhone: capped(40).pipe(z.string().min(9, 'Вкажіть телефон.')),
+    buyerEmail: cappedOrNull(254).optional(),
+    noCall: z.boolean().optional(),
+    comment: cappedOrNull(1000).optional(),
+    deliveryMethod: z.enum(DELIVERY_METHODS),
+    deliveryCity: cappedOrNull(120).optional(),
+    deliveryPoint: cappedOrNull(300).optional(),
+    paymentMethod: z.enum(PAYMENT_METHODS),
+    sourcePage: cappedOrNull(500).optional(),
+    // honeypot
+    website2: z.string().max(0, 'Замовлення не прийнято.').optional().or(z.literal('')),
+  })
+  .superRefine((d, ctx) => {
+    if (d.buyerEmail && !EMAIL_RE.test(d.buyerEmail)) ctx.addIssue({ code: 'custom', path: ['buyerEmail'], message: 'Перевірте email.' })
+    const needsCity = d.deliveryMethod === 'np_branch' || d.deliveryMethod === 'np_postomat' || d.deliveryMethod === 'np_courier' || d.deliveryMethod === 'ukrposhta'
+    if (needsCity && !d.deliveryCity) ctx.addIssue({ code: 'custom', path: ['deliveryCity'], message: 'Вкажіть місто.' })
+    if (needsCity && !d.deliveryPoint)
+      ctx.addIssue({ code: 'custom', path: ['deliveryPoint'], message: d.deliveryMethod === 'np_courier' ? 'Вкажіть вулицю, будинок і квартиру.' : 'Вкажіть номер відділення чи поштомату.' })
+    if (d.paymentMethod === 'card_online') ctx.addIssue({ code: 'custom', path: ['paymentMethod'], message: 'Оплата карткою на сайті ще не підключена.' })
+  })
+export type CheckoutCreate = z.infer<typeof checkoutCreate>

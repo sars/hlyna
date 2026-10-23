@@ -3,7 +3,10 @@ import type { Actor } from '../services/audit'
 import { approveClaim, rejectClaim, studioWelcomeMessage } from '../services/claims'
 import { applyChangeSet, getChangeSet, pendingChangeSetOf } from '../services/changeSets'
 import { NotFound, setRequestStatus } from '../services/requests'
-import type { RequestStatus } from '../../shared/options'
+import { getOrder, kabinetOrderUrl, NotFound as OrderNotFound, OrderError, setOrderStatus, staffOrderKeyboard } from '../services/orders'
+import { ownsStudio } from '../auth/access'
+import { ownerByChat } from '../services/ownerTelegram'
+import { ORDER_STATUS_LABEL, type RequestStatus } from '../../shared/options'
 import { site } from '../../content/site'
 import type { TgKeyboard } from './tg'
 
@@ -111,11 +114,49 @@ export async function tapRequestStatus(db: Db, id: number, action: string, actor
   return { answer: STATUS_LABEL[status], mark: { line: `Статус: ${STATUS_LABEL[status]}`, keyboard } }
 }
 
+const ORDER_ACTIONS: Record<string, 'confirmed' | 'in_progress' | 'shipped' | 'done'> = { c: 'confirmed', w: 'in_progress', s: 'shipped', d: 'done' }
+
+/**
+ * An order button («o:<action>:<id>»). From the owner's group it acts as staff; from any other chat the chat must belong to
+ * an owner of the order's studio, and the studio's own transition rules apply.
+ */
+export async function tapOrder(db: Db, id: number, action: string, actor: Actor, from: { ourChat: boolean; chatId: number }): Promise<TapResult> {
+  const status = ORDER_ACTIONS[action]
+  if (!status) return { answer: 'Невідома дія' }
+  const o = await getOrder(db, id)
+  if (!o) return { answer: 'Замовлення не знайдено' }
+  let by: 'staff' | 'studio' = 'staff'
+  let who: Actor = actor
+  if (!from.ourChat) {
+    const owner = await ownerByChat(db, from.chatId)
+    if (!owner || !(await ownsStudio(db, owner.id, o.studioId))) return { answer: 'Це замовлення не вашої студії' }
+    by = 'studio'
+    who = { id: owner.id, source: 'telegram' }
+  }
+  try {
+    const r = await setOrderStatus(db, id, status, who, { by })
+    const cabinet = { text: '🔗 У кабінеті', url: kabinetOrderUrl(o.studio.slug, id) }
+    const next: TgKeyboard = from.ourChat
+      ? staffOrderKeyboard(id)
+      : status === 'confirmed'
+        ? [[{ text: '📦 Відправлено', callback_data: `o:s:${id}` }, cabinet]]
+        : status === 'shipped'
+          ? [[{ text: '✅ Виконано', callback_data: `o:d:${id}` }, cabinet]]
+          : [[cabinet]]
+    return { answer: r.already ? `Уже: ${ORDER_STATUS_LABEL[status]}` : ORDER_STATUS_LABEL[status], mark: { line: `Статус: ${ORDER_STATUS_LABEL[status]}`, keyboard: next } }
+  } catch (e) {
+    if (e instanceof OrderError) return { answer: e.message.slice(0, 190) }
+    if (e instanceof OrderNotFound) return { answer: 'Замовлення не знайдено' }
+    throw e
+  }
+}
+
 /** Routes callback_data «kind:action:id» to an action. */
-export async function handleTap(db: Db, data: string, actor: Actor): Promise<TapResult & { askReason?: number }> {
+export async function handleTap(db: Db, data: string, actor: Actor, from?: { ourChat: boolean; chatId: number }): Promise<TapResult & { askReason?: number }> {
   const [kind, action, raw] = data.split(':')
   const id = Number(raw)
   if (!Number.isInteger(id) || id <= 0) return { answer: 'Невідома дія' }
+  if (kind === 'o') return tapOrder(db, id, action ?? '', actor, from ?? { ourChat: true, chatId: 0 })
   if (kind === 'c' && action === 'a') return tapApproveClaim(db, id, actor)
   if (kind === 'c' && action === 'r') return { answer: 'Напишіть причину', askReason: id }
   if (kind === 'c' && action === 'n') return tapRejectClaim(db, id, '', actor)

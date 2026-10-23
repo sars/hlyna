@@ -6,6 +6,7 @@ import { site } from '@/content/site'
 import { db } from '@/server/db'
 import type { Actor } from '@/server/services/audit'
 import { handleTap, tapRejectClaim, type TgKeyboard } from '@/server/telegram/actions'
+import { linkOwnerTelegram, START_TOKEN_RE } from '@/server/services/ownerTelegram'
 
 // Telegram bot webhook: the buttons under our notifications (claims, owner edits, customer requests). Every action
 // runs through the same services as /panel (src/server/telegram/actions.ts → src/server/services/*), so a tap and a
@@ -54,14 +55,30 @@ export async function POST(req: Request) {
   if (!update) return Response.json({ ok: true })
 
   try {
+    // A studio owner linking their Telegram from the cabinet (`t.me/<bot>?start=k_<token>`): before the site chat, which
+    // otherwise treats every unknown chat as a visitor.
+    const start = update.message?.text?.trim().match(START_TOKEN_RE)
+    if (start && update.message) {
+      const linked = await linkOwnerTelegram(db, start[1]!, update.message.chat.id, actor)
+      await tg('sendMessage', {
+        chat_id: update.message.chat.id,
+        text: linked
+          ? `Готово, ${linked.name}. Нові замовлення з крамниці «Глина» для ваших студій приходитимуть сюди — з кнопками «Підтвердити» і «Відправлено». Відключити можна в кабінеті.`
+          : `Посилання не впізнано. Відкрийте кабінет студії на ${site.url}/kabinet і натисніть «Підключити Telegram» ще раз.`,
+        disable_web_page_preview: true,
+      })
+      return Response.json({ ok: true })
+    }
     if (chatEnabled() && (await chat().handleTelegramUpdate(update, String(process.env.TELEGRAM_CHAT_ID ?? ''), site.url))) return Response.json({ ok: true })
     const cq = update.callback_query
     if (cq) {
-      if (!ourChat(cq.from.id) && !ourChat(cq.message?.chat.id)) {
+      const ours = ourChat(cq.from.id) || ourChat(cq.message?.chat.id)
+      // Order buttons may be tapped in a studio owner's own chat (tapOrder checks the chat owns the studio); everything else is ours only.
+      if (!ours && !(cq.data ?? '').startsWith('o:')) {
         await tg('answerCallbackQuery', { callback_query_id: cq.id })
         return Response.json({ ok: true })
       }
-      const r = await handleTap(db, cq.data ?? '', actor)
+      const r = await handleTap(db, cq.data ?? '', actor, { ourChat: ours, chatId: cq.message?.chat.id ?? cq.from.id })
       if (r.askReason) {
         await say(`${REJECT_PROMPT}${r.askReason}: відповідайте на це повідомлення.`, { reply_markup: { force_reply: true, input_field_placeholder: 'Причина відмови' } })
         await say(`Або відхилити заявку #${r.askReason} без причини:`, { reply_markup: { inline_keyboard: [[{ text: 'Відхилити без причини', callback_data: `c:n:${r.askReason}` }]] } })
