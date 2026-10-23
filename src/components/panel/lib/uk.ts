@@ -368,6 +368,8 @@ export const uk = {
   'chat.tokens': 'Токени: {input} / {output}',
   'chat.messages': 'Повідомлень: {count}',
   'chat.events': 'Події',
+  'chat.spend': 'За 30 днів: розмов {conversations}, відповідей помічника {turns}, токени {input} / {output}, {cost}',
+  'chat.cost': 'Вартість',
 
   'entity.city': 'Місто',
   'entity.media': 'Фото',

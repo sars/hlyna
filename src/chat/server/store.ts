@@ -181,6 +181,20 @@ export async function listConversations(db: ChatDb, f: { status?: ChatStatus | '
   return { rows: rows.slice(0, PAGE), hasMore: rows.length > PAGE, next: rows.length > PAGE ? rows[PAGE - 1]!.id : null }
 }
 
+/** Spend over the last `days` days: conversations, turns and tokens (the panel turns them into dollars). */
+export async function usageSince(db: ChatDb, days: number) {
+  const [row] = await db
+    .select({
+      conversations: sql<number>`count(*)::int`,
+      turns: sql<number>`coalesce(sum(${conversations.turns}), 0)::int`,
+      input: sql<number>`coalesce(sum(${conversations.inputTokens}), 0)::int`,
+      output: sql<number>`coalesce(sum(${conversations.outputTokens}), 0)::int`,
+    })
+    .from(conversations)
+    .where(sql`${conversations.createdAt} > now() - make_interval(days => ${days})`)
+  return row!
+}
+
 export async function getTranscript(db: ChatDb, id: number) {
   const conversation = await getById(db, id)
   if (!conversation) return null

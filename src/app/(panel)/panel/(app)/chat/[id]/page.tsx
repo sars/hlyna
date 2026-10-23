@@ -8,6 +8,7 @@ import { t } from '@/components/panel/lib/i18n'
 import { CHAT_TONE } from '@/components/panel/lib/labels'
 import { Card, CardContent } from '@/components/panel/ui/card'
 import { getTranscript } from '@/chat/server/store'
+import { estimateUsd, fmtUsd } from '@/chat/server/pricing'
 import { db } from '@/server/db'
 
 export const metadata = { title: 'Чат' }
@@ -25,6 +26,7 @@ export default async function ChatTranscriptPage({ params }: { params: Promise<{
     ['Telegram', c.visitorTgChatId ? 'так' : '—'],
     ['', t('chat.turns', { count: c.turns })],
     ['', t('chat.tokens', { input: c.inputTokens, output: c.outputTokens })],
+    [t('chat.cost'), (() => { const v = estimateUsd(process.env.CHAT_MODEL || 'gpt-5.5', c.inputTokens, c.outputTokens); return v === null ? '—' : fmtUsd(v) })()],
   ].filter(([, v]) => v)
   return (
     <div className="space-y-5">
