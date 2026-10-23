@@ -2,7 +2,7 @@
 
 import React, { useCallback, useEffect, useEffectEvent, useId, useRef, useState } from 'react'
 
-import type { PublicConversation, PublicMessage } from '../server/http'
+import type { PublicConversation, PublicMessage, PublicThread } from '../server/http'
 
 // The chat as the visitor sees it: a cobalt block where the request form stood. Inline on a desktop column; on a
 // phone the first tap into the field opens the same thread full-screen in a native <dialog>. State is one array of
@@ -93,6 +93,7 @@ export function ChatPanel(p: ChatPanelProps) {
   const api = p.api ?? '/api/chat'
   const uid = useId()
   const [conv, setConv] = useState<PublicConversation | null>(null)
+  const [threadList, setThreadList] = useState<PublicThread[]>([])
   const [messages, setMessages] = useState<PublicMessage[]>([])
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
@@ -130,6 +131,7 @@ export function ChatPanel(p: ChatPanelProps) {
   const applyState = useCallback(
     (c: PublicConversation) => {
       setConv(c)
+      setThreadList(c.threads)
       const s = seenState.current
       if (c.status === 'waiting' && !s.waiting) {
         s.waiting = true
@@ -153,8 +155,10 @@ export function ChatPanel(p: ChatPanelProps) {
     restored.current = true
     fetch(`${api}/current?thread=${encodeURIComponent(p.thread)}`, { credentials: 'same-origin' })
       .then((r) => (r.ok ? r.json() : null))
-      .then((d: { conversation: PublicConversation | null; messages?: PublicMessage[] } | null) => {
-        if (!d?.conversation) return
+      .then((d: { conversation: PublicConversation | null; messages?: PublicMessage[]; threads?: PublicThread[] } | null) => {
+        if (!d) return
+        if (d.threads) setThreadList(d.threads)
+        if (!d.conversation) return
         applyState(d.conversation)
         for (const m of d.messages ?? []) append(m)
       })
@@ -343,7 +347,9 @@ export function ChatPanel(p: ChatPanelProps) {
   const hasThread = messages.length > 0 || streaming !== null
   // The page's greeting opens only its own thread; another thread shown here starts with its own lines.
   const ownThread = !conv || conv.thread === p.thread
-  const threads = conv?.threads ?? []
+  const threads = threadList
+  const others = threads.filter((t) => t.id !== conv?.id)
+  const currentThread = conv ? threads.find((t) => t.id === conv.id) : undefined
   // An empty thread is «нова»; two threads with one name are told apart by their time.
   const labelOf = (t: { id: string; label: string; at: string; count: number }) => (t.count === 0 ? `${t.label} · нова` : threads.filter((x) => x.label === t.label && x.count > 0).length > 1 ? `${t.label} · ${timeOf(t.at)}` : t.label)
 
@@ -473,18 +479,44 @@ export function ChatPanel(p: ChatPanelProps) {
     </p>
   )
 
-  // The thread list: this page's thread and the others, switched here; «＋ нова» starts another on this page.
-  const threadRow = conv && threads.length > 0 && (
+  // The thread row stays one line: the current thread, «+ нова», and the others folded under «ще N» (a native
+  // <details>: label, first line, time), switched here without leaving the page.
+  const threadRow = (currentThread || others.length > 0) && (
     <nav className="hl-threads" aria-label="Ваші розмови">
-      {threads.map((t) => (
-        <button key={t.id} type="button" className="hl-thread" aria-current={t.id === conv.id ? 'true' : undefined} onClick={() => void openThread(t.id)} disabled={busy}>
-          {labelOf(t)}
-        </button>
-      ))}
+      {currentThread && (
+        <span className="hl-thread" aria-current="true">
+          {labelOf(currentThread)}
+        </span>
+      )}
       {messages.length > 0 && (
         <button type="button" className="hl-thread" data-new="" onClick={() => void startNew()} disabled={busy}>
           + нова
         </button>
+      )}
+      {others.length > 0 && (
+        <details className="hl-threads-more">
+          <summary className="hl-thread">
+            {currentThread ? 'ще' : 'ваші розмови'} · {others.length}
+          </summary>
+          <ul className="hl-threads-list">
+            {others.map((t) => (
+              <li key={t.id}>
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.currentTarget.closest('details')?.removeAttribute('open')
+                    void openThread(t.id)
+                  }}
+                  disabled={busy}
+                >
+                  <span className="hl-threads-l">{labelOf(t)}</span>
+                  <span className="hl-threads-f">{t.first ?? '—'}</span>
+                  <span className="hl-threads-t">{timeOf(t.at)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </details>
       )}
     </nav>
   )

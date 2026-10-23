@@ -26,8 +26,9 @@ export type PublicConversation = {
   thread: string
   lastPage: string
   /** The visitor's open threads, this one included, newest first. */
-  threads: { id: string; thread: string; page: string; label: string; at: string; count: number }[]
+  threads: PublicThread[]
 }
+export type PublicThread = { id: string; thread: string; page: string; label: string; first: string | null; at: string; count: number }
 export type PublicMessage = { id: number; role: Message['role']; text: string; at: string }
 
 export const pubMsg = (m: Message): PublicMessage => ({ id: m.id, role: m.role, text: m.text, at: m.createdAt })
@@ -102,7 +103,8 @@ export function chatHttp(deps: HttpDeps) {
       if (!visitor) return json({ conversation: null })
       const threadKey = new URL(req.url).searchParams.get('thread') ?? ''
       const cur = await deps.chat().current(visitor, threadKey)
-      if (!cur) return json({ conversation: null })
+      // No thread for this page yet: the visitor's other threads still come along, so the panel can list them.
+      if (!cur) return json({ conversation: null, threads: await deps.chat().threads(visitor) })
       return json({ conversation: await pub(cur.conversation), messages: cur.messages.map(pubMsg) })
     },
 

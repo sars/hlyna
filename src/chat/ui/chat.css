@@ -37,10 +37,20 @@
   .hl-chat-composer textarea::placeholder { color: var(--color-ink-2); }
   .hl-chat-composer .ui-btn { height: auto; min-height: 52px; align-self: stretch; border-radius: 0 var(--radius-btn) var(--radius-btn) 0; }
   /* The thread list in the header: mono tabs, the current one underlined in paper, the others dimmer. */
-  .hl-threads { display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  .hl-threads { position: relative; display: flex; flex-wrap: wrap; gap: 4px 14px; }
   .hl-thread { min-height: 28px; padding: 4px 0; border: 0; background: none; color: var(--color-on-cobalt-2); font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; border-bottom: 2px solid transparent; }
   .hl-thread[aria-current='true'] { color: var(--color-paper); border-bottom-color: var(--color-paper); cursor: default; }
   .hl-thread[data-new] { color: var(--color-peach); }
+  .hl-threads-more > summary { list-style: none; }
+  .hl-threads-more > summary::-webkit-details-marker { display: none; }
+  .hl-threads-more > summary::after { content: ' ▾'; }
+  .hl-threads-more[open] > summary::after { content: ' ▴'; }
+  .hl-threads-list { position: absolute; left: 0; right: 0; top: 100%; z-index: 5; max-width: 480px; margin: 4px 0 0; max-height: 50vh; overflow-y: auto; padding: 4px 0; list-style: none; background: var(--color-paper); color: var(--color-ink); border-radius: var(--radius-btn); box-shadow: 0 8px 24px rgb(0 0 0 / 0.25); }
+  .hl-threads-list button { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: 'l t' 'f t'; column-gap: 12px; width: 100%; padding: 8px 12px; border: 0; background: none; color: inherit; text-align: left; font: inherit; cursor: pointer; }
+  @media (hover: hover) { .hl-threads-list button:hover { background: var(--color-paper-2); } }
+  .hl-threads-l { grid-area: l; font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; }
+  .hl-threads-f { grid-area: f; font-size: 13.5px; line-height: 1.35; color: var(--color-ink-2); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; }
+  .hl-threads-t { grid-area: t; align-self: center; font-family: var(--font-mono); font-size: 11px; color: var(--color-ink-2); }
   @media (hover: hover) { .hl-thread:not([aria-current='true']):hover { color: var(--color-paper); } }
   .hl-chat-note { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; line-height: 1.5; color: var(--color-on-cobalt-2); }
   .hl-chat-note a, .hl-chat-note button { color: inherit; text-decoration: underline; text-underline-offset: 3px; background: none; border: 0; padding: 0; font: inherit; letter-spacing: inherit; cursor: pointer; }

@@ -254,7 +254,7 @@ export function createChat(cfg: ChatConfig) {
     contact,
     telegramLink,
     /** The visitor's open threads, named for a list (newest first). */
-    threads: async (visitorId: string) => (await openThreads(db, visitorId)).map((o) => ({ id: o.publicId, thread: o.threadKey, page: o.page ?? '/', label: threadLabel(o.kind, o.context, o.page ?? '/'), at: o.updatedAt, count: o.count })),
+    threads: async (visitorId: string) => (await openThreads(db, visitorId)).map((o) => ({ id: o.publicId, thread: o.threadKey, page: o.page ?? '/', label: threadLabel(o.kind, o.context, o.page ?? '/'), first: o.first?.slice(0, 80) ?? null, at: o.updatedAt, count: o.count })),
     presence: () => getPresence(db),
     messagesAfter: (c: Conversation, afterId: number) => listMessages(db, c.id, { afterId }),
     get: (id: number) => getById(db, id),
