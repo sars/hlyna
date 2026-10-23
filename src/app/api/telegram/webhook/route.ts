@@ -1,6 +1,8 @@
 import { timingSafeEqual } from 'node:crypto'
 
 import { tg } from '@/server/telegram/tg'
+import { chat, chatEnabled } from '@/server/chatAdapter'
+import { site } from '@/content/site'
 import { db } from '@/server/db'
 import type { Actor } from '@/server/services/audit'
 import { handleTap, tapRejectClaim, type TgKeyboard } from '@/server/telegram/actions'
@@ -9,8 +11,10 @@ import { handleTap, tapRejectClaim, type TgKeyboard } from '@/server/telegram/ac
 // runs through the same services as /panel (src/server/telegram/actions.ts → src/server/services/*), so a tap and a
 // click do the same thing and both land in the audit log (source «telegram»).
 // Accepts only Telegram (secret header set with setWebhook) and only our chat (TELEGRAM_CHAT_ID). Idempotent.
+// The site chat (src/chat) sees every update first: its buttons (`ch:`), the owner's Reply to a conversation,
+// and visitors who continued a conversation in Telegram (any other chat).
 
-type Msg = { message_id: number; chat: { id: number }; text?: string; reply_to_message?: { text?: string } }
+type Msg = { message_id: number; chat: { id: number }; text?: string; reply_to_message?: { message_id: number; text?: string } }
 type Update = {
   callback_query?: { id: string; from: { id: number }; data?: string; message?: Msg }
   message?: Msg & { from?: { id: number } }
@@ -50,6 +54,7 @@ export async function POST(req: Request) {
   if (!update) return Response.json({ ok: true })
 
   try {
+    if (chatEnabled() && (await chat().handleTelegramUpdate(update, String(process.env.TELEGRAM_CHAT_ID ?? ''), site.url))) return Response.json({ ok: true })
     const cq = update.callback_query
     if (cq) {
       if (!ourChat(cq.from.id) && !ourChat(cq.message?.chat.id)) {
