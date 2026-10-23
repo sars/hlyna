@@ -135,7 +135,7 @@ export async function createCheckout(db: Db, raw: unknown, ip: string): Promise<
         if (r.item.stock != null) await tx.update(items).set({ stock: sql`greatest(${items.stock} - ${line.qty}, 0)` }).where(eq(items.id, r.item.id))
         else if (r.item.kind === 'piece') await tx.update(items).set({ stock: 0 }).where(eq(items.id, r.item.id))
       }
-      await audit(tx, PUBLIC, 'order', o!.id, 'create', { studioId, subtotalKop, lines: lines.map(({ r, line }) => `${r.item.title} × ${line.qty}`) })
+      await audit(tx, PUBLIC, 'order', o!.id, 'create', null)
       out.push({ id: o!.id, studio: shopName(s), studioId })
     }
     return out

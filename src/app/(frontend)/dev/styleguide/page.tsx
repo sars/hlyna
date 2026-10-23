@@ -3,6 +3,11 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { ChoiceChip } from '@/components/ui/ChoiceChip'
+import { ItemGrid } from '@/components/ui/ItemGrid'
+import { OrderSteps } from '@/components/ui/OrderSteps'
+import { PriceLine } from '@/components/ui/PriceLine'
+import { ForStudiosBand } from '@/components/site/ForStudiosBand'
+import { cardOf, getShopItems } from '@/lib/shopData'
 import { Meter, SectionRow, SectionRows } from '@/components/ui/SectionRow'
 import { PasswordInput } from '@/components/ui/PasswordInput.client'
 import { SaveBar } from '@/components/ui/SaveBar'
@@ -112,6 +117,7 @@ const Cap = ({ children }: { children: React.ReactNode }) => <p className="m-0 f
 
 export default async function StyleguidePage() {
   if (process.env.NODE_ENV === 'production') notFound()
+  const shopItems = (await getShopItems()).slice(0, 4).map(cardOf)
 
   const [all, f, idx, saga, found] = await Promise.all([getAllStudios(), facts(), priceIndex(), getStudioBySlug('saga-pottery'), searchCatalog('коло львів')])
   const search = found.result
@@ -577,6 +583,20 @@ export default async function StyleguidePage() {
         <Cap>Сезонний вказівник на одну сторінку: ряд між 1px лінійками, фото 1:1, кікер, назва, рядок фактів, стрілка; увесь ряд — одне посилання з data-promo для GA4 (promo_click). Нижче — живий SeasonPromo (порожній, коли в src/content/promos.ts немає чинної кампанії) і сам примітив</Cap>
         <SeasonPromo place="mk-city" city="sumy" />
         <PromoStrip href="/dobirky" photo={sitePhotos.promoKhellovin} kicker="Добірка · до 31 жовтня" title="Кераміка на Хелловін" text="Гарбузи 595–1 300 грн і чашки з привидами 650–2 300 грн від 13 українських майстерень; майстер-класи з глини до 31 жовтня у шести містах." cta="Відкрити добірку" promo="styleguide" place="styleguide" />
+      </Block>
+
+      <Block id="sg-shop" title="27 · Крамниця: ItemGrid, PriceLine, OrderSteps, ForStudiosBand">
+        <Cap>Сітка виробів 2 → 3 → 4 з лінійками, фото 4:5 на paper-2, «N фото», ціна cobalt і стан mono; продано — теракотова позначка (docs/shop/DESIGN.md §2)</Cap>
+        {shopItems.length ? <ItemGrid items={shopItems} /> : <Note>У локальній базі немає виробів партнерів: запустіть read-shops.ts.</Note>}
+        <div className="grid gap-3">
+          <PriceLine priceKop={95000} state="in_stock" size="lg" />
+          <PriceLine priceKop={120000} state="piece" size="sm" />
+          <PriceLine priceKop={300000} state="to_order" lead="2–4 тижні" size="sm" />
+          <PriceLine priceKop={70000} state="sold" size="sm" />
+        </div>
+        <Cap>Кроки замовлення: пройдені ink, поточний cobalt, наступні порожні; вертикально на телефоні</Cap>
+        <OrderSteps status="in_progress" dates={{ new: '24 жовтня', confirmed: '24 жовтня' }} />
+        <ForStudiosBand />
       </Block>
     </main>
   )

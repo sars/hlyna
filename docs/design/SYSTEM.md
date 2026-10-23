@@ -409,6 +409,28 @@
 
 ---
 
+### 4.5 Крамниця (`/kramnytsia`, `src/components/shop/`, `src/components/ui/Item*`)
+
+Специфікація — `docs/shop/DESIGN.md` (§1 шаблони, §2 примітиви з розмірами, §3 копія, §4 фото, §5 рух, §6 GA4, §7 відхилення); тут — реєстр примітивів і де вони. Купівля — головна дія крамниці: на `/kramnytsia/*` немає `MobileRequestBar`, `CtaBand` і бічної форми; запит для бізнесу — рядок у кінці головної крамниці. Стан кошика — `src/shop/cart.ts` (`localStorage` `hl:cart`, подія `hl:cart`).
+
+| Компонент | Файл | Призначення |
+|---|---|---|
+| `ItemGrid` / `ItemCell` | `ui/ItemGrid.tsx`, CSS `.ui-items` | сітка виробів 2 → 3 (md) → 4 (lg), `compact` 2 → 4; фото 4:5 на `paper-2`, друге фото кросфейдом на hover, «N фото», назва, `PriceLine`, рядок виробника |
+| `PriceLine` | `ui/PriceLine.tsx` | ціна cobalt Unbounded 600 `tabular-nums` + стан mono (`sm` у сітці мовчить про «є в наявності»; `lg` у `BuyBox`); «Продано» — `terracotta-text` |
+| `ItemGallery` (client) | `ui/ItemGallery.client.tsx`, CSS `.ui-igal*` | мініатюри 72px + головне 4:5 від md (ландшафт — `contain`), стрічка зі scroll-snap і лічильником на телефоні; відкриває `GalleryViewer compact`; під нею `PhotoCredit` |
+| `QtyStepper` (client) | `ui/QtyStepper.client.tsx`, CSS `.ui-qty` | «−» число «+» кнопками, 52px / `sm` 36px |
+| `OrderSteps` | `ui/OrderSteps.tsx`, CSS `.ui-steps` | крапки на лінійці: пройдені ink, поточна cobalt, наступні порожні; вертикально < md; скасовано → `Note` |
+| `MakerLine`, `PhotoCredit` | `ui/MakerLine.tsx`, `ui/PhotoCredit.tsx` | «Зробила майстерня «…», Місто. Профіль →»; «Фото: …, зі згоди студії.» під кожною галереєю і сіткою |
+| `BuyBox` (client) | `shop/BuyBox.client.tsx` | ціна + стан, одне речення, степпер + «У кошик» (cobalt), `Facts` компактний (доставка · оплата · повернення · виготовлення), `MakerLine`; `sold` → `Button ink` «Замовити подібне» |
+| `ShopBuyBar` (client) | `shop/ShopBuyBar.client.tsx` | каркас `MobileRequestBar` з `data-request-bar`; ціна ліворуч, дія праворуч; ховається, поки `BuyBox`/`OrderSummary` на екрані |
+| `ShopToast` (client) | `shop/ShopToast.client.tsx`, CSS `.ui-toast` | «Додано в кошик» / «Прибрано»: fixed, 2px ink, фото 56×70, «Оформити» + «Дивитися далі», 6 с; `ShopToastHost` раз на сторінку |
+| `CartLink` (client) | `shop/CartLink.client.tsx`, CSS `.ui-cartbtn` | у `nav-actions`: нічого при порожньому кошику; ≥ 65rem mono «Кошик N», < 65rem квадрат 44px з лічильником (у крамниці тоді ховається «Запит») |
+| `CartLine` (client), `OrderSummary` | `shop/CartLine.client.tsx` (`.ui-cartline`), `shop/OrderSummary.tsx` | рядок кошика/замовлення 72px фото · текст · сума; підсумок за студіями, «Разом до оплати студіям», `collapsed` → `details` на телефоні |
+| `CartPage`, `CheckoutForm` (client) | `shop/CartPage.client.tsx`, `shop/CheckoutForm.client.tsx` (`.ui-choice`, `.ui-tel`) | кошик і оформлення в одну сторінку: `Field variant="box"` (єдине дозволене поле на папері), радіо-рядки `ChoiceRow` з полями, що розкриваються, телефон з нерухомим +380, рядок згоди |
+| `ForStudiosBand` | `site/ForStudiosBand.tsx` | `Panel ink` «Хочете розмістити свої вироби? Додайте студію» → `/dlya-studiy` |
+
+Дрібний теракотовий текст у крамниці — лише позначка «Продано» (та сама роль, що «останній пост…»). `Field variant="box"` дозволений і у формі оформлення замовлення (не лише в кабінеті).
+
 ## 5. Шаблони сторінок
 
 Скрізь: `SiteHeader` → `main.wrap` → … → `SiteFooter`; `MobileRequestBar` на сторінках із формою або з контекстним запитом. У дужках — де стоїть CTA запиту: **верх / після відповіді / кінець**. Сезонний `PromoStrip` (§4.1), якщо є, стоїть одразу після геро і ніколи не вище кнопки запиту: головна — під геро перед «Що ви шукаєте?»; `/maister-klasy` — перший елемент гріду; `/maister-klasy/[city]` і тематичні МК-сторінки (`TopicPage`, `section: 'mk'`) — перший блок колонки вмісту перед епіграфом; `/podarunky-z-keramiky` — після першого розділу копі.
@@ -426,6 +448,7 @@
 | **Профіль** `/vyrobnyky/[slug]` | `hero` 7/5: [`Breadcrumbs`, `Kicker` «Тип · Місто», H1 (`break-words`), на м'якому чи закритому профілі — `Note` з одним реченням про останній знак активності й де студії міста, які працюють (`dormantLine`, `src/lib/present.ts`; замість рядка «Дані: … · перевірено»; внизу геро `Updated` «Перевірено: …»), опис 17px max 70ch (абзаци), `QuoteBlock` цитата власника (без джерела), новина: `Kicker` «Новини від студії · місяць рік» + текст власника (свіжа, до ~6 міс.) або «Що нового:» `Kicker` + наш текст, `ChipGroup` статичних чипів (`as="span"`: «працює із закладами», «корпоративні замовлення»), `Button cobalt arrow` «Запит цій студії» (**верх**), `Updated`] ∣ [`Kicker` «Коротко» + `Facts`] · фото студії (лише зі згоди): `StudioGallery` на всю ширину (§4.1) · `cols`: Де знайти: `SectionHead` з `note`-адресою → `MapFrame profile` → маршрути (mono кікер + посилання cobalt) · Що робить: 2 `ListBlock` (+ `MoreLink` «Ще N →») · Ціни: `SectionHead note` → `PriceList` · Для бізнесу: `SectionHead kicker` → `Note` або умови → `CtaBand cobalt` (**після відповіді**) · Кейси студії `IndexCell` · Instagram (`InstagramPosts`) · «Також» (пов'язані профілі з `src/content/linked.json`: посилання + сірий підпис, що це для цієї студії) · Інші студії міста: `StudioCell` сітка ∣ бічна: `RequestForm` (**кінець** на десктопі), `SideBox` «Це ваша студія?» → «Керувати профілем →». `MobileRequestBar`. |
 | **`/zapyt`** | `max-w-narrow`: `Breadcrumbs`, `Kicker`, H1, лід → `RequestForm` повна/`forStudio` → `Faq` коротке (що далі, 10%). Без `MobileRequestBar`. |
 | **Кабінет** `/kabinet/*` (noindex) | власний layout (`kb-head`, `kb-foot`), список і вхід — `max-w-[520px]`/`860px`, редактор від lg — `300px + 720px`; бланки `Field variant="box"`, `ListEditor`, `ChoiceChip`, `StatusTag`, `SectionRow`, `SaveBar`, `PhotoManager` (§4.4); читабельне на `paper-2`; без епіграфа, без запиту, без шапки сайту. |
+| **Крамниця** `/kramnytsia`, `/kramnytsia/<категорія>`, `/kramnytsia/<студія>`, `/kramnytsia/<студія>/<виріб>`, кошик, оформлення, замовлення | `docs/shop/DESIGN.md` §1: `InnerHero` без фото (факти, `FactStrip`, чипи категорій) → `Epigraph` (лише головна) → `SectionHead` + `ItemGrid` + `PhotoCredit` → «Як це працює» `NumberedList` → студії `IndexCell` → `Faq` без розмітки → `ForStudiosBand` → рядок запиту для бізнесу → `Updated`. Виріб: крихти → сітка `ui-item` (голова · галерея · `BuyBox` · виробник) → характеристики `Facts` → проза → `Faq` → схожі → ще від студії. Кошик/оформлення — клієнтські тіла в серверному каркасі; замовлення — `OrderSteps` + `Facts` + `CartLine readOnly`; усі три `noindex`, без `MobileRequestBar`. |
 | **404 / error** | `max-w-narrow pt-16 pb-24` grid gap 5: `Kicker` «Помилка 404» / «Тимчасова помилка», H1, абзац 18px ink-2, `ChipGroup` розділів (404) або `Button ink` «Спробувати ще раз» + `Button ghost` «На головну» (error), `MoreLink` «На головну →». Фото нема (кадр 417 з плану — лише якщо власник захоче). |
 | **`/mapa`, `/podiyi`, `/muzei-keramiky`, `/pro-nas`, `/dlya-studiy`, `/de-kupyty-keramiku`, `/tsiny-2026`** | геро без фото (крім `pro-nas` — без) → розділи з `SectionHead` + `DataTable` (`/tsiny-2026` зведена — `mode="scroll"`, решта `stack`) / `MapFrame list` + `Chip active` фільтри / `NumberedList` → `Faq` → `CtaBand ink` або `Panel ink` «Для студій» на `/dlya-studiy`. |
 

@@ -18,6 +18,15 @@ Updated 2026-10-12.
 - Threads: one per studio, per city's classes, one for business pages, one for home (`thread_key`); the header lists the visitor's open threads, switched in place; «+ нова» starts another. A business lead (business page, or words like партія/логотип/корпоратив, or a business tool call) is flagged to the owner at once, before the answer; while a hand-over waits the assistant keeps answering.
 - Production needs `OPENAI_API_KEY` in `.env` (deploy/README.md) and migration 0008.
 
+## Крамниця (2026-10-24, branch `worktree-shop`, not deployed)
+- Plan `docs/shop/PLAN.md`, design `docs/shop/DESIGN.md`, research `docs/shop/research/`; decision in `docs/decisions.md` 2026-10-24.
+- Data: migration 0010 (`app.orders`, `app.order_items`, `app.item_photos`, shop fields on `items`, `studios.shop_terms`, `user.telegram_*`). Services `src/server/services/orders.ts`, `ownerTelegram.ts`; reads `src/server/publicShop.ts` → `src/lib/shopData.ts` (cache tag `items`). Tests `tests/int/orders.int.spec.ts`.
+- Pages `src/app/(frontend)/kramnytsia/*` (home, category, studio shop, item, cart, checkout, order, `feed.xml`); components `src/components/shop/`, `src/components/ui/Item*`, `PriceLine`, `OrderSteps`, `QtyStepper`; copy `src/content/shop.ts`; JSON-LD `src/lib/shopLd.ts`.
+- Studio side: `/kabinet/studiya/<slug>/zamovlennia`, Telegram link on `/kabinet`; staff: `/panel/zamovlennia`.
+- Scripts: `read-shops.ts` (daily; `PHOTOS=1` for photos and the studio's text), `edit-items.ts` (JSON edits: `scripts/app/edits/2026-10-24-osonnia-shop.json`).
+- Production steps: apply migration 0010; `PROD=1 PHOTOS=1 MEDIA_DIR=<empty folder> … read-shops.ts` then tar the folder into the media volume (as for studio photos); `PROD=1 EDITS=scripts/app/edits/2026-10-24-osonnia-shop.json … edit-items.ts`; add `read-shops.ts` to the daily cron; `TELEGRAM_BOT_USERNAME` in `.env` for the owners' link; Google Merchant Center with `/kramnytsia/feed.xml`.
+- Open: the offer/terms page (the consent line points to the FAQ), online payment (plata by mono split), Nova Poshta API, gift certificates as items.
+
 ## Next
 - Collections for studios, master classes, prices, requests; import from `UkraineCeramics/_master/`.
 - Chat: measure two weeks (GA4 `chat_open`, `chat_first_message`, `chat_handoff`, `chat_contact`, `chat_request`, `chat_telegram`), then studios with a cabinet as a second human.

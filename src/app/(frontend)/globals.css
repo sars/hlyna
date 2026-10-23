@@ -988,6 +988,11 @@
   .ui-cartbtn-n { position: absolute; top: -4px; right: -4px; padding: 2px 4px; background: var(--color-ink); color: var(--color-paper); font-family: var(--font-mono); font-size: 10.5px; line-height: 1; }
   /* In the shop on a phone the cart takes the request button's place: «лупа · кошик · Меню» fits from 360px (DESIGN.md §7.2). */
   @media (max-width: 64.99rem) { .nav-actions:has(.ui-cartbtn[data-in-shop]) > .nav-request { display: none; } }
+  /* On a laptop (65–85rem) the one header row holds the menu, «Крамниця», the search, «Кошик N» and the button: tighter gaps while the cart shows. */
+  @media (min-width: 65rem) and (max-width: 84.99rem) {
+    .nav-top:has(.nav-actions .nav-sec) .nav-list { gap: clamp(8px, 1.1vw, 16px); }
+    .nav-top:has(.nav-actions .nav-sec) .nav-actions .ui-btn { padding-inline: 1em; }
+  }
 
   .ui-summary > summary::-webkit-details-marker { display: none; }
   .ui-summary > summary .ui-faq-pm::before { content: '+'; }

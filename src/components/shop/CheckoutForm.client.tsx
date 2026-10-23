@@ -84,6 +84,11 @@ export function CheckoutForm({ studios }: { studios: StudioTerms }) {
   const [sending, setSending] = useState(false)
   const formRef = useRef<HTMLFormElement>(null)
   const began = useRef(false)
+  // Set once the order is in: the cart empties, and the empty-cart redirect below must not race the order page.
+  const placed = useRef(false)
+
+  /** A field's error goes as soon as the buyer touches the field again. */
+  const fix = (k: keyof Errors) => setErrors((e) => (e[k] ? { ...e, [k]: undefined } : e))
 
   const groups = groupCart(lines)
   const terms = sharedTerms(groups.map((g) => g.studio.slug), studios)
@@ -94,7 +99,7 @@ export function CheckoutForm({ studios }: { studios: StudioTerms }) {
   const needsCity = delivery === 'np_branch' || delivery === 'np_postomat' || delivery === 'np_courier' || delivery === 'ukrposhta'
 
   useEffect(() => {
-    if (!hydrated) return
+    if (!hydrated || placed.current) return
     if (!lines.length) {
       router.replace('/kramnytsia/koshyk')
       return
@@ -156,6 +161,7 @@ export function CheckoutForm({ studios }: { studios: StudioTerms }) {
         setSending(false)
         return
       }
+      placed.current = true
       cart.clear()
       router.replace(`/kramnytsia/zamovlennia/${json.token}?new=1`)
     } catch {
@@ -190,15 +196,15 @@ export function CheckoutForm({ studios }: { studios: StudioTerms }) {
           <Field label={c.phone.label} htmlFor={`${uid}-phone`} hint={c.phone.hint} error={errors.buyerPhone} variant="box">
             <div className="ui-tel" data-invalid={errors.buyerPhone ? '' : undefined}>
               <span aria-hidden>+380</span>
-              <input id={`${uid}-phone`} name="buyerPhone" type="tel" inputMode="tel" autoComplete="tel-national" maxLength={12} placeholder="67 000 00 00" value={phone} onChange={(e) => setPhone(e.target.value.replace(/[^\d ]/g, ''))} aria-invalid={errors.buyerPhone ? true : undefined} />
+              <input id={`${uid}-phone`} name="buyerPhone" type="tel" inputMode="tel" autoComplete="tel-national" maxLength={12} placeholder="67 000 00 00" value={phone} onChange={(e) => (setPhone(e.target.value.replace(/[^\d ]/g, '')), fix('buyerPhone'))} aria-invalid={errors.buyerPhone ? true : undefined} />
             </div>
           </Field>
           <Field label={c.name.label} htmlFor={`${uid}-name`} hint={c.name.hint} error={errors.buyerName} variant="box">
-            <Input id={`${uid}-name`} name="buyerName" autoComplete="name" value={name} onChange={(e) => setName(e.target.value)} invalid={Boolean(errors.buyerName)} />
+            <Input id={`${uid}-name`} name="buyerName" autoComplete="name" value={name} onChange={(e) => (setName(e.target.value), fix('buyerName'))} invalid={Boolean(errors.buyerName)} />
           </Field>
           {digital && (
             <Field label={c.email.label} htmlFor={`${uid}-email`} hint={c.email.hint} error={errors.buyerEmail} variant="box">
-              <Input id={`${uid}-email`} name="buyerEmail" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} invalid={Boolean(errors.buyerEmail)} />
+              <Input id={`${uid}-email`} name="buyerEmail" type="email" autoComplete="email" value={email} onChange={(e) => (setEmail(e.target.value), fix('buyerEmail'))} invalid={Boolean(errors.buyerEmail)} />
             </Field>
           )}
         </fieldset>
@@ -207,14 +213,14 @@ export function CheckoutForm({ studios }: { studios: StudioTerms }) {
           <Legend n={c.sections.delivery} title="Як отримати" note={c.deliveryNote} />
           <ul className="m-0 list-none p-0" role="radiogroup" aria-invalid={errors.deliveryMethod ? true : undefined}>
             {terms.delivery.map((d) => (
-              <ChoiceRow key={d} name="deliveryMethod" value={d} label={c.delivery[d].label} note={d === 'pickup' ? (terms.pickup.join('; ') || undefined) : ('note' in c.delivery[d] ? (c.delivery[d] as { note?: string }).note : undefined)} aside={c.delivery[d].aside} checked={delivery === d} onChange={() => setDelivery(d)}>
+              <ChoiceRow key={d} name="deliveryMethod" value={d} label={c.delivery[d].label} note={d === 'pickup' ? (terms.pickup.join('; ') || undefined) : ('note' in c.delivery[d] ? (c.delivery[d] as { note?: string }).note : undefined)} aside={c.delivery[d].aside} checked={delivery === d} onChange={() => (setDelivery(d), fix('deliveryMethod'))}>
                 {d !== 'pickup' && (
                   <div className="grid gap-1">
                     <Field label={c.city.label} htmlFor={`${uid}-city-${d}`} error={delivery === d ? errors.deliveryCity : undefined} variant="box">
-                      <Input id={`${uid}-city-${d}`} name={delivery === d ? 'deliveryCity' : undefined} autoComplete="address-level2" value={city} onChange={(e) => setCity(e.target.value)} invalid={delivery === d && Boolean(errors.deliveryCity)} />
+                      <Input id={`${uid}-city-${d}`} name={delivery === d ? 'deliveryCity' : undefined} autoComplete="address-level2" value={city} onChange={(e) => (setCity(e.target.value), fix('deliveryCity'))} invalid={delivery === d && Boolean(errors.deliveryCity)} />
                     </Field>
                     <Field label={d === 'np_courier' ? c.address.label : c.point.label} htmlFor={`${uid}-point-${d}`} hint={d === 'np_courier' ? undefined : c.point.hint} error={delivery === d ? errors.deliveryPoint : undefined} variant="box">
-                      <Input id={`${uid}-point-${d}`} name={delivery === d ? 'deliveryPoint' : undefined} autoComplete={d === 'np_courier' ? 'street-address' : 'off'} value={point} onChange={(e) => setPoint(e.target.value)} invalid={delivery === d && Boolean(errors.deliveryPoint)} />
+                      <Input id={`${uid}-point-${d}`} name={delivery === d ? 'deliveryPoint' : undefined} autoComplete={d === 'np_courier' ? 'street-address' : 'off'} value={point} onChange={(e) => (setPoint(e.target.value), fix('deliveryPoint'))} invalid={delivery === d && Boolean(errors.deliveryPoint)} />
                     </Field>
                   </div>
                 )}
@@ -232,7 +238,7 @@ export function CheckoutForm({ studios }: { studios: StudioTerms }) {
           <Legend n={c.sections.payment} title="Як оплатити" />
           <ul className="m-0 list-none p-0" role="radiogroup">
             {terms.payment.map((p) => (
-              <ChoiceRow key={p} name="paymentMethod" value={p} label={c.payment[p].label} note={c.payment[p].note ?? PAYMENT_HINT[p]} checked={payment === p} onChange={() => setPayment(p)} />
+              <ChoiceRow key={p} name="paymentMethod" value={p} label={c.payment[p].label} note={c.payment[p].note ?? PAYMENT_HINT[p]} checked={payment === p} onChange={() => (setPayment(p), fix('paymentMethod'))} />
             ))}
           </ul>
           {errors.paymentMethod && (
