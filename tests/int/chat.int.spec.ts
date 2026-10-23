@@ -126,6 +126,7 @@ describe('a turn with the assistant', () => {
     const fresh = await getById(db, c.id)
     expect(fresh?.tgHeadMessageId).toBe(101)
     expect(fresh?.turns).toBe(1)
+    expect(edits.find((e) => e.id === 101 && e.text)?.text).toContain('— помічник веде сам, нічого не треба · відповідей: 1')
     expect(fresh?.inputTokens).toBe(100)
     // The model saw the context as a developer line and the visitor's text last.
     const input = seenParams[0]!.input as { role?: string; content?: string }[]

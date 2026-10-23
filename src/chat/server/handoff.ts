@@ -22,7 +22,7 @@ export const headKeyboard = (c: Pick<Conversation, 'id' | 'status'>, t: Transpor
         [{ text: '🔗 В панелі', url: t.panelUrl(c.id) }],
       ]
 
-const STATUS_LINE: Record<string, string> = { ai: 'відповідає помічник', waiting: 'чекає людину', human: 'відповідає людина', closed: 'завершено' }
+const STATUS_LINE: Record<string, string> = { ai: 'помічник веде сам, нічого не треба', waiting: 'чекає людину', human: 'відповідає людина', closed: 'завершено' }
 const stamp = () => new Intl.DateTimeFormat('uk-UA', { timeZone: 'Europe/Kyiv', dateStyle: 'short', timeStyle: 'short' }).format(new Date())
 
 /** Telegram follows the status: the head gets a status line and the right buttons; earlier notes (hand-over, lead) get the same buttons. */
@@ -30,7 +30,8 @@ export async function syncTelegram(db: ChatDb, c: Conversation, t: Transport, wh
   if (!c.tgHeadMessageId) return
   const first = (await listMessages(db, c.id, { limit: 1 }))[0]?.text ?? ''
   const keyboard = headKeyboard(c, t)
-  const line = `— ${STATUS_LINE[c.status] ?? c.status}${who ? ` (${who})` : ''} (${stamp()})`
+  const count = c.status === 'ai' && c.turns > 0 ? ` · відповідей: ${c.turns}` : ''
+  const line = `— ${STATUS_LINE[c.status] ?? c.status}${who ? ` (${who})` : ''}${count} (${stamp()})`
   await t.editOwnerMessage(c.tgHeadMessageId, `${headText(c, first)}\n${line}`, keyboard).catch(() => {})
   const notes = await db
     .select({ data: events.data })

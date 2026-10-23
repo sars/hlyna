@@ -1,5 +1,5 @@
 import { runTurn, type TurnResult } from './engine'
-import { closeConversation, ensureHead, flagBusiness, handBack, humanReply, linkTelegram, relayVisitor, requestHuman, saveContact, takeOver, threadLabel } from './handoff'
+import { closeConversation, ensureHead, flagBusiness, handBack, humanReply, linkTelegram, relayVisitor, requestHuman, saveContact, syncTelegram, takeOver, threadLabel } from './handoff'
 import {
   addMessage,
   bumpUsage,
@@ -142,6 +142,8 @@ export function createChat(cfg: ChatConfig) {
       ? await addMessage(db, c.id, 'assistant', answer, { meta: { tools: turn.toolCalls.map((t) => ({ name: t.name, ms: t.ms, args: t.args })), usage: turn.usage, rounds: turn.rounds } })
       : null
     await bumpUsage(db, c.id, turn.usage)
+    // The head in Telegram says the assistant has it («нічого не треба») and how many answers it gave.
+    await syncTelegram(db, await refresh(fresh), transport)
     if (!turn.text && answer) opts.onDelta?.(answer)
     return { visitor, assistant, conversation: fresh }
   }
