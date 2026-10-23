@@ -105,6 +105,35 @@ export async function upsertItem(ex: Exec, studioId: number, d: ItemDraft & { so
   return { id: cur.id, action: 'updated' as const, changes }
 }
 
+/** The fields an edits file (scripts/app/edit-items.ts) may set: our text, the spec table, the kind and terms, the shop fields. */
+export const EDITABLE_FIELDS = [
+  'title', 'category', 'kind', 'fulfillment', 'description', 'photoFact', 'terms', 'specs', 'leadDaysMin', 'leadDaysMax', 'stock', 'priceMin', 'priceMax', 'priceText', 'availability', 'confirmedAt', 'occasion', 'seasonEnds',
+] as const
+export type ItemPatch = Partial<Pick<typeof items.$inferInsert, (typeof EDITABLE_FIELDS)[number]>> & { hidden?: boolean }
+
+/**
+ * Edits one item by (studio, slug): sets the given fields, and hides («manual», sticks) or shows it again (the freshness
+ * rule decides from there). Nothing is written when nothing differs.
+ */
+export async function patchItem(ex: Exec, studioId: number, slug: string, patch: ItemPatch, actor: Actor, today: string, studio: StudioState) {
+  const [cur] = await ex.select().from(items).where(and(eq(items.studioId, studioId), eq(items.slug, slug))).limit(1)
+  if (!cur) return null
+  const { hidden, ...fields } = patch
+  const next: Record<string, unknown> = { ...cur, ...fields }
+  if (hidden === true) Object.assign(next, { visibility: 'hidden', hiddenReason: 'manual' })
+  if (hidden === false) {
+    const f = freshness({ ...(next as Item), visibility: 'public', hiddenReason: null }, studio, today)
+    Object.assign(next, f)
+  }
+  const changes = diff(cur as Record<string, unknown>, next, [...EDITABLE_FIELDS, 'visibility', 'hiddenReason'])
+  if (!Object.keys(changes).length) return { id: cur.id, changed: false as const }
+  const by = actor.id ?? actor.source
+  const set = Object.fromEntries(Object.keys(changes).map((k) => [k, next[k]]))
+  await ex.update(items).set({ ...set, updatedAt: sql`now()`, updatedBy: by }).where(eq(items.id, cur.id))
+  await audit(ex, actor, 'item', cur.id, 'update', changes)
+  return { id: cur.id, changed: true as const, changes }
+}
+
 /** Logs one check of an item and stamps it as checked. */
 export async function recordCheck(
   ex: Exec,
