@@ -1,5 +1,6 @@
 // Labels and tones for stored values (one place, so a status reads the same on every screen).
 import type { StatusTone } from '@/components/panel/inhouse/status-badge'
+import { CHAT_STATUS, type ChatStatus } from '@/chat/schema'
 import { CONFIDENCE, GEO_PRECISION, REQUEST_STATUS, REQUEST_WHAT, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY, type RequestStatus } from '@/shared/options'
 import { t } from './i18n'
 
@@ -59,3 +60,7 @@ export function historyValue(entity: string, field: string, v: unknown, fmtDate:
   const s = String(v)
   return s.length > 80 ? `${s.slice(0, 80)}…` : s
 }
+
+/** The site chat's states (src/chat): waiting for a person is the one that needs attention. */
+export const CHAT_TONE: Record<ChatStatus, StatusTone> = { ai: 'neutral', waiting: 'warn', human: 'good', closed: 'neutral' }
+export const chatStatusOptions = CHAT_STATUS.map((value) => ({ value, label: t(`chat.status.${value}`) }))

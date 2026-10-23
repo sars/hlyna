@@ -46,6 +46,7 @@ Fill in:
 - `POSTGRES_PASSWORD` = `openssl rand -hex 24`
 - `BETTER_AUTH_SECRET`, `REVALIDATE_SECRET`, `TELEGRAM_WEBHOOK_SECRET` = `openssl rand -hex 32` each; `BETTER_AUTH_URL=https://hlyna.com.ua`
 - `NEXT_PUBLIC_SERVER_URL=https://hlyna.com.ua`
+- `OPENAI_API_KEY` for the site chat (project «hlyna» on platform.openai.com with its own monthly hard limit; `CHAT_MODEL`, `CHAT_DAILY_TURNS`, `TELEGRAM_BOT_USERNAME` are optional, see `.env.example`). Without the key every page shows the request form instead of the chat.
 - `DATABASE_URL` can stay as is: compose overrides it with the db container address.
 
 ## 4. Start

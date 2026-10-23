@@ -11,9 +11,15 @@ Updated 2026-10-12.
 - Screenshots: `pnpm shots /route` → `.shots/` (390px + 1280px). Page snapshots and diffs: `node scripts/snapshot.mjs`.
 - Writing voice: `docs/voice/`.
 
+## Chat instead of the form (2026-10-23)
+- Plan and decisions: `docs/chat/PLAN.md`. Module `src/chat/` (schema `chat`, engine, hand-over, Telegram, HTTP, panel UI) + the site's adapter `src/server/chatAdapter.ts` (tools over the catalogue, the prompt in `chatPrompt.ts`, the Telegram transport). `RequestBlock` shows the chat where the form stood when `OPENAI_API_KEY` is set, else the form; `/zapyt` keeps the form.
+- Telegram: head message per conversation, Reply answers, «Взяти» / «Завершити», `/done`, `/online` `/offline` `/auto`; visitors continue with `t.me/<bot>?start=c_<id>`.
+- Panel: `/panel/chat` (read-only). Tests: `tests/int/chat.int.spec.ts` (fake model, fake Telegram). Try a turn locally: `HLYNA_SCRIPT=1 DATABASE_URL=… pnpm exec tsx experiments/chat-try.ts "питання"`; screenshots of an exchange: `node experiments/chat-shots.mjs /vyrobnyky/<slug>`.
+- Production needs `OPENAI_API_KEY` in `.env` (deploy/README.md) and migration 0008.
+
 ## Next
 - Collections for studios, master classes, prices, requests; import from `UkraineCeramics/_master/`.
-- Request form → admin → Telegram notification.
+- Chat: measure two weeks (GA4 `chat_open`, `chat_first_message`, `chat_handoff`, `chat_contact`, `chat_request`, `chat_telegram`), then studios with a cabinet as a second human.
 
 ## Reminders (2026-10-10)
 - **Instagram pass** (needs a `claude --chrome` session): collect 1–3 pinned/latest post URLs per public studio for lazy-loaded embeds; read captions and images to add a unique, paraphrased paragraph to each profile.
