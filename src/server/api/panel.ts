@@ -4,7 +4,7 @@ import { zValidator } from '@hono/zod-validator'
 import { Hono, type Context } from 'hono'
 import { z } from 'zod'
 
-import { REQUEST_STATUS } from '../../shared/options'
+import { ORDER_STATUS, PAYMENT_STATUS, REQUEST_STATUS } from '../../shared/options'
 import { AuthError, type SignedInUser } from '../auth/access'
 import { setPasswordAndSignIn } from '../auth/kabinet-adapter'
 import { InviteError } from '../auth/invites'
@@ -14,6 +14,7 @@ import type { Actor } from '../services/audit'
 import { approveClaim, reissueClaimInvite, rejectClaim } from '../services/claims'
 import { applyChangeSet, FIELD_ORDER, rejectChangeSet, type FieldKey } from '../services/changeSets'
 import { NotFound, setRequestStatus, setRequestStudios, updateRequest } from '../services/requests'
+import { NotFound as OrderNotFound, OrderError, setOrderStatus, updateOrder } from '../services/orders'
 import { searchStudios } from '../services/studios'
 import { Conflict, Invalid, restoreRevision, saveStudio, revisionChanges } from '../services/studioEditor'
 import { createCity, saveCity } from '../services/cities'
@@ -38,6 +39,8 @@ const app = new Hono<Env>().basePath('/api/panel')
 app.onError((err, c) => {
   if (err instanceof AuthError) return c.json({ error: err.message }, err.status)
   if (err instanceof NotFound) return c.json({ error: err.message }, 404)
+  if (err instanceof OrderNotFound) return c.json({ error: err.message }, 404)
+  if (err instanceof OrderError) return c.json({ error: err.message }, err.status as 400 | 403 | 404 | 409 | 422)
   if (err instanceof InviteError) return c.json({ error: err.message, code: err.code }, 400)
   if (err instanceof Invalid) return c.json({ error: err.message }, 400)
   if (err instanceof Conflict) return c.json({ error: err.message, current: err.current, changes: err.changes, by: err.by }, 409)
@@ -84,6 +87,21 @@ app.patch('/requests/:id', zValidator('param', id), zValidator('json', z.object(
 
 app.put('/requests/:id/studios', zValidator('param', id), zValidator('json', z.object({ studioIds: z.array(z.number().int().positive()).max(20) })), async (c) =>
   c.json(await setRequestStudios(db, c.req.valid('param').id, c.req.valid('json').studioIds, c.get('actor'))),
+)
+
+app.post('/orders/:id/status', zValidator('param', id), zValidator('json', z.object({ status: z.enum(ORDER_STATUS), reason: z.string().trim().max(500).optional() })), async (c) => {
+  const { status, reason } = c.req.valid('json')
+  return c.json(await setOrderStatus(db, c.req.valid('param').id, status, c.get('actor'), { by: 'staff', reason }))
+})
+
+app.patch(
+  '/orders/:id',
+  zValidator('param', id),
+  zValidator('json', z.object({ tracking: z.string().max(60).nullable().optional(), studioNote: z.string().max(2000).nullable().optional(), paymentStatus: z.enum(PAYMENT_STATUS).optional(), deliveryUah: z.number().nonnegative().max(100_000).nullable().optional() })),
+  async (c) => {
+    const { deliveryUah, ...rest } = c.req.valid('json')
+    return c.json(await updateOrder(db, c.req.valid('param').id, { ...rest, ...(deliveryUah === undefined ? {} : { deliveryKop: deliveryUah === null ? null : Math.round(deliveryUah * 100) }) }, c.get('actor')))
+  },
 )
 
 app.post('/claims/:id/approve', zValidator('param', id), zValidator('json', z.object({ linkToOwnerId: z.string().max(100).nullish() })), async (c) =>

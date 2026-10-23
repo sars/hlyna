@@ -1,6 +1,6 @@
 // The panel's screens, once. The sidebar on a desktop and the tab bar on a phone are two ways of showing this
 // one list; adding a screen is one line here. (Adapted from brocoders/inhouse-ai-starter-kit, MIT.)
-import { Building2, Camera, ClipboardList, FilePenLine, House, Image, MapPin, MessageSquare, ScrollText, UserCheck, Users, type LucideIcon } from 'lucide-react'
+import { Building2, Camera, ClipboardList, FilePenLine, House, Image, MapPin, MessageSquare, ScrollText, ShoppingBag, UserCheck, Users, type LucideIcon } from 'lucide-react'
 
 import type { StaffRole } from '@/server/auth/roles'
 import { t, type TextKey } from '@/components/panel/lib/i18n'
@@ -18,6 +18,7 @@ export type Screen = {
 export const screens: Screen[] = [
   { href: '/panel', labelKey: 'nav.overview', icon: House, tab: true },
   { href: '/panel/zapyty', labelKey: 'nav.requests', icon: ClipboardList, tab: true },
+  { href: '/panel/zamovlennia', labelKey: 'nav.orders', icon: ShoppingBag },
   { href: '/panel/chat', labelKey: 'nav.chat', icon: MessageSquare },
   { href: '/panel/zayavky', labelKey: 'nav.claims', icon: UserCheck, tab: true },
   { href: '/panel/zminy', labelKey: 'nav.changes', icon: FilePenLine },

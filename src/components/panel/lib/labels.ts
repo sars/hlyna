@@ -1,7 +1,7 @@
 // Labels and tones for stored values (one place, so a status reads the same on every screen).
 import type { StatusTone } from '@/components/panel/inhouse/status-badge'
 import { CHAT_STATUS, type ChatStatus } from '@/chat/schema'
-import { CONFIDENCE, GEO_PRECISION, REQUEST_STATUS, REQUEST_WHAT, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY, type RequestStatus } from '@/shared/options'
+import { CONFIDENCE, GEO_PRECISION, ORDER_STATUS, ORDER_STATUS_LABEL, REQUEST_STATUS, REQUEST_WHAT, STUDIO_FORMATS, STUDIO_STATUSES, STUDIO_TYPES, STUDIO_VISIBILITY, type OrderStatus, type RequestStatus } from '@/shared/options'
 import { t } from './i18n'
 
 export const statusLabel = (s: string) => t(`status.${s}`)
@@ -17,6 +17,17 @@ export const STATUS_TONE: Record<RequestStatus, StatusTone> = {
   lost: 'bad',
   closed: 'neutral',
 }
+
+export const ORDER_STATUS_TONE: Record<OrderStatus, StatusTone> = {
+  new: 'warn',
+  confirmed: 'neutral',
+  in_progress: 'neutral',
+  shipped: 'neutral',
+  done: 'good',
+  cancelled: 'bad',
+}
+export const orderStatusLabel = (s: OrderStatus) => ORDER_STATUS_LABEL[s]
+export const orderStatusOptions = ORDER_STATUS.map((value) => ({ value, label: ORDER_STATUS_LABEL[value] }))
 
 export const statusOptions = REQUEST_STATUS.map((value) => ({ value, label: statusLabel(value) }))
 export const whatOptions = REQUEST_WHAT.map((value) => ({ value, label: whatLabel(value) }))
