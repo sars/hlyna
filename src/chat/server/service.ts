@@ -7,7 +7,7 @@ import {
   findByTgMessageId,
   findByVisitorTgChat,
   findOpenByVisitor,
-  otherOpenThreads,
+  openThreads,
   getById,
   getByPublicId,
   getPresence,
@@ -72,9 +72,9 @@ export function createChat(cfg: ChatConfig) {
     return u ? `https://t.me/${u}?start=c_${c.publicId}` : null
   }
 
-  /** The visitor's open thread for this context (a studio, classes in a city, business…), or a new one. */
-  async function open(visitorId: string, page: { threadKey: string; page: string; kind: string; context?: Record<string, unknown>; ipHash?: string | null }) {
-    const existing = await findOpenByVisitor(db, visitorId, page.threadKey)
+  /** The visitor's open thread for this context (a studio, classes in a city, business…), or a new one; `fresh` always starts one. */
+  async function open(visitorId: string, page: { threadKey: string; page: string; kind: string; context?: Record<string, unknown>; ipHash?: string | null; fresh?: boolean }) {
+    const existing = page.fresh ? null : await findOpenByVisitor(db, visitorId, page.threadKey)
     if (existing) {
       if (existing.lastPage !== page.page) return updateConversation(db, existing.id, { lastPage: page.page, context: { ...(existing.context ?? {}), ...(page.context ?? {}) } })
       return existing
@@ -111,7 +111,7 @@ export function createChat(cfg: ChatConfig) {
     }
 
     const presence = await getPresence(db)
-    const others = await otherOpenThreads(db, c.visitorId, c.id)
+    const others = (await openThreads(db, c.visitorId)).filter((o) => o.id !== c.id && o.first).slice(0, 3)
     const context = await cfg.context(c, { presenceOnline: presence.online, otherThreads: others.map((o) => ({ page: o.page ?? '', first: o.first ?? '' })) })
     let turn: TurnResult
     try {
@@ -145,11 +145,6 @@ export function createChat(cfg: ChatConfig) {
     if (presence.online && Date.now() - new Date(c.handoffAt).getTime() < CONTACT_NUDGE_MS) return null
     await updateConversation(db, c.id, { contactAskedAt: new Date().toISOString() })
     return addMessage(db, c.id, 'assistant', TEXT.askContact, { meta: { nudge: true } })
-  }
-
-  /** «Нова розмова»: the visitor closes the thread; the next message opens a fresh one. */
-  async function close(c: Conversation) {
-    return closeConversation(db, c, transport)
   }
 
   async function contact(c: Conversation, type: string, value: string) {
@@ -257,10 +252,9 @@ export function createChat(cfg: ChatConfig) {
     send,
     nudge,
     contact,
-    close,
     telegramLink,
-    /** The visitor's other open threads, named for a list (newest first). */
-    otherThreads: async (c: Conversation) => (await otherOpenThreads(db, c.visitorId, c.id, 5)).map((o) => ({ page: o.page ?? '/', label: threadLabel(o.kind, o.context, o.page ?? '/') })),
+    /** The visitor's open threads, named for a list (newest first). */
+    threads: async (visitorId: string) => (await openThreads(db, visitorId)).map((o) => ({ id: o.publicId, thread: o.threadKey, page: o.page ?? '/', label: threadLabel(o.kind, o.context, o.page ?? '/'), at: o.updatedAt, count: o.count })),
     presence: () => getPresence(db),
     messagesAfter: (c: Conversation, afterId: number) => listMessages(db, c.id, { afterId }),
     get: (id: number) => getById(db, id),

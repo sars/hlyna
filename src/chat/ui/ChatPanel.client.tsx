@@ -284,15 +284,26 @@ export function ChatPanel(p: ChatPanelProps) {
     el.style.height = `${Math.min(el.scrollHeight, 160)}px`
   }
 
-  const startNew = async () => {
-    if (!conv || busy) return
-    await fetch(`${api}/${conv.id}/close`, { method: 'POST', credentials: 'same-origin' }).catch(() => {})
-    setConv(null)
-    setMessages([])
+  const show = (d: { conversation: PublicConversation; messages: PublicMessage[] }) => {
     setStreaming(null)
     setError(null)
+    setMessages([])
     lastId.current = 0
     seenState.current = { waiting: false, contact: false, request: false }
+    applyState(d.conversation)
+    for (const m of d.messages) append(m)
+  }
+  /** «＋ нова»: a fresh thread for this page; the old ones stay in the list. */
+  const startNew = async () => {
+    if (busy) return
+    const r = await fetch(`${api}/open`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ page: p.page, kind: p.kind, thread: p.thread, fresh: true, context: p.context ?? {} }) }).catch(() => null)
+    if (r?.ok) show((await r.json()) as { conversation: PublicConversation; messages: PublicMessage[] })
+  }
+  /** Another thread from the list, shown here without leaving the page. */
+  const openThread = async (id: string) => {
+    if (busy || id === conv?.id) return
+    const r = await fetch(`${api}/${id}`, { credentials: 'same-origin' }).catch(() => null)
+    if (r?.ok) show((await r.json()) as { conversation: PublicConversation; messages: PublicMessage[] })
   }
 
   const saveContact = async () => {
@@ -330,19 +341,24 @@ export function ChatPanel(p: ChatPanelProps) {
           ? 'Людина з Глини на зв’язку'
           : 'Розмову завершено. Напишіть, якщо з’явиться питання'
   const hasThread = messages.length > 0 || streaming !== null
+  // The page's greeting opens only its own thread; another thread shown here starts with its own lines.
+  const ownThread = !conv || conv.thread === p.thread
+  const threads = conv?.threads ?? []
+  // An empty thread is «нова»; two threads with one name are told apart by their time.
+  const labelOf = (t: { id: string; label: string; at: string; count: number }) => (t.count === 0 ? `${t.label} · нова` : threads.filter((x) => x.label === t.label && x.count > 0).length > 1 ? `${t.label} · ${timeOf(t.at)}` : t.label)
 
   const opener = (
     <li className="hl-chat-row" data-role="assistant">
       <div className="hl-chat-who">{WHO.assistant}</div>
       <p className="hl-chat-text">
-        <span id={`${uid}-h`}>{p.title}</span> {p.intro}
+        <span>{p.title}</span> {p.intro}
       </p>
     </li>
   )
 
   const thread = (
     <ol className="hl-chat-thread m-0 list-none p-0" aria-live="polite" aria-relevant="additions">
-      {opener}
+      {ownThread && opener}
       {messages.map((m) => (
         <li key={m.id} className="hl-chat-row" data-role={m.role}>
           {m.role !== 'system' && (
@@ -457,40 +473,38 @@ export function ChatPanel(p: ChatPanelProps) {
     </p>
   )
 
-  const otherThreads = conv && conv.threads.length > 0 && (
-    <p className="hl-chat-note m-0">
-      Ваші інші розмови:{' '}
-      {conv.threads.map((t, i) => (
-        <React.Fragment key={t.page}>
-          {i > 0 && ' · '}
-          <a href={`${t.page}#zapyt-forma`}>{t.label}</a>
-        </React.Fragment>
+  // The thread list: this page's thread and the others, switched here; «＋ нова» starts another on this page.
+  const threadRow = conv && threads.length > 0 && (
+    <nav className="hl-threads" aria-label="Ваші розмови">
+      {threads.map((t) => (
+        <button key={t.id} type="button" className="hl-thread" aria-current={t.id === conv.id ? 'true' : undefined} onClick={() => void openThread(t.id)} disabled={busy}>
+          {labelOf(t)}
+        </button>
       ))}
-    </p>
+      {messages.length > 0 && (
+        <button type="button" className="hl-thread" data-new="" onClick={() => void startNew()} disabled={busy}>
+          + нова
+        </button>
+      )}
+    </nav>
   )
 
   const footNote = (
     <p className="hl-chat-note m-0">
       Для замовника безкоштовно · <a href={p.fallbackHref}>форма замість чату</a>
-      {conv && messages.length > 0 && (
-        <>
-          {' '}
-          ·{' '}
-          <button type="button" onClick={() => void startNew()}>
-            нова розмова
-          </button>
-        </>
-      )}
     </p>
   )
 
   return (
     <>
-      <section id="zapyt-forma" data-chat="" data-tone="cobalt" aria-labelledby={`${uid}-h`} className="group/tone grid gap-3.5 bg-cobalt p-[clamp(18px,2.4vw,28px)] text-paper">
-        <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-          <span className="font-mono text-kicker leading-[1.4] uppercase text-on-cobalt-2">{p.kicker}</span>
-          <span className="hl-chat-note">{status}</span>
-        </div>
+      <section id="zapyt-forma" data-chat="" data-tone="cobalt" aria-label="Чат з Глиною" className="group/tone grid gap-3.5 bg-cobalt p-[clamp(18px,2.4vw,28px)] text-paper">
+        <header className="grid gap-2 border-b border-rule-on-dark pb-3">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <span className="font-mono text-kicker leading-[1.4] uppercase text-paper">{p.kicker}</span>
+            <span className="hl-chat-note">{status}</span>
+          </div>
+          {threadRow}
+        </header>
         <div ref={inlineScroll} className={hasThread ? 'hl-chat-scroll' : undefined}>
           {thread}
         </div>
@@ -498,7 +512,6 @@ export function ChatPanel(p: ChatPanelProps) {
         {!expanded && waitingExtras}
         {composer(inlineArea, 'inline')}
         {errorLine}
-        {otherThreads}
         {footNote}
         <noscript>
           <p className="m-0 text-[15px]">
@@ -519,6 +532,7 @@ export function ChatPanel(p: ChatPanelProps) {
                 Закрити
               </button>
             </div>
+            {threadRow && <div className="px-gutter pt-2">{threadRow}</div>}
             <div ref={dialogScroll} className="hl-chat-dlg-body">
               {thread}
               {chips && <div className="mt-3">{chips}</div>}
@@ -527,7 +541,6 @@ export function ChatPanel(p: ChatPanelProps) {
               {waitingExtras}
               {composer(dialogArea, 'dialog')}
               {errorLine}
-              {otherThreads}
             </div>
           </>
         )}

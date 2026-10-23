@@ -40,18 +40,24 @@ export async function findOpenByVisitor(db: ChatDb, visitorId: string, threadKey
   return row ?? null
 }
 
-/** The visitor's other open threads (the assistant is told what else they asked about). */
-export async function otherOpenThreads(db: ChatDb, visitorId: string, exceptId: number, limit = 3) {
+/** The visitor's open threads, newest first (the panel lists them; the assistant is told about the others). */
+// Correlated subqueries name the outer column in full: in a single-table select drizzle renders ${conversations.id}
+// as a bare "id", which binds to the subquery's own table (see src/server/db/index.ts).
+export async function openThreads(db: ChatDb, visitorId: string, limit = 8) {
   return db
     .select({
       id: conversations.id,
+      publicId: conversations.publicId,
+      threadKey: conversations.threadKey,
       page: conversations.lastPage,
       kind: conversations.kind,
       context: conversations.context,
-      first: sql<string | null>`(select m.text from chat.messages m where m.conversation_id = ${conversations.id} and m.role = 'visitor' order by m.id limit 1)`,
+      updatedAt: conversations.updatedAt,
+      first: sql<string | null>`(select m.text from chat.messages m where m.conversation_id = "chat"."conversations"."id" and m.role = 'visitor' order by m.id limit 1)`,
+      count: sql<number>`(select count(*)::int from chat.messages m where m.conversation_id = "chat"."conversations"."id" and m.role <> 'system')`,
     })
     .from(conversations)
-    .where(and(eq(conversations.visitorId, visitorId), ne(conversations.id, exceptId), ne(conversations.status, 'closed')))
+    .where(and(eq(conversations.visitorId, visitorId), ne(conversations.status, 'closed')))
     .orderBy(desc(conversations.updatedAt))
     .limit(limit)
 }
@@ -187,8 +193,8 @@ export async function listConversations(db: ChatDb, f: { status?: ChatStatus | '
       turns: conversations.turns,
       createdAt: conversations.createdAt,
       updatedAt: conversations.updatedAt,
-      first: sql<string | null>`(select m.text from chat.messages m where m.conversation_id = ${conversations.id} and m.role = 'visitor' order by m.id limit 1)`,
-      count: sql<number>`(select count(*)::int from chat.messages m where m.conversation_id = ${conversations.id})`,
+      first: sql<string | null>`(select m.text from chat.messages m where m.conversation_id = "chat"."conversations"."id" and m.role = 'visitor' order by m.id limit 1)`,
+      count: sql<number>`(select count(*)::int from chat.messages m where m.conversation_id = "chat"."conversations"."id")`,
     })
     .from(conversations)
     .where(where.length ? and(...where) : undefined)

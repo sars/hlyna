@@ -406,6 +406,20 @@ describe('one open thread per visitor and context', () => {
     await updateConversation(db, a.id, { status: 'closed' })
     const c = await open('v9', '/c')
     expect(c.id).not.toBe(a.id)
+    // «＋ нова»: another thread for the same context; both stay open and listed, newest first.
+    const d = await chat.open('v9', { threadKey: 'profile:yar', page: '/c', kind: 'profile', fresh: true })
+    expect(d.id).not.toBe(c.id)
+    expect((await chat.current('v9', 'profile:yar'))?.conversation.id).toBe(d.id)
+    const list = await chat.threads('v9')
+    expect(list.map((t) => t.id)).toEqual([d.publicId, c.publicId, biz.publicId])
+    expect(list.map((t) => t.count)).toEqual([0, 0, 0])
+    script.push({ text: 'ок' })
+    await chat.send(c, 'Привіт', { ip: '1.1.1.1', via: 'site' })
+    const after = await chat.threads('v9')
+    expect(after[0]).toMatchObject({ id: c.publicId, count: 2 })
+    expect(after.find((t) => t.id === d.publicId)?.count).toBe(0)
+    const panel = await chat.list({ status: 'open' })
+    expect(panel.rows.find((r) => r.id === c.id)).toMatchObject({ count: 2, first: 'Привіт' })
   })
 
   it('the assistant is told about the visitor\'s other open threads', async () => {

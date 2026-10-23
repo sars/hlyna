@@ -22,10 +22,11 @@ export type PublicConversation = {
   telegram: boolean
   telegramLink: string | null
   humanOnline: boolean
-  /** Where the visitor last wrote from. */
+  /** The thread's context key and where the visitor last wrote from. */
+  thread: string
   lastPage: string
-  /** The visitor's other open threads: where to find them and how they are named. */
-  threads: { page: string; label: string }[]
+  /** The visitor's open threads, this one included, newest first. */
+  threads: { id: string; thread: string; page: string; label: string; at: string; count: number }[]
 }
 export type PublicMessage = { id: number; role: Message['role']; text: string; at: string }
 
@@ -61,8 +62,8 @@ export function chatHttp(deps: HttpDeps) {
 
   async function pub(c: Conversation): Promise<PublicConversation> {
     const chat = deps.chat()
-    const [link, presence, threads] = await Promise.all([chat.telegramLink(c), chat.presence(), chat.otherThreads(c)])
-    return { id: c.publicId, status: c.status, kind: c.kind, hasContact: Boolean(c.contact), requestId: c.requestId, telegram: Boolean(c.visitorTgChatId), telegramLink: link, humanOnline: presence.online, lastPage: c.lastPage ?? c.page, threads }
+    const [link, presence, threads] = await Promise.all([chat.telegramLink(c), chat.presence(), chat.threads(c.visitorId)])
+    return { id: c.publicId, status: c.status, kind: c.kind, hasContact: Boolean(c.contact), requestId: c.requestId, telegram: Boolean(c.visitorTgChatId), telegramLink: link, humanOnline: presence.online, thread: c.threadKey, lastPage: c.lastPage ?? c.page, threads }
   }
 
   /** The conversation a request may touch: by public id, and only the visitor whose cookie opened it. */
@@ -77,7 +78,7 @@ export function chatHttp(deps: HttpDeps) {
     /** POST {page, kind, context}: the visitor's open conversation (or a fresh one); sets the visitor cookie. */
     async open(req: Request) {
       if (!deps.enabled()) return json({ error: 'off' }, { status: 503 })
-      const body = (await req.json().catch(() => null)) as { page?: string; kind?: string; thread?: string; context?: Record<string, unknown> } | null
+      const body = (await req.json().catch(() => null)) as { page?: string; kind?: string; thread?: string; fresh?: boolean; context?: Record<string, unknown> } | null
       const page = typeof body?.page === 'string' && body.page.startsWith('/') ? body.page.slice(0, 300) : '/'
       const kind = typeof body?.kind === 'string' ? body.kind.slice(0, 20) : 'other'
       const threadKey = typeof body?.thread === 'string' ? body.thread.slice(0, 200) : page
@@ -89,7 +90,7 @@ export function chatHttp(deps: HttpDeps) {
         visitor = newVisitor()
         headers['set-cookie'] = cookieHeader(req, visitor)
       }
-      const c = await deps.chat().open(visitor, { threadKey, page, kind, context, ipHash: deps.ipHash(ip) })
+      const c = await deps.chat().open(visitor, { threadKey, page, kind, context, ipHash: deps.ipHash(ip), fresh: body?.fresh === true })
       const messages = await deps.chat().messagesAfter(c, 0)
       return json({ conversation: await pub(c), messages: messages.map(pubMsg) }, { headers })
     },
@@ -198,13 +199,13 @@ export function chatHttp(deps: HttpDeps) {
       return new Response(stream, { headers: SSE_HEADERS })
     },
 
-    /** POST: «Нова розмова» closes this thread. */
-    async close(req: Request, publicId: string) {
+    /** GET: one of the visitor's threads with its messages (switching threads in place). */
+    async get(req: Request, publicId: string) {
       if (!deps.enabled()) return json({ error: 'off' }, { status: 503 })
       const c = await own(req, publicId)
       if (!c) return json({ error: 'Розмову не знайдено.' }, { status: 404 })
-      await deps.chat().close(c)
-      return json({ ok: true })
+      const messages = await deps.chat().messagesAfter(c, 0)
+      return json({ conversation: await pub(c), messages: messages.map(pubMsg) })
     },
 
     /** POST {type, value}: a contact typed into the panel's own field (outside the model). */
