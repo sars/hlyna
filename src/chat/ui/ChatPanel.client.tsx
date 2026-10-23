@@ -232,6 +232,10 @@ export function ChatPanel(p: ChatPanelProps) {
         let c = conv
         if (!c) {
           const r = await fetch(`${api}/open`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ page: p.page, kind: p.kind, thread: p.thread, context: p.context ?? {} }) })
+          if (r.status === 503) {
+            setError('Чат зараз вимкнено.')
+            return
+          }
           if (!r.ok) throw new Error('open')
           const d = (await r.json()) as { conversation: PublicConversation; messages: PublicMessage[] }
           c = d.conversation

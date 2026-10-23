@@ -19,7 +19,12 @@ import { CHAT_INSTRUCTIONS } from './chatPrompt'
 // is gone from the site; copy src/chat elsewhere and write another adapter.
 
 export const CHAT_MODEL = process.env.CHAT_MODEL || 'gpt-5.5'
+/** The API answers only with a key. */
 export const chatEnabled = () => Boolean(process.env.OPENAI_API_KEY) && process.env.CHAT_ENABLED !== '0'
+/** Pages show the chat unless it is switched off: they are pre-rendered at build time, where no key is present
+ * (the image build only gets the database), so the key must not decide what the HTML holds. Without a key the
+ * panel's first send fails with a plain line and the link to the form. */
+export const chatShown = () => process.env.CHAT_ENABLED !== '0'
 
 const profileUrl = (slug: string) => `${site.url}/vyrobnyky/${slug}`
 
