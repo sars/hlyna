@@ -167,7 +167,7 @@ export function createChat(cfg: ChatConfig) {
   // ---------- Telegram: the owner's replies and buttons, and visitors who continued in Telegram
 
   type Msg = { message_id: number; chat: { id: number }; text?: string; reply_to_message?: { message_id: number; text?: string } }
-  type Update = { callback_query?: { id: string; from: { id: number }; data?: string; message?: Msg }; message?: Msg & { from?: { id: number } } }
+  type Update = { callback_query?: { id: string; from: { id: number }; data?: string; message?: Msg }; message?: Msg & { from?: { id: number; first_name?: string; username?: string } } }
 
   /** Returns true when the update was about the chat (so the site's webhook stops there). */
   async function handleTelegramUpdate(update: Update, ownerChatId: string, siteUrl: string): Promise<boolean> {
@@ -199,6 +199,11 @@ export function createChat(cfg: ChatConfig) {
     const m = update.message
     if (!m?.text) return false
     const text = m.text.trim()
+    // «/chatid» anywhere: the id to put into TELEGRAM_CHAT_ID (a group's id is negative).
+    if (/^\/chatid(@\w+)?$/.test(text)) {
+      await transport.sendTo(m.chat.id, `chat id: ${m.chat.id}`)
+      return true
+    }
 
     if (String(m.chat.id) === ownerChatId) {
       await touchOwner(db)
@@ -221,7 +226,7 @@ export function createChat(cfg: ChatConfig) {
         await closeConversation(db, c, transport)
         return true
       }
-      await humanReply(db, c, text, transport, m.message_id)
+      await humanReply(db, c, text, transport, m.message_id, m.from?.first_name ?? m.from?.username)
       return true
     }
 

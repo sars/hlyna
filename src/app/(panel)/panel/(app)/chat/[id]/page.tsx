@@ -56,7 +56,8 @@ export default async function ChatTranscriptPage({ params }: { params: Promise<{
           {messages.map((m) => (
             <div key={m.id} className={`border-l-2 pl-3 ${ROLE_CLASS[m.role] ?? ''}`}>
               <div className="text-xs text-muted-foreground">
-                {t(`chat.role.${m.role}`)} · {formatDateTime(m.createdAt)}
+                {t(`chat.role.${m.role}`)}
+                {m.meta && typeof m.meta.who === 'string' ? ` (${m.meta.who})` : ''} · {formatDateTime(m.createdAt)}
                 {m.meta && 'tools' in m.meta && Array.isArray(m.meta.tools) && m.meta.tools.length > 0 ? ` · ${(m.meta.tools as { name: string }[]).map((x) => x.name).join(', ')}` : ''}
               </div>
               <p className="m-0 text-sm break-words whitespace-pre-line">{m.text}</p>

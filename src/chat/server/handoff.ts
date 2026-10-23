@@ -82,9 +82,9 @@ export async function takeOver(db: ChatDb, c: Conversation, t: Transport) {
 }
 
 /** A person's reply from Telegram lands in the thread (and in the visitor's Telegram, if linked). */
-export async function humanReply(db: ChatDb, c: Conversation, text: string, t: Transport, tgMessageId?: number) {
+export async function humanReply(db: ChatDb, c: Conversation, text: string, t: Transport, tgMessageId?: number, who?: string) {
   const conv = c.status === 'human' ? c : await takeOver(db, c, t)
-  const m = await addMessage(db, conv.id, 'human', text, { tgMessageId: tgMessageId ?? null, meta: { via: 'telegram' } })
+  const m = await addMessage(db, conv.id, 'human', text, { tgMessageId: tgMessageId ?? null, meta: { via: 'telegram', ...(who ? { who } : {}) } })
   if (conv.visitorTgChatId) await t.sendTo(conv.visitorTgChatId, text)
   return m
 }
