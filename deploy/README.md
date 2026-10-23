@@ -134,3 +134,18 @@ data (the build fails if it sees fewer than 100 studios). Pages re-render only a
 scripts call `revalidateTag('studios', 'max')`) or once a day in the background; readers always get ready HTML and
 never wait for a render. `POST /revalidate?secret=…` does the same for the whole catalogue; add `&all=1` to drop
 every page's HTML (the next visit to each page then waits for a fresh render).
+
+## Крамниця (shop) on production
+
+First deploy of the shop (docs/shop/PLAN.md, docs/STATUS.md «Крамниця»): apply migration 0010, add `TELEGRAM_BOT_USERNAME` to the
+server `.env` (the owners' «Підключити Telegram» link), then fill the data through the tunnel:
+
+```bash
+PROD=1 PHOTOS=1 MEDIA_DIR=/tmp/hlyna-media-shop pnpm exec tsx scripts/app/read-shops.ts      # items, stock, the partner's photos → the folder
+tar -C /tmp/hlyna-media-shop -cf - . | ssh hlyna 'cd /opt/hlyna && docker compose exec -T app tar -C /app/public/media -xf -'
+PROD=1 EDITS=scripts/app/edits/2026-10-24-osonnia-shop.json pnpm exec tsx scripts/app/edit-items.ts   # our text, specs, categories, shop terms
+```
+
+Daily: `read-shops.ts` without `PHOTOS` (stock and prices; the freshness rule) — a cron like the log digest, or run it from the Mac.
+Orders need no deploy step: they reach the owner's Telegram group and `/panel/zamovlennia`; studios handle theirs in `/kabinet`.
+Google Merchant Center reads `/kramnytsia/feed.xml`.
