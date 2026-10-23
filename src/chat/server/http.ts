@@ -75,9 +75,10 @@ export function chatHttp(deps: HttpDeps) {
     /** POST {page, kind, context}: the visitor's open conversation (or a fresh one); sets the visitor cookie. */
     async open(req: Request) {
       if (!deps.enabled()) return json({ error: 'off' }, { status: 503 })
-      const body = (await req.json().catch(() => null)) as { page?: string; kind?: string; context?: Record<string, unknown> } | null
+      const body = (await req.json().catch(() => null)) as { page?: string; kind?: string; thread?: string; context?: Record<string, unknown> } | null
       const page = typeof body?.page === 'string' && body.page.startsWith('/') ? body.page.slice(0, 300) : '/'
       const kind = typeof body?.kind === 'string' ? body.kind.slice(0, 20) : 'other'
+      const threadKey = typeof body?.thread === 'string' ? body.thread.slice(0, 200) : page
       const context = body?.context && typeof body.context === 'object' ? Object.fromEntries(Object.entries(body.context).filter(([k, v]) => /^[a-zA-Z]+$/.test(k) && typeof v === 'string').map(([k, v]) => [k, String(v).slice(0, 200)])) : {}
       const ip = deps.clientIp(req.headers)
       let visitor = visitorOf(req)
@@ -86,17 +87,18 @@ export function chatHttp(deps: HttpDeps) {
         visitor = newVisitor()
         headers['set-cookie'] = cookieHeader(req, visitor)
       }
-      const c = await deps.chat().open(visitor, { page, kind, context, ipHash: deps.ipHash(ip) })
+      const c = await deps.chat().open(visitor, { threadKey, page, kind, context, ipHash: deps.ipHash(ip) })
       const messages = await deps.chat().messagesAfter(c, 0)
       return json({ conversation: await pub(c), messages: messages.map(pubMsg) }, { headers })
     },
 
-    /** GET: the open conversation for this visitor, if any (no cookie is set here). */
+    /** GET ?thread=<key>: the visitor's open thread for this context, if any (no cookie is set here). */
     async current(req: Request) {
       if (!deps.enabled()) return json({ conversation: null })
       const visitor = visitorOf(req)
       if (!visitor) return json({ conversation: null })
-      const cur = await deps.chat().current(visitor)
+      const threadKey = new URL(req.url).searchParams.get('thread') ?? ''
+      const cur = await deps.chat().current(visitor, threadKey)
       if (!cur) return json({ conversation: null })
       return json({ conversation: await pub(cur.conversation), messages: cur.messages.map(pubMsg) })
     },

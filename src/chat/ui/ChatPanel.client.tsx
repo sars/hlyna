@@ -12,6 +12,8 @@ import type { PublicConversation, PublicMessage } from '../server/http'
 export type ChatPanelProps = {
   page: string
   kind: string
+  /** The thread this panel belongs to (one open conversation per visitor and thread). */
+  thread: string
   context?: Record<string, string>
   kicker: string
   title: string
@@ -34,7 +36,10 @@ const timeOf = (iso: string) => {
 }
 
 const URL_RE = /https?:\/\/[^\s<>()«»"']+[^\s<>()«»"'.,:;!?]/g
-function Linked({ text }: { text: string }) {
+/** «1 600 грн» and «3–8 тижнів» stay on one line. */
+const tidy = (t: string) => t.replace(/(\d)\s(?=\d{3}(?!\d))/g, '$1\u00a0').replace(/(\d)\s(грн|тижн|год|хв|осіб|шт)/g, '$1\u00a0$2')
+function Linked({ text: raw }: { text: string }) {
+  const text = tidy(raw)
   const out: React.ReactNode[] = []
   let last = 0
   for (const m of text.matchAll(URL_RE)) {
@@ -146,7 +151,7 @@ export function ChatPanel(p: ChatPanelProps) {
   useEffect(() => {
     if (restored.current) return
     restored.current = true
-    fetch(`${api}/current`, { credentials: 'same-origin' })
+    fetch(`${api}/current?thread=${encodeURIComponent(p.thread)}`, { credentials: 'same-origin' })
       .then((r) => (r.ok ? r.json() : null))
       .then((d: { conversation: PublicConversation | null; messages?: PublicMessage[] } | null) => {
         if (!d?.conversation) return
@@ -154,7 +159,7 @@ export function ChatPanel(p: ChatPanelProps) {
         for (const m of d.messages ?? []) append(m)
       })
       .catch(() => {})
-  }, [api, append, applyState])
+  }, [api, append, applyState, p.thread])
 
   // ---------- a person's replies and status, while there is a conversation
   useEffect(() => {
@@ -222,7 +227,7 @@ export function ChatPanel(p: ChatPanelProps) {
       try {
         let c = conv
         if (!c) {
-          const r = await fetch(`${api}/open`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ page: p.page, kind: p.kind, context: p.context ?? {} }) })
+          const r = await fetch(`${api}/open`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ page: p.page, kind: p.kind, thread: p.thread, context: p.context ?? {} }) })
           if (!r.ok) throw new Error('open')
           const d = (await r.json()) as { conversation: PublicConversation; messages: PublicMessage[] }
           c = d.conversation
@@ -265,7 +270,7 @@ export function ChatPanel(p: ChatPanelProps) {
         setSending(false)
       }
     },
-    [api, append, applyState, busy, conv, messages, p.context, p.kind, p.page, track],
+    [api, append, applyState, busy, conv, messages, p.context, p.kind, p.page, p.thread, track],
   )
 
   const onKey = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -325,18 +330,12 @@ export function ChatPanel(p: ChatPanelProps) {
           ? 'Людина з Глини на зв’язку'
           : 'Розмову завершено. Напишіть, якщо з’явиться питання'
   const hasThread = messages.length > 0 || streaming !== null
-  // The thread came from another page: say so, the assistant is told where the visitor is on the next line.
-  const movedHere = Boolean(conv && messages.length && conv.lastPage !== p.page)
 
   const opener = (
     <li className="hl-chat-row" data-role="assistant">
       <div className="hl-chat-who">{WHO.assistant}</div>
       <p className="hl-chat-text">
-        <strong id={`${uid}-h`} className="font-semibold">
-          {p.title}
-        </strong>
-        <br />
-        {p.intro}
+        <span id={`${uid}-h`}>{p.title}</span> {p.intro}
       </p>
     </li>
   )
@@ -356,11 +355,6 @@ export function ChatPanel(p: ChatPanelProps) {
           </p>
         </li>
       ))}
-      {movedHere && streaming === null && (
-        <li className="hl-chat-row" data-role="system">
-          <p className="hl-chat-text">Ви перейшли на іншу сторінку. Розмова триває, помічник знає, де ви.</p>
-        </li>
-      )}
       {streaming !== null && (
         <li className="hl-chat-row" data-role="assistant">
           <div className="hl-chat-who">

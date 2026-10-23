@@ -75,7 +75,7 @@ const chat = createChat({
   llm,
   model: 'fake',
   instructions: 'test instructions',
-  context: async (c, x) => `page ${c.lastPage} online ${x.presenceOnline}`,
+  context: async (c, x) => `page ${c.lastPage} online ${x.presenceOnline}${x.otherThreads.length ? ` other ${x.otherThreads.map((o) => `${o.page} ${o.first}`).join(' | ')}` : ''}`,
   tools: [echo],
   transport,
   rateLimited: async (key, max) => {
@@ -100,7 +100,7 @@ afterAll(async () => {
   await pool.end()
 })
 
-const open = (visitor = 'v1', page = '/vyrobnyky/yar') => chat.open(visitor, { page, kind: 'profile', context: { studioName: 'Яр' } })
+const open = (visitor = 'v1', page = '/vyrobnyky/yar', threadKey = 'profile:yar') => chat.open(visitor, { threadKey, page, kind: 'profile', context: { studioName: 'Яр' } })
 
 describe('a turn with the assistant', () => {
   it('streams the answer, stores both messages, tells the owner once', async () => {
@@ -340,7 +340,7 @@ describe('http', () => {
     expect(stored?.ipHash).toBe('h:9.9.9.9')
     const cookieHeader = cookie.split(';')[0]!
 
-    const cur = await http.current(new Request('http://localhost/api/chat/current', { headers: { cookie: cookieHeader } }))
+    const cur = await http.current(new Request('http://localhost/api/chat/current?thread=%2Fdlya-biznesu', { headers: { cookie: cookieHeader } }))
     expect(((await cur.json()) as { conversation: { id: string } }).conversation.id).toBe(d1.conversation.id)
     expect(((await (await http.current(new Request('http://localhost/api/chat/current'))).json()) as { conversation: null }).conversation).toBeNull()
 
@@ -392,15 +392,31 @@ describe('http', () => {
   })
 })
 
-describe('one open conversation per visitor', () => {
-  it('open() returns the same conversation on another page and updates the context', async () => {
+describe('one open thread per visitor and context', () => {
+  it('open() returns the same thread for the same context, another for another, and a new one after closing', async () => {
     const a = await open('v9', '/a')
-    const b = await chat.open('v9', { page: '/b', kind: 'home', context: { city: 'Львів' } })
+    const b = await chat.open('v9', { threadKey: 'profile:yar', page: '/b', kind: 'home', context: { city: 'Львів' } })
     expect(b.id).toBe(a.id)
     expect(b.lastPage).toBe('/b')
     expect(b.context).toEqual({ studioName: 'Яр', city: 'Львів' })
+    const biz = await chat.open('v9', { threadKey: 'business', page: '/dlya-biznesu', kind: 'business' })
+    expect(biz.id).not.toBe(a.id)
+    expect((await chat.current('v9', 'business'))?.conversation.id).toBe(biz.id)
+    expect((await chat.current('v9', 'profile:yar'))?.conversation.id).toBe(a.id)
     await updateConversation(db, a.id, { status: 'closed' })
     const c = await open('v9', '/c')
     expect(c.id).not.toBe(a.id)
+  })
+
+  it('the assistant is told about the visitor\'s other open threads', async () => {
+    const a = await open('v9', '/vyrobnyky/yar')
+    script.push({ text: 'ок' })
+    await chat.send(a, 'Хочу 30 чашок', { ip: '1.1.1.1', via: 'site' })
+    const biz = await chat.open('v9', { threadKey: 'business', page: '/dlya-biznesu', kind: 'business' })
+    script.push({ text: 'ок' })
+    await chat.send(biz, 'Терміни?', { ip: '1.1.1.1', via: 'site' })
+    const input = seenParams.at(-1)!.input as { role?: string; content?: string }[]
+    expect(input[0]!.content).toContain('/vyrobnyky/yar')
+    expect(input[0]!.content).toContain('Хочу 30 чашок')
   })
 })

@@ -22,8 +22,10 @@ export const conversations = chat.table(
     id: serial('id').primaryKey(),
     /** Unguessable id the browser and the Telegram deep link use (never the serial). */
     publicId: text('public_id').notNull().unique(),
-    /** Cookie id of the visitor; one open conversation per visitor. */
+    /** Cookie id of the visitor; one open conversation per visitor and thread. */
     visitorId: text('visitor_id').notNull(),
+    /** What the thread is about: a studio (profile:<slug>), classes in a city, business, home… (set by the host). */
+    threadKey: text('thread_key').notNull().default(''),
     status: chatStatus('status').notNull().default('ai'),
     /** Page the conversation started on, and the kind of opener it got (profile, business, classes, home…). */
     page: text('page').notNull(),
@@ -52,7 +54,7 @@ export const conversations = chat.table(
     createdAt: ts('created_at').notNull().defaultNow(),
     updatedAt: ts('updated_at').notNull().defaultNow(),
   },
-  (t) => [index('chat_conversations_visitor_idx').on(t.visitorId, t.status), index('chat_conversations_created_idx').on(t.createdAt), index('chat_conversations_head_idx').on(t.tgHeadMessageId)],
+  (t) => [index('chat_conversations_visitor_idx').on(t.visitorId, t.threadKey, t.status), index('chat_conversations_created_idx').on(t.createdAt), index('chat_conversations_head_idx').on(t.tgHeadMessageId)],
 )
 
 export const messages = chat.table(

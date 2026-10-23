@@ -37,7 +37,7 @@ export type ChatConfig = {
   /** Stable instructions (cached across requests): who the assistant is, the rules. */
   instructions: string
   /** Facts about this conversation for this turn: page, studio, city, state. Rebuilt every turn. */
-  context: (c: Conversation, extra: { presenceOnline: boolean }) => Promise<string> | string
+  context: (c: Conversation, extra: { presenceOnline: boolean; otherThreads: { page: string; first: string }[] }) => Promise<string> | string
   tools: ToolDef[]
   transport: Transport
   /** Fixed-window limit shared with the rest of the site; true means over the limit. */

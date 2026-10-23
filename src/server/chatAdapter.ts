@@ -181,7 +181,7 @@ const KIND_LINE: Record<string, string> = {
   other: '',
 }
 
-async function context(c: Conversation, extra: { presenceOnline: boolean }) {
+async function context(c: Conversation, extra: { presenceOnline: boolean; otherThreads: { page: string; first: string }[] }) {
   const ctx = (c.context ?? {}) as { studioSlug?: string; studioName?: string; city?: string }
   const lines = [
     `Сьогодні ${new Intl.DateTimeFormat('uk-UA', { dateStyle: 'long', timeZone: 'Europe/Kyiv' }).format(new Date())}.`,
@@ -195,6 +195,7 @@ async function context(c: Conversation, extra: { presenceOnline: boolean }) {
       lines.push(`Студія сторінки: ${JSON.stringify(k)}. ${k.acceptsRequests ? 'Вона приймає запити.' : 'Запити їй не надсилаємо (не працює, не підтверджена або це не студія).'}`)
     }
   }
+  if (extra.otherThreads.length) lines.push(`Відвідувач має ще розмови на інших сторінках (для розуміння, не переказуй): ${extra.otherThreads.map((o) => `${o.page}: «${o.first.slice(0, 120)}»`).join('; ')}.`)
   lines.push(`Людина з Глини зараз ${extra.presenceOnline ? 'онлайн' : 'офлайн'}.`)
   lines.push(`Стан розмови: ${c.status}; контакт ${c.contact ? 'є' : 'ще не збережено'}; запит ${c.requestId ? `№${c.requestId} уже створено` : 'не створено'}${c.visitorTgChatId ? '; відвідувач також у Telegram' : ''}.`)
   return lines.join('\n')

@@ -7,5 +7,7 @@ import { chatOpener, type ChatKind } from '@/content/chat'
 export function ChatBox({ page, kind, studio, city, classes, business, fallbackHref }: { page: string; kind: ChatKind; studio?: { slug: string; name: string }; city?: string; classes?: boolean; business?: boolean; fallbackHref?: string }) {
   const o = chatOpener(kind, { studioName: studio?.name, city, classes, business })
   const context: Record<string, string> = { ...(studio ? { studioSlug: studio.slug, studioName: studio.name } : {}), ...(city ? { city } : {}) }
-  return <ChatPanel page={page} kind={kind} context={context} kicker={o.kicker} title={o.title} intro={o.intro} chips={o.chips} fallbackHref={fallbackHref ?? '/zapyt'} />
+  // One thread per context: a studio, classes in a city, business pages as one, the home page as one.
+  const thread = kind === 'profile' && studio ? `profile:${studio.slug}` : kind === 'classes' ? `classes:${city ?? ''}` : kind === 'business' || kind === 'home' ? kind : `other:${city ?? page}`
+  return <ChatPanel page={page} kind={kind} thread={thread} context={context} kicker={o.kicker} title={o.title} intro={o.intro} chips={o.chips} fallbackHref={fallbackHref ?? '/zapyt'} />
 }

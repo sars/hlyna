@@ -11,8 +11,10 @@
   .hl-chat-row[data-role='human'] .hl-chat-who { color: var(--color-peach); }
   .hl-chat-text { margin: 0; font-size: 15.5px; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere; }
   .hl-chat-text a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
-  .hl-chat-row[data-role='visitor'] .hl-chat-text { padding: 9px 12px; border-radius: var(--radius-btn); background: var(--color-paper); color: var(--color-ink); }
-  .hl-chat-row[data-role='human'] .hl-chat-text { padding: 9px 12px; border-radius: var(--radius-btn); box-shadow: inset 0 0 0 1.5px var(--color-peach); }
+  .hl-chat-row[data-role='assistant'] .hl-chat-text, .hl-chat-row[data-role='human'] .hl-chat-text, .hl-chat-row[data-role='visitor'] .hl-chat-text { padding: 10px 13px; border-radius: var(--radius-btn); }
+  .hl-chat-row[data-role='assistant'] .hl-chat-text { background: var(--color-cobalt-deep); }
+  .hl-chat-row[data-role='human'] .hl-chat-text { background: var(--color-cobalt-deep); box-shadow: inset 0 0 0 1.5px var(--color-peach); }
+  .hl-chat-row[data-role='visitor'] .hl-chat-text { background: var(--color-paper); color: var(--color-ink); }
   .hl-chat-row[data-role='system'] { justify-self: stretch; max-width: none; text-align: center; padding: 2px 0; }
   .hl-chat-row[data-role='system'] .hl-chat-text { font-family: var(--font-mono); font-size: 11.5px; line-height: 1.4; letter-spacing: 0.02em; color: var(--color-on-cobalt-2); }
   /* «пише…»: three dots that rise in turn. */

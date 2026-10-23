@@ -7,6 +7,7 @@ import {
   findByTgMessageId,
   findByVisitorTgChat,
   findOpenByVisitor,
+  otherOpenThreads,
   getById,
   getByPublicId,
   getPresence,
@@ -71,9 +72,9 @@ export function createChat(cfg: ChatConfig) {
     return u ? `https://t.me/${u}?start=c_${c.publicId}` : null
   }
 
-  /** The visitor's open conversation, or a new one on this page. */
-  async function open(visitorId: string, page: { page: string; kind: string; context?: Record<string, unknown>; ipHash?: string | null }) {
-    const existing = await findOpenByVisitor(db, visitorId)
+  /** The visitor's open thread for this context (a studio, classes in a city, business…), or a new one. */
+  async function open(visitorId: string, page: { threadKey: string; page: string; kind: string; context?: Record<string, unknown>; ipHash?: string | null }) {
+    const existing = await findOpenByVisitor(db, visitorId, page.threadKey)
     if (existing) {
       if (existing.lastPage !== page.page) return updateConversation(db, existing.id, { lastPage: page.page, context: { ...(existing.context ?? {}), ...(page.context ?? {}) } })
       return existing
@@ -81,8 +82,8 @@ export function createChat(cfg: ChatConfig) {
     return createConversation(db, { visitorId, ...page })
   }
 
-  async function current(visitorId: string) {
-    const c = await findOpenByVisitor(db, visitorId)
+  async function current(visitorId: string, threadKey: string) {
+    const c = await findOpenByVisitor(db, visitorId, threadKey)
     if (!c) return null
     return { conversation: c, messages: await listMessages(db, c.id) }
   }
@@ -110,7 +111,8 @@ export function createChat(cfg: ChatConfig) {
     }
 
     const presence = await getPresence(db)
-    const context = await cfg.context(c, { presenceOnline: presence.online })
+    const others = await otherOpenThreads(db, c.visitorId, c.id)
+    const context = await cfg.context(c, { presenceOnline: presence.online, otherThreads: others.map((o) => ({ page: o.page ?? '', first: o.first ?? '' })) })
     let turn: TurnResult
     try {
       turn = await runTurn(

@@ -22,22 +22,37 @@ export function newPublicId(len = 24) {
   return out
 }
 
-export async function createConversation(db: ChatDb, data: { visitorId: string; page: string; kind: string; context?: Record<string, unknown>; ipHash?: string | null }) {
+export async function createConversation(db: ChatDb, data: { visitorId: string; threadKey: string; page: string; kind: string; context?: Record<string, unknown>; ipHash?: string | null }) {
   const [row] = await db
     .insert(conversations)
-    .values({ publicId: newPublicId(), visitorId: data.visitorId, page: data.page, lastPage: data.page, kind: data.kind, context: data.context ?? null, ipHash: data.ipHash ?? null })
+    .values({ publicId: newPublicId(), visitorId: data.visitorId, threadKey: data.threadKey, page: data.page, lastPage: data.page, kind: data.kind, context: data.context ?? null, ipHash: data.ipHash ?? null })
     .returning()
   return row!
 }
 
-export async function findOpenByVisitor(db: ChatDb, visitorId: string) {
+export async function findOpenByVisitor(db: ChatDb, visitorId: string, threadKey: string) {
   const [row] = await db
     .select()
     .from(conversations)
-    .where(and(eq(conversations.visitorId, visitorId), ne(conversations.status, 'closed')))
+    .where(and(eq(conversations.visitorId, visitorId), eq(conversations.threadKey, threadKey), ne(conversations.status, 'closed')))
     .orderBy(desc(conversations.id))
     .limit(1)
   return row ?? null
+}
+
+/** The visitor's other open threads (the assistant is told what else they asked about). */
+export async function otherOpenThreads(db: ChatDb, visitorId: string, exceptId: number, limit = 3) {
+  return db
+    .select({
+      id: conversations.id,
+      page: conversations.lastPage,
+      kind: conversations.kind,
+      first: sql<string | null>`(select m.text from chat.messages m where m.conversation_id = ${conversations.id} and m.role = 'visitor' order by m.id limit 1)`,
+    })
+    .from(conversations)
+    .where(and(eq(conversations.visitorId, visitorId), ne(conversations.id, exceptId), ne(conversations.status, 'closed')))
+    .orderBy(desc(conversations.updatedAt))
+    .limit(limit)
 }
 
 export async function getByPublicId(db: ChatDb, publicId: string) {
