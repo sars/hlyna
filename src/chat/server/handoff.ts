@@ -17,6 +17,16 @@ export const headKeyboard = (c: Pick<Conversation, 'id' | 'status'>, t: Transpor
 
 const KIND_LABEL: Record<string, string> = { profile: 'профіль студії', business: 'для бізнесу', classes: 'майстер-класи', home: 'головна', other: 'сторінка' }
 
+/** How a thread is named in a list: the studio, «Майстер-класи · Львів», «Для бізнесу», «Головна». */
+export function threadLabel(kind: string, context: Record<string, unknown> | null | undefined, page: string) {
+  const ctx = (context ?? {}) as { studioName?: string; city?: string }
+  if (kind === 'profile' && ctx.studioName) return ctx.studioName
+  if (kind === 'classes') return `Майстер-класи${ctx.city ? ` · ${ctx.city}` : ''}`
+  if (kind === 'business') return 'Для бізнесу'
+  if (kind === 'home') return 'Головна'
+  return ctx.city ?? page
+}
+
 export function headText(c: Conversation, first: string) {
   const ctx = (c.context ?? {}) as { studioName?: string; city?: string }
   return [

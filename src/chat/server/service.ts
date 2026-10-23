@@ -1,5 +1,5 @@
 import { runTurn, type TurnResult } from './engine'
-import { closeConversation, ensureHead, handBack, humanReply, linkTelegram, relayVisitor, requestHuman, saveContact, takeOver } from './handoff'
+import { closeConversation, ensureHead, handBack, humanReply, linkTelegram, relayVisitor, requestHuman, saveContact, takeOver, threadLabel } from './handoff'
 import {
   addMessage,
   bumpUsage,
@@ -259,6 +259,8 @@ export function createChat(cfg: ChatConfig) {
     contact,
     close,
     telegramLink,
+    /** The visitor's other open threads, named for a list (newest first). */
+    otherThreads: async (c: Conversation) => (await otherOpenThreads(db, c.visitorId, c.id, 5)).map((o) => ({ page: o.page ?? '/', label: threadLabel(o.kind, o.context, o.page ?? '/') })),
     presence: () => getPresence(db),
     messagesAfter: (c: Conversation, afterId: number) => listMessages(db, c.id, { afterId }),
     get: (id: number) => getById(db, id),

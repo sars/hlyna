@@ -22,8 +22,10 @@ export type PublicConversation = {
   telegram: boolean
   telegramLink: string | null
   humanOnline: boolean
-  /** Where the visitor last wrote from (the page shows a line when they moved on). */
+  /** Where the visitor last wrote from. */
   lastPage: string
+  /** The visitor's other open threads: where to find them and how they are named. */
+  threads: { page: string; label: string }[]
 }
 export type PublicMessage = { id: number; role: Message['role']; text: string; at: string }
 
@@ -59,8 +61,8 @@ export function chatHttp(deps: HttpDeps) {
 
   async function pub(c: Conversation): Promise<PublicConversation> {
     const chat = deps.chat()
-    const [link, presence] = await Promise.all([chat.telegramLink(c), chat.presence()])
-    return { id: c.publicId, status: c.status, kind: c.kind, hasContact: Boolean(c.contact), requestId: c.requestId, telegram: Boolean(c.visitorTgChatId), telegramLink: link, humanOnline: presence.online, lastPage: c.lastPage ?? c.page }
+    const [link, presence, threads] = await Promise.all([chat.telegramLink(c), chat.presence(), chat.otherThreads(c)])
+    return { id: c.publicId, status: c.status, kind: c.kind, hasContact: Boolean(c.contact), requestId: c.requestId, telegram: Boolean(c.visitorTgChatId), telegramLink: link, humanOnline: presence.online, lastPage: c.lastPage ?? c.page, threads }
   }
 
   /** The conversation a request may touch: by public id, and only the visitor whose cookie opened it. */

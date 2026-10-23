@@ -457,6 +457,18 @@ export function ChatPanel(p: ChatPanelProps) {
     </p>
   )
 
+  const otherThreads = conv && conv.threads.length > 0 && (
+    <p className="hl-chat-note m-0">
+      Ваші інші розмови:{' '}
+      {conv.threads.map((t, i) => (
+        <React.Fragment key={t.page}>
+          {i > 0 && ' · '}
+          <a href={`${t.page}#zapyt-forma`}>{t.label}</a>
+        </React.Fragment>
+      ))}
+    </p>
+  )
+
   const footNote = (
     <p className="hl-chat-note m-0">
       Для замовника безкоштовно · <a href={p.fallbackHref}>форма замість чату</a>
@@ -486,6 +498,7 @@ export function ChatPanel(p: ChatPanelProps) {
         {!expanded && waitingExtras}
         {composer(inlineArea, 'inline')}
         {errorLine}
+        {otherThreads}
         {footNote}
         <noscript>
           <p className="m-0 text-[15px]">
@@ -514,6 +527,7 @@ export function ChatPanel(p: ChatPanelProps) {
               {waitingExtras}
               {composer(dialogArea, 'dialog')}
               {errorLine}
+              {otherThreads}
             </div>
           </>
         )}

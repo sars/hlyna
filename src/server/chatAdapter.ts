@@ -236,9 +236,14 @@ function openai() {
   return (globalForChat.hlynaOpenAI ??= new OpenAI({ timeout: 60_000, maxRetries: 1 }))
 }
 
-/** The site's chat, built once per process. */
+/** The site's chat, built once per process (in development on every call, so a hot reload never serves a stale object). */
 export function chat(): Chat {
-  return (globalForChat.hlynaChat ??= createChat({
+  if (process.env.NODE_ENV !== 'production') return build()
+  return (globalForChat.hlynaChat ??= build())
+}
+
+function build(): Chat {
+  return createChat({
     db,
     llm: { stream: (p: LlmParams) => openai().responses.stream(p as unknown as Parameters<OpenAI['responses']['stream']>[0]) },
     model: CHAT_MODEL,
@@ -247,5 +252,5 @@ export function chat(): Chat {
     tools,
     transport,
     rateLimited: (key, max, windowMs) => rateLimited(db, key, max, windowMs),
-  }))
+  })
 }

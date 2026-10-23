@@ -47,6 +47,7 @@ export async function otherOpenThreads(db: ChatDb, visitorId: string, exceptId: 
       id: conversations.id,
       page: conversations.lastPage,
       kind: conversations.kind,
+      context: conversations.context,
       first: sql<string | null>`(select m.text from chat.messages m where m.conversation_id = ${conversations.id} and m.role = 'visitor' order by m.id limit 1)`,
     })
     .from(conversations)
