@@ -255,7 +255,7 @@ describe('handing over to a person', () => {
     const head = (await getById(db, c.id))!.tgHeadMessageId!
     const handled = await chat.handleTelegramUpdate({ message: { message_id: 500, chat: { id: Number(OWNER) }, from: { id: Number(OWNER), first_name: 'Kateryna' }, text: 'Вітаю, я з Глини', reply_to_message: { message_id: head } } }, OWNER, 'https://example.test')
     expect(handled).toBe(true)
-    expect(edits.findLast((e) => e.id === head && e.text)?.text).toContain('— відповідає людина (Kateryna)')
+    expect([...edits].reverse().find((e) => e.id === head && e.text)?.text).toContain('— відповідає людина (Kateryna)')
     let rows = await listMessages(db, c.id)
     expect(rows.map((m) => m.role)).toEqual(['visitor', 'assistant', 'system', 'human'])
     expect(rows[2]!.text).toBe(TEXT.humanJoined)
@@ -278,7 +278,7 @@ describe('handing over to a person', () => {
     edits.length = 0
     await chat.handleTelegramUpdate({ callback_query: { id: 'cq1', from: { id: Number(OWNER), first_name: 'Kateryna' }, data: `ch:x:${c.id}` } }, OWNER, 'https://example.test')
     expect((await getById(db, c.id))?.status).toBe('closed')
-    const headEdit = edits.findLast((e) => e.id === head && e.text)
+    const headEdit = [...edits].reverse().find((e) => e.id === head && e.text)
     expect(headEdit?.text).toContain('— завершено')
     expect(JSON.stringify(headEdit?.keyboard)).not.toContain('ch:')
     expect(JSON.stringify(headEdit?.keyboard)).toContain('panel/chat')
