@@ -6,6 +6,7 @@ import React, { createContext, useContext, useState } from 'react'
 import { Kicker } from '@/components/ui/Kicker'
 import { cx } from '@/components/ui/layout'
 import { Meter, SectionRow, SectionRows } from '@/components/ui/SectionRow'
+import { StatusTag } from '@/components/ui/StatusTag'
 import type { StudioSummary } from '@/shared/kabinet'
 import type { KabinetSection } from '@/shared/options'
 
@@ -24,7 +25,7 @@ export function useStudio(): Ctx {
 // The studio overview and the editor share this frame: below lg the overview is a page of section rows and each
 // section is its own screen; from lg the rows are a sticky navigation on the left and the section (the first one on
 // the overview) is on the right. One markup serves both, so nothing flashes or loads twice.
-export function StudioFrame({ initial, mode, current, children }: { initial: StudioSummary; mode: 'overview' | 'section'; current?: KabinetSection; children: React.ReactNode }) {
+export function StudioFrame({ initial, mode, current, children }: { initial: StudioSummary; mode: 'overview' | 'section'; current?: KabinetSection | 'zamovlennia'; children: React.ReactNode }) {
   const [studio, setStudio] = useState(initial)
   const overview = mode === 'overview'
   const Name = overview ? 'h1' : 'p'
@@ -63,6 +64,14 @@ export function StudioFrame({ initial, mode, current, children }: { initial: Stu
                 lgCurrent={overview && i === 0}
               />
             ))}
+            <li>
+              <Link href={`/kabinet/studiya/${studio.slug}/zamovlennia`} className="ui-srow" aria-current={current === 'zamovlennia' ? 'page' : undefined}>
+                <span className="ui-srow-n">Замовлення</span>
+                <span className="ui-srow-l">{studio.openOrders > 0 ? `${studio.openOrders} відкритих` : 'немає відкритих'}</span>
+                <StatusTag state={studio.openOrders > 0 ? 'review' : 'live'}>{studio.openOrders > 0 ? 'відкриті' : 'крамниця'}</StatusTag>
+                <span className="ui-srow-go" aria-hidden>→</span>
+              </Link>
+            </li>
           </SectionRows>
           <p className="m-0 hidden text-[14px] leading-[1.45] text-ink-2 lg:block">Усе, що збережете, ми переглянемо й опублікуємо протягом доби. На сайті до того — попередня версія.</p>
         </aside>

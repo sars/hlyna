@@ -4,10 +4,12 @@ import { redirect } from 'next/navigation'
 import React from 'react'
 
 import { conjunction, formatDayMonth, joinList } from '@/components/kabinet/format'
+import { TelegramUnlink } from '@/components/kabinet/TelegramUnlink.client'
 import { Button } from '@/components/ui/Button'
 import { Kicker } from '@/components/ui/Kicker'
 import { cx, wrap } from '@/components/ui/layout'
 import { MoreLink } from '@/components/ui/MoreLink'
+import { Note } from '@/components/ui/Note'
 import { Meter } from '@/components/ui/SectionRow'
 import { StatusTag } from '@/components/ui/StatusTag'
 import { kabinetOwner } from '@/lib/kabinetData'
@@ -54,6 +56,11 @@ function Studio({ s }: { s: StudioSummary }) {
         <MoreLink href={s.profileUrl} arrow>
           Профіль на сайті
         </MoreLink>
+        {s.openOrders > 0 && (
+          <MoreLink href={`${base}/zamovlennia`} arrow>
+            Замовлень відкрито: {s.openOrders}
+          </MoreLink>
+        )}
       </div>
     </li>
   )
@@ -62,7 +69,7 @@ function Studio({ s }: { s: StudioSummary }) {
 export default async function Kabinet() {
   const owner = await kabinetOwner()
   if (!owner) redirect('/kabinet/vhid')
-  const { studios } = owner
+  const { studios, telegram } = owner
   return (
     <main className={cx(wrap, 'flex-1 pt-hero pb-section')}>
       <div className="grid max-w-[860px] gap-4">
@@ -84,6 +91,28 @@ export default async function Kabinet() {
             До кабінету ще не додано студій. <Link href="/zapyt?vid=studiya">Напишіть нам</Link>.
           </p>
         )}
+        <section aria-label="Сповіщення про замовлення" className="grid gap-2.5 border-t-2 border-ink pt-4">
+          <Kicker>Сповіщення про замовлення</Kicker>
+          {telegram.linked ? (
+            <>
+              <p className="m-0 max-w-read text-[15.5px] leading-[1.5]">Telegram підключено: нові замовлення приходять вам у бот.</p>
+              <div>
+                <TelegramUnlink />
+              </div>
+            </>
+          ) : telegram.link ? (
+            <>
+              <p className="m-0 max-w-read text-[15.5px] leading-[1.5]">Підключіть Telegram, щоб нові замовлення з крамниці приходили вам одразу, з кнопками «Підтвердити» і «Відправлено».</p>
+              <div>
+                <a href={telegram.link} target="_blank" rel="noopener" className="ui-btn" data-variant="ink" data-size="sm">
+                  Підключити Telegram
+                </a>
+              </div>
+            </>
+          ) : (
+            <Note>Підключення Telegram ще не налаштоване. Замовлення все одно видно тут, у кабінеті.</Note>
+          )}
+        </section>
       </div>
     </main>
   )

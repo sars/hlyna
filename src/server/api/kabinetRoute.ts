@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server'
 import { currentUser } from '@/server/auth/guards'
 import { db } from '@/server/db'
 import { FieldErrors, Forbidden } from '@/server/services/kabinet'
+import { NotFound as OrderNotFound, OrderError } from '@/server/services/orders'
 import { clientIp, rateLimited } from '@/server/services/limits'
 import { Invalid } from '@/server/services/studioEditor'
 
@@ -24,6 +25,8 @@ export async function kabinetApi(
     if (e instanceof Forbidden) return NextResponse.json({ error: e.message }, { status: 403 })
     if (e instanceof FieldErrors) return NextResponse.json({ error: e.message, fields: e.fields }, { status: 400 })
     if (e instanceof Invalid) return NextResponse.json({ error: e.message }, { status: 400 })
+    if (e instanceof OrderError) return NextResponse.json({ error: e.message }, { status: e.status })
+    if (e instanceof OrderNotFound) return NextResponse.json({ error: e.message }, { status: 404 })
     throw e
   }
 }

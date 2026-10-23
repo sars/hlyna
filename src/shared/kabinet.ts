@@ -31,6 +31,8 @@ export type StudioSummary = {
   savedAt: string | null
   sections: SectionSummary[]
   profileUrl: string
+  /** Shop orders not yet done or cancelled. */
+  openOrders: number
 }
 
 export type KabinetPhoto = {

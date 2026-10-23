@@ -20,6 +20,7 @@ import { KABINET_SECTIONS, KABINET_SECTION_TITLE, type KabinetSection } from '..
 import type { KabinetPhoto, SaveOk, SectionPage, SectionSummary, SectionValues, StudioSummary } from '../../shared/kabinet'
 import { audit, same, type Actor, type Changes } from './audit'
 import { currentValue, normalizeProposed, type FieldKey } from './changeSets'
+import { openOrderCounts } from './orders'
 import { Invalid } from './studioEditor'
 
 // The studio owner's cabinet. Owners never write to studios: every section save is merged into the studio's one pending
@@ -47,6 +48,8 @@ export type Loaded = {
   photoIds: number[]
   cs: typeof changeSets.$inferSelect | null
   p: Partial<Record<FieldKey, unknown>>
+  /** Orders of the studio that are not yet done or cancelled. */
+  openOrders: number
 }
 
 /** Change-set keys that make up each section (what a save writes and what «на перевірці» looks at). */
@@ -68,7 +71,7 @@ async function loadState(db: Db, s: Row, city: string | null): Promise<Loaded> {
   const prices = await db.select({ text: studioPrices.text, source: studioPrices.source, dateText: studioPrices.dateText }).from(studioPrices).where(eq(studioPrices.studioId, s.id)).orderBy(asc(studioPrices.position))
   const photoIds = (await db.select({ id: studioPhotos.mediaId }).from(studioPhotos).where(eq(studioPhotos.studioId, s.id)).orderBy(asc(studioPhotos.position))).map((p) => p.id)
   const [cs] = await db.select().from(changeSets).where(and(eq(changeSets.studioId, s.id), eq(changeSets.status, 'pending'))).limit(1)
-  return { s, city, prices, photoIds, cs: cs ?? null, p: cs ? normalizeProposed(cs.proposed as Record<string, unknown>) : {} }
+  return { s, city, prices, photoIds, cs: cs ?? null, p: cs ? normalizeProposed(cs.proposed as Record<string, unknown>) : {}, openOrders: (await openOrderCounts(db, [s.id])).get(s.id) ?? 0 }
 }
 
 /** The owner's studio by slug with its state, or null when it isn't theirs (callers answer 403/404, never leak others). */
@@ -191,6 +194,7 @@ export function summarize(l: Loaded): StudioSummary {
     savedAt: cs ? iso(cs.updatedAt) : null,
     sections,
     profileUrl: `/vyrobnyky/${s.slug}`,
+    openOrders: l.openOrders,
   }
 }
 
