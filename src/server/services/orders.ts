@@ -10,7 +10,7 @@ import type { TgKeyboard } from '../telegram/tg'
 import { tg } from '../telegram/tg'
 import { site } from '../../content/site'
 import { canOrder, effectiveTerms, itemPath, nextStatuses, normalizePhone, OFFER_VERSION, uah } from '../../lib/shop'
-import { displayName } from '../../lib/present'
+import { shopName } from '../../lib/present'
 import { DELIVERY_METHOD_LABEL, ORDER_STATUS_LABEL, PAYMENT_METHOD_LABEL, type OrderStatus, type PaymentStatus } from '../../shared/options'
 import { checkoutCreate } from '../../shared/schemas'
 import { audit, diff, type Actor, type Exec } from './audit'
@@ -85,9 +85,9 @@ export async function createCheckout(db: Db, raw: unknown, ip: string): Promise<
     const s = g[0]!.studio
     const terms = effectiveTerms(s.shopTerms, s.address)
     const allDigital = g.every((r) => r.item.fulfillment === 'digital')
-    if (d.deliveryMethod === 'none' ? !allDigital : !terms.delivery.includes(d.deliveryMethod)) return { ok: false, status: 400, error: `${displayName(s)} не доставляє так: ${DELIVERY_METHOD_LABEL[d.deliveryMethod].toLowerCase()}.`, field: 'deliveryMethod' }
-    if (d.paymentMethod === 'card_online' || !terms.payment.includes(d.paymentMethod)) return { ok: false, status: 400, error: `${displayName(s)} не приймає такий спосіб оплати.`, field: 'paymentMethod' }
-    if (d.deliveryMethod === 'pickup' && !terms.pickupAddress) return { ok: false, status: 400, error: `${displayName(s)} не має самовивозу.`, field: 'deliveryMethod' }
+    if (d.deliveryMethod === 'none' ? !allDigital : !terms.delivery.includes(d.deliveryMethod)) return { ok: false, status: 400, error: `${shopName(s)} не доставляє так: ${DELIVERY_METHOD_LABEL[d.deliveryMethod].toLowerCase()}.`, field: 'deliveryMethod' }
+    if (d.paymentMethod === 'card_online' || !terms.payment.includes(d.paymentMethod)) return { ok: false, status: 400, error: `${shopName(s)} не приймає такий спосіб оплати.`, field: 'paymentMethod' }
+    if (d.deliveryMethod === 'pickup' && !terms.pickupAddress) return { ok: false, status: 400, error: `${shopName(s)} не має самовивозу.`, field: 'deliveryMethod' }
   }
 
   const checkoutToken = token()
@@ -136,7 +136,7 @@ export async function createCheckout(db: Db, raw: unknown, ip: string): Promise<
         else if (r.item.kind === 'piece') await tx.update(items).set({ stock: 0 }).where(eq(items.id, r.item.id))
       }
       await audit(tx, PUBLIC, 'order', o!.id, 'create', { studioId, subtotalKop, lines: lines.map(({ r, line }) => `${r.item.title} × ${line.qty}`) })
-      out.push({ id: o!.id, studio: displayName(s), studioId })
+      out.push({ id: o!.id, studio: shopName(s), studioId })
     }
     return out
   })
@@ -171,7 +171,8 @@ async function linesOf(ex: Exec, orderIds: number[]): Promise<Map<number, OrderL
       unitKop: orderItems.unitKop,
       qty: orderItems.qty,
       options: orderItems.options,
-      photo: sql<string | null>`(select coalesce(m.variants->'thumbnail'->>'file', m.file_name) from app.item_photos ip join app.media m on m.id = ip.media_id where ip.item_id = ${orderItems.itemId} and m.status = 'active' order by ip.position limit 1)`,
+      // The outer column is named in full: a bare `item_id` would bind to item_photos (see src/server/db/index.ts).
+      photo: sql<string | null>`(select coalesce(m.variants->'thumbnail'->>'file', m.file_name) from app.item_photos ip join app.media m on m.id = ip.media_id where ip.item_id = "app"."order_items"."item_id" and m.status = 'active' order by ip.position limit 1)`,
     })
     .from(orderItems)
     .where(inArray(orderItems.orderId, orderIds))
@@ -200,7 +201,7 @@ const studioCols = {
 
 async function hydrate(ex: Exec, rows: { o: typeof orders.$inferSelect; s: { id: number; slug: string; name: string; shortName: string | null; city: string | null; phone: string | null; email: string | null; instagram: string | null; website: string | null; address: string | null; shopTerms: (typeof studios.$inferSelect)['shopTerms'] } }[]): Promise<OrderFull[]> {
   const lines = await linesOf(ex, rows.map((r) => r.o.id))
-  return rows.map(({ o, s }) => ({ ...o, lines: lines.get(o.id) ?? [], studio: { ...s, name: displayName({ name: s.name, shortName: s.shortName }) } }))
+  return rows.map(({ o, s }) => ({ ...o, lines: lines.get(o.id) ?? [], studio: { ...s, name: shopName({ name: s.name, shortName: s.shortName }) } }))
 }
 
 export async function getOrder(db: Db, id: number): Promise<OrderFull | null> {

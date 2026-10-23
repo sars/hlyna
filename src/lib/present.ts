@@ -325,6 +325,12 @@ const hasCyr = (t: string) => /[а-яіїєґ]/i.test(t)
 /** The name a studio goes by on the site: its short name when set, else the cleaned full name. */
 export const displayName = (s: { name: string; shortName?: string | null }): string => s.shortName?.trim() || cleanName(s.name)
 
+/** The shop and the orders name a studio by the part in «…» of its display name («Студія кераміки «Осоння» (Суми)» → «Осоння»), as the cabinet does. */
+export const shopName = (s: { name: string; shortName?: string | null }): string => {
+  const full = displayName(s)
+  return full.match(/«([^»]+)»/)?.[1]?.trim() || full.replace(/\s*\([^)]*\)\s*$/, '').trim() || full
+}
+
 export function cleanName(name: string): string {
   let n = name
     .replace(/\s*\((?=[^)]*(?:тел\.?|\+?\d[\d\s-]{6,}|партнер))[^)]*\)/giu, '')

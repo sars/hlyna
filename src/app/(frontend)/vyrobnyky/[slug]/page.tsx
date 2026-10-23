@@ -14,6 +14,8 @@ import { PriceList } from '@/components/ui/PriceList'
 import { QuoteBlock } from '@/components/ui/QuoteBlock'
 import { SideBox } from '@/components/ui/SideBox'
 import { IndexCell, StudioCell, StudioCells } from '@/components/ui/StudioCell'
+import { ItemGrid } from '@/components/ui/ItemGrid'
+import { cardOf, getShopItemsAll } from '@/lib/shopData'
 import { Updated } from '@/components/ui/Updated'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -196,6 +198,8 @@ export default async function StudioPage({ params }: Args) {
   const receivesVisitors = ['studio', 'school', 'shop', 'heritage'].includes(s.type ?? '')
   const photos = await getStudioPhotos(s.id)
   const cases = casesForStudio(s.slug)
+  // The studio's items in the shop (a partner with listed, unsold pieces).
+  const shopItems = (await getShopItemsAll()).filter((x) => x.studio.id === s.id && x.visibility === 'public' && x.state !== 'sold')
 
   // Profiles that cannot take a request get a box with what we know and a request to studios that work now.
   const showForm = acceptsRequests(s)
@@ -386,6 +390,16 @@ export default async function StudioPage({ params }: Args) {
                 </div>
               ))}
             </div>
+          </Block>
+        )}
+
+        {/* A partner's listed items (docs/shop/DESIGN.md §1): up to four, then the studio's shop page. */}
+        {shopItems.length > 0 && (
+          <Block id="kramnytsia" title="Крамниця" note="Ціни студії; виріб відправляє майстерня.">
+            <ItemGrid items={shopItems.slice(0, 4).map(cardOf)} variant="compact" showStudio={false} />
+            <MoreLink href={`/kramnytsia/${s.slug}`} arrow>
+              Усі вироби студії ({shopItems.length})
+            </MoreLink>
           </Block>
         )}
 

@@ -260,4 +260,3 @@ export const checkoutCreate = z
       ctx.addIssue({ code: 'custom', path: ['deliveryPoint'], message: d.deliveryMethod === 'np_courier' ? 'Вкажіть вулицю, будинок і квартиру.' : 'Вкажіть номер відділення чи поштомату.' })
     if (d.paymentMethod === 'card_online') ctx.addIssue({ code: 'custom', path: ['paymentMethod'], message: 'Оплата карткою на сайті ще не підключена.' })
   })
-export type CheckoutCreate = z.infer<typeof checkoutCreate>

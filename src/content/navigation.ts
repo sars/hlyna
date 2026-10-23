@@ -252,8 +252,9 @@ const mainNavPlan: NavSection[] = [
 ]
 
 const simpleNavPlan: NavLink[] = [
-  { label: 'Ціни', href: '/tsiny-2026' },
-  // The header holds one row: while a seasonal section is shown, these two wait in the footer.
+  { label: 'Крамниця', href: '/kramnytsia' },
+  // The header holds one row: while a seasonal section is shown, these three wait in the footer (the shop stays).
+  { label: 'Ціни', href: '/tsiny-2026', offSeason: true },
   { label: 'Гайди', href: '/hayidy', offSeason: true },
   { label: 'Мапа', href: '/mapa', offSeason: true },
 ]
@@ -323,6 +324,7 @@ export const footerColumns: NavColumn[] = ([
   {
     title: 'Каталог',
     links: [
+      { label: 'Крамниця: вироби студій', href: '/kramnytsia' },
       { label: 'Усі студії й майстри', href: '/vyrobnyky' },
       { label: 'За містами', href: '/vyrobnyky/misto' },
       { label: 'За виробами', href: '/vyrobnyky/vyrib' },

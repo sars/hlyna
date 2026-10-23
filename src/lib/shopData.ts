@@ -3,9 +3,10 @@ import { cache } from 'react'
 
 import { loadShopItems, type ShopItem, type ShopStudio } from '@/server/publicShop'
 import { ITEM_CATEGORIES, type ItemCategory } from '@/shared/options'
+import type { ShopItemCard } from '@/shop/types'
 
 import { MIN_LIST } from './catalog'
-import { SHOP_RESERVED } from './shop'
+import { leadText, SHOP_RESERVED } from './shop'
 
 // The shop's reads for pages: one cached load of every partner item (tag `items`, refreshed by writes through
 // src/server/revalidate.ts and by the daily read-shops.ts run), then plain filters. Scripts bypass the cache.
@@ -44,11 +45,39 @@ export const getShopCategories = cache(async (): Promise<ShopCategory[]> => {
 export const isShopCategory = (s: string): s is ItemCategory => (ITEM_CATEGORIES as readonly string[]).includes(s)
 export const isShopReserved = (s: string) => SHOP_RESERVED.has(s)
 
+/** The small view a card, the cart and the buy box use (serialisable for client components). */
+export const cardOf = (i: ShopItem): ShopItemCard => ({
+  id: i.id,
+  slug: i.slug,
+  path: i.path,
+  title: i.title,
+  category: i.category,
+  priceKop: (i.priceMin ?? 0) * 100,
+  state: i.state,
+  lead: leadText(i.leadDaysMin, i.leadDaysMax),
+  fulfillment: i.fulfillment,
+  orderable: i.orderable,
+  stock: i.stock,
+  studio: { slug: i.studio.slug, name: i.studio.name, city: i.studio.city },
+  photos: i.photos.map((p) => ({ small: p.small, url: p.url, alt: p.alt, width: p.width, height: p.height, focalY: p.focalY })),
+})
+
+/** Up to `n` other listed items: the same category first, then the same studio, never the item itself. */
+export function similarItems(all: ShopItem[], i: ShopItem, n = 6): ShopItem[] {
+  const listed = all.filter((x) => x.id !== i.id && x.visibility === 'public' && x.state !== 'sold')
+  const same = listed.filter((x) => x.category === i.category)
+  const studio = listed.filter((x) => x.studio.id === i.studio.id && !same.includes(x))
+  return [...same, ...studio, ...listed.filter((x) => !same.includes(x) && !studio.includes(x))].slice(0, n)
+}
+
 /** The price span of listed items, in whole hryvnias; null when nothing has a price. */
 export function priceSpan(items: ShopItem[]): { min: number; max: number } | null {
   const xs = items.map((i) => i.priceMin).filter((p): p is number => p != null && p > 0)
   return xs.length ? { min: Math.min(...xs), max: Math.max(...xs) } : null
 }
+
+/** «24 жовтня 2026» from an ISO date, Kyiv time. */
+export const shopDate = (iso: string | null | undefined) => (iso ? new Intl.DateTimeFormat('uk-UA', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'Europe/Kyiv' }).format(new Date(iso)).replace(/\s*р\.$/, '') : '')
 
 /** The newest change among items and their studios: `lastmod` and «Оновлено». */
 export const latestItemUpdate = (items: ShopItem[]) => items.reduce<string | null>((m, i) => (i.updatedAt > (m ?? '') ? i.updatedAt : m), null)

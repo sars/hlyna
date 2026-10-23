@@ -4,6 +4,8 @@ import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import sharp from 'sharp'
 
+import { MEDIA_DIR } from '@/server/media'
+
 // Share card for any page, 1200×630, composition C2 «Етикетка» (docs/design/SYSTEM.md §7): a photo fills the card,
 // a paper label with a cobalt bar carries the text, a paper tab with the mark and ГЛИНА hangs from the top edge.
 // studio=1: no photo; an ink field with the studio's name as the subject. No years, no counts or prices: the card
@@ -36,8 +38,13 @@ const noYears = (s: string) =>
 
 const param = (u: URL, k: string, max: number) => noYears((u.searchParams.get(k) || '').slice(0, max))
 
-// img=<name> → public/images/site/<name>.jpg; doc-<name> → public/images/doc; stock-<name> → public/images/stock.
+// img=<name> → public/images/site/<name>.jpg; doc-<name> → public/images/doc; stock-<name> → public/images/stock;
+// media-<file> → the uploaded photo's 1200×630 «og» variant in the media folder (shop items, studio photos).
 async function photo(img: string) {
+  if (img.startsWith('media-')) {
+    const buf = await readFile(path.join(MEDIA_DIR(), `${img.slice(6)}.jpg`)).catch(() => null)
+    return buf ? `data:image/jpeg;base64,${buf.toString('base64')}` : null
+  }
   const [dirName, file] = img.startsWith('doc-') ? ['doc', img.slice(4)] : img.startsWith('stock-') ? ['stock', img.slice(6)] : ['site', img]
   const buf = await readFile(path.join(process.cwd(), 'public/images', dirName, `${file}.jpg`)).catch(() => null)
   return buf ? `data:image/jpeg;base64,${buf.toString('base64')}` : null

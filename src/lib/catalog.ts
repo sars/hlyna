@@ -5,6 +5,7 @@ import type { City, Studio } from '@/types/catalog'
 import { OBLAST_CENTRES } from '@/shared/options'
 import { cleanAddress, cleanPublic } from './present'
 import { wholeAmountsIn } from './money'
+import { pluralUk } from './plural'
 import { loadItemPhotos, loadPublicCities, loadPublicPhotos, loadPublicStudios } from '@/server/publicCatalog'
 
 // Read-only data layer for public pages. Pages are pre-rendered HTML; they re-render only after a write
@@ -314,10 +315,5 @@ export const MIN_LIST = 3 // no thin pages: a list needs at least 3 real entries
 
 export const igHandle = (url?: string | null) => url?.replace(/\/$/, '').split('/').pop() ?? ''
 
-// Ukrainian plural: pluralUk(5, ['місце', 'місця', 'місць']) → 'місць'
-export function pluralUk(n: number, [one, few, many]: [string, string, string]) {
-  const m10 = n % 10, m100 = n % 100
-  if (m10 === 1 && m100 !== 11) return one
-  if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return few
-  return many
-}
+// Ukrainian plural: pluralUk(5, ['місце', 'місця', 'місць']) → 'місць' (lives in ./plural so client components can use it without this module's data imports).
+export { pluralUk }

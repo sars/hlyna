@@ -5,9 +5,22 @@ import { cityPages, getAllStudios, getCatalog, offersMasterClasses } from '@/lib
 import { makerCities } from '@/lib/makers'
 import { certificateCities } from '@/editorial/topics'
 import { liveWrittenPages } from '@/editorial/registry'
+import { getShopCategories, getShopItemsAll, getShopStudios, latestItemUpdate } from '@/lib/shopData'
 
 // Every public catalogue page: hubs, topic and product pages, master-class, certificate and maker cities, studio profiles.
 export const revalidate = 86400
+
+async function shopUrls(): Promise<{ loc: string; lastmod: string }[]> {
+  const [items, cats, studios] = await Promise.all([getShopItemsAll(), getShopCategories(), getShopStudios()])
+  if (!items.length) return []
+  const day = (iso: string | null) => (iso ?? site.contentUpdated).slice(0, 10)
+  return [
+    { loc: `${site.url}/kramnytsia`, lastmod: day(latestItemUpdate(items)) },
+    ...cats.map((c) => ({ loc: `${site.url}/kramnytsia/${c.slug}`, lastmod: day(latestItemUpdate(c.items)) })),
+    ...studios.map((s) => ({ loc: `${site.url}/kramnytsia/${s.slug}`, lastmod: day(latestItemUpdate(s.items)) })),
+    ...items.filter((i) => i.visibility === 'public' || i.state === 'sold').map((i) => ({ loc: `${site.url}${i.path}`, lastmod: day(i.updatedAt) })),
+  ]
+}
 
 const HUBS = ['/', '/zapyt', '/maister-klasy', '/vyrobnyky', '/vyrobnyky/misto', '/vyrobnyky/vyrib', '/dlya-biznesu', '/tsiny-2026', '/hayidy', '/dlya-studiy', '/pro-nas', '/dobirky', '/dobirky/suchasni-keramisty', '/dobirky/kosiv-i-opishne', '/mapa', '/llms.txt']
 
@@ -32,6 +45,8 @@ export async function GET() {
     ...cities.map((g) => ({ loc: `${site.url}/maister-klasy/${g.city.slug}`, lastmod: latest(g.studios) })),
     ...(await makerCities()).map((g) => ({ loc: `${site.url}/vyrobnyky/misto/${g.city.slug}`, lastmod: latest(g.studios) })),
     ...(await getCatalog()).map((s) => ({ loc: `${site.url}/vyrobnyky/${s.slug}`, lastmod: s.updatedAt || content })),
+    // The shop: its home, the categories with a page, the partner studios' shops, every listed item (sold ones keep their page too).
+    ...(await shopUrls()),
   ])
   return new Response(xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8' } })
 }

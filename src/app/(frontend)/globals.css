@@ -847,3 +847,149 @@
 .map-pop small { color: var(--color-ink-2); }
 .map-chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
 .map-chips span { padding: 4px 7px; border-radius: var(--radius-btn); box-shadow: inset 0 0 0 1px var(--color-rule); font-family: var(--font-mono); font-size: 10.5px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--color-ink-2); }
+
+/* Крамниця (docs/shop/DESIGN.md §2): the item grid, the item gallery, the stepper, the order steps, the checkout rows,
+   the cart line, the toast, the header cart button. Same rules as the rest: hairlines, paper-2 under photos, no shadows. */
+@layer components {
+  /* ItemGrid: 2 → 3 (md) → 4 (lg) ruled cells; `compact` 2 → 4 (md). The first cell of a row is flush left, the last has no right rule. */
+  .ui-items { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; padding: 0; list-style: none; border-top: 2px solid var(--color-ink); }
+  .ui-items > li > a { display: grid; gap: 6px; align-content: start; height: 100%; padding: 10px 10px 16px; border-bottom: 1px solid var(--color-rule); border-right: 1px solid var(--color-rule); color: var(--color-ink); text-decoration: none; }
+  .ui-items > li:nth-child(2n + 1) > a { padding-left: 0; }
+  .ui-items > li:nth-child(2n) > a { padding-right: 0; border-right: 0; }
+  .ui-items > li > a:hover .ui-name { color: var(--color-cobalt); }
+  .ui-items > li[data-sold] .ui-item-ph { opacity: 0.75; }
+  @media (min-width: 50rem) {
+    .ui-items { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .ui-items > li > a, .ui-items > li:nth-child(2n + 1) > a, .ui-items > li:nth-child(2n) > a { padding: 14px 14px 18px; border-right: 1px solid var(--color-rule); }
+    .ui-items > li:nth-child(3n + 1) > a { padding-left: 0; }
+    .ui-items > li:nth-child(3n) > a { padding-right: 0; border-right: 0; }
+    .ui-items[data-variant='compact'] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .ui-items[data-variant='compact'] > li:nth-child(3n + 1) > a { padding-left: 14px; }
+    .ui-items[data-variant='compact'] > li:nth-child(3n) > a { padding-right: 14px; border-right: 1px solid var(--color-rule); }
+    .ui-items[data-variant='compact'] > li:nth-child(4n + 1) > a { padding-left: 0; }
+    .ui-items[data-variant='compact'] > li:nth-child(4n) > a { padding-right: 0; border-right: 0; }
+  }
+  @media (min-width: 60rem) {
+    .ui-items { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .ui-items > li:nth-child(3n + 1) > a { padding-left: 14px; }
+    .ui-items > li:nth-child(3n) > a { padding-right: 14px; border-right: 1px solid var(--color-rule); }
+    .ui-items > li:nth-child(4n + 1) > a { padding-left: 0; }
+    .ui-items > li:nth-child(4n) > a { padding-right: 0; border-right: 0; }
+  }
+  .ui-item-ph { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; background: var(--color-paper-2); }
+  .ui-item-ph img { object-fit: cover; }
+  .ui-item-ph img[data-second] { opacity: 0; transition: opacity 0.2s; }
+  @media (hover: hover) { .ui-items > li > a:hover .ui-item-ph img[data-second] { opacity: 1; } }
+  .ui-item-n { position: absolute; left: 0; bottom: 0; padding: 4px 6px; background: var(--color-paper); color: var(--color-ink); font-family: var(--font-mono); font-size: 10.5px; line-height: 1; letter-spacing: 0.08em; text-transform: uppercase; }
+
+  /* ItemGallery: thumbnails + a 4:5 main frame from md; a bleed scroll-snap strip with a counter below md. */
+  .ui-igal { display: grid; gap: 8px; }
+  .ui-igal-thumbs, .ui-igal-main { display: none; }
+  .ui-igal-strip { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; margin-inline: calc(-1 * var(--spacing-gutter)); padding-inline: var(--spacing-gutter); scroll-padding-inline: var(--spacing-gutter); }
+  .ui-igal-strip::-webkit-scrollbar { display: none; }
+  .ui-igal-strip > a { position: relative; display: block; flex: 0 0 calc(100% - 40px); aspect-ratio: 4 / 5; overflow: hidden; scroll-snap-align: start; background: var(--color-paper-2); }
+  .ui-igal-strip > a img { object-fit: cover; }
+  .ui-igal[data-n='1'] .ui-igal-strip > a { flex-basis: 100%; }
+  .ui-igal-count { justify-self: end; font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; color: var(--color-ink-2); }
+  @media (min-width: 50rem) {
+    .ui-igal { grid-template-columns: 72px minmax(0, 1fr); gap: 12px; }
+    .ui-igal[data-n='1'] { grid-template-columns: minmax(0, 1fr); }
+    .ui-igal-strip, .ui-igal-count { display: none; }
+    .ui-igal-thumbs { display: grid; align-content: start; gap: 8px; }
+    .ui-igal-thumbs > button { position: relative; display: block; width: 72px; aspect-ratio: 4 / 5; padding: 0; border: 0; overflow: hidden; background: var(--color-paper-2); box-shadow: inset 0 0 0 1px var(--color-rule); cursor: pointer; }
+    .ui-igal-thumbs > button img { object-fit: cover; }
+    .ui-igal-thumbs > button[aria-selected='true'] { box-shadow: inset 0 0 0 2px var(--color-ink); }
+    .ui-igal-thumbs > button:focus-visible { outline: 2px solid var(--color-cobalt); outline-offset: 2px; }
+    .ui-igal-main { position: relative; display: block; aspect-ratio: 4 / 5; overflow: hidden; background: var(--color-paper-2); }
+    .ui-igal-main img { object-fit: cover; }
+    .ui-igal-main[data-wide] img { object-fit: contain; }
+  }
+
+  /* The item page grid from lg: gallery left over three rows, head / buy / more right (DESIGN.md §1 Виріб). */
+  .ui-item { display: grid; gap: clamp(20px, 3vw, 40px); align-items: start; }
+  @media (min-width: 60rem) {
+    .ui-item { grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); grid-template-rows: auto auto 1fr; grid-template-areas: 'gallery head' 'gallery buy' 'gallery more'; }
+    .ui-item > [data-area='gallery'] { grid-area: gallery; }
+    .ui-item > [data-area='head'] { grid-area: head; }
+    .ui-item > [data-area='buy'] { grid-area: buy; }
+    .ui-item > [data-area='more'] { grid-area: more; }
+  }
+  .ui-buy-facts .ui-toprule { border-top-width: 1px; border-top-color: var(--color-rule); }
+  .ui-buy-facts dt { font-size: 11px; }
+  .ui-buy-facts dd { font-size: 14.5px; }
+
+  /* QtyStepper: «−» number «+», buttons only. */
+  .ui-qty { display: inline-grid; grid-template-columns: auto 3ch auto; align-items: center; height: 52px; border-radius: var(--radius-btn); box-shadow: inset 0 0 0 1.5px var(--color-ink); }
+  .ui-qty[data-size='sm'] { height: 36px; }
+  .ui-qty > button { width: 44px; height: 100%; padding: 0; border: 0; background: transparent; color: var(--color-ink); font-family: var(--font-mono); font-size: 18px; line-height: 1; cursor: pointer; transition: background-color 0.2s; }
+  .ui-qty[data-size='sm'] > button { width: 36px; font-size: 16px; }
+  .ui-qty > button:hover:not(:disabled) { background: var(--color-paper-2); }
+  .ui-qty > button:disabled { opacity: 0.4; cursor: default; }
+  .ui-qty > button:focus-visible { outline: 2px solid var(--color-cobalt); outline-offset: -2px; }
+  .ui-qty > span { text-align: center; font-family: var(--font-display); font-weight: 600; font-size: 15px; font-variant-numeric: tabular-nums; }
+
+  /* OrderSteps: dots on a hairline; passed ink, current cobalt, next hollow. Vertical below md. */
+  .ui-steps { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .ui-steps > li { position: relative; display: grid; gap: 2px; padding-left: 24px; }
+  .ui-steps > li::before { content: ''; position: absolute; left: 0; top: 4px; width: 12px; height: 12px; border-radius: 50%; background: var(--color-ink); }
+  .ui-steps > li[data-state='current']::before { background: var(--color-cobalt); outline: 3px solid var(--color-cobalt); outline-offset: 3px; }
+  .ui-steps > li[data-state='next']::before { background: transparent; box-shadow: inset 0 0 0 1.5px var(--color-rule); }
+  .ui-steps > li:not(:last-child)::after { content: ''; position: absolute; left: 5.5px; top: 20px; bottom: -14px; width: 1px; background: var(--color-rule); }
+  .ui-steps-n { font-family: var(--font-display); font-weight: 600; font-size: 14.5px; line-height: 1.3; }
+  .ui-steps > li[data-state='next'] .ui-steps-n { color: var(--color-ink-2); font-weight: 400; }
+  .ui-steps-d { font-size: 12.5px; color: var(--color-ink-2); }
+  @media (min-width: 50rem) {
+    .ui-steps { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 0; }
+    .ui-steps > li { padding: 22px 12px 0 0; }
+    .ui-steps > li::before { top: 0; }
+    .ui-steps > li:not(:last-child)::after { left: 16px; right: 0; top: 5.5px; bottom: auto; width: auto; height: 1px; }
+    .ui-steps-n { font-family: var(--font-mono); font-weight: 400; font-size: 11px; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.4; }
+    .ui-steps > li[data-state='next'] .ui-steps-n { font-weight: 400; }
+  }
+
+  /* ChoiceRow: a radio row with a note and an aside; the fields under the chosen one unfold. */
+  .ui-choice > label { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 14px; align-items: start; min-height: 48px; padding: 10px 0; border-bottom: 1px solid var(--color-rule); cursor: pointer; }
+  .ui-choice > label input { width: 22px; height: 22px; margin: 2px 0 0; accent-color: var(--color-cobalt); }
+  .ui-choice-more { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.15s; }
+  .ui-choice-more > div { overflow: hidden; }
+  .ui-choice[data-checked] .ui-choice-more { grid-template-rows: 1fr; }
+  .ui-choice[data-checked] .ui-choice-more > div { padding: 4px 0 14px 36px; }
+  .ui-choice[data-checked] > label { border-bottom-color: transparent; }
+  .ui-choice[data-checked] .ui-choice-more { border-bottom: 1px solid var(--color-rule); }
+
+  /* The phone box with its fixed +380. */
+  .ui-tel { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; min-height: 48px; background: var(--color-paper-white); box-shadow: inset 0 0 0 1px var(--color-ink-2); }
+  .ui-tel:hover { box-shadow: inset 0 0 0 1px var(--color-ink); }
+  .ui-tel:focus-within { box-shadow: inset 0 0 0 2px var(--color-cobalt); }
+  .ui-tel[data-invalid] { box-shadow: inset 0 0 0 2px var(--color-terracotta-text); }
+  .ui-tel > span { padding: 0 8px 0 14px; border-right: 1px solid var(--color-rule); font-size: 16px; line-height: 1; color: var(--color-ink-2); }
+  .ui-tel > input { min-width: 0; padding: 12px 14px; border: 0; background: transparent; color: var(--color-ink); font: inherit; font-size: 16px; letter-spacing: 0.02em; }
+  .ui-tel > input:focus { outline: 0; }
+
+  /* CartLine: photo · text · sum. */
+  .ui-cartline { display: grid; grid-template-columns: 72px minmax(0, 1fr); gap: 4px 14px; padding: 14px 0; border-bottom: 1px solid var(--color-rule); }
+  .ui-cartline-ph { position: relative; display: block; width: 72px; aspect-ratio: 4 / 5; overflow: hidden; background: var(--color-paper-2); grid-row: 1 / 3; }
+  .ui-cartline-ph img { object-fit: cover; }
+  .ui-cartline-sum { grid-column: 2; }
+  @media (min-width: 40rem) {
+    .ui-cartline { grid-template-columns: 72px minmax(0, 1fr) auto; }
+    .ui-cartline-sum { grid-column: 3; grid-row: 1 / 3; }
+  }
+
+  /* ShopToast: fixed, non-blocking, a 2px ink ring, no shadow. */
+  .ui-toast { position: fixed; z-index: 40; inset-inline: var(--spacing-gutter); bottom: calc(76px + env(safe-area-inset-bottom, 0px)); display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 2px 14px; padding: 12px 14px; background: var(--color-paper); box-shadow: inset 0 0 0 2px var(--color-ink); animation: ui-toast-in 0.2s ease-out; }
+  .ui-toast-ph { position: relative; display: block; width: 56px; aspect-ratio: 4 / 5; overflow: hidden; background: var(--color-paper-2); grid-row: 1 / 4; }
+  .ui-toast-ph img { object-fit: cover; }
+  @media (min-width: 60rem) { .ui-toast { inset-inline: auto; right: var(--spacing-gutter); top: 84px; bottom: auto; width: min(420px, calc(100vw - 2 * var(--spacing-gutter))); } }
+  @keyframes ui-toast-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+  /* CartLink on a phone: a 44px square like the search trigger, the count in the corner. */
+  .ui-cartbtn { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: var(--radius-btn); box-shadow: inset 0 0 0 2px currentColor; color: var(--color-ink); }
+  .ui-cartbtn-n { position: absolute; top: -4px; right: -4px; padding: 2px 4px; background: var(--color-ink); color: var(--color-paper); font-family: var(--font-mono); font-size: 10.5px; line-height: 1; }
+  /* In the shop on a phone the cart takes the request button's place: «лупа · кошик · Меню» fits from 360px (DESIGN.md §7.2). */
+  @media (max-width: 64.99rem) { .nav-actions:has(.ui-cartbtn[data-in-shop]) > .nav-request { display: none; } }
+
+  .ui-summary > summary::-webkit-details-marker { display: none; }
+  .ui-summary > summary .ui-faq-pm::before { content: '+'; }
+  .ui-summary[open] > summary .ui-faq-pm::before { content: '–'; }
+}

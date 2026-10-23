@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/Button'
 import { Mark } from '@/components/ui/Mark'
+import { CartLink } from '@/components/shop/CartLink.client'
 import { mainNav, requestHrefFor, simpleNav, STUDIO_JOIN_HREF, utilityNav } from '@/content/navigation'
 import { SearchHeader } from './search/SiteSearch.client'
 
@@ -142,10 +143,11 @@ export function MainNav() {
 
       <div className="nav-actions">
         <SearchHeader onOpen={() => setOpen(null)} />
+        <CartLink />
         <button type="button" className="ui-btn min-[65rem]:hidden" data-variant="ghost" data-size="sm" aria-expanded={drawer} aria-controls="mobile-menu" onClick={openDrawer}>
           Меню
         </button>
-        <Button href={request} size="sm" arrow>
+        <Button href={request} size="sm" arrow className="nav-request">
           <span className="hidden min-[65rem]:inline">Отримати пропозиції</span>
           <span className="min-[65rem]:hidden">Запит</span>
         </Button>

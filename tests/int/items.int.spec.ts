@@ -106,8 +106,8 @@ describe('reading a Wix shop', () => {
     const r = wixProducts(wixPage([product('1', 'Чашка "Мак"', true), product('2', 'Чашка Велика', false, 700)], 2), 'https://shop.test')
     expect(r.total).toBe(2)
     expect(r.products).toEqual([
-      { id: '1', name: 'Чашка "Мак"', url: 'https://shop.test/product-page/' + encodeURIComponent('чашка "мак"'), price: 950, inStock: true },
-      { id: '2', name: 'Чашка Велика', url: 'https://shop.test/product-page/' + encodeURIComponent('чашка велика'), price: 700, inStock: false },
+      { id: '1', name: 'Чашка "Мак"', url: 'https://shop.test/product-page/' + encodeURIComponent('чашка "мак"'), price: 950, inStock: true, sku: null, media: [] },
+      { id: '2', name: 'Чашка Велика', url: 'https://shop.test/product-page/' + encodeURIComponent('чашка велика'), price: 700, inStock: false, sku: null, media: [] },
     ])
     expect(wixProducts('<html></html>', 'https://shop.test')).toEqual({ products: [], total: null })
   })

@@ -35,7 +35,8 @@ export function MobileRequestBar() {
   }, [pathname])
 
   const hidden = formVisible || heroVisible
-  if (pathname?.startsWith('/zapyt')) return null
+  // The shop has its own bar (ShopBuyBar): buying is the primary action there.
+  if (pathname?.startsWith('/zapyt') || pathname?.startsWith('/kramnytsia')) return null
   return (
     <div
       data-request-bar=""

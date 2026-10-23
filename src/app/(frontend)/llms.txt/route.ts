@@ -6,6 +6,7 @@ import { cityPages, getAllStudios, offersMasterClasses, pluralUk } from '@/lib/c
 import { makerCities } from '@/lib/makers'
 import { pageName } from '@/lib/present'
 import { priceIndex } from '@/lib/priceIndex'
+import { getShopItems } from '@/lib/shopData'
 import { certificateCities, topicData } from '@/editorial/topics'
 
 // llms.txt: a plain-text map of the site for AI assistants (https://llmstxt.org).
@@ -41,6 +42,14 @@ export async function GET() {
   await section('Майстер-класи', ['mk'], mkCities.map((g) => `- [Майстер-класи з кераміки: ${pageName(g)}](${site.url}/maister-klasy/${g.city.slug}): ${g.studios.length} ${pluralUk(g.studios.length, ['місце', 'місця', 'місць'])}`))
   await section('Подарункові сертифікати', ['cert'], (await certificateCities()).map((c) => `- [Сертифікати на гончарство: ${c.name}](${site.url}/sertyfikaty/${c.slug})`))
   await section('Вироби', ['makers'])
+  // The shop: every listed item with its price, state and maker, so an assistant can answer «де купити чашку ручної роботи» with a page.
+  const shopItems = (await getShopItems()).filter((i) => i.state !== 'sold' && i.priceMin)
+  if (shopItems.length) {
+    lines.push(`## Крамниця (${shopItems.length} ${pluralUk(shopItems.length, ['виріб', 'вироби', 'виробів'])} від студій-партнерів; ціни студій, відправляє сама майстерня Новою поштою; замовлення без реєстрації)`)
+    lines.push(`- [Крамниця: кераміка ручної роботи від студій](${site.url}/kramnytsia)`)
+    for (const i of shopItems) lines.push(`- [${i.title} — ${i.studio.name}${i.studio.city ? `, ${i.studio.city}` : ''}](${site.url}${i.path}): ${i.priceMin} грн, ${i.state === 'to_order' ? 'під замовлення' : i.state === 'piece' ? 'один примірник' : 'в наявності'}${i.specs.find((s) => /об[’']єм/i.test(s.label)) ? `, ${i.specs.find((s) => /об[’']єм/i.test(s.label))!.value}` : ''}`)
+    lines.push(`- Фід товарів (Google Merchant RSS): ${site.url}/kramnytsia/feed.xml`, '')
+  }
   lines.push('## Виробники за містами', ...(await makerCities()).map((g) => `- [Кераміка ручної роботи: ${pageName(g)}](${site.url}/vyrobnyky/misto/${g.city.slug}): ${g.studios.length} студій, брендів і майстрів`), '')
   const written = await liveWrittenPages()
   const wave = written.filter((w) => w.section !== 'keysy')

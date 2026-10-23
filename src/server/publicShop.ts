@@ -6,7 +6,7 @@ import { db } from './db'
 import { cities, media, studios } from './db/schema/catalog'
 import { itemPhotos, items, type ItemSpec } from './db/schema/items'
 import { canOrder, effectiveTerms, itemState, type EffectiveTerms, type ItemState } from '../lib/shop'
-import { displayName } from '../lib/present'
+import { shopName } from '../lib/present'
 import type { ItemCategory } from '../shared/options'
 
 // What the shop pages read (docs/shop/PLAN.md): the items of partner studios (consent_requests) with their photos and
@@ -108,7 +108,7 @@ export async function loadShopItems(withHidden = false): Promise<ShopItem[]> {
       st = {
         id: s.id,
         slug: s.slug,
-        name: displayName(s),
+        name: shopName(s),
         city: cityName,
         citySlug,
         address: s.address,

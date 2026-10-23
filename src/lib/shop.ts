@@ -6,7 +6,6 @@ import {
   ORDER_STATUS_LABEL,
   PAYMENT_METHOD_LABEL,
   type DeliveryMethod,
-  type ItemCategory,
   type OrderStatus,
   type PaymentMethod,
   type ShopTerms,
@@ -21,8 +20,6 @@ export const SHOP_PATH = '/kramnytsia'
 export const SHOP_RESERVED = new Set(['koshyk', 'oformlennia', 'zamovlennia', 'feed.xml'])
 
 export const itemPath = (studioSlug: string, itemSlug: string) => `${SHOP_PATH}/${studioSlug}/${itemSlug}`
-export const studioShopPath = (studioSlug: string) => `${SHOP_PATH}/${studioSlug}`
-export const categoryPath = (c: ItemCategory) => `${SHOP_PATH}/${c}`
 
 // ---------- money
 const NBSP = ' '
@@ -33,7 +30,6 @@ export function uah(kop: number): string {
   const int = String(Math.abs(whole)).replace(/\B(?=(\d{3})+(?!\d))/g, NBSP)
   return `${whole < 0 ? '−' : ''}${int}${rest ? `,${String(rest).padStart(2, '0')}` : ''}${NBSP}грн`
 }
-export const kopFromUah = (hryvnias: number) => Math.round(hryvnias * 100)
 
 // ---------- item state
 export type ItemLike = {
@@ -120,6 +116,14 @@ export function effectiveTerms(t: ShopTerms | null | undefined, address: string 
 }
 
 export const deliveryLabel = (m: DeliveryMethod) => DELIVERY_METHOD_LABEL[m]
+/** «Нова пошта (відділення, поштомат, кур’єр), Укрпошта · за тарифами перевізника; самовивіз» — the ways in one line. */
+export function deliverySummary(ways: DeliveryMethod[], pickup: string | null = null): string {
+  const np = ways.filter((w) => w.startsWith('np_')).map((w) => ({ np_branch: 'відділення', np_postomat: 'поштомат', np_courier: 'кур’єр' })[w as 'np_branch' | 'np_postomat' | 'np_courier'])
+  const parts = [...(np.length ? [`Нова пошта (${np.join(', ')})`] : []), ...(ways.includes('ukrposhta') ? ['Укрпошта'] : [])]
+  const carrier = parts.length ? `${parts.join(', ')} · за тарифами перевізника` : ''
+  const pick = ways.includes('pickup') || pickup ? 'самовивіз' : ''
+  return [carrier, pick].filter(Boolean).join('; ')
+}
 export const paymentLabel = (m: PaymentMethod) => PAYMENT_METHOD_LABEL[m]
 /** What a payment way means for the buyer, in one line (checkout and the order page). */
 export const PAYMENT_HINT: Record<PaymentMethod, string> = {
