@@ -1,0 +1,44 @@
+/* The chat panel (src/chat/ui/ChatPanel.client.tsx): what Tailwind utilities express badly. Tokens come from the host's
+   theme (paper, cobalt, on-cobalt-2, rule-on-dark, fonts); the panel itself is a cobalt tone block. */
+@layer components {
+  .hl-chat-thread { display: grid; gap: 0; min-width: 0; }
+  .hl-chat-row { display: grid; gap: 4px; padding: 10px 0; border-top: 1px solid var(--color-rule-on-dark); min-width: 0; }
+  .hl-chat-row:first-child { border-top: 0; padding-top: 0; }
+  .hl-chat-who { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--color-on-cobalt-2); }
+  .hl-chat-text { margin: 0; font-size: 15.5px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .hl-chat-text a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  .hl-chat-row[data-role='visitor'] .hl-chat-text { color: var(--color-on-cobalt-2); }
+  .hl-chat-row[data-role='system'] { padding-block: 8px; }
+  .hl-chat-row[data-role='system'] .hl-chat-text { font-family: var(--font-mono); font-size: 12px; line-height: 1.4; letter-spacing: 0.02em; color: var(--color-on-cobalt-2); }
+  .hl-chat-row[data-role='human'] .hl-chat-who { color: var(--color-peach); }
+  /* «пише…»: three dots that rise in turn. */
+  .hl-chat-dots { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
+  .hl-chat-dots i { width: 4px; height: 4px; border-radius: 50%; background: currentColor; animation: hl-chat-dot 1.2s infinite ease-in-out; }
+  .hl-chat-dots i:nth-child(2) { animation-delay: 0.2s; }
+  .hl-chat-dots i:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes hl-chat-dot { 0%, 60%, 100% { opacity: 0.35; transform: translateY(0); } 30% { opacity: 1; transform: translateY(-2px); } }
+  .hl-chat-cursor { display: inline-block; width: 2px; height: 1em; margin-left: 2px; vertical-align: -0.15em; background: currentColor; animation: hl-chat-blink 1s steps(2) infinite; }
+  @keyframes hl-chat-blink { to { opacity: 0; } }
+  /* Suggestion chips on cobalt: mono caps in a 1.5px paper frame; hover and press fill with paper. */
+  .hl-chip { display: inline-flex; align-items: center; min-height: 36px; padding: 7px 11px; border: 0; border-radius: var(--radius-btn); background: transparent; box-shadow: inset 0 0 0 1.5px var(--color-on-cobalt-2); color: var(--color-paper); font-family: var(--font-mono); font-size: 11.5px; letter-spacing: 0.04em; line-height: 1.2; text-align: left; text-transform: uppercase; cursor: pointer; transition: background-color 0.2s, color 0.2s; }
+  @media (hover: hover) { .hl-chip:hover { background: var(--color-paper); color: var(--color-cobalt-deep); box-shadow: inset 0 0 0 1.5px var(--color-paper); } }
+  .hl-chip:active { background: var(--color-paper); color: var(--color-cobalt-deep); }
+  /* The composer: an underlined textarea (as the form's fields) with the send button beside it. */
+  .hl-chat-composer { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 10px; }
+  .hl-chat-composer textarea { width: 100%; min-width: 0; min-height: 44px; max-height: 160px; padding: 10px 0; border: 0; border-bottom: 2px solid rgb(239 233 222 / 0.6); border-radius: 0; background: transparent; color: var(--color-paper); font-family: var(--font-body); font-size: 16px; line-height: 1.4; resize: none; outline: none; }
+  .hl-chat-composer textarea::placeholder { color: rgb(239 233 222 / 0.55); }
+  .hl-chat-composer textarea:focus { border-bottom-color: var(--color-paper); }
+  .hl-chat-note { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.03em; line-height: 1.5; color: var(--color-on-cobalt-2); }
+  .hl-chat-note a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
+  /* Inline thread on a desktop column: capped, scrolls inside, newest at the bottom. */
+  .hl-chat-scroll { max-height: min(52vh, 520px); overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+  /* Full-screen on phones: a native <dialog> on cobalt, like the search dialog on paper. */
+  .hl-chat-dlg { position: fixed; inset: 0; z-index: 50; width: 100%; height: 100%; max-width: none; max-height: none; margin: 0; padding: 0; overflow: hidden; border: 0; background: var(--color-cobalt); color: var(--color-paper); }
+  .hl-chat-dlg::backdrop { background: transparent; }
+  .hl-chat-dlg[open] { display: grid; grid-template-rows: auto minmax(0, 1fr) auto; }
+  .hl-chat-dlg-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: calc(12px + env(safe-area-inset-top, 0px)) var(--spacing-gutter) 10px; border-bottom: 2px solid var(--color-paper); }
+  .hl-chat-dlg-top button { height: 44px; padding: 0 2px; border: 0; background: none; font: 400 12px/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase; color: var(--color-paper); cursor: pointer; }
+  .hl-chat-dlg-body { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 12px var(--spacing-gutter); }
+  .hl-chat-dlg-foot { display: grid; gap: 8px; padding: 8px var(--spacing-gutter) calc(10px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--color-rule-on-dark); }
+  @media (min-width: 60rem) { .hl-chat-dlg { display: none !important; } }
+}
