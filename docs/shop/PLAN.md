@@ -42,6 +42,7 @@
 - **SEO/LLM**: Product + Offer (seller = студія, `shippingDetails`, `hasMerchantReturnPolicy`, `availability`: InStock | PreOrder | SoldOut, `priceCurrency: UAH`), ItemList на списках, BreadcrumbList, `OnlineStore` на головній крамниці; усе в серверному HTML; sitemap з lastmod; feed для Merchant Center; `/kramnytsia/koshyk|oformlennia|zamovlennia` у robots disallow; продані — 200 + схожі; FAQ текстом без розмітки FAQPage.
 - **GA4**: `view_item`, `add_to_cart`, `remove_from_cart`, `begin_checkout`, `purchase` (value, currency UAH, items).
 - **Для студій**: смуга «Хочете розмістити свої вироби? Додайте студію» → `/dlya-studiy` (той самий процес: профіль → згода на запити → партнер).
+- **Про 10 % покупцю не кажемо** (власник, 25.10.2026): це умови між нами і студією; у крамниці немає пункту «10 % платить студія», FAQ про заробіток «Глини» і згадки в рядку згоди. Модель лишається на `/dlya-studiy`, `/pro-nas` і в `site.model`.
 
 ## Стан на 24.10.2026
 Зроблено на гілці `worktree-shop` (не задеплоєно): міграція 0010, сервіси замовлень і Telegram-зв'язку, публічні сторінки крамниці, кошик і оформлення, сторінка замовлення, кабінет (замовлення, підключення Telegram), панель (`/panel/zamovlennia`), скрипти `read-shops.ts PHOTOS=1` і `edit-items.ts`, 9 виробів Осоння з нашими описами й фото, фід, sitemap, llms.txt, JSON-LD, дизайн-специфікація `DESIGN.md`, 12 інтеграційних тестів замовлень. Перевірено в браузері локально: додавання в кошик → оформлення → сторінка замовлення → підтвердження і відправка в кабінеті → панель.
